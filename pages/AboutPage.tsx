@@ -3,7 +3,7 @@ import { ArrowRight, Building2, CheckCircle2, Headphones, MapPin, PackageSearch,
 import { APP_NAME, CONTACT_PHONE } from '../constants';
 import { Link } from '../context/CartContext';
 import { useReveal } from '../lib/useReveal';
-import aboutImg from './about.png';
+import aboutImg from '../public/assets/images/about.png';
 
 const priorities = [
   {

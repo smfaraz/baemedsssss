@@ -1,7 +1,7 @@
 import React from 'react';
 import { Product, Category } from './types';
-import tm from './tm.jpeg'
-import suctionImage from './suction-machine.jpg'
+import tm from './public/assets/images/tm.jpeg';
+import suctionImage from './public/assets/images/suction-machine.jpg';
 import {
   Stethoscope,
   Activity,
