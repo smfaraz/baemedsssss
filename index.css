@@ -1,0 +1,377 @@
+@import "tailwindcss";
+
+@theme {
+  /* BaeMeds identity — research-backed premium medical-retail:
+     deep navy (trust/competence) + warm off-white base (2026 warm-neutral shift)
+     + honey-amber emotional accent (prestige without medical "alarm"). Zero teal. */
+  --color-medical-primary: #14539a;
+  --color-medical-dark: #0b2239;
+  --color-medical-deep: #0f3a63;
+  --color-medical-light: #e7eef7;
+  --color-medical-text: #0b1f33;
+  --color-medical-alert: #d64545;
+  --color-medical-success: #157a52;
+  --color-medical-gray: #f4f2ec;
+  --color-medical-accent: #f2a63c;
+  --color-medical-accent-soft: #fdecd0;
+  --color-medical-secondary: #0f8a5f;
+  --color-medical-secondary-soft: #d8f0e5;
+  --color-medical-urgent: #e05a3a;
+  --color-medical-urgent-soft: #fde4dc;
+
+  --font-sans: "Inter Variable", Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-heading: "Inter Variable", Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  --shadow-soft: 0 18px 46px -26px rgba(11, 16, 48, 0.45);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  text-size-adjust: 100%;
+}
+
+body {
+  min-width: 320px;
+  margin: 0;
+  background-color: #f6f3ee;
+  color: #0b1f33;
+  font-family: "Inter Variable", Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+:focus-visible {
+  outline: 3px solid rgba(20, 83, 154, 0.45);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: #f2a63c;
+  color: #0b2239;
+}
+
+.tap-target {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+/* The gallery now exposes swipe dots; hide the legacy text hint and its broken encoding artifact. */
+section[aria-label="Product gallery"] > div:nth-child(2) p span {
+  display: none;
+}
+
+/* Remove the legacy vendor separator line that was rendering a stray mojibake "A" above titles. */
+.container > .grid > section:nth-child(2) > p:first-child {
+  display: none;
+}
+
+.safe-bottom {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+@media (min-width: 1024px) {
+  .category-tile {
+    flex: 0 0 calc((20% - 0.6rem));
+  }
+}
+
+.scrollbar-hidden {
+  scrollbar-width: none;
+}
+
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}
+
+.filter-toolbar-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #94a3b8 transparent;
+}
+
+.filter-toolbar-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.filter-toolbar-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.filter-toolbar-scroll::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: #94a3b8;
+}
+
+.filter-toolbar-scroll::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+.breathing-card {
+  animation: breathe 6s ease-in-out infinite;
+  transform-origin: center;
+  will-change: transform;
+}
+
+.hero-stage {
+  position: relative;
+  isolation: isolate;
+  background-color: #0b2239;
+}
+
+/* Fine engineering-grid texture — flat color blocks, no gradient fills. */
+.hero-stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 44px 44px;
+  opacity: 0.5;
+}
+
+.hero-stage > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Color-block section rhythm for the modern-retail feel. */
+.block-ink { background: #0b2239; color: #fff; }
+.block-blue { background: #14539a; color: #fff; }
+.block-mist { background: #e7eef7; }
+.block-sand { background: #f4f2ec; }
+
+.chip-accent {
+  background: #f2a63c;
+  color: #0b2239;
+  box-shadow: 0 12px 26px -14px rgba(242, 166, 60, 0.85);
+}
+
+/* Animated trust marquee. */
+.marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 32s linear infinite;
+}
+
+.marquee-track:hover .marquee {
+  animation-play-state: paused;
+}
+
+/* Scroll-triggered reveal (paired with IntersectionObserver adding .is-visible). */
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity 620ms cubic-bezier(0.22, 1, 0.36, 1), transform 620ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+
+.reveal-on-scroll.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+.hero-float {
+  animation: hero-float 7s ease-in-out infinite;
+}
+
+.hero-float-delay {
+  animation-delay: -3.5s;
+}
+
+.support-pulse {
+  animation: support-pulse 3.8s ease-in-out infinite;
+}
+
+.motion-lift {
+  transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .motion-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 40px -24px rgba(18, 59, 74, 0.52);
+  }
+}
+
+.stagger-grid > * {
+  animation: reveal-up 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.stagger-grid > *:nth-child(2) { animation-delay: 45ms; }
+.stagger-grid > *:nth-child(3) { animation-delay: 90ms; }
+.stagger-grid > *:nth-child(4) { animation-delay: 135ms; }
+.stagger-grid > *:nth-child(5) { animation-delay: 180ms; }
+.stagger-grid > *:nth-child(6) { animation-delay: 225ms; }
+
+.reveal-up {
+  animation: reveal-up 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.surface-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  background: #fff;
+  box-shadow: 0 14px 38px -24px rgba(18, 59, 74, 0.35);
+}
+
+.page-shell {
+  min-height: 60vh;
+  background: #f7f9fa;
+}
+
+@keyframes breathe {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+@keyframes ambient-shift {
+  from { background-position: 0% 0%; }
+  to { background-position: 100% 100%; }
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* Cart badge pop when the count changes. */
+.cart-bump {
+  animation: cart-bump 700ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes cart-bump {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.8); }
+  70% { transform: scale(0.78); }
+  100% { transform: scale(1); }
+}
+
+/* Icon wiggle on the cart control when an item is added. */
+.cart-wiggle {
+  animation: cart-wiggle 700ms ease;
+  transform-origin: 50% 10%;
+}
+
+@keyframes cart-wiggle {
+  0%, 100% { transform: rotate(0); }
+  20% { transform: rotate(-14deg); }
+  45% { transform: rotate(12deg); }
+  70% { transform: rotate(-7deg); }
+  85% { transform: rotate(4deg); }
+}
+
+/* Fly-to-cart puck that arcs a product thumbnail into the cart icon. */
+.fly-puck {
+  position: fixed;
+  z-index: 200;
+  height: 72px;
+  width: 72px;
+  overflow: hidden;
+  border-radius: 14px;
+  border: 2px solid #fff;
+  background: #fff;
+  box-shadow: 0 18px 40px -14px rgba(11, 34, 57, 0.55);
+  pointer-events: none;
+  will-change: transform, opacity;
+  transition: transform 1050ms cubic-bezier(0.5, -0.35, 0.4, 1.1), opacity 1050ms ease;
+}
+
+.fly-puck img {
+  height: 100%;
+  width: 100%;
+  object-fit: contain;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fly-puck { display: none !important; }
+  .cart-bump, .cart-wiggle { animation: none !important; }
+}
+
+@keyframes hero-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-7px) rotate(0.35deg); }
+}
+
+@keyframes reveal-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes support-pulse {
+  0%, 100% { box-shadow: 0 12px 30px -12px rgba(8, 127, 120, 0.72); }
+  50% { box-shadow: 0 16px 38px -8px rgba(8, 127, 120, 0.42); }
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #C1C1C1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #A8A8A8;
+}
+
+@media (max-width: 639px) {
+  .text-6xl,
+  .text-5xl,
+  .text-4xl {
+    font-size: 2rem !important;
+    line-height: 1.12 !important;
+  }
+
+  .text-3xl {
+    font-size: 1.75rem !important;
+    line-height: 1.18 !important;
+  }
+
+  .py-20,
+  .py-16 {
+    padding-top: 2.75rem !important;
+    padding-bottom: 2.75rem !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .reveal-on-scroll {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

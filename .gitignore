@@ -1,0 +1,19 @@
+node_modules
+dist
+.env
+
+# Screenshot sweep — keep the shared baseline, ignore regeneratable output
+audit/mobile-shots/current
+audit/mobile-shots/diff
+audit/mobile-shots/diff-report.json
+dev-run.log
+dev-server.stdout.log
+dev-server.stderr.log
+.vercel
+
+# Internal project notes stay local and are never committed.
+/*.md
+!/README.md
+/audit/*.md
+
+.vercel
