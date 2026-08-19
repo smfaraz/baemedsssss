@@ -97,6 +97,7 @@ async function prerender() {
   const routesToPrerender = [
     '/',
     '/products',
+    '/guides/oxygen-concentrator-rental-hyderabad',
     '/about',
     '/contact',
     '/bulk-orders',

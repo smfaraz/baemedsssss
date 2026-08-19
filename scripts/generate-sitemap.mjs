@@ -85,6 +85,7 @@ async function generateCompleteSitemap() {
   const staticRoutes = [
     { path: '/', priority: '1.0', changefreq: 'daily' },
     { path: '/products', priority: '0.9', changefreq: 'daily' },
+    { path: '/guides/oxygen-concentrator-rental-hyderabad', priority: '0.95', changefreq: 'weekly' },
     { path: '/bulk-orders', priority: '0.8', changefreq: 'weekly' },
     { path: '/about', priority: '0.7', changefreq: 'monthly' },
     { path: '/contact', priority: '0.7', changefreq: 'monthly' },

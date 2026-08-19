@@ -20,6 +20,7 @@ import OrderSuccessPage from './pages/OrderSuccessPage';
 import ThankYouPage from './pages/ThankYouPage';
 import NotFoundPage from './pages/NotFoundPage';
 import AdminPage from './pages/AdminPage';
+import OxygenRentalGuidePage from './pages/OxygenRentalGuidePage';
 import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
 import { ReviewsProvider } from './context/ReviewsContext';
@@ -54,6 +55,8 @@ function App() {
                 <Route path="/wishlist" element={<WishlistPage />} />
                 <Route path="/checkout" element={<CheckoutPage />} />
                 <Route path="/bulk-orders" element={<BulkOrderPage />} />
+                <Route path="/guides/oxygen-concentrator-rental-hyderabad" element={<OxygenRentalGuidePage />} />
+                <Route path="/oxygen-concentrator-rental-hyderabad" element={<OxygenRentalGuidePage />} />
                 <Route path="/about" element={<AboutPage />} />
                 <Route path="/contact" element={<ContactPage />} />
                 <Route path="/policies/privacy" element={<PolicyPage type="privacy" />} />
