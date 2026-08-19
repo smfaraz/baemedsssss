@@ -69,14 +69,18 @@ async function prerender() {
 
   let browser;
   try {
-    browser = await chromium.launch({ headless: true, channel: 'msedge' });
-  } catch (e) {
+    browser = await chromium.launch({ headless: true });
+  } catch (e1) {
     try {
-      browser = await chromium.launch({ headless: true, channel: 'chrome' });
-    } catch (err) {
-      console.warn('Could not launch system browser for prerender:', err.message);
-      server.close();
-      return;
+      browser = await chromium.launch({ headless: true, channel: 'msedge' });
+    } catch (e2) {
+      try {
+        browser = await chromium.launch({ headless: true, channel: 'chrome' });
+      } catch (err) {
+        console.warn('Prerendering skipped (browser not found in environment):', err.message);
+        server.close();
+        return;
+      }
     }
   }
 
