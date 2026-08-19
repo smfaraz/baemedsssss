@@ -204,6 +204,7 @@ const ProductDetailPage: React.FC = () => {
   if (isLoading) {
     return (
       <main className="min-h-[65vh] bg-slate-50 px-4 py-16" aria-busy="true">
+        <SEO title="Loading Product Details" canonical={id ? `/products/${id}` : '/products'} />
         <div className="mx-auto max-w-6xl animate-pulse">
           <div className="h-4 w-56 rounded bg-slate-200" />
           <div className="mt-8 grid gap-8 lg:grid-cols-2">
@@ -220,6 +221,7 @@ const ProductDetailPage: React.FC = () => {
     const whatsappFallback = `https://wa.me/${CONTACT_PHONE.replace(/\D/g, '')}?text=${encodeURIComponent('Hello Baemeds, I need help finding a product.')}`;
     return (
       <main className="min-h-[65vh] bg-slate-50 px-4 py-16">
+        <SEO title="Product Not Found" canonical={id ? `/products/${id}` : '/products'} />
         <div className="mx-auto max-w-2xl rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-soft sm:p-12">
           <Stethoscope size={48} className="mx-auto text-medical-primary" />
           <h1 className="mt-5 text-2xl font-bold text-medical-dark">{loadError ? 'Product temporarily unavailable' : 'Product not found'}</h1>
@@ -239,6 +241,7 @@ const ProductDetailPage: React.FC = () => {
       <SEO
         title={product.seo?.title || product.title}
         description={product.seo?.description || product.description?.replace(/(<([^>]+)>)/gi, '').slice(0, 160)}
+        canonical={`/products/${product.handle}`}
         ogImage={product.image}
         ogType="product"
         productData={{

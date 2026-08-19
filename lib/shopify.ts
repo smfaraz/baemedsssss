@@ -700,9 +700,11 @@ export const fetchProductsByCategory = async (category: string): Promise<Product
 };
 
 export const fetchProductByHandle = async (handle: string): Promise<Product | undefined> => {
-  const cleanHandle = cleanCatalogueText(handle);
-  const cached = allProductsCache?.find(product => product.handle === cleanHandle);
-  if (cached) return cached;
+  const cleanHandle = cleanCatalogueText(handle).toLowerCase().trim();
+  if (allProductsCache) {
+    const cached = allProductsCache.find(p => p.handle.toLowerCase() === cleanHandle || p.id === handle || p.id.endsWith(`/${handle}`));
+    if (cached) return cached;
+  }
 
   const query = `
     query getProductByHandle($handle: String!) {
@@ -713,12 +715,36 @@ export const fetchProductByHandle = async (handle: string): Promise<Product | un
   `;
   try {
     const data: any = await shopifyFetch(query, { handle: cleanHandle });
-    if (!data.product) return undefined;
-    return rememberProduct(normalizeProduct(data.product));
+    if (data?.product) {
+      return rememberProduct(normalizeProduct(data.product));
+    }
   } catch (error) {
-    console.error("Error fetching product by handle:", error);
-    return undefined;
+    console.warn("Direct GraphQL fetchProductByHandle failed; falling back to full catalogue", error);
   }
+
+  // Fallback 1: Search in full catalogue
+  try {
+    const all = await fetchAllProducts();
+    const found = all.find(p => 
+      p.handle.toLowerCase() === cleanHandle ||
+      p.handle.toLowerCase().replace(/[^a-z0-9]/g, '') === cleanHandle.replace(/[^a-z0-9]/g, '') ||
+      p.id === handle ||
+      p.id.endsWith(`/${handle}`)
+    );
+    if (found) return rememberProduct(found);
+  } catch (err) {
+    console.warn("Catalogue fallback failed", err);
+  }
+
+  // Fallback 2: Shopify Buy SDK fetchByHandle
+  try {
+    const product = await client.product.fetchByHandle(cleanHandle);
+    if (product) return rememberProduct(normalizeProduct(product));
+  } catch (err) {
+    console.error("All fetchProductByHandle attempts failed for:", cleanHandle, err);
+  }
+
+  return undefined;
 };
 
 const normalizeSearchValue = (value: unknown): string => stripHtml(value)

@@ -35,8 +35,26 @@ const SEO: React.FC<SEOProps> = ({
   productData,
 }) => {
   const fullTitle = title ? `${title} | ${APP_NAME}` : APP_NAME;
-  const canonicalPath = canonical || `${window.location.pathname}${window.location.search}`;
-  const fullCanonical = new URL(canonicalPath, SITE_URL).toString();
+  
+  // Compute clean absolute canonical URL strictly without query parameters
+  const getCleanCanonical = () => {
+    try {
+      if (canonical) {
+        // If an explicit canonical is passed (e.g. /products/handle or full URL)
+        const parsed = new URL(canonical, SITE_URL);
+        return `${SITE_URL}${parsed.pathname === '/' ? '/' : parsed.pathname.replace(/\/+$/, '')}`;
+      }
+      if (typeof window !== 'undefined' && window.location?.pathname) {
+        const path = window.location.pathname;
+        return `${SITE_URL}${path === '/' ? '/' : path.replace(/\/+$/, '')}`;
+      }
+    } catch {
+      // Fallback
+    }
+    return SITE_URL;
+  };
+
+  const fullCanonical = getCleanCanonical();
   const socialImage = ogImage ? new URL(ogImage, SITE_URL).toString() : DEFAULT_SOCIAL_IMAGE;
   const hasRating = Boolean(
     productData?.ratingValue
@@ -50,19 +68,62 @@ const SEO: React.FC<SEOProps> = ({
     name: productData.name,
     image: productData.image ? [productData.image] : undefined,
     description: productData.description,
-    sku: productData.sku,
+    sku: productData.sku || productData.name.toLowerCase().replace(/[^a-z0-9]/g, '-'),
+    mpn: productData.sku || productData.name.toLowerCase().replace(/[^a-z0-9]/g, '-'),
     brand: {
       '@type': 'Brand',
-      name: productData.brand,
+      name: productData.brand || APP_NAME,
     },
     offers: {
       '@type': 'Offer',
       url: fullCanonical,
-      priceCurrency: productData.currency,
+      priceCurrency: productData.currency || 'INR',
       price: productData.price,
+      priceValidUntil: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      itemCondition: 'https://schema.org/NewCondition',
       availability: productData.availability === 'InStock'
         ? 'https://schema.org/InStock'
         : 'https://schema.org/OutOfStock',
+      seller: {
+        '@type': 'MedicalBusiness',
+        name: APP_NAME,
+        url: SITE_URL,
+      },
+      hasMerchantReturnPolicy: {
+        '@type': 'MerchantReturnPolicy',
+        applicableCountry: 'IN',
+        returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+        merchantReturnDays: 7,
+        returnMethod: 'https://schema.org/ReturnByMail',
+        returnFees: 'https://schema.org/FreeReturn',
+      },
+      shippingDetails: {
+        '@type': 'OfferShippingDetails',
+        shippingRate: {
+          '@type': 'MonetaryAmount',
+          value: '0',
+          currency: 'INR',
+        },
+        shippingDestination: {
+          '@type': 'DefinedRegion',
+          addressCountry: 'IN',
+        },
+        deliveryTime: {
+          '@type': 'ShippingDeliveryTime',
+          handlingTime: {
+            '@type': 'QuantitativeValue',
+            minValue: 0,
+            maxValue: 1,
+            unitCode: 'd',
+          },
+          transitTime: {
+            '@type': 'QuantitativeValue',
+            minValue: 1,
+            maxValue: 4,
+            unitCode: 'd',
+          },
+        },
+      },
     },
     ...(hasRating ? {
       aggregateRating: {
