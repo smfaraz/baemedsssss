@@ -134,6 +134,83 @@ const SEO: React.FC<SEOProps> = ({
     } : {}),
   } : null;
 
+  const businessJsonLd = !productData ? {
+    '@context': 'https://schema.org',
+    '@type': 'MedicalBusiness',
+    '@id': `${SITE_URL}/#organization`,
+    name: APP_NAME,
+    url: SITE_URL,
+    logo: `${SITE_URL}/baemeds-social-preview.jpg`,
+    image: `${SITE_URL}/baemeds-social-preview.jpg`,
+    description: 'Trusted medical equipment supplier in Hyderabad & Pan-India providing hospital-grade durable medical equipment (DME), oxygen concentrators, BiPAP/CPAP machines, patient monitors, and rental healthcare equipment.',
+    telephone: '+919390349389',
+    email: 'sales@baemeds.in',
+    priceRange: '₹₹₹',
+    paymentAccepted: 'Cash, Credit Card, UPI, Bank Transfer, GST Invoice',
+    currenciesAccepted: 'INR',
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: 'Hyderabad',
+      addressLocality: 'Hyderabad',
+      addressRegion: 'Telangana',
+      postalCode: '500001',
+      addressCountry: 'IN',
+    },
+    geo: {
+      '@type': 'GeoCoordinates',
+      latitude: 17.3850,
+      longitude: 78.4867,
+    },
+    openingHoursSpecification: [
+      {
+        '@type': 'OpeningHoursSpecification',
+        dayOfWeek: [
+          'Monday',
+          'Tuesday',
+          'Wednesday',
+          'Thursday',
+          'Friday',
+          'Saturday',
+          'Sunday',
+        ],
+        opens: '00:00',
+        closes: '23:59',
+      },
+    ],
+    areaServed: [
+      {
+        '@type': 'City',
+        name: 'Hyderabad',
+      },
+      {
+        '@type': 'Country',
+        name: 'India',
+      },
+    ],
+    hasOfferCatalog: {
+      '@type': 'OfferCatalog',
+      name: 'Medical Equipment Sales & Rental Catalogue',
+      itemListElement: [
+        {
+          '@type': 'OfferCatalog',
+          name: 'Oxygen Concentrators (Sales & Rental)',
+        },
+        {
+          '@type': 'OfferCatalog',
+          name: 'BiPAP & CPAP Sleep Apnea Machines',
+        },
+        {
+          '@type': 'OfferCatalog',
+          name: 'Multipara Patient Monitors & ICU Systems',
+        },
+        {
+          '@type': 'OfferCatalog',
+          name: 'Electric Wheelchairs & Mobility Aids',
+        },
+      ],
+    },
+  } : null;
+
   return (
     <Helmet>
       <title>{fullTitle}</title>
@@ -143,6 +220,10 @@ const SEO: React.FC<SEOProps> = ({
 
       {jsonLd && (
         <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
+      )}
+
+      {businessJsonLd && (
+        <script type="application/ld+json">{JSON.stringify(businessJsonLd)}</script>
       )}
 
       <meta property="og:type" content={ogType} />
