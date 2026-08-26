@@ -373,6 +373,9 @@ const Header: React.FC = () => {
             )}
           </div>
           <Link to="/products?category=Oxygen%20Concentrator" className="hover:text-medical-primary">Respiratory care</Link>
+          <Link to="/guides/oxygen-concentrator-rental-hyderabad" className="inline-flex items-center gap-1 text-teal-800 bg-teal-50 px-2.5 py-1 rounded-lg border border-teal-200/80 hover:bg-teal-100 hover:text-teal-950 font-bold transition text-xs">
+            Oxygen Rentals
+          </Link>
           <Link to="/products?category=Patient%20Monitor" className="hover:text-medical-primary">Diagnostics</Link>
           <Link to="/products?category=Hospital%20Furniture" className="hover:text-medical-primary">Mobility & furniture</Link>
           <Link to="/bulk-orders" className="hover:text-medical-primary">Hospital orders</Link>
@@ -410,6 +413,17 @@ const Header: React.FC = () => {
               </Link>
               <Link to="/bulk-orders" onClick={closeMenu} className="flex min-h-12 items-center gap-2 rounded-xl border border-medical-primary px-3 text-sm font-bold text-medical-dark">
                 <Hospital size={18} /> Hospital orders
+              </Link>
+            </div>
+
+            <div className="mb-4">
+              <Link
+                to="/guides/oxygen-concentrator-rental-hyderabad"
+                onClick={closeMenu}
+                className="flex min-h-12 items-center justify-between rounded-xl bg-teal-50 border border-teal-200 px-3 text-sm font-bold text-teal-900 shadow-sm"
+              >
+                <span>Oxygen Rentals (Hyderabad)</span>
+                <span className="rounded bg-teal-700 px-1.5 py-0.5 text-[10px] font-bold text-white uppercase">60m Setup</span>
               </Link>
             </div>
 

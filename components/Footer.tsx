@@ -57,9 +57,10 @@ const Footer: React.FC = () => {
         </div>
 
         <div>
-          <h2 className="font-black text-white">Shop</h2>
+          <h2 className="font-black text-white">Shop &amp; Rentals</h2>
           <ul className="mt-3 space-y-1">
             <li><Link to="/products" className="inline-flex min-h-11 items-center hover:text-white">All products</Link></li>
+            <li><Link to="/guides/oxygen-concentrator-rental-hyderabad" className="inline-flex min-h-11 items-center text-emerald-400 font-semibold hover:text-white">Oxygen Rentals (Hyderabad)</Link></li>
             <li><Link to="/products?category=Oxygen%20Concentrator" className="inline-flex min-h-11 items-center hover:text-white">Respiratory care</Link></li>
             <li><Link to="/products?category=Patient%20Monitor" className="inline-flex min-h-11 items-center hover:text-white">Patient monitoring</Link></li>
             <li><Link to="/products?category=Hospital%20Furniture" className="inline-flex min-h-11 items-center hover:text-white">Hospital furniture</Link></li>
