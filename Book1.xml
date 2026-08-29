@@ -3,10 +3,10 @@
   <channel>
     <title>BAE Meds Product Feed</title>
     <link>https://baemeds.in</link>
-    <description>Live Google Merchant Center feed synchronized directly from Shopify</description>
+    <description>Live Google Merchant Center feed with optimized Shopping Title attributes and categories</description>
     <item>
       <g:id>RES-AIRSENSE10-AUTOSET-CPAP</g:id>
-      <g:title>ResMed AirSense 10 AutoSet CPAP – 4-20 cmH2O – 2 Year Warranty</g:title>
+      <g:title>ResMed AirSense 10 AutoSet CPAP Machine with Heated Humidifier — 2-Year Warranty</g:title>
       <g:description>ResMed AirSense 10 AutoSet CPAP Machine The ResMed AirSense 10 AutoSet is a reliable CPAP device designed for effective treatment of Obstructive Sleep Apnea (OSA) in both hospital and home settings. It delivers stable pressure therapy with advanced comfort features like HumidAir™ heated humidification, AutoRamp™, and EPR™ for easier breathing. Quiet operation and AirView™ remote monitoring make it a trusted choice for consistent, comfortable sleep therapy. Specifications Therapy Mode: Fixed-pressure CPAP Pressure Range: 4–20 cmH₂O Humidifier: Integrated HumidAir™ heated humidifier Climate Control: Automatic humidity &amp; temperature adjustment Noise Level: &lt; 26 dB Display: Color LCD Data Connectivity: AirView™, SD Card Ramp: AutoRamp™ with sleep onset detection EPR Levels: 1–3 selectable SmartStart: Available Power Input: 100–240V AC Dimensions: 11.6 × 25.5 × 15.0 cm Weight: Approx. 1.2 kg (device only) What’s Included in the Box AirSense 10 CPAP Device HumidAir™ Heated Humidifier Standard CPAP Tubing Power Supply Unit Pre-installed Filter User Manual Carry Bag Warranty: 2years The ResMed AirSense 10 AutoSet CPAP Machine comes with a 2-year manufacturer warranty, ensuring long-term reliability and peace of mind.</g:description>
       <g:link>https://baemeds.in/products/resmed-airsense-10-autoset</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/ChatGPT_Image_Jun_12_2026_04_05_51_PM.png?v=1781260565</g:image_link>
@@ -17,11 +17,12 @@
       <g:condition>new</g:condition>
       <g:mpn>RES-AIRSENSE10-AUTOSET-CPAP</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:product_type>CPAP machine</g:product_type>
+      <g:product_type>CPAP Machine</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>RES-LUMIS100-VPAP-ST-TRIPACK</g:id>
-      <g:title>ResMed Lumis 100 VPAP ST BIPAP Tripack</g:title>
+      <g:title>ResMed Lumis 100 VPAP ST BiPAP Tripack with HumidAir Heated Humidifier</g:title>
       <g:description>ResMed Lumis 100 VPAP ST BiPAP Tripack The ResMed Lumis 100 VPAP ST BiPAP Tripack is an advanced non-invasive ventilator designed for patients with chronic respiratory insufficiency who require spontaneous/timed (ST) bilevel therapy. It delivers precise pressure support with a backup rate to ensure consistent ventilation, while integrated humidification and intelligent comfort features enhance patient tolerance. Ideal for hospital, ICU step-down, and home-care use, it offers reliable performance with quiet operation and easy clinical monitoring. Specifications Pressure Range (IPAP/EPAP): 4–25 cm H₂O Ramp Time: Adjustable Sound Level: ≤30 dB Display: LCD screen with therapy data Connectivity: SD card and optional cloud-based data sharing Power Supply: 100–240V AC, 50/60Hz Weight: Approx. 2.2 kg Key Features ST (Spontaneous/Timed) Mode: Automatically delivers pressure support during spontaneous breathing and provides timed breaths if needed. Dual Pressure Settings (IPAP/EPAP): Independently adjustable inspiratory and expiratory pressures for enhanced comfort and effective therapy. Integrated Heated Humidifier: Reduces dryness and nasal irritation, improving comfort during therapy. Advanced Algorithms: Includes AutoRamp, EPR (Expiratory Pressure Relief), and SmartStart features for personalized therapy. Quiet Operation: Engineered for minimal noise to ensure uninterrupted sleep. User-Friendly Interface: Intuitive controls and LCD display for easy operation and monitoring. Data Management: Built-in SD card and optional cloud connectivity for compliance tracking and reporting. Travel-Ready: Lightweight and FAA-approved for use during air travel. Tripack Includes ResMed Lumis 100 VPAP ST BIPAP Device Integrated Heated Humidifier ClimateLineAir Heated Tubing Standard Tubing Air Filter Power Adapter &amp; Cord User Manual Travel Bag Warranty: 2 year</g:description>
       <g:link>https://baemeds.in/products/resmed-lumis-100-vpap-st-bipap-tripack</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/ChatGPTImageJun12_2026_03_57_52PM.png?v=1781260125</g:image_link>
@@ -32,11 +33,12 @@
       <g:condition>new</g:condition>
       <g:mpn>RES-LUMIS100-VPAP-ST-TRIPACK</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:product_type>bipap machine</g:product_type>
+      <g:product_type>BiPAP Machine</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>RES-LUMIS150-AVAPS-S10</g:id>
-      <g:title>BIPAP RESMED AVAPS LUMIS 150 S10 SERIES</g:title>
+      <g:title>ResMed Lumis 150 VPAP ST with iVAPS (S10 Series) BiPAP Non-Invasive Ventilator</g:title>
       <g:description>ResMed Lumis 150 AVAPS BiPAP – S10 Series The ResMed Lumis 150 AVAPS BiPAP (S10 Series) is an advanced non-invasive ventilation device designed for patients requiring targeted volume-assured pressure support. With AVAPS technology, it automatically adjusts pressure to maintain consistent tidal volume, ensuring stable and effective ventilation. Built for hospital, long-term care, and home use, it combines intelligent therapy modes, patient comfort features, and quiet performance for reliable respiratory support. Key Features – ResMed Lumis 150 AVAPS BiPAP (S10 Series) AVAPS (Average Volume Assured Pressure Support) for consistent tidal volume delivery Automatically adjusts pressure to meet patient ventilation needs Multiple therapy modes including S, ST, T, and AVAPS Integrated HumidAir™ heated humidifier for enhanced comfort Intelligent Backup Rate (iBR™) ensures reliable breathing support AutoEPAP to maintain upper airway patency Easy-Breathe waveform for natural, comfortable breathing Climate Control for optimal humidity and temperature regulation Quiet operation suitable for hospital and home environments Color LCD display with intuitive clinician and patient menus Built-in SD card &amp; AirView™ connectivity for therapy monitoring Advanced leak compensation for consistent therapy delivery Compact S10 platform design for portability and durability ResMed Lumis 150 AVAPS BiPAP – S10 Series (Quick Specs) Therapy Type: BiPAP / Non-invasive ventilation Modes: S, ST, T, AVAPS, AutoEPAP Pressure Range: Up to 25 cmH₂O AVAPS: Automatic volume-assured pressure support Backup Rate: Intelligent Backup Rate (iBR™) Humidifier: Integrated HumidAir™ heated humidifier Display: Color LCD Connectivity: SD Card, AirView™ Noise Level: Quiet operation Use: Hospital, long-term care &amp; home use Warranty: 2 years</g:description>
       <g:link>https://baemeds.in/products/bipap-resmed-avaps-lumis-150-s10-series</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/ChatGPTImageJun12_2026_03_52_44PM.png?v=1781259777</g:image_link>
@@ -47,11 +49,12 @@
       <g:condition>new</g:condition>
       <g:mpn>RES-LUMIS150-AVAPS-S10</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:product_type>bipap machine</g:product_type>
+      <g:product_type>BiPAP Machine</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>RES-AIRSENSE11-AUTOSET-TRI4G</g:id>
-      <g:title>RESMED AIRSENSE 11 AUTOSET TRI 4G</g:title>
+      <g:title>ResMed AirSense 11 AutoSet Tri 4G Auto-CPAP with Cellular Connectivity</g:title>
       <g:description>ResMed AirSense 11 AutoSet TRI 4G The ResMed AirSense 11 AutoSet TRI 4G is a next-generation auto-adjusting CPAP device designed for effective treatment of Obstructive Sleep Apnea (OSA). It features intelligent pressure adjustment, enhanced comfort technologies, and built-in 4G connectivity for seamless remote monitoring. With a modern touchscreen interface and quiet operation, it is ideal for both home and clinical use. Key Features – TRI 4G AirStart APAP Auto-adjusting pressure therapy for Obstructive Sleep Apnea (OSA) 4G connectivity for seamless remote monitoring Intelligent auto-pressure response to patient breathing Quiet, reliable operation for night-long comfort Easy-to-use interface with simple controls Compact, travel-friendly design Quick Specs – TRI 4G AirStart APAP Therapy Type: Auto PAP (APAP) Pressure Range: ~4–20 cmH₂O (standard range) Connectivity: Built-in 4G Humidifier: Optional / integrated (depending on model) Noise Level: Low (suitable for home use) Display: Clear control panel / screen Power: 100–240 V AC, travel compatible Use: Home &amp; clinical sleep therapy Warranty: 2 year</g:description>
       <g:link>https://baemeds.in/products/resmed-airsense-11-autoset-tri-4g</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/928dbe97-159b-43bd-b92a-683b89bb03eb.png?v=1781259458</g:image_link>
@@ -62,11 +65,12 @@
       <g:condition>new</g:condition>
       <g:mpn>RES-AIRSENSE11-AUTOSET-TRI4G</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:product_type>CPAP machine</g:product_type>
+      <g:product_type>CPAP Machine</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>RES-AIRSTART-APAP-S10-37365</g:id>
-      <g:title>AIRSTART APAP RESMED S10 37365</g:title>
+      <g:title>ResMed AirStart 10 APAP Auto-Adjusting CPAP Machine</g:title>
       <g:description>AIRSTART APAP – ResMed S10 (37365) The ResMed AIRSTART APAP S10 (37365) is an auto-adjusting positive airway pressure device designed to support effective management of Obstructive Sleep Apnea (OSA). It continuously monitors breathing patterns and automatically adjusts pressure levels throughout the night to deliver personalized therapy. Engineered for reliability and ease of use, the device operates quietly and features a simple user interface, making it suitable for both home and clinical sleep therapy environments. Warranty: 2 Year</g:description>
       <g:link>https://baemeds.in/products/airstart-apap-resmed-s10-37365</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/6080de5b-f631-451b-979e-b628ae98ebcd.png?v=1781258119</g:image_link>
@@ -77,11 +81,12 @@
       <g:condition>new</g:condition>
       <g:mpn>RES-AIRSTART-APAP-S10-37365</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:product_type>CPAP machine</g:product_type>
+      <g:product_type>CPAP Machine</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>PHI-DREAMSTATION-AUTO-CPAP-IAX500S15</g:id>
-      <g:title>PHILIPS RESPIRONICS DREAMSTATION AUTO CPAP IAX500S15</g:title>
+      <g:title>Philips Respironics DreamStation Auto CPAP Sleep Apnea Machine (IAX500S15)</g:title>
       <g:description>Philips Respironics DreamStation Auto CPAP (IAX500S15) The Philips Respironics DreamStation Auto CPAP (IAX500S15) is a modern, reliable sleep therapy device that automatically adjusts airway pressure throughout the night to treat Obstructive Sleep Apnea (OSA). Engineered for comfort and compliance, it offers intuitive controls, quiet operation, and advanced connectivity options, making it ideal for both home and clinical sleep care. ⭐ Key Features Auto-adjusting airway pressure for personalized sleep therapy Intelligent response to breathing patterns Comfort features for improved tolerance and adherence Quiet and smooth operation for restful sleep Easy-to-navigate user interface Compatible with remote monitoring systems Compact, travel-friendly design 📊 Quick Specs Therapy Type: Auto CPAP (APAP) Pressure Range: Approx. 4–20 cmH₂O (standard) Humidity: Optional humidifier support Noise Level: Low (suitable for bedroom use) Display: Clear, user-friendly screen Power: 100–240 V AC Use: Home and clinical sleep therapy Warranty: 2 Years</g:description>
       <g:link>https://baemeds.in/products/philips-respironics-dreamstation-auto-cpap-iax500s15</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/6355450b-7032-45a4-b5c2-ed46a3966f6a.png?v=1781257758</g:image_link>
@@ -92,11 +97,12 @@
       <g:condition>new</g:condition>
       <g:mpn>PHI-DREAMSTATION-AUTO-CPAP-IAX500S15</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:product_type>CPAP machine</g:product_type>
+      <g:product_type>CPAP Machine</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>OXY-BIPAP-AIRSMART-ST25</g:id>
-      <g:title>OXYMED BIPAP AIRSMART ST 25</g:title>
+      <g:title>Oxymed AirSmart ST25 BiPAP Machine for COPD &amp; Respiratory Support</g:title>
       <g:description>OxyMed BiPAP AirSmart ST 25 The OxyMed BiPAP AirSmart ST 25 is a reliable bilevel positive airway pressure device designed to deliver effective respiratory support for patients with sleep apnea and hypoventilation disorders. Featuring Spontaneous/Timed (ST) mode, it ensures consistent breathing support with an intelligent backup rate. Compact, quiet, and easy to use, it’s ideal for home care and clinical respiratory therapy. Key Features BiPAP therapy with ST mode for spontaneous &amp; timed support Intelligent backup rate (iBR) for consistent ventilation Smooth pressure transitions for improved comfort Quiet operation suitable for bedroom/home use User-friendly controls and interface Compact and portable design Quick Specs Therapy Type: BiPAP (ST mode) Pressure Range: Up to ~25 cmH₂O (typical) Modes Supported: S, ST Humidifier: Optional/compatible accessory Display: Simple user interface Noise Level: Low (home-friendly) Power: 100–240 V AC Use: Home &amp; clinical respiratory support Warranty: 3 years</g:description>
       <g:link>https://baemeds.in/products/oxymed-bipap-airsmart-st-25</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/d8d2660b-a99f-449a-abcc-0a48dd9793be_17d0d175-7e21-4e9f-ba7d-b26e89791313.png?v=1781257363</g:image_link>
@@ -107,11 +113,12 @@
       <g:condition>new</g:condition>
       <g:mpn>OXY-BIPAP-AIRSMART-ST25</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:product_type>bipap machine</g:product_type>
+      <g:product_type>BiPAP Machine</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>OXY-BIPAP-AIRSMART-ST30</g:id>
-      <g:title>OXYMED BIPAP AIRSMART ST 30</g:title>
+      <g:title>Oxymed AirSmart ST30 High Pressure BiPAP Machine with S/T Modes</g:title>
       <g:description>OxyMed BiPAP AirSmart ST 30 The OxyMed BiPAP AirSmart ST 30 is a comfortable and reliable bilevel positive airway pressure device designed to support patients with sleep apnea and respiratory insufficiency. Featuring Spontaneous/Timed (ST) mode with intelligent backup rate, it provides dependable ventilatory assistance while maximizing comfort. Its quiet performance and intuitive interface make it suitable for both home and clinical use. ⭐ Key Features BiPAP therapy with ST mode (spontaneous + timed support) Intelligent Backup Rate (iBR) for consistent breathing support Smooth pressure transitions enhance patient comfort Quiet operation ideal for bedroom/home environment Easy-to-use controls and interface Compact, travel-friendly design 📊 Quick Specs Therapy Type: BiPAP with ST mode Pressure Range: Up to ~30 cmH₂O (typical) Modes Supported: S, ST Humidifier: Optional / compatible accessory Display: Simple user interface Noise Level: Low, home-friendly Power Input: 100–240 V AC Use: Home &amp; clinical respiratory support Warranty: 3 years</g:description>
       <g:link>https://baemeds.in/products/oxymed-bipap-airsmart-st-30</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/d8d2660b-a99f-449a-abcc-0a48dd9793be_9f0df65a-9623-4e2f-83cb-8b6562676605.png?v=1781256867</g:image_link>
@@ -122,11 +129,12 @@
       <g:condition>new</g:condition>
       <g:mpn>OXY-BIPAP-AIRSMART-ST30</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:product_type>bipap machine</g:product_type>
+      <g:product_type>BiPAP Machine</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>OXY-BIPAP-ISERIES-B5</g:id>
-      <g:title>BIPAP AUTO OXYMED ISERIES B5</g:title>
+      <g:title>Oxymed iSeries B5 Auto BiPAP Machine with Dynamic Humidification</g:title>
       <g:description>OxyMed iSeries B5 BiPAP Auto The OxyMed iSeries B5 BiPAP Auto is an advanced automatic bilevel positive airway pressure device designed to provide effective respiratory support for patients with Obstructive Sleep Apnea (OSA) and related breathing disorders. It automatically adjusts pressure based on real-time breathing patterns for personalized comfort. Quiet operation and intuitive controls make it ideal for home and clinical respiratory therapy. ⭐ Key Features Auto BiPAP therapy with automatic pressure adjustment Intelligent response to patient breathing patterns Smooth and comfortable pressure transitions Quiet operation suitable for home or clinical settings Easy-to-use interface Compact, portable design 📊 Quick Specs Therapy Type: Auto BiPAP Pressure Range: Approx. 4–25 cmH₂O (typical) Modes Supported: Auto BiPAP (auto-adjusting) Humidifier: Optional / compatible accessory Display: Simple user interface Noise Level: Low, bedroom-friendly Power: 100–240 V AC Use: Home &amp; clinical respiratory support Warranty: 3 years</g:description>
       <g:link>https://baemeds.in/products/bipap-auto-oxymed-iseries-b5</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/a99a6950-93b8-4920-aeb5-4ef21e1a2fb6.png?v=1781256500</g:image_link>
@@ -137,7 +145,8 @@
       <g:condition>new</g:condition>
       <g:mpn>OXY-BIPAP-ISERIES-B5</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:product_type>bipap machine</g:product_type>
+      <g:product_type>BiPAP Machine</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>OXY-CPAP-ISERIES-C5</g:id>
@@ -152,11 +161,12 @@
       <g:condition>new</g:condition>
       <g:mpn>OXY-CPAP-ISERIES-C5</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:product_type>CPAP machine</g:product_type>
+      <g:product_type>CPAP Machine</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>BMC-BIPAP-G2S-B30VT</g:id>
-      <g:title>BMC BIPAP G2S B30VT</g:title>
+      <g:title>BMC Resmart G2S B30VT BiPAP Machine with Target Tidal Volume (VT)</g:title>
       <g:description>BMC BiPAP G2S B30VT The BMC BiPAP G2S B30VT is a high-performance bilevel positive airway pressure device designed for patients with respiratory insufficiency and sleep-related breathing disorders. It provides stable, comfortable ventilation support with advanced bilevel modes and intuitive controls. A reliable choice for both home and clinical respiratory therapy. Warranty 1 Year Manufacturer Warranty</g:description>
       <g:link>https://baemeds.in/products/bmc-bipap-g2s-b30vt</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/900dbdcd-8079-4bea-bf8b-28b46c58a95d.png?v=1781256104</g:image_link>
@@ -167,11 +177,12 @@
       <g:condition>new</g:condition>
       <g:mpn>BMC-BIPAP-G2S-B30VT</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:product_type>bipap machine</g:product_type>
+      <g:product_type>BiPAP Machine</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>BMC-CPAP-SYSTEM-G2S</g:id>
-      <g:title>BMC AUTO CPAP SYSTEM G2S</g:title>
+      <g:title>BMC Resmart G2S Auto CPAP Machine with Integrated Heated Humidifier</g:title>
       <g:description>Description The BMC G2S A20 Auto CPAP System is an advanced sleep therapy device designed to treat obstructive sleep apnea (OSA) by delivering continuous positive airway pressure. It features an auto-adjusting pressure system that responds to apnea, hypopnea, and snoring events in real time, ensuring effective and comfortable therapy throughout the night. The device comes with an integrated heated humidifier to reduce dryness and improve comfort, along with a user-friendly interface and quiet operation, making it suitable for both home and clinical use. It also supports data tracking via SD card and software/app, helping monitor therapy performance. Warranty 1 Year Manufacturer Warranty</g:description>
       <g:link>https://baemeds.in/products/bmc-auto-cpap-system-g2s</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/b2983602-323b-4bba-9022-9264c62188d4.png?v=1781255732</g:image_link>
@@ -182,11 +193,12 @@
       <g:condition>new</g:condition>
       <g:mpn>BMC-CPAP-SYSTEM-G2S</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:product_type>CPAP machine</g:product_type>
+      <g:product_type>CPAP Machine</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>OXY-O2CONC-MINI-5LPM</g:id>
-      <g:title>OXYGEN CONCENTRATOR OXYMED MINI 5LPM -SALE</g:title>
+      <g:title>Oxymed Mini 5 LPM Medical Grade Oxygen Concentrator</g:title>
       <g:description>OxyMed Mini 5 LPM Oxygen Concentrator (For Sale) The OxyMed Mini 5 LPM Oxygen Concentrator is a compact and reliable oxygen therapy device that delivers a continuous flow of medical-grade oxygen up to 5 liters per minute. Designed for home, travel, or clinical use, it offers quiet operation, easy controls, and efficient performance — ideal for patients needing daily supplemental oxygen. ⭐ Key Features Continuous oxygen delivery up to 5 LPM Compact, space-saving design Quiet and energy-efficient operation Simple and intuitive controls Built-in safety alarms Low maintenance and reliable performance Suitable for home, clinic, or travel use 📊 Quick Specs Oxygen Flow: Up to 5 LPM (continuous) Oxygen Purity: Typically ≥ 93 ± 3 % Power: 220–240 V AC (model dependent) Noise Level: Low (home-friendly) Display: Simple indicator panel Alarms: Power failure, low oxygen purity, high temp Use: Home &amp; clinical supplemental oxygen therapy Warranty: 3 years</g:description>
       <g:link>https://baemeds.in/products/oxygen-concentrator-oxymed-mini-5lpm-for-sale</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/fbdd4e9e-ddc9-4d15-b5c7-c4b674aeff24.png?v=1781255379</g:image_link>
@@ -198,10 +210,11 @@
       <g:mpn>OXY-O2CONC-MINI-5LPM</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:product_type>Oxygen Concentrator</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>BPL-O2CONC-5LPM</g:id>
-      <g:title>OXYGEN CONCENTRATOR BPL 5LPM</g:title>
+      <g:title>BPL 5 LPM Stationary Oxygen Concentrator for Home Oxygen Therapy</g:title>
       <g:description>BPL 5 LPM Oxygen Concentrator The BPL 5 LPM Oxygen Concentrator is a reliable and efficient oxygen therapy device designed to provide a continuous flow of medical-grade oxygen up to 5 liters per minute. Ideal for home, clinical, or emergency use, this model combines quiet operation with user-friendly controls and built-in safety features for everyday oxygen support. ⭐ Key Features Continuous oxygen delivery up to 5 LPM Quiet operation suitable for home and clinical environments Simple, easy-to-use control panel Built-in safety alarms (power failure, purity, overheat) Stable and durable design Low maintenance and efficient performance 📊 Quick Specs Oxygen Flow: Up to 5 LPM (continuous) Oxygen Purity: Typically ≥ 93 ± 3 % Power Requirement: 220–240 V AC (model dependent) Noise Level: Low (home-suitable) Display: Indicator panel Alarms: Power, low oxygen, high temperature Use: Home, clinic &amp; emergency supplemental oxygen therapy</g:description>
       <g:link>https://baemeds.in/products/oxygen-concentrator-bpl-5lpm</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/ChatGPTImageJun12_2026_02_15_36PM.png?v=1781253952</g:image_link>
@@ -213,10 +226,11 @@
       <g:mpn>BPL-O2CONC-5LPM</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:product_type>Oxygen Concentrator</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>OLI-O2CONC-OLIVE</g:id>
-      <g:title>OXYGEN CONCENTRATOR OLIVE</g:title>
+      <g:title>Olive 5 LPM Medical Oxygen Concentrator for Home Care</g:title>
       <g:description>Olive Oxygen Concentrator The Olive Oxygen Concentrator is a dependable medical device designed to provide a continuous flow of oxygen for patients requiring supplemental oxygen therapy. With quiet operation, easy controls, and efficient performance, it’s suitable for home, clinical, or emergency use. ⭐ Key Features Continuous oxygen delivery (flow rate depends on model) Quiet and efficient performance Easy-to-use control panel Built-in safety alarms (power failure, purity, overheating) Stable and durable design for everyday use Low maintenance and energy-efficient 📊 Quick Specs Oxygen Flow: (Model dependent — e.g., up to 5 LPM typical) Oxygen Purity: Typically ≥ 93 ± 3 % Power Requirement: 220–240 V AC Noise Level: Low (home-friendly) Display: Simple indicator panel Alarms: Power failure, low purity, high temperature Use: Home, clinical &amp; emergency oxygen support</g:description>
       <g:link>https://baemeds.in/products/oxygen-concentrator-olive</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/ChatGPTImageJun12_2026_02_12_24PM.png?v=1781253776</g:image_link>
@@ -228,10 +242,11 @@
       <g:mpn>OLI-O2CONC-OLIVE</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:product_type>Oxygen Concentrator</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>RES-AIRFIT-N20-MASK-M</g:id>
-      <g:title>AIRFIT N20 MASK (RESMED) (M)</g:title>
+      <g:title>ResMed AirFit N20 Nasal CPAP Mask with Comfort Headgear (Size M)</g:title>
       <g:description>AirFit N20 Nasal CPAP Mask – Medium (M) | ResMed The ResMed AirFit N20 (Medium) is a nasal CPAP mask designed for comfort, stability, and reliable performance during sleep therapy. Its minimal-contact design and soft cushion help create a secure seal while reducing facial pressure, making it suitable for nightly use. Engineered with QuietAir™ vent technology, the mask helps diffuse exhaled air gently for a quieter and more comfortable sleep environment. The flexible frame adapts to facial contours, providing a stable fit even with movement during sleep.</g:description>
       <g:link>https://baemeds.in/products/airfit-n20-mask-resmed-m</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/ChatGPT_Image_Jun_12_2026_02_04_06_PM.png?v=1781253271</g:image_link>
@@ -242,11 +257,12 @@
       <g:condition>new</g:condition>
       <g:mpn>RES-AIRFIT-N20-MASK-M</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:product_type>CPAP Mask</g:product_type>
+      <g:product_type>CPAP &amp; BiPAP Mask</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>GEN-2-CHANNEL-TENS</g:id>
-      <g:title>2 CHANNEL TENS</g:title>
+      <g:title>2-Channel TENS with Ultrasound Electrotherapy Physiotherapy Unit</g:title>
       <g:description>High-quality 2 CHANNEL TENS. Order online at the best price with fast delivery. Warranty: 1 year.</g:description>
       <g:link>https://baemeds.in/products/2-channel-tens</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/ChatGPTImageJun12_2026_02_00_31PM.png?v=1781253047</g:image_link>
@@ -257,11 +273,12 @@
       <g:condition>new</g:condition>
       <g:mpn>GEN-2-CHANNEL-TENS</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:product_type>TENS Unit</g:product_type>
+      <g:product_type>Physiotherapy Device</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Alternative &amp; Holistic Health</g:google_product_category>
     </item>
     <item>
       <g:id>GEN-4-CHANNEL-TENS</g:id>
-      <g:title>4 CHANNEL TENS</g:title>
+      <g:title>4-Channel TENS with Ultrasound Digital Physiotherapy Pain Relief Machine</g:title>
       <g:description>High-quality 4 CHANNEL TENS. Order online at the best price with fast delivery. Warranty: 1 year.High-quality 4 Channel TENS unit designed for effective pain management and muscle stimulation. Features independent control of 4 channels for targeted therapeutic relief. Ideal for treating chronic pain, muscle soreness, and post-injury recovery. Easy-to-use interface with adjustable intensity settings. Durable construction built to last. Comes with 1-year warranty. Order online at competitive prices with fast delivery across India.</g:description>
       <g:link>https://baemeds.in/products/4-channel-tens</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/ChatGPTImageJun12_2026_01_54_12PM.png?v=1781252665</g:image_link>
@@ -272,11 +289,12 @@
       <g:condition>new</g:condition>
       <g:mpn>GEN-4-CHANNEL-TENS</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:product_type>TENS Unit</g:product_type>
+      <g:product_type>Physiotherapy Device</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Alternative &amp; Holistic Health</g:google_product_category>
     </item>
     <item>
       <g:id>ACC-ACCU-CHEK-INSTA</g:id>
-      <g:title>ACCU CHEK INSTANT S WITH 10 STRIP</g:title>
+      <g:title>Accu-Chek Instant S Blood Glucose Meter (with 10 Strips &amp; Lancing Device)</g:title>
       <g:description>ACCU-CHEK Instant S is a reliable blood glucose monitoring system designed for accurate diabetes management. This compact meter delivers results in just 5 seconds, requiring only a small 0.6µL blood sample for testing. The system features an intuitive display and simple operation, making it suitable for daily glucose tracking. Included are 10 test strips to get you started with consistent monitoring. Ideal for individuals managing type 1 or type 2 diabetes, this meter provides the precision and ease of use you need for effective blood sugar control. Warranty: Lifetime</g:description>
       <g:link>https://baemeds.in/products/accu-chek-instant-s-with-10-strip</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/ChatGPTImageJun12_2026_01_49_03PM.png?v=1781252371</g:image_link>
@@ -288,10 +306,11 @@
       <g:mpn>ACC-ACCU-CHEK-INSTA</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:product_type>Glucometer</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Medical Tests &amp; Monitors</g:google_product_category>
     </item>
     <item>
       <g:id>ACC-ACCU-CHEK-INSTA</g:id>
-      <g:title>ACCU CHEK INSTANT WITH 10 STRIP</g:title>
+      <g:title>Accu-Chek Instant Blood Glucose Monitoring System (with 10 Strips)</g:title>
       <g:description>High-quality ACCU CHEK INSTANT WITH 10 STRIP. Order online at the best price with fast delivery and warranty. Warranty: Lifetime</g:description>
       <g:link>https://baemeds.in/products/accu-chek-instant-with-10-strip</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/d813b672-0a09-4262-b792-dfd35412f736.png?v=1781252001</g:image_link>
@@ -303,10 +322,11 @@
       <g:mpn>ACC-ACCU-CHEK-INSTA</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:product_type>Glucometer</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Medical Tests &amp; Monitors</g:google_product_category>
     </item>
     <item>
       <g:id>ACC-ACCUSURE-AUTOMA</g:id>
-      <g:title>ACCUSURE AUTOMATIC DIGITAL BLOOD PRESSURE MONITOR</g:title>
+      <g:title>ACCUSURE AUTOMATIC DIGITAL BLOOD PRESSURE MONITOR — Patient Monitor</g:title>
       <g:description>High-quality ACCUSURE AUTOMATIC DIGITAL BLOOD PRESSURE MONITOR. Order online at the best price with fast delivery and warranty. Warranty: 5 years</g:description>
       <g:link>https://baemeds.in/products/accusure-automatic-digital-blood-pressure-monitor</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/a307fb0a-495f-4421-960f-c3e6985261a0.png?v=1781251688</g:image_link>
@@ -318,10 +338,11 @@
       <g:mpn>ACC-ACCUSURE-AUTOMA</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:product_type>BP Monitor</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Medical Tests &amp; Monitors</g:google_product_category>
     </item>
     <item>
       <g:id>ACC-ACCUSURE-SIMPLE</g:id>
-      <g:title>ACCUSURE SIMPLE WITH 10 STRIP</g:title>
+      <g:title>AccuSure Simple Blood Glucose Monitoring System (with 10 Strips)</g:title>
       <g:description>High-quality ACCUSURE SIMPLE WITH 10 STRIP. Order online at the best price with fast delivery and warranty. Warranty: Lifetime</g:description>
       <g:link>https://baemeds.in/products/accusure-simple-with-10-strip</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/303f0869-531d-4542-b408-34d31617207b.png?v=1781251450</g:image_link>
@@ -333,10 +354,11 @@
       <g:mpn>ACC-ACCUSURE-SIMPLE</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:product_type>Glucometer</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Medical Tests &amp; Monitors</g:google_product_category>
     </item>
     <item>
       <g:id>RES-AIRFIT-F20-FULL</g:id>
-      <g:title>AIRFIT F20 FULL FACE MASK (RESMED) (M)</g:title>
+      <g:title>ResMed AirFit F20 Full Face CPAP/BiPAP Mask with InfinitySeal Cushion (Size M)</g:title>
       <g:description>High-quality AIRFIT F20 FULL FACE MASK (RESMED) (M). Order online at the best price with fast delivery and warranty.</g:description>
       <g:link>https://baemeds.in/products/airfit-f20-full-face-mask-resmed-m</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/BCO.08ee9841-dd53-48ee-9886-d45e93cb5f60.png?v=1781239237</g:image_link>
@@ -347,11 +369,12 @@
       <g:condition>new</g:condition>
       <g:mpn>RES-AIRFIT-F20-FULL</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:product_type>CPAP Mask</g:product_type>
+      <g:product_type>CPAP &amp; BiPAP Mask</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>GEN-AMARA-GEL-FULL-</g:id>
-      <g:title>AMARA GEL FULL FACE MASK</g:title>
+      <g:title>Philips Respironics Amara Gel Full Face CPAP Mask</g:title>
       <g:description>High-quality AMARA GEL FULL FACE MASK. Order online at the best price with fast delivery and warranty.</g:description>
       <g:link>https://baemeds.in/products/amara-gel-full-face-mask</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/BCO.7a942006-fca1-4098-8a3f-216a72e29aaa.png?v=1781237765</g:image_link>
@@ -362,11 +385,12 @@
       <g:condition>new</g:condition>
       <g:mpn>GEN-AMARA-GEL-FULL-</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:product_type>CPAP Mask</g:product_type>
+      <g:product_type>CPAP &amp; BiPAP Mask</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>GEN-BESTFIT-FULL-FA</g:id>
-      <g:title>BESTFIT FULL FACE MASK</g:title>
+      <g:title>BestFit Full Face CPAP/BiPAP Mask with Quick Release Clips</g:title>
       <g:description>High-quality BESTFIT FULL FACE MASK. Order online at the best price with fast delivery and warranty.</g:description>
       <g:link>https://baemeds.in/products/bestfit-full-face-mask</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/BCO.ce41b233-504f-4b6e-891d-54200fd87555.png?v=1781237573</g:image_link>
@@ -377,11 +401,12 @@
       <g:condition>new</g:condition>
       <g:mpn>GEN-BESTFIT-FULL-FA</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:product_type>CPAP Mask</g:product_type>
+      <g:product_type>CPAP &amp; BiPAP Mask</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>BEU-BEURER-BLOOD-RE</g:id>
-      <g:title>BEURER BLOOD RESSURE MONITOR BM27</g:title>
+      <g:title>BEURER BLOOD RESSURE MONITOR BM27 — Patient Monitor</g:title>
       <g:description>High-quality BEURER BLOOD RESSURE MONITOR BM27. Order online at the best price with fast delivery and warranty. Warranty: 5 years</g:description>
       <g:link>https://baemeds.in/products/beurer-blood-ressure-monitor-bm27</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/82608ec0-d83d-4472-91fc-22ee689db0e4.png?v=1781237430</g:image_link>
@@ -393,10 +418,11 @@
       <g:mpn>BEU-BEURER-BLOOD-RE</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:product_type>BP Monitor</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Medical Tests &amp; Monitors</g:google_product_category>
     </item>
     <item>
       <g:id>BEU-BEURER-BLOOD-RE</g:id>
-      <g:title>BEURER BLOOD RESSURE MONITOR BM36</g:title>
+      <g:title>BEURER BLOOD RESSURE MONITOR BM36 — Patient Monitor</g:title>
       <g:description>The Beurer Blood Pressure Monitor BM36 is an automatic upper-arm blood pressure monitor designed for accurate measurement of systolic pressure, diastolic pressure, and pulse rate. Manufactured by Beurer, it is suitable for regular home monitoring and clinical use. The device features a clear digital display and simple operation, enabling quick and reliable readings. Its compact and user-friendly design supports consistent blood pressure tracking for effective cardiovascular health management. Key Features Automatic upper-arm blood pressure measurement Displays systolic, diastolic, and pulse rate Clear and easy-to-read digital display Simple, user-friendly operation Suitable for home and clinical use High-quality BEURER BLOOD RESSURE MONITOR BM36. Order online at the best price with fast delivery and warranty. Warranty: 5 years</g:description>
       <g:link>https://baemeds.in/products/beurer-blood-ressure-monitor-bm36</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/baa7b52c-2658-4a4d-9926-3ee914e1b5e7.png?v=1781237099</g:image_link>
@@ -408,10 +434,11 @@
       <g:mpn>BEU-BEURER-BLOOD-RE</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:product_type>BP Monitor</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Medical Tests &amp; Monitors</g:google_product_category>
     </item>
     <item>
       <g:id>BEU-BEURER-BLOOD-RE</g:id>
-      <g:title>BEURER BLOOD RESSURE MONITOR BM46</g:title>
+      <g:title>BEURER BLOOD RESSURE MONITOR BM46 — Patient Monitor</g:title>
       <g:description>The Beurer Blood Pressure Monitor BM46 is an automatic upper-arm blood pressure monitor designed for accurate and reliable measurement of systolic pressure, diastolic pressure, and pulse rate. Manufactured by Beurer, it is suitable for both home monitoring and clinical use. The device features a large, easy-to-read display and simple one-button operation, ensuring user convenience and clear result interpretation. It supports regular blood pressure monitoring for effective cardiovascular health management. Key Features Automatic upper-arm blood pressure measurement Displays systolic, diastolic, and pulse rate Large, clear digital display Simple and user-friendly operation Suitable for home and clinical use High-quality BEURER BLOOD RESSURE MONITOR BM46. Order online at the best price with fast delivery and warranty. Warranty: 5 years</g:description>
       <g:link>https://baemeds.in/products/beurer-blood-ressure-monitor-bm46</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/4905d611-eb02-430f-b778-4d1b26b0db60.png?v=1781236963</g:image_link>
@@ -423,10 +450,11 @@
       <g:mpn>BEU-BEURER-BLOOD-RE</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:product_type>BP Monitor</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Medical Tests &amp; Monitors</g:google_product_category>
     </item>
     <item>
       <g:id>BPL-BLOOD-PRESSURE-</g:id>
-      <g:title>BLOOD PRESSURE DIGITAL BPL-120</g:title>
+      <g:title>BPL 120 Fully Automatic Digital Blood Pressure Monitor</g:title>
       <g:description>The Blood Pressure Digital BPL-120 is an automatic digital blood pressure monitor designed for accurate and reliable measurement of systolic pressure, diastolic pressure, and pulse rate. It is suitable for both home monitoring and clinical use. The device features a clear digital display for easy reading and simple one-touch operation for user convenience. Designed to deliver consistent and dependable results, the BPL-120 supports regular blood pressure monitoring for effective health management. Key Features Automatic digital blood pressure measurement Displays systolic, diastolic, and pulse rate Easy one-button operation Clear, easy-to-read digital display Suitable for home and clinical use High-quality BLOOD PRESSURE DIGITAL BPL-120. Order online at the best price with fast delivery and warranty. Warranty : 3 years</g:description>
       <g:link>https://baemeds.in/products/blood-pressure-digital-bpl-120</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/a7baea75-68ca-4782-8540-60c298209f33.png?v=1781236833</g:image_link>
@@ -437,11 +465,12 @@
       <g:condition>new</g:condition>
       <g:mpn>BPL-BLOOD-PRESSURE-</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:product_type>BP Monitor</g:product_type>
+      <g:product_type>Blood Pressure Monitor</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Medical Tests &amp; Monitors</g:google_product_category>
     </item>
     <item>
       <g:id>BMC-BMC-F6-FULL-FAC</g:id>
-      <g:title>BMC F6 FULL FACE MASK</g:title>
+      <g:title>BMC F6 Full Face Mask for CPAP &amp; BiPAP Therapy</g:title>
       <g:description>The BMC F6 Full Face Mask is designed to provide effective and comfortable CPAP therapy for patients requiring both nasal and oral airflow support. It features a soft full-face cushion that delivers a secure seal while minimizing pressure and skin irritation. The lightweight and ergonomic design ensures stable performance during sleep, even for active sleepers. Easy to fit, clean, and maintain, the BMC F6 Full Face Mask is suitable for long-term home and clinical use and is compatible with most standard CPAP devices. Key Features Soft full-face cushion for enhanced comfort Provides both nasal and oral airflow Secure fit with reduced air leakage Quiet airflow for uninterrupted sleep Lightweight, patient-friendly design Compatible with standard CPAP machine. High-quality BMC F6 FULL FACE MASK. Order online at the best price with fast delivery and warranty.</g:description>
       <g:link>https://baemeds.in/products/bmc-f6-full-face-mask</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/7dbc25be-feeb-43d9-86ef-58fb7da82cc3.png?v=1781236568</g:image_link>
@@ -452,11 +481,12 @@
       <g:condition>new</g:condition>
       <g:mpn>BMC-BMC-F6-FULL-FAC</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:product_type>CPAP Mask</g:product_type>
+      <g:product_type>CPAP &amp; BiPAP Mask</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>BMC-BMC-N5-NASAL-MA</g:id>
-      <g:title>BMC N5 NASAL MASK</g:title>
+      <g:title>BMC N5 Ultra-Light Nasal CPAP Mask with Silicone Cushion</g:title>
       <g:description>The BMC N5 Nasal Mask is a lightweight CPAP nasal interface designed for effective and comfortable sleep apnea therapy. It features a soft nasal cushion that provides a stable seal while reducing pressure on the nasal area for improved patient comfort. The ergonomic design supports natural movement during sleep and helps minimize air leakage. Easy to fit, clean, and maintain, the BMC N5 Nasal Mask is suitable for both home and clinical use and is compatible with most standard CPAP devices. Key Features Soft nasal cushion for enhanced comfort Lightweight and minimal-contact design Secure fit with reduced leakage Quiet airflow for uninterrupted sleep Compatible with standard CPAP machines High-quality BMC N5 NASAL MASK. Order online at the best price with fast delivery and warranty.</g:description>
       <g:link>https://baemeds.in/products/bmc-n5-nasal-mask</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/9ccf7a45-4ffd-4b45-8705-b826a69e88ee.png?v=1781236283</g:image_link>
@@ -467,11 +497,12 @@
       <g:condition>new</g:condition>
       <g:mpn>BMC-BMC-N5-NASAL-MA</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:product_type>CPAP Mask</g:product_type>
+      <g:product_type>CPAP &amp; BiPAP Mask</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>BMC-BMC-N5A-NASAL-M</g:id>
-      <g:title>BMC N5A NASAL MASK</g:title>
+      <g:title>BMC N5A Auto-Adjusting Nasal CPAP Mask with Headgear</g:title>
       <g:description>The BMC N5A Nasal Mask is a compact CPAP nasal interface designed for effective and comfortable sleep apnea therapy. Developed by BMC, it features a soft nasal cushion that ensures a stable seal while reducing pressure and skin irritation. Its lightweight design supports patient comfort during prolonged use and allows natural movement during sleep. The mask is easy to fit, clean, and maintain, making it suitable for both home and clinical CPAP therapy. Key Features Soft nasal cushion for improved patient comfort Lightweight and minimal-contact design Secure fit with reduced air leakage Quiet airflow for uninterrupted sleep Compatible with standard CPAP devices High-quality BMC N5A NASAL MASK. Order online at the best price with fast delivery and warranty.</g:description>
       <g:link>https://baemeds.in/products/bmc-n5a-nasal-mask</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/f97b4c45-0b79-4ee2-99e2-2314b8980b2b.png?v=1781236081</g:image_link>
@@ -482,11 +513,12 @@
       <g:condition>new</g:condition>
       <g:mpn>BMC-BMC-N5A-NASAL-M</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:product_type>CPAP Mask</g:product_type>
+      <g:product_type>CPAP &amp; BiPAP Mask</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>BMC-BMC-P2-NASAL-MA</g:id>
-      <g:title>BMC P2 NASAL MASK</g:title>
+      <g:title>Oxymed P2 Ultra-Portable Oxygen Concentrator with Rechargeable Battery</g:title>
       <g:description>The BMC P2 Nasal Mask is a lightweight CPAP nasal interface designed to deliver effective and comfortable sleep apnea therapy. It features a soft nasal cushion that provides a secure seal while minimizing pressure on the face, ensuring stable performance throughout the night. The ergonomic design supports natural movement during sleep and helps reduce mask leaks. Easy to assemble and maintain, the BMC P2 is compatible with most standard CPAP devices and is suitable for long-term clinical use. Key Features Soft nasal cushion for patient comfort Lightweight, minimal-contact design Secure fit with reduced air leakage Quiet airflow for uninterrupted sleep Compatible with standard CPAP machines High-quality BMC P2 NASAL MASK. Order online at the best price with fast delivery and warranty.</g:description>
       <g:link>https://baemeds.in/products/bmc-p2-nasal-mask</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/865b5e84-4199-4289-befc-ef02c7f41251.png?v=1781235855</g:image_link>
@@ -497,11 +529,12 @@
       <g:condition>new</g:condition>
       <g:mpn>BMC-BMC-P2-NASAL-MA</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:product_type>CPAP Mask</g:product_type>
+      <g:product_type>Oxygen Concentrator</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>BPL-BPL-COMPRESSOR-</g:id>
-      <g:title>BPL COMPRESSOR NEBULIZER N8</g:title>
+      <g:title>BPL N8 Compact Compressor Nebulizer for Child &amp; Adult Respiratory Therapy</g:title>
       <g:description>The BPL Compressor Nebulizer N8 is a reliable medical device designed for effective aerosol delivery in the treatment of respiratory conditions such as asthma, COPD, and bronchitis. Manufactured by BPL, it ensures efficient medication delivery to the lower respiratory tract. The device features a powerful compressor for consistent nebulization and is suitable for both adult and pediatric use. Its durable construction and easy operation make it ideal for home and clinical settings. Key Features Efficient compressor-based nebulization Suitable for adults and children Consistent aerosol output for effective therapy Easy to operate and maintain Suitable for home and clinical use Warranty: 2 years High-quality BPL COMPRESSOR NEBULIZER N8. Order online at the best price with fast delivery and warranty.</g:description>
       <g:link>https://baemeds.in/products/bpl-compressor-nebulizer-n8</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/ChatGPTImageJun11_2026_11_01_16PM.png?v=1781199146</g:image_link>
@@ -513,10 +546,11 @@
       <g:mpn>BPL-BPL-COMPRESSOR-</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:product_type>Nebulizer</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>BPL-CARDIART-6208-V</g:id>
-      <g:title>CARDIART 6208 VIEWPLUS 3 CHANNEL ECG BPL</g:title>
+      <g:title>BPL Cardiart 6208 ViewPlus 3-Channel Digital ECG Machine with Interpretation</g:title>
       <g:description>The Cardiart 6208 ViewPlus 3-Channel ECG is a reliable electrocardiograph designed for accurate cardiac monitoring and diagnosis. Manufactured by BPL, it records and displays high-quality 3-channel ECG waveforms for clinical assessment. The device features a clear display for real-time waveform viewing and supports efficient ECG acquisition in hospitals, clinics, and diagnostic centers. Its user-friendly operation and dependable performance make it suitable for routine cardiac evaluations. Key Features 3-channel ECG recording Clear display for real-time waveform viewing Accurate and reliable cardiac monitoring User-friendly operation Suitable for hospitals, clinics, and diagnostic centers High-quality CARDIART 6208 VIEWPLUS 3 CHANNEL ECG BPL. Order online at the best price with fast delivery. Warranty: 1 year.</g:description>
       <g:link>https://baemeds.in/products/cardiart-6208-viewplus-3-channel-ecg-bpl</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/ChatGPTImageJun11_2026_10_56_48PM.png?v=1781198923</g:image_link>
@@ -528,10 +562,11 @@
       <g:mpn>BPL-CARDIART-6208-V</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:product_type>ECG Machine</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Medical Tests &amp; Monitors</g:google_product_category>
     </item>
     <item>
       <g:id>COM-COMFO-CARE-NEBU</g:id>
-      <g:title>COMFO CARE NEBULIZER COMPRESSOR SYSTEM CN-01WA</g:title>
+      <g:title>Comfo Care CN-01WA Piston Compressor Nebulizer Machine</g:title>
       <g:description>The Comfo Care Nebulizer Compressor System CN-01WA is designed for effective aerosol medication delivery in the management of respiratory conditions such as asthma, bronchitis, and COPD. It provides consistent nebulization to ensure efficient drug delivery to the respiratory tract. The system features a reliable compressor mechanism and user-friendly operation, making it suitable for both adult and pediatric patients. Durable and easy to maintain, it is ideal for home as well as clinical use. Key Features Compressor-based nebulization system Efficient aerosol delivery for respiratory therapy Suitable for adults and children Simple operation and easy maintenance Suitable for home and clinical use High-quality COMFO CARE NEBULIZER COMPRESSOR SYSTEM CN-01WA. Order online at the best price with fast delivery and warranty. Warranty: 3 years</g:description>
       <g:link>https://baemeds.in/products/comfo-care-nebulizer-compressor-system-cn-01wa</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/ChatGPTImageJun11_2026_10_54_06PM.png?v=1781198666</g:image_link>
@@ -542,10 +577,11 @@
       <g:mpn>COM-COMFO-CARE-NEBU</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:product_type>Nebulizer</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>COM-COMFO-CARE-NEBU</g:id>
-      <g:title>COMFO CARE NEBULIZER COMPRESSOR SYSTEM CN-02MC</g:title>
+      <g:title>Comfo Care CN-02MC Compressor Nebulizer System with Medication Cup</g:title>
       <g:description>The COMFO CARE NEBULIZER COMPRESSOR SYSTEM CN-02MC delivers reliable aerosol medication delivery for patients requiring consistent respiratory therapy. This compressor-driven nebulizer system features a robust motor designed for frequent clinical and home use, ensuring efficient medication atomization with minimal residual volume. The CN-02MC model offers quiet operation and durable construction, making it suitable for extended treatment sessions. Ideal for healthcare facilities and patients managing chronic respiratory conditions, this system provides dependable performance and ease of maintenance for long-term therapeutic support. High-quality COMFO CARE NEBULIZER COMPRESSOR SYSTEM CN-02MC. Order online at the best price with fast delivery and warranty. Warranty: 3 years</g:description>
       <g:link>https://baemeds.in/products/comfo-care-nebulizer-compressor-system-cn-02mc</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/ChatGPTImageJun11_2026_10_51_28PM.png?v=1781198499</g:image_link>
@@ -557,10 +593,11 @@
       <g:mpn>COM-COMFO-CARE-NEBU</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:product_type>Nebulizer</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>COM-COMFO-CARE-PORT</g:id>
-      <g:title>COMFO CARE PORTABLE SUCTION MACHINE</g:title>
+      <g:title>Comfo Care Portable Phlegm Suction Unit with Overflow Protection</g:title>
       <g:description>Description The Comfo Care Portable Suction Machine is a medical aspirator designed to remove mucus, blood, saliva, and other secretions from the airway, helping patients breathe comfortably. It is widely used in home care, hospitals, and emergency situations, especially for patients with respiratory conditions or post-surgery needs. The device comes with a complete setup including suction catheter, tubing, filters, and collection jar, making it ready for immediate use. It features an oil-free pump system for low maintenance, adjustable suction control, and portable design, ensuring safe, efficient, and easy operation for caregivers. Warranty 1 Year Manufacturer Warranty</g:description>
       <g:link>https://baemeds.in/products/comfo-care-portable-suction-machine</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/ChatGPTImageJun11_2026_10_47_45PM.png?v=1781198276</g:image_link>
@@ -572,10 +609,11 @@
       <g:mpn>COM-COMFO-CARE-PORT</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:product_type>Suction Machine</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>GEN-COMFORTGEL-BLUE</g:id>
-      <g:title>COMFORTGEL BLUE FULL FACE MASK</g:title>
+      <g:title>Philips Respironics ComfortGel Blue Full Face CPAP Mask with Headgear</g:title>
       <g:description>The ComfortGel Blue Full Face Mask delivers reliable, comfortable respiratory support for extended wear. Engineered with gel-infused cushioning technology, it minimizes pressure points and skin irritation while maintaining a secure seal. The wide field of vision and intuitive headgear design ensure easy adjustment and consistent fit across varied facial contours. Ideal for sleep apnea therapy, non-invasive ventilation, and respiratory care settings where comfort and performance matter. Durable silicone construction withstands frequent cleaning and long-term use. High-quality COMFORTGEL BLUE FULL FACE MASK. Order online at the best price with fast delivery and warranty.</g:description>
       <g:link>https://baemeds.in/products/comfortgel-blue-full-face-mask</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/385854e0-abb6-4954-b59d-39e355d34cb2.png?v=1781197961</g:image_link>
@@ -586,11 +624,12 @@
       <g:condition>new</g:condition>
       <g:mpn>GEN-COMFORTGEL-BLUE</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:product_type>CPAP Mask</g:product_type>
+      <g:product_type>CPAP &amp; BiPAP Mask</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>CON-CONTEC-INFRARED</g:id>
-      <g:title>CONTEC INFRARED THERMOMETER</g:title>
+      <g:title>Contec Non-Contact Infrared Forehead Thermometer</g:title>
       <g:description>Description The Contec Infrared Thermometer (TP500) is a non-contact digital thermometer designed to measure body temperature quickly and safely without physical contact, reducing the risk of cross-infection. It uses infrared sensing technology to detect temperature from a short distance, making it ideal for home use, hospitals, clinics, and public screening. The device provides fast readings within 1 second with high accuracy (±0.2°C) and features a large backlit LCD display, fever alarm, and memory storage (up to 32 readings) for easy monitoring. It also includes auto shut-off and long battery life, making it convenient for regular use across all age groups. Warranty 1 Year Manufacturer Warranty</g:description>
       <g:link>https://baemeds.in/products/contec-infrared-thermometer</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/4128fd41-e985-43a7-93df-4efc09a5fff4.png?v=1781197625</g:image_link>
@@ -601,10 +640,11 @@
       <g:mpn>CON-CONTEC-INFRARED</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:product_type>Thermometer</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Medical Tests &amp; Monitors</g:google_product_category>
     </item>
     <item>
       <g:id>GEN-DEC-MOUNT-PORTA</g:id>
-      <g:title>DEC MOUNT PORTABLE OXYGEN CONCENTRATOR</g:title>
+      <g:title>DEC Mount Portable Oxygen Concentrator with Pulse Flow Battery</g:title>
       <g:description>Description The DEC (Deckmount) Portable Oxygen Concentrator is a compact, lightweight device designed to provide medical-grade oxygen therapy for patients with respiratory conditions such as COPD, asthma, and low oxygen levels. It uses pulse dose technology with optional continuous mode, delivering oxygen based on the user’s breathing pattern for efficient and reliable therapy. With a weight of around 1.5–2 kg, it is highly portable and suitable for home use, travel, and outdoor mobility. The device delivers ≥90% oxygen purity across multiple flow settings (1–5 pulse levels + continuous mode), ensuring consistent oxygen supply. It also features a detachable rechargeable battery (up to ~4 hours backup), quiet operation, safety alarms, and a user-friendly display, making it convenient and safe for daily use. Warranty 1 Year Manufacturer Warranty on device</g:description>
       <g:link>https://baemeds.in/products/dec-mount-portable-oxygen-concentrator</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/15981a32-c90b-49d1-ae60-904e6baf0824.png?v=1781197170</g:image_link>
@@ -616,10 +656,11 @@
       <g:mpn>GEN-DEC-MOUNT-PORTA</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:product_type>Oxygen Concentrator</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>EZ-DIGITAL-THERMOM</g:id>
-      <g:title>DIGITAL THERMOMETER EZ LIFE</g:title>
+      <g:title>EZ Life Flexible Tip Digital Clinical Thermometer</g:title>
       <g:description># DIGITAL THERMOMETER EZ LIFE Accurate temperature readings in seconds with the EZ Life Digital Thermometer, designed for reliable home and clinical use. Features a large, easy-to-read LCD display and fast measurement technology that delivers results in under 60 seconds. The flexible tip ensures comfortable placement for all ages, while the automatic shutoff conserves battery life. Includes memory function to track previous readings and comes with replaceable batteries. Ideal for families, clinics, and healthcare facilities requiring dependable vital sign monitoring. High-quality DIGITAL THERMOMETER EZ LIFE. Order online at the best price with fast delivery and warranty.</g:description>
       <g:link>https://baemeds.in/products/digital-thermometer-ez-life</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/4bce9206-1e40-4b3f-a8bb-c911067bb04a.png?v=1781196938</g:image_link>
@@ -631,10 +672,11 @@
       <g:mpn>EZ-DIGITAL-THERMOM</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:product_type>Thermometer</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Medical Tests &amp; Monitors</g:google_product_category>
     </item>
     <item>
       <g:id>DR-DR-MOREPEN-GLUC</g:id>
-      <g:title>DR MOREPEN  GLUCO ONE WITH 25STRIP</g:title>
+      <g:title>EVOX-5S 5 LPM Stationary Oxygen Concentrator for Home &amp; Clinical Care</g:title>
       <g:description>The Dr. Morepen Gluco One is a reliable blood glucose monitoring system designed for accurate diabetes management. This complete kit includes 25 test strips, enabling consistent daily monitoring of blood sugar levels. The device features a simple, user-friendly interface suitable for both patients and healthcare settings. With rapid results and minimal blood sample requirements, it supports effective glucose tracking for better health outcomes. Ideal for individuals managing type 1 or type 2 diabetes who need dependable, affordable monitoring solutions. High-quality DR MOREPEN GLUCO ONE WITH 25STRIP. Order online at the best price with fast delivery and warranty. Warranty: Lifetime</g:description>
       <g:link>https://baemeds.in/products/dr-morepen-gluco-one-with-25strip</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/3af3c599-f81f-4a07-9d73-842fbd7ced7a.png?v=1781196565</g:image_link>
@@ -645,11 +687,12 @@
       <g:condition>new</g:condition>
       <g:mpn>DR-DR-MOREPEN-GLUC</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:product_type>Glucometer</g:product_type>
+      <g:product_type>Oxygen Concentrator</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>DR-DR-TRUST-DIGITA</g:id>
-      <g:title>DR TRUST DIGITAL THERMOMETER 604</g:title>
+      <g:title>Dr Trust 604 Waterproof Digital Clinical Thermometer</g:title>
       <g:description>DR TRUST DIGITAL THERMOMETER 604 delivers fast, accurate temperature readings in just 10 seconds with its advanced infrared sensor technology. The large LCD display ensures easy visibility in any lighting condition, while the memory function stores up to 32 previous readings for convenient health tracking. Featuring a non-contact design, it minimizes cross-contamination risk—ideal for clinical settings and home use. Low battery indicator and automatic shutoff extend battery life. Clinically validated for reliability, this thermometer is an essential tool for healthcare professionals and families alike. High-quality DR TRUST DIGITAL THERMOMETER 604. Order online at the best price with fast delivery and warranty.</g:description>
       <g:link>https://baemeds.in/products/dr-trust-digital-thermometer-604</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/42b0bdb5-ac60-491a-a3ba-1c4af8c8f6d8.png?v=1781196024</g:image_link>
@@ -661,10 +704,11 @@
       <g:mpn>DR-DR-TRUST-DIGITA</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:product_type>Thermometer</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Medical Tests &amp; Monitors</g:google_product_category>
     </item>
     <item>
       <g:id>DR-DR-TRUST-PROFIS</g:id>
-      <g:title>DR TRUST PROFISSIONAL DIGITAL BLOOD PRESSURE MONITOR 122</g:title>
+      <g:title>DR TRUST PROFISSIONAL DIGITAL BLOOD PRESSURE MONITOR 122 — Patient Monitor</g:title>
       <g:description>The DR TRUST Professional Digital Blood Pressure Monitor 122 delivers clinical-grade accuracy for reliable home health monitoring. This advanced device features automatic inflation technology and a large digital display for easy reading, making regular blood pressure checks straightforward and hassle-free. With memory storage for multiple readings, you can track trends over time to share with your healthcare provider. The ergonomic arm cuff ensures comfortable fit and consistent measurements. Ideal for individuals managing hypertension or those requiring routine cardiovascular monitoring, this monitor combines professional-grade performance with user-friendly operation for dependable daily use. High-quality DR TRUST PROFISSIONAL DIGITAL BLOOD PRESSURE MONITOR 122. Order online at the best price with fast delivery and warranty. Warranty: 3 years</g:description>
       <g:link>https://baemeds.in/products/dr-trust-profissional-digital-blood-pressure-monitor-122</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/b3eac2f0-5673-4908-8fec-0ced49d62be3.png?v=1781195631</g:image_link>
@@ -676,10 +720,11 @@
       <g:mpn>DR-DR-TRUST-PROFIS</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:product_type>BP Monitor</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Medical Tests &amp; Monitors</g:google_product_category>
     </item>
     <item>
       <g:id>DR-DR-TRUST-TITANI</g:id>
-      <g:title>DR TRUST TITANIUM COMPRESSOR NEBULIZER 409</g:title>
+      <g:title>Dr Trust Titanium 409 Heavy Duty Compressor Nebulizer with Mask Kit</g:title>
       <g:description>DR TRUST TITANIUM COMPRESSOR NEBULIZER 409 The DR TRUST Titanium Compressor Nebulizer 409 delivers reliable aerosol therapy with advanced compressor technology designed for consistent medication delivery. Built with a durable titanium-reinforced construction, this nebulizer operates quietly while maintaining optimal particle size for deep lung penetration. Ideal for treating asthma, COPD, and other respiratory conditions, it features a high-capacity medicine cup and adjustable mist output settings. The ergonomic design accommodates both adult and pediatric patients, with a straightforward assembly process and minimal maintenance requirements. Backed by clinical-grade performance standards, this nebulizer is a trusted choice for home healthcare and clinical settings seeking dependable respiratory care solutions. High-quality DR TRUST TITANIUM COMPRESSOR NEBULIZER 409. Order online at the best price with fast delivery and warranty. Warranty: 2 year</g:description>
       <g:link>https://baemeds.in/products/dr-trust-titanium-compressor-nebulizer-409</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/1b6b33cb-42e7-4d63-96a1-7aba3e6d6f03.png?v=1781195300</g:image_link>
@@ -691,10 +736,11 @@
       <g:mpn>DR-DR-TRUST-TITANI</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:product_type>Nebulizer</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>GEN-EASYCURA-PHENOM</g:id>
-      <g:title>EASYCURA (PHENOMOCARE) FULL FACE MASK</g:title>
+      <g:title>EasyCura PneumoCare Full Face CPAP Mask with Dual Silicone Cushion</g:title>
       <g:description>The EASYCURA Full Face Mask by Phenomocare delivers comprehensive facial protection with a secure, ergonomic fit designed for extended wear. Engineered with premium materials, this mask provides reliable barrier protection while maintaining comfort during prolonged use. The full-face design ensures complete coverage, making it ideal for healthcare professionals, facility staff, and individuals requiring dependable respiratory protection. Features a adjustable headgear system for a customized fit across various face sizes. Meets stringent safety standards for medical and industrial applications. Choose EASYCURA for professional-grade protection you can trust. High-quality EASYCURA (PHENOMOCARE) FULL FACE MASK. Order online at the best price with fast delivery and warranty.</g:description>
       <g:link>https://baemeds.in/products/easycura-phenomocare-full-face-mask</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/6e08ea17-e15e-4566-ab28-191e5935a86c.png?v=1781194753</g:image_link>
@@ -705,11 +751,12 @@
       <g:condition>new</g:condition>
       <g:mpn>GEN-EASYCURA-PHENOM</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:product_type>CPAP Mask</g:product_type>
+      <g:product_type>CPAP &amp; BiPAP Mask</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>EZ-EZ-LIFE-INFRARE</g:id>
-      <g:title>EZ LIFE INFRARED THERMOMETER</g:title>
+      <g:title>EZ Life Non-Contact Infrared Digital Body Thermometer</g:title>
       <g:description># EZ LIFE INFRARED THERMOMETER Advanced non-contact temperature measurement for clinical and home use. This infrared thermometer delivers fast, accurate readings in just one second without physical contact, reducing cross-contamination risk. Features a large LCD display for easy reading, memory function to track temperature history, and automatic shutoff to conserve battery life. Ideal for healthcare facilities, clinics, and families seeking reliable, hygienic temperature monitoring. Meets medical-grade accuracy standards for professional and personal applications. High-quality EZ LIFE INFRARED THERMOMETER. Order online at the best price with fast delivery. Warranty: 1 year.</g:description>
       <g:link>https://baemeds.in/products/ez-life-infrared-thermometer</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/e3e14055-25b9-450f-9ed9-7c5d63062843.png?v=1781193425</g:image_link>
@@ -721,10 +768,11 @@
       <g:mpn>EZ-EZ-LIFE-INFRARE</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:product_type>Thermometer</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Medical Tests &amp; Monitors</g:google_product_category>
     </item>
     <item>
       <g:id>EZ-EZ-LIFE-PISTON-</g:id>
-      <g:title>EZ LIFE PISTON COMPRESSOR NEBULIZER EX-1303</g:title>
+      <g:title>EZ Life Piston Compressor Nebulizer EX-1303 for Home Asthma Care</g:title>
       <g:description>The EZ LIFE Piston Compressor Nebulizer EX-1303 delivers reliable aerosol medication delivery for respiratory care. Engineered with a durable piston compressor mechanism, this nebulizer converts liquid medications into fine mist for effective inhalation therapy. Ideal for treating asthma, COPD, and other respiratory conditions, it features consistent performance and minimal maintenance requirements. Compact design suits clinical and home-care settings. Trusted by healthcare professionals for dependable nebulization across diverse patient populations. High-quality EZ LIFE PISTON COMPRESSOR NEBULIZER EX-1303. Order online at the best price with fast delivery. warranty: 18 months.</g:description>
       <g:link>https://baemeds.in/products/ez-life-piston-compressor-nebulizer-ex-1303</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/7d3f1f6e-ab1c-4eae-8cc7-d0ceeb8d1a58.png?v=1781191575</g:image_link>
@@ -736,6 +784,7 @@
       <g:mpn>EZ-EZ-LIFE-PISTON-</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:product_type>Nebulizer</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>GEN-F4-FULL-FACE-MA</g:id>
@@ -750,11 +799,12 @@
       <g:condition>new</g:condition>
       <g:mpn>GEN-F4-FULL-FACE-MA</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:product_type>CPAP Mask</g:product_type>
+      <g:product_type>CPAP &amp; BiPAP Mask</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>PHI-FULL-FACE-MASK-</g:id>
-      <g:title>FULL FACE MASK IMAGE3 W/HGR PHILIPS RESPIRONICS</g:title>
+      <g:title>Philips Respironics Image3 Full Face CPAP Mask with Headgear</g:title>
       <g:description>The Philips Respironics Image3 Full Face Mask with Headgear delivers reliable, comfortable therapy for patients requiring non-invasive ventilation or CPAP treatment. Engineered with a wide field of vision and intuitive design, this mask minimizes pressure points while maintaining an effective seal. The included headgear system ensures secure positioning and easy adjustment for personalized fit. Ideal for healthcare facilities and home care settings, the Image3 combines durability with patient compliance—critical factors in respiratory therapy success. Compatible with Philips Respironics systems for seamless integration into existing treatment protocols. High-quality FULL FACE MASK IMAGE3 W/HGR PHILIPS RESPIRONICS. Order online at the best price with fast delivery and warranty.</g:description>
       <g:link>https://baemeds.in/products/full-face-mask-image3-w-hgr-philips-respironics</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/ba73460a-8cac-44e6-b526-f6aca31b688b.png?v=1781190578</g:image_link>
@@ -765,11 +815,12 @@
       <g:condition>new</g:condition>
       <g:mpn>PHI-FULL-FACE-MASK-</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:product_type>CPAP Mask</g:product_type>
+      <g:product_type>CPAP &amp; BiPAP Mask</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>GEN-GILMA-INFRARED-</g:id>
-      <g:title>GILMA INFRARED THERMOMETER</g:title>
+      <g:title>Gilma Digital Non-Contact Infrared Forehead Thermometer</g:title>
       <g:description>Description The Gilma Infrared Thermometer is a non-contact digital temperature measuring device designed to check body temperature quickly and safely without direct contact. It uses infrared sensing technology to detect temperature from a short distance, helping reduce the risk of cross infection. It provides instant readings within 1 second, making it ideal for home use, hospitals, clinics, and public screening. The device features a large LCD display with backlight, fever alarm, and memory storage, allowing easy monitoring of temperature trends. It can measure both body and surface temperature and supports readings in Celsius and Fahrenheit. Warranty 1 Year Manufacturer Warranty</g:description>
       <g:link>https://baemeds.in/products/gilma-infrared-thermometer</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/84153132-6836-4483-8f3c-547ababee113.png?v=1781190212</g:image_link>
@@ -781,10 +832,11 @@
       <g:mpn>GEN-GILMA-INFRARED-</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:product_type>Thermometer</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Medical Tests &amp; Monitors</g:google_product_category>
     </item>
     <item>
       <g:id>LIF-LIFE-LINE-COMPR</g:id>
-      <g:title>LIFE LINE COMPRESSOR NEBULIZER  NEBB045</g:title>
+      <g:title>Life Line NEBB045 Portable Compressor Nebulizer Machine</g:title>
       <g:description>Description The LIFE LINE Compressor Nebulizer (NEBB045) is a medical device designed to convert liquid medication into a fine mist (aerosol), allowing it to be inhaled directly into the lungs for fast and effective respiratory treatment. It is suitable for patients suffering from asthma, bronchitis, COPD, and other breathing disorders. The device features a piston compressor system, ensuring consistent medication delivery with clinical accuracy. It is easy to operate with a single-button function, lightweight, and comes with a complete nebulization kit, making it ideal for both adults and children in home or clinical settings. Warranty 1 Year Manufacturer Warranty</g:description>
       <g:link>https://baemeds.in/products/life-line-compressor-nebulizer-nebb045</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/82621452-645c-4ca2-84f6-c1bd7460b4f8.png?v=1781189540</g:image_link>
@@ -796,10 +848,11 @@
       <g:mpn>LIF-LIFE-LINE-COMPR</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:product_type>Nebulizer</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>LIF-LIFE-LINE-PORTA</g:id>
-      <g:title>LIFE LINE PORTABLE SUCTION MACHINE</g:title>
+      <g:title>Life Line Portable Medical Suction Apparatus for Airway Management</g:title>
       <g:description>Description The LIFE LINE Portable Suction Machine is a compact, electrically operated medical device used to remove mucus, saliva, blood, or other fluids from the airway, helping patients maintain clear breathing. It is suitable for home care, hospitals, clinics, and emergency situations, especially for patients with respiratory conditions or post-surgical care. It features an oil-free piston pump system that provides reliable suction with low maintenance, along with adjustable pressure control for safe and customized use. The machine also includes a 1000 ml collection bottle and overflow protection system, ensuring hygienic and safe operation. Its portable and lightweight design makes it convenient for caregivers to use and transport. Warranty 1 Year Manufacturer Warranty</g:description>
       <g:link>https://baemeds.in/products/life-line-portable-suction-machine</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/730da225-9683-479d-a41b-3a443be5ed7d.png?v=1781187446</g:image_link>
@@ -811,10 +864,11 @@
       <g:mpn>LIF-LIFE-LINE-PORTA</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:product_type>Suction Machine</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>GEN-LONGLIFE595-BLO</g:id>
-      <g:title>LONGLIFE595 BLOOD PRESSURE MONITOR</g:title>
+      <g:title>LONGLIFE595 BLOOD PRESSURE MONITOR — Patient Monitor</g:title>
       <g:description>Description The Long life 595 Blood Pressure Monitor is a fully automatic upper-arm digital device designed for accurate measurement of blood pressure and pulse rate at home or in clinical use. It uses the Oscillometric measurement method, ensuring reliable readings with minimal effort. The device features a large LCD display, memory storage (up to 60 readings), and irregular heartbeat detection, helping users track and manage their health effectively. It also includes simple one-touch operation and comfortable cuff inflation, making it suitable for daily monitoring, elderly users, and patients with hypertension. Additionally, clinically validated models in this category are recommended for home and self-measurement, ensuring dependable performance for regular use. Warranty 1 Year Manufacturer Warranty</g:description>
       <g:link>https://baemeds.in/products/longlife595-blood-ressure-monitor</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/ad281cf0-8660-4959-ad1d-e67d0a87f3b5.png?v=1781187258</g:image_link>
@@ -826,10 +880,11 @@
       <g:mpn>GEN-LONGLIFE595-BLO</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:product_type>BP Monitor</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Medical Tests &amp; Monitors</g:google_product_category>
     </item>
     <item>
       <g:id>GEN-M-CARE-PORTABLE</g:id>
-      <g:title>M CARE PORTABLE SUCTION MACHINE</g:title>
+      <g:title>M Care Portable Medical Phlegm Suction Unit</g:title>
       <g:description>Description The M CARE Portable Suction Machine is a compact medical device designed to remove mucus, saliva, blood, and other secretions from the airway, helping patients breathe more easily. It is suitable for home care, hospitals, emergency use, and post-operative care, especially for patients with respiratory conditions like COPD and bronchitis. The device features an oil-free pump system with adjustable suction control, ensuring efficient and safe operation with minimal maintenance. Its portable and lightweight design, along with a collection jar and filter system, makes it easy to use and hygienic for both patients and caregivers. Warranty 1 Year Manufacturer Warranty</g:description>
       <g:link>https://baemeds.in/products/m-care-portable-suction-machine</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/12d13770-bc1d-4e79-9c9d-70c80aac6f0d.png?v=1781186990</g:image_link>
@@ -841,10 +896,11 @@
       <g:mpn>GEN-M-CARE-PORTABLE</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:product_type>Suction Machine</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>GEN-M-TRUEBLUE-W-HG</g:id>
-      <g:title>Philips Respironics True Blue Mask W/HGR - Medium</g:title>
+      <g:title>Philips Respironics TrueBlue Gel Nasal CPAP Mask with Auto Seal (Size M)</g:title>
       <g:description># Philips Respironics True Blue Mask W/HGR - Medium The Philips Respironics True Blue Mask delivers reliable nasal coverage for CPAP therapy with a medium fit designed for optimal comfort during extended wear. The integrated headgear retention system ensures stable positioning throughout the night, minimizing mask shifts and air leaks. Its soft silicone cushion adapts to facial contours for a personalized seal without excessive pressure. Ideal for patients seeking a balance between simplicity and performance in their sleep apnea management routine. High-quality M TRUEBLUE W/HGR INT. Order online at the best price with fast delivery and warranty.</g:description>
       <g:link>https://baemeds.in/products/m-trueblue-w-hgr-int</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/2093e5c8-aa96-4e1c-8af5-e1ff103aac84.png?v=1781186808</g:image_link>
@@ -855,11 +911,12 @@
       <g:condition>new</g:condition>
       <g:mpn>GEN-M-TRUEBLUE-W-HG</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:product_type>CPAP Mask</g:product_type>
+      <g:product_type>CPAP &amp; BiPAP Mask</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>GEN-MINI-MS</g:id>
-      <g:title>MINI MS</g:title>
+      <g:title>Mini MS Electro-Muscle Stimulator Unit for Physical Therapy</g:title>
       <g:description>MINI MS is a compact medical device designed for reliable everyday clinical and home-care use. Built for ease of use and durability, it&apos;s a practical addition to any medical supplies kit.Contact us for full specifications and usage details.</g:description>
       <g:link>https://baemeds.in/products/mini-ms</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/6d7964c8-2270-4020-b4a4-ab6308fd9eea.png?v=1781186458</g:image_link>
@@ -869,11 +926,12 @@
       <g:condition>new</g:condition>
       <g:mpn>GEN-MINI-MS</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:product_type>Medical Equipment</g:product_type>
+      <g:product_type>Physiotherapy Device</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Alternative &amp; Holistic Health</g:google_product_category>
     </item>
     <item>
       <g:id>YON-MULTIPARA-MONIT</g:id>
-      <g:title>MULTIPARA MONITOR PM30 YONKER 5 PARA</g:title>
+      <g:title>Yonker PM30 5-Parameter Multi-Para Patient Monitor for ICU &amp; OT</g:title>
       <g:description>The MULTIPARA MONITOR PM30 YONKER 5 PARA is a comprehensive vital signs monitoring solution designed for clinical environments. This five-parameter monitor simultaneously tracks heart rate, blood pressure, oxygen saturation (SpO2), temperature, and respiratory rate, providing real-time patient data essential for acute care settings. The PM30 features a clear display interface for quick assessment and reliable sensor technology for consistent readings. Ideal for hospitals, clinics, and emergency departments, this multiparameter monitor delivers the accuracy and dependability healthcare professionals require for patient monitoring and clinical decision-making. High-quality MULTIPARA MONITOR PM30 YONKER 5 PARA. Order online at the best price with fast delivery. Warranty: 1 year.</g:description>
       <g:link>https://baemeds.in/products/multipara-monitor-pm30-yonker-5-para</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/716dfe0d-51ac-4bcf-ae43-6ef89567265a.png?v=1781168989</g:image_link>
@@ -885,10 +943,11 @@
       <g:mpn>YON-MULTIPARA-MONIT</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:product_type>Patient Monitor</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Medical Tests &amp; Monitors</g:google_product_category>
     </item>
     <item>
       <g:id>OMR-OMRON-7121J-AUT</g:id>
-      <g:title>OMRON 7121J AUTOMATIC BLOOD PRESSURE MONITOR</g:title>
+      <g:title>OMRON 7121J AUTOMATIC BLOOD PRESSURE MONITOR — Patient Monitor</g:title>
       <g:description>The OMRON 7121J delivers clinical-grade blood pressure monitoring for home and clinical settings. This fully automatic device measures systolic and diastolic pressure plus pulse rate with advanced oscillometric technology, eliminating manual inflation. The large digital display ensures easy reading, while the memory function stores multiple readings for trend tracking. Ideal for patients managing hypertension or those requiring regular cardiovascular monitoring, it combines reliability with user-friendly operation. High-quality OMRON 7121J AUTOMATIC BLOOD PRESSURE MONITOR. Order online at the best price with fast delivery and warranty. Warranty: 2 Years</g:description>
       <g:link>https://baemeds.in/products/omron-7121j-automatic-blood-pressure-monitor</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/fb49ce77-3dc4-4f3a-b92f-d3f4f3bfa142.png?v=1781168849</g:image_link>
@@ -900,10 +959,11 @@
       <g:mpn>OMR-OMRON-7121J-AUT</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:product_type>BP Monitor</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Medical Tests &amp; Monitors</g:google_product_category>
     </item>
     <item>
       <g:id>OMR-OMRON-7143T1-A-</g:id>
-      <g:title>OMRON 7143T1-A AUTOMATIC BLOOD PRESSURE MONITOR</g:title>
+      <g:title>OMRON 7143T1-A AUTOMATIC BLOOD PRESSURE MONITOR — Patient Monitor</g:title>
       <g:description>The OMRON 7143T1-A delivers clinical-grade blood pressure monitoring with advanced oscillometric technology for accurate readings in seconds. Featuring an extra-large display and one-touch operation, this automatic monitor simplifies routine health tracking for patients and healthcare settings alike. The device stores multiple readings with date and time stamps, enabling trend analysis and informed clinical decisions. Ideal for home monitoring, clinics, and medical facilities requiring reliable, repeatable measurements. Warranty: 2 years High-quality OMRON 7143T1-A AUTOMATIC BLOOD PRESSURE MONITOR. Order online at the best price with fast delivery and warranty.</g:description>
       <g:link>https://baemeds.in/products/omron-7143t1-a-automatic-blood-pressure-monitor</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/f5713581-4a61-4fc3-9ab0-d70a865b5011.png?v=1781168508</g:image_link>
@@ -915,10 +975,11 @@
       <g:mpn>OMR-OMRON-7143T1-A-</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:product_type>BP Monitor</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Medical Tests &amp; Monitors</g:google_product_category>
     </item>
     <item>
       <g:id>OMR-OMRON-8712-AUTO</g:id>
-      <g:title>OMRON 8712 AUTOMATIC BLOOD PRESSURE MONITOR</g:title>
+      <g:title>OMRON 8712 AUTOMATIC BLOOD PRESSURE MONITOR — Patient Monitor</g:title>
       <g:description>The OMRON 8712 delivers clinical-grade blood pressure monitoring with IntelliSense technology that automatically adjusts cuff pressure for comfort without sacrificing accuracy. Dual memory storage tracks readings for two users independently, while the large LCD display ensures easy result interpretation. Ideal for home monitoring and clinical settings, this device meets medical-grade standards and provides consistent, reliable measurements for hypertension management and cardiovascular health tracking. High-quality OMRON 8712 AUTOMATIC BLOOD PRESSURE MONITOR. Order online at the best price with fast delivery and warranty. Warranty: 2 years</g:description>
       <g:link>https://baemeds.in/products/omron-8712-automatic-blood-pressure-monitor</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/bb57f2bc-b134-457e-93f4-0a31affc241e.png?v=1781168205</g:image_link>
@@ -930,10 +991,11 @@
       <g:mpn>OMR-OMRON-8712-AUTO</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:product_type>BP Monitor</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Medical Tests &amp; Monitors</g:google_product_category>
     </item>
     <item>
       <g:id>OXY-OXYGEN-CONCENTR</g:id>
-      <g:title>OXYGEN CONCENTRATOR OXYMED 10LPM</g:title>
+      <g:title>Oxymed 10 LPM High Flow Medical Oxygen Concentrator</g:title>
       <g:description>OXYGEN CONCENTRATOR OXYMED 10LPM delivers reliable oxygen therapy for patients requiring continuous or intermittent respiratory support. This medical-grade concentrator produces up to 10 liters per minute of 95% pure oxygen, making it suitable for home care, clinical settings, and portable use. Features include a durable compressor system, adjustable flow settings, and integrated safety mechanisms to ensure consistent performance. The unit operates quietly and efficiently, reducing noise disruption in patient environments. Ideal for managing chronic respiratory conditions, post-operative recovery, and oxygen-dependent care protocols. Meets medical device standards for dependable therapeutic delivery. High-quality OXYGEN CONCENTRATOR OXYMED 10LPM. Order online at the best price with fast delivery and warranty. Warranty: 3 years</g:description>
       <g:link>https://baemeds.in/products/oxygen-concentrator-oxymed-10lpm</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/b8d5ae4c-94f9-41df-8a13-0c6de2b33195.png?v=1781167954</g:image_link>
@@ -945,10 +1007,11 @@
       <g:mpn>OXY-OXYGEN-CONCENTR</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:product_type>Oxygen Concentrator</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>OXY-OXYMED-NASAL-MA</g:id>
-      <g:title>OXYMED NASAL MASK</g:title>
+      <g:title>Oxymed Silicone Nasal CPAP Mask with Adjustable Headgear</g:title>
       <g:description>OXYMED NASAL MASK The OXYMED Nasal Mask delivers reliable oxygen therapy with a secure, comfortable fit designed for extended wear. Engineered with soft silicone cushioning and adjustable headgear, this mask minimizes pressure points while maintaining an effective seal for consistent oxygen delivery. Ideal for patients requiring supplemental oxygen therapy at home or in clinical settings, the mask accommodates various face shapes and sizes. Easy to clean and maintain, it integrates seamlessly with standard oxygen delivery systems. A dependable choice for respiratory care professionals and patients prioritizing comfort without compromising therapeutic efficacy. High-quality OXYMED NASAL MASK. Order online at the best price with fast delivery and warranty.</g:description>
       <g:link>https://baemeds.in/products/oxymed-nasal-mask</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/d736ad7c-be88-4e5c-8563-b373cbd3cce8.png?v=1781167656</g:image_link>
@@ -959,11 +1022,12 @@
       <g:condition>new</g:condition>
       <g:mpn>OXY-OXYMED-NASAL-MA</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:product_type>CPAP Mask</g:product_type>
+      <g:product_type>CPAP &amp; BiPAP Mask</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>OXY-OXYMED-PORTABLE</g:id>
-      <g:title>OXYMED Portable Oxygen Concentrator P2</g:title>
+      <g:title>Oxymed P2 Ultra-Portable Oxygen Concentrator with Rechargeable Battery</g:title>
       <g:description>Description The Oxymed P2 Portable Oxygen Concentrator is a compact and lightweight oxygen therapy device designed for patients who require continuous oxygen support while maintaining mobility. It uses pulse dose technology to deliver oxygen efficiently based on the user’s breathing pattern, ensuring effective therapy with minimal power consumption. Weighing around 1.98 kg, the device is highly portable and suitable for home use, travel, and outdoor activities. It provides 90–95% oxygen purity with up to 5 pulse flow settings, ensuring consistent and reliable oxygen delivery. The concentrator features a quiet operation, rechargeable battery system, and multiple power options (AC/DC/battery), making it ideal for uninterrupted use even during travel or power cuts. It also includes a user-friendly display and carry bag, allowing easy handling and monitoring. Warranty 1 Year Warranty on battery &amp; sieve beds</g:description>
       <g:link>https://baemeds.in/products/oxymed-portable-oxygen-concentrator-p2</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/b0fa772d-c005-4fde-932b-7eb81785ff74.png?v=1781167372</g:image_link>
@@ -975,10 +1039,11 @@
       <g:mpn>OXY-OXYMED-PORTABLE</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:product_type>Oxygen Concentrator</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>OXY-OXYMED-PORTABLE</g:id>
-      <g:title>OXYMED PORTABLE SUCTION MACHINE</g:title>
+      <g:title>Oxymed Portable Electric Phlegm Suction Machine for Home Care &amp; Clinics</g:title>
       <g:description>Description The Oxymed Portable Suction Machine is a compact and efficient medical device used to remove mucus, blood, and other fluids from the airway, helping patients breathe more easily. It is suitable for home care, hospitals, emergency use, and post-surgery recovery, especially for patients with respiratory conditions like COPD. The device features an oil-free pump, adjustable suction pressure, and a portable design, making it easy to operate for caregivers while ensuring safe and effective airway clearance. Warranty 1 Year Manufacturer Warranty</g:description>
       <g:link>https://baemeds.in/products/oxymed-portable-suction-machine</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/988a8fc8-68c7-4b3f-9300-a3bb2767b918.png?v=1781166993</g:image_link>
@@ -990,10 +1055,11 @@
       <g:mpn>OXY-OXYMED-PORTABLE</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:product_type>Suction Machine</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>CON-PATIENT-MONITOR</g:id>
-      <g:title>PATIENT MONITOR CMS5100 (CONTEC)</g:title>
+      <g:title>Contec CMS5100 Compact Vital Signs Patient Monitor (SpO2, NIBP, PR)</g:title>
       <g:description>The CONTEC CMS5100 is a compact, portable patient monitor designed for continuous vital sign tracking in clinical and home care settings. This multi-parameter device simultaneously displays heart rate, blood oxygen saturation (SpO2), blood pressure, and body temperature with high-precision sensors. The bright LCD screen ensures clear readability in various lighting conditions, while the lightweight design facilitates easy transport between patient rooms or care locations. Built-in alarm thresholds alert caregivers to critical changes, and the extended battery life supports extended monitoring sessions. Ideal for hospitals, clinics, ambulatory care centers, and home healthcare providers seeking reliable, user-friendly patient monitoring. High-quality PATIENT MONITOR CMS5100 (CONTEC). Order online at the best price with fast delivery. Warranty: 1 year.</g:description>
       <g:link>https://baemeds.in/products/patient-monitor-cms5100-contec</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/3de05133-7221-4080-863c-54508d553954.png?v=1781166745</g:image_link>
@@ -1005,10 +1071,11 @@
       <g:mpn>CON-PATIENT-MONITOR</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:product_type>Patient Monitor</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Medical Tests &amp; Monitors</g:google_product_category>
     </item>
     <item>
       <g:id>GEN-PHEUMO-CARE-FUL</g:id>
-      <g:title>PHEUMO CARE FULL FACE  MASK</g:title>
+      <g:title>Pneumo Care Full Face CPAP/BiPAP Mask with Adjustable Ergonomic Seal</g:title>
       <g:description># PNEUMO CARE FULL FACE MASK The Pneumo Care Full Face Mask delivers comprehensive respiratory protection with a secure, ergonomic design engineered for extended wear comfort. Featuring a wide field of vision and adjustable headgear straps, this mask ensures a reliable seal for consistent performance in clinical and home care settings. The soft silicone interface minimizes pressure points while maintaining effective isolation, making it ideal for patients requiring non-invasive ventilation support or respiratory therapy. Compatible with standard respiratory equipment, this mask combines durability with user-friendly operation for healthcare professionals and patients alike. High-quality PNEUMO CARE FULL FACE MASK. Order online at the best price with fast delivery and warranty.</g:description>
       <g:link>https://baemeds.in/products/pheumo-care-full-face-mask</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/909d19e3-2421-4b59-a6d0-66f33a7a1b98.png?v=1781166489</g:image_link>
@@ -1019,11 +1086,12 @@
       <g:condition>new</g:condition>
       <g:mpn>GEN-PHEUMO-CARE-FUL</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:product_type>CPAP Mask</g:product_type>
+      <g:product_type>CPAP &amp; BiPAP Mask</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>PHI-PHILIPS-DREAMST</g:id>
-      <g:title>PHILIPS DreamStation BIPAP AVAPS 25</g:title>
+      <g:title>Philips Respironics DreamStation BiPAP AVAPS 25 Non-Invasive Ventilator</g:title>
       <g:description>PHILIPS DreamStation BiPAP AVAPS 25 delivers advanced non-invasive ventilation for patients requiring flexible pressure support. The AVAPS (Average Volume-Assured Pressure Support) mode automatically adjusts pressure to maintain consistent tidal volumes, reducing clinician intervention and improving patient comfort. Integrated humidification and quiet operation make it suitable for home and clinical settings. Comprehensive data tracking supports therapy compliance monitoring and clinical decision-making. High-quality PHILIPS DreamStation BIPAP AVAPS 25. Order online at the best price with fast delivery and WARRANTY: 2YEARS</g:description>
       <g:link>https://baemeds.in/products/philips-dreamstation-bipap-avaps-25</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/e894f1e0-202a-4dea-a1af-64869f4d6b98.png?v=1781166244</g:image_link>
@@ -1034,11 +1102,12 @@
       <g:condition>new</g:condition>
       <g:mpn>PHI-PHILIPS-DREAMST</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:product_type>bipap machine</g:product_type>
+      <g:product_type>BiPAP Machine</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>PHI-PHILIPS-DREAMWE</g:id>
-      <g:title>PHILIPS DREAMWEAR FULL FACE MASK</g:title>
+      <g:title>Philips Respironics DreamWear Under-the-Nose Nasal CPAP Mask</g:title>
       <g:description>High-quality PHILIPS DREAMWEAR FULL FACE MASK. Order online at the best price with fast delivery and warranty.</g:description>
       <g:link>https://baemeds.in/products/philips-dreamwear-full-face-mask</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/9e84668c-68b4-40ec-82a8-c05a05e238d8.png?v=1781165909</g:image_link>
@@ -1049,11 +1118,12 @@
       <g:condition>new</g:condition>
       <g:mpn>PHI-PHILIPS-DREAMWE</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:product_type>CPAP Mask</g:product_type>
+      <g:product_type>CPAP &amp; BiPAP Mask</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>PHI-PHILIPS-DREAMWE</g:id>
-      <g:title>PHILIPS DREAMWEAR NASAL MASK</g:title>
+      <g:title>Philips Respironics DreamWear Under-the-Nose Nasal CPAP Mask</g:title>
       <g:description>The Philips DreamWear Nasal Mask delivers exceptional comfort for nightly CPAP therapy with its innovative hose-above design that minimizes facial contact and pressure points. Engineered with a soft, flexible frame and adjustable headgear, this mask accommodates various face shapes while maintaining a secure seal. The lightweight construction reduces sleep disruption, while the quick-release clips enable effortless donning and doffing. Ideal for side sleepers and those sensitive to traditional mask designs, the DreamWear promotes consistent therapy adherence through superior comfort and minimal claustrophobia. Compatible with most CPAP machines, it represents a clinically-proven advancement in sleep apnea management. High-quality PHILIPS DREAMWEAR NASAL MASK. Order online at the best price with fast delivery and warranty.</g:description>
       <g:link>https://baemeds.in/products/philips-dreamwear-nasal-mask</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/bd213a36-475c-4739-b823-6c923973c6e3.png?v=1781165593</g:image_link>
@@ -1064,11 +1134,12 @@
       <g:condition>new</g:condition>
       <g:mpn>PHI-PHILIPS-DREAMWE</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:product_type>CPAP Mask</g:product_type>
+      <g:product_type>CPAP &amp; BiPAP Mask</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>PHI-PHILIPS-EVERFLO</g:id>
-      <g:title>PHILIPS EVERFLOW OXYGEN CONCENTRATOR 5 LPM</g:title>
+      <g:title>Philips Respironics EverFlo 5 LPM Oxygen Concentrator for Home Care</g:title>
       <g:description>The Philips Everflow Oxygen Concentrator delivers reliable oxygen therapy at 5 liters per minute, engineered for both home and clinical settings. This compact, whisper-quiet device features advanced oxygen separation technology that continuously extracts oxygen from ambient air, eliminating the need for tank refills. Built with Philips&apos; proven durability standards, it includes an integrated humidifier bottle, adjustable flow settings, and safety alarms to monitor operational status. The lightweight design facilitates portability, while the energy-efficient motor reduces electricity consumption. Ideal for patients requiring consistent supplemental oxygen therapy with minimal maintenance and maximum dependability. High-quality PHILIPS EVERFLOW OXYGEN CONCENTRATOR 5 LPM. Order online at the best price with fast delivery and WARRANTY: 2 YEARS</g:description>
       <g:link>https://baemeds.in/products/philips-everflow-oxygen-concentrator-5-lpm</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/2b027766-bdcb-4a2f-bea4-5a63a916c52c.png?v=1781165257</g:image_link>
@@ -1080,6 +1151,7 @@
       <g:mpn>PHI-PHILIPS-EVERFLO</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:product_type>Oxygen Concentrator</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>PHI-PHILIPS-GEL-PIL</g:id>
@@ -1094,11 +1166,12 @@
       <g:condition>new</g:condition>
       <g:mpn>PHI-PHILIPS-GEL-PIL</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:product_type>CPAP Mask</g:product_type>
+      <g:product_type>CPAP &amp; BiPAP Mask</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>RES-RESMED-P10-NASA</g:id>
-      <g:title>RESMED P10 NASAL MASK</g:title>
+      <g:title>ResMed AirFit P10 Ultra-Quiet Nasal Pillows Mask System</g:title>
       <g:description>The ResMed P10 Nasal Mask delivers reliable, comfortable CPAP therapy with its lightweight design and minimal contact points. Engineered for patients seeking reduced facial coverage, this mask features a soft silicone cushion that adapts to individual anatomy, minimizing pressure marks and irritation. The dual-wall design enhances stability while maintaining breathability, and the quick-release headgear allows effortless donning and doffing. Compatible with standard CPAP machines, the P10 is ideal for side sleepers and those transitioning to mask therapy. Includes adjustable headgear and replacement cushions for extended use and optimal fit. High-quality RESMED P10 NASAL MASK. Order online at the best price with fast delivery and warranty.</g:description>
       <g:link>https://baemeds.in/products/resmed-p10-nasal-mask</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/1123a577-c66e-46c0-a1eb-daeab0c292d5.png?v=1781163153</g:image_link>
@@ -1109,11 +1182,12 @@
       <g:condition>new</g:condition>
       <g:mpn>RES-RESMED-P10-NASA</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:product_type>CPAP Mask</g:product_type>
+      <g:product_type>CPAP &amp; BiPAP Mask</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>ROS-ROSSMAX-BLOOD-R</g:id>
-      <g:title>ROSSMAX BLOOD PRESSURE MONITOR</g:title>
+      <g:title>ROSSMAX BLOOD PRESSURE MONITOR — Patient Monitor</g:title>
       <g:description>Description The Rossmax Blood Pressure Monitor is a fully automatic digital device designed to measure blood pressure and pulse rate accurately at home or in clinical settings. It uses advanced technologies like Real Fuzzy Technology, which automatically adjusts cuff pressure based on the user’s condition for comfortable and precise readings. The device includes features such as irregular heartbeat detection, hypertension risk indication, and memory storage, making it ideal for daily health monitoring, elderly patients, and individuals with hypertension or heart-related conditions. It offers one-touch operation with a large LCD display, ensuring easy use for all age groups. Warranty 1 Year Manufacturer Warranty</g:description>
       <g:link>https://baemeds.in/products/rossmax-blood-ressure-monitor</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/cc1d9373-2cce-43e7-b394-607dda03a196.png?v=1781162968</g:image_link>
@@ -1125,10 +1199,11 @@
       <g:mpn>ROS-ROSSMAX-BLOOD-R</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:product_type>BP Monitor</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Medical Tests &amp; Monitors</g:google_product_category>
     </item>
     <item>
       <g:id>GEN-TENCE-MS-COMBO-</g:id>
-      <g:title>TENCE MS COMBO MINI</g:title>
+      <g:title>TENS MS Combo Mini Portable Muscle Stimulator for Physiotherapy</g:title>
       <g:description># TENCE MS COMBO MINI The TENCE MS Combo Mini delivers targeted microstimulation therapy in a compact, portable format designed for healthcare professionals and patients managing musculoskeletal conditions. This lightweight device combines ease of use with clinical-grade performance, making it ideal for point-of-care treatment in clinical settings or home therapy programs. The mini configuration reduces bulk without compromising therapeutic output, allowing practitioners to integrate microstimulation into diverse treatment protocols. Durable construction ensures reliable performance across frequent clinical applications. High-quality TENCE MS COMBO MINI. Order online at the best price with fast delivery. Warranty: 1 year.</g:description>
       <g:link>https://baemeds.in/products/tence-ms-combo-mini</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/71Lbe0JBKkL.jpg?v=1780645103</g:image_link>
@@ -1139,11 +1214,12 @@
       <g:condition>new</g:condition>
       <g:mpn>GEN-TENCE-MS-COMBO-</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:product_type>Medical Equipment</g:product_type>
+      <g:product_type>Physiotherapy Device</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Alternative &amp; Holistic Health</g:google_product_category>
     </item>
     <item>
       <g:id>GEN-ULTRASOUND-2-CH</g:id>
-      <g:title>ULTRASOUND 2 CHANNEL TENS</g:title>
+      <g:title>2-Channel TENS with Ultrasound Electrotherapy Physiotherapy Unit</g:title>
       <g:description># ULTRASOUND 2 CHANNEL TENS Advanced dual-channel therapeutic device combining ultrasound and TENS (Transcutaneous Electrical Nerve Stimulation) technology for comprehensive pain management and tissue healing. The two independent channels allow simultaneous treatment of multiple areas or alternating therapy protocols. Ultrasound penetrates deep tissue to promote circulation and reduce inflammation, while TENS delivers targeted electrical stimulation to block pain signals and encourage natural recovery. Ideal for clinics, rehabilitation centers, and professional healthcare settings requiring versatile, evidence-based pain relief and therapeutic solutions. High-quality ULTRASOUND 2 CHANNEL TENS. Order online at the best price with fast delivery. Warranty: 1 year.</g:description>
       <g:link>https://baemeds.in/products/ultrasound-2-channel-tens</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/6cba9231-c502-44d4-b956-bc6caeebea4b.png?v=1781162773</g:image_link>
@@ -1154,11 +1230,12 @@
       <g:condition>new</g:condition>
       <g:mpn>GEN-ULTRASOUND-2-CH</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:product_type>TENS Unit</g:product_type>
+      <g:product_type>Physiotherapy Device</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Alternative &amp; Holistic Health</g:google_product_category>
     </item>
     <item>
       <g:id>GEN-ULTRASOUND-4-CH</g:id>
-      <g:title>ULTRASOUND 4 CHANNEL TENS</g:title>
+      <g:title>4-Channel TENS with Ultrasound Digital Physiotherapy Pain Relief Machine</g:title>
       <g:description># ULTRASOUND 4 CHANNEL TENS Advanced therapeutic device combining ultrasound and 4-channel TENS technology for comprehensive pain management and tissue healing. Delivers targeted ultrasound waves to penetrate deep muscle tissue while simultaneous electrical stimulation blocks pain signals and promotes circulation. Ideal for orthopedic clinics, physical therapy centers, and sports medicine facilities. Features independent channel control for customized treatment protocols across multiple body areas. Supports acute and chronic pain relief, muscle rehabilitation, and post-operative recovery with clinically proven efficacy. High-quality ULTRASOUND 4 CHANNEL TENS. Order online at the best price with fast delivery and warranty:1 year.</g:description>
       <g:link>https://baemeds.in/products/ultrasound-4-channel-tens</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/ChatGPTImageJun11_2026_12_50_28PM.png?v=1781162443</g:image_link>
@@ -1169,11 +1246,12 @@
       <g:condition>new</g:condition>
       <g:mpn>GEN-ULTRASOUND-4-CH</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:product_type>TENS Unit</g:product_type>
+      <g:product_type>Physiotherapy Device</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Alternative &amp; Holistic Health</g:google_product_category>
     </item>
     <item>
       <g:id>GEN-VENTED-FULL-FAC</g:id>
-      <g:title>VENTED FULL FACE MASK</g:title>
+      <g:title>Vented Full Face CPAP/BiPAP Hospital Mask with Exhalation Port</g:title>
       <g:description>A vented full face mask designed for extended wear comfort and optimal airflow. Features a wide field of vision with a secure headgear system that distributes pressure evenly across the face. The ventilation design minimizes heat and moisture buildup, making it ideal for prolonged use in clinical or home care settings. Compatible with standard respiratory equipment and built to medical-grade standards for reliable performance and patient safety. High-quality VENTED FULL FACE MASK. Order online at the best price with fast delivery and warranty.</g:description>
       <g:link>https://baemeds.in/products/vented-full-face-mask</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/ChatGPTImageJun11_2026_12_39_43PM.png?v=1781161874</g:image_link>
@@ -1184,11 +1262,12 @@
       <g:condition>new</g:condition>
       <g:mpn>GEN-VENTED-FULL-FAC</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:product_type>CPAP Mask</g:product_type>
+      <g:product_type>CPAP &amp; BiPAP Mask</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>YUW-YN02-NASAL-MASK</g:id>
-      <g:title>YN02 NASAL MASK YUWELL</g:title>
+      <g:title>Yuwell YN-02 Nasal CPAP Mask with Silicone Forehead Support</g:title>
       <g:description># YN02 Nasal Mask YUWELL The YN02 Nasal Mask from YUWELL delivers reliable, comfortable nasal interface therapy for patients requiring non-invasive ventilation support. Engineered with a soft silicone cushion design, this mask minimizes pressure points while maintaining an effective seal for consistent oxygen delivery. The adjustable headgear accommodates various face shapes, ensuring personalized fit and reducing skin irritation during extended wear. Compatible with standard CPAP and BiPAP systems, the YN02 is ideal for sleep apnea management and respiratory care settings. Lightweight construction and intuitive assembly make it practical for both clinical and home-use environments. YUWELL&apos;s precision manufacturing ensures durability and reliable performance for healthcare professionals and patients alike. High-quality YN02 NASAL MASK YUWELL. Order online at the best price with fast delivery and warranty.</g:description>
       <g:link>https://baemeds.in/products/yn02-nasal-mask-yuwell</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/YN02NASALMASKYUWELL.png?v=1780645108</g:image_link>
@@ -1199,11 +1278,12 @@
       <g:condition>new</g:condition>
       <g:mpn>YUW-YN02-NASAL-MASK</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:product_type>CPAP Mask</g:product_type>
+      <g:product_type>CPAP &amp; BiPAP Mask</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>YUW-YUWELL-FULL-FAC</g:id>
-      <g:title>YUWELL FULL FACE MASK YF-03</g:title>
+      <g:title>Yuwell YF-03 Full Face CPAP Mask with Breathable Headgear</g:title>
       <g:description>The YUWELL Full Face Mask YF-03 delivers comprehensive respiratory protection with a wide field of vision and secure fit design. Engineered for extended wear comfort, this full-face mask accommodates various facial contours while maintaining an effective seal. Ideal for CPAP therapy, sleep apnea management, and non-invasive ventilation, it features adjustable headgear straps for personalized fit and reduced pressure points. The transparent facepiece allows easy monitoring and patient observation. Compatible with standard CPAP tubing connections, this mask combines durability with user-friendly maintenance for reliable nightly use. High-quality YUWELL FULL FACE MASK YF-03. Order online at the best price with fast delivery and warranty.</g:description>
       <g:link>https://baemeds.in/products/yuwell-full-face-mask-yf-03</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/ChatGPTImageJun11_2026_12_30_42PM.png?v=1781161263</g:image_link>
@@ -1214,11 +1294,12 @@
       <g:condition>new</g:condition>
       <g:mpn>YUW-YUWELL-FULL-FAC</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:product_type>CPAP Mask</g:product_type>
+      <g:product_type>CPAP &amp; BiPAP Mask</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>YUW-YUWELL-NASAL-PI</g:id>
-      <g:title>YUWELL NASAL PILLOW MASK YP 01</g:title>
+      <g:title>Yuwell YP-01 Lightweight Nasal Pillows CPAP Mask</g:title>
       <g:description>The YUWELL Nasal Pillow Mask YP 01 delivers comfortable, non-invasive respiratory support with its innovative pillow-style design. Engineered for extended wear, this mask features soft silicone nasal pillows that minimize facial contact while maintaining a secure seal for consistent therapy delivery. The lightweight construction reduces pressure points and facial marks, making it ideal for side sleepers and those sensitive to traditional mask styles. Compatible with standard CPAP systems, it offers adjustable headgear for personalized fit. The easy-to-clean components ensure hygiene and durability, while the quiet operation supports undisturbed sleep. Perfect for patients seeking comfort without compromising therapeutic effectiveness.</g:description>
       <g:link>https://baemeds.in/products/yuwell-nasal-pillow-mask-yp-01</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/ChatGPTImageJun11_2026_12_24_55PM.png?v=1781160917</g:image_link>
@@ -1229,11 +1310,12 @@
       <g:condition>new</g:condition>
       <g:mpn>YUW-YUWELL-NASAL-PI</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:product_type>CPAP Mask</g:product_type>
+      <g:product_type>CPAP &amp; BiPAP Mask</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>MED-LARGE-ADULT-DIAPER</g:id>
-      <g:title>Medis Large Adult Diaper</g:title>
+      <g:title>Medis Large Adult Diapers (High Absorbency &amp; Anti-Bacterial Leak Guard)</g:title>
       <g:description>Leakage preventionHigh speed channelSuper absorbent layered surface for cleaner skin fastening frontal tape. Non-woven one way top - channels fluid into the absorbent pad and prevents it from flowing back Inner absorbent pad Superior absorbency turns fluid into gel Users feel dry and comfortable Frontal tape with landing guidePremium Secure Quality Discreet Bladder Protection Contour Shaped Disposable For Adult Incontinence Premium Diapers For Max Dryness Premium Secure Quality</g:description>
       <g:link>https://baemeds.in/products/medis-large-adult-diaper</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/ChatGPTImageJun11_2026_12_19_49PM.png?v=1781160611</g:image_link>
@@ -1245,10 +1327,11 @@
       <g:mpn>MED-LARGE-ADULT-DIAPER</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:product_type>Adult Diaper</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Personal Care &gt; Incontinence Aids</g:google_product_category>
     </item>
     <item>
       <g:id>EVOX-5S-OC</g:id>
-      <g:title>EVOX-5S 5LPM Oxygen Concentrator</g:title>
+      <g:title>EVOX-5S 5 LPM Stationary Oxygen Concentrator for Home &amp; Clinical Care</g:title>
       <g:description>EVOX-5S (5LPM) Oxygen Concentrator – Purity For SuretyThe EVOX-5S is a reliable and efficient 5-litre-per-minute oxygen concentrator designed for home and clinical use. With touch panel operation and a clear LED display, it delivers consistent, high-purity oxygen for patients who need continuous oxygen therapy.Key Features Oxygen Flow: 0.5–5 L/min Oxygen Concentration: 93% ± 3% Oxygen Output Pressure: 40–70 kPa Live Purity Display: Yes Display Method: On LED Screen (6 LED Display) Operating Mode: Continuous Nebulizing Method: Individual Nebulizing Particle Size: 3 Micron (25%) Operation: Touch Panel Button Accumulated Hours Display: Yes Weight: 19.4 kg Accessories Included: Nebulizer and Nasal Cannula Warranty: 3 Years Ideal for patients requiring supplemental oxygen therapy at home or in a clinical setting. The EVOX-5S combines ease of use with medical-grade performance.</g:description>
       <g:link>https://baemeds.in/products/evox-5s-5lpm-oxygen-concentrator</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/evox-5s-5liter-oxygen-concentrator-with-nebulizer-digital-display-500x500.jpg?v=1787113835</g:image_link>
@@ -1259,10 +1342,11 @@
       <g:mpn>EVOX-5S-OC</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:product_type>Oxygen Concentrator</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>EVOX-WC-105E</g:id>
-      <g:title>EVOX WC-105/105E Electric Wheelchair</g:title>
+      <g:title>EVOX WC-105/105E Reclining Electric Wheelchair with Commode Facility</g:title>
       <g:description>EVOX WC-105/105E Electric WheelchairThe EVOX WC-105/105E is a powerful and foldable electric wheelchair designed for comfort, convenience, and independence. With dual 250W motors and a lithium battery, it offers a smooth ride with a range of up to 19 km.Key Features Driving Range: 15–19 km Motor: DC 250W × 2 pcs Battery: 24V 11Ah Lithium Battery (Removable for easy recharging) Max Speed: 6 km/h Frame: Mild Steel Parking Brake: Yes Brakes: Electromagnetic &amp; Manual (Optional) Controller: Can be fixed on both sides Armrest: Flip-up armrest Footrest: Adjustable &amp; Detachable Handles: Rubber Grip Push Handles Cushion: Comfortable Cushion Foldable: Yes – Easy to fold for transport and storage Warranty: 1 Year Perfect for individuals with mobility challenges who need a reliable, easy-to-use electric wheelchair for daily use indoors and outdoors.</g:description>
       <g:link>https://baemeds.in/products/evox-wc-105-105e-electric-wheelchair</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/1-10.jpg?v=1787113508</g:image_link>
@@ -1273,10 +1357,11 @@
       <g:mpn>EVOX-WC-105E</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:product_type>Electric Wheelchair</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Mobility &amp; Accessibility</g:google_product_category>
     </item>
     <item>
       <g:id>EVOX-WC-104S</g:id>
-      <g:title>EVOX WC-104S Standing Electric Wheelchair</g:title>
+      <g:title>EVOX WC-104S Standing Electric Wheelchair with Motorized Recline &amp; Joystick</g:title>
       <g:description>EVOX WC-104S Standing Electric WheelchairThe EVOX WC-104S is an advanced standing electric wheelchair that allows users to transition from sitting to standing position electrically. With a long driving range and powerful dual motors, it is designed for users who need both mobility and the therapeutic benefits of standing.Key Features Driving Range: 25–30 km Motor: DC 24V 250W × 2 pcs Battery: 24V 20Ah Lithium Battery Max Speed: 10 km/h Parking Brake: Electromagnetic Voltage: 220V Standing Function: Electric Elevating Footrest – Adjustable angle 80° Reclining Backrest: Electric Reclining – Adjustable angle 60° (80–120° range) Cushion: Washable High Density Foam Cushion (Black Colour) Calf Support: Height Adjustable Controller: Can be fixed on both sides; includes battery charge status &amp; charge level indicator Ideal for users who require a premium powered wheelchair with standing and reclining capabilities for improved circulation, posture, and independence.</g:description>
       <g:link>https://baemeds.in/products/evox-wc-104s-standing-electric-wheelchair</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/2-3.jpg?v=1787113517</g:image_link>
@@ -1287,10 +1372,11 @@
       <g:mpn>EVOX-WC-104S</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
       <g:product_type>Electric Wheelchair</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Mobility &amp; Accessibility</g:google_product_category>
     </item>
     <item>
       <g:id>TOP-LC-BPAP-30T</g:id>
-      <g:title>Topson LC-BPAP-30T BiPAP</g:title>
+      <g:title>Topson LC-BPAP-30T BiPAP Machine for Sleep Apnea &amp; COPD Support</g:title>
       <g:description>Topson LC-BPAP-30T BiPAPThe Topson LC-BPAP-30T is an affordable, feature-rich BiPAP machine designed for the treatment of respiratory insufficiency, including sleep apnea and COPD. It delivers two distinct pressure levels — a higher pressure during inhalation (IPAP) and a lower pressure during exhalation (EPAP) — to keep the airway open and reduce breathing effort.Key Features Modes: CPAP, S, T, ST, AVAPS, Auto S Pressure Range: 4–30 hPa Humidification: 0–5 levels, built-in humidifier Auto Altitude Compensation: Yes Auto Leak Compensation: Yes Noise Level: Less than 30dB Weight: 0.8 kg (without humidifier) Dimensions: 140mm x 156mm x 94mm (without humidifier) Warranty: 2 Years Box Contents BiPAP Machine Humidifier Power Adapter Filters Hose Pipe (Tubing) User Manual Ideal for patients needing a reliable, budget-friendly BiPAP solution with advanced event detection and excellent synchronization for comfortable therapy.</g:description>
       <g:link>https://baemeds.in/products/topson-lc-bpap-30t-bipap</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/RespBuy-Topsob-Bipap-LC-30T.png?v=1787116234</g:image_link>
@@ -1300,11 +1386,12 @@
       <g:condition>new</g:condition>
       <g:mpn>TOP-LC-BPAP-30T</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:product_type>bipap machine</g:product_type>
+      <g:product_type>BiPAP Machine</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
     <item>
       <g:id>PHI-EVERFLO-FILTER-NEW</g:id>
-      <g:title>Philips Respironics EverFlo Replacement Intake Air Filter - Compatible with EverFlo &amp; EverFlo Q Oxygen Concentrators</g:title>
+      <g:title>Philips Respironics EverFlo Intake Air Filter — EverFlo &amp; EverFlo Q Concentrators</g:title>
       <g:description>Genuine-fit replacement intake air filter for the Philips Respironics EverFlo and EverFlo Q stationary oxygen concentrators. This filter sits in the clear intake housing on the back of the unit and protects the compressor and internal components from dust, lint, and airborne particles before they enter the machine. Compatibility: Philips Respironics EverFlo &amp; EverFlo Q Stationary Oxygen Concentrators Function: Filters incoming air to protect the compressor and maintain stable oxygen purity Installation: Tool-free, snap-in design — replace in under two minutes Recommended Replacement: Every 3 months to 2 years depending on usage and environment, or sooner if visibly dirty Material: Medical-grade filter media in a clear inspection housing Regular replacement helps maintain oxygen output quality, protects the internal motor/compressor, and extends the overall service life of the concentrator. Note: This is a filter accessory only, not a complete oxygen concentrator.</g:description>
       <g:link>https://baemeds.in/products/philips-respironics-everflo-replacement-intake-air-filter-compatible-with-everflo-everflo-q-oxygen-concentrators</g:link>
       <g:image_link>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/Philips-Respironics-1055860-Intake-Filter-for-EverFlo-and-EverFlo-Q-Stationary-Oxygen-Concentrator.jpg?v=1787235476</g:image_link>
@@ -1314,7 +1401,8 @@
       <g:condition>new</g:condition>
       <g:mpn>PHI-EVERFLO-FILTER-NEW</g:mpn>
       <g:identifier_exists>no</g:identifier_exists>
-      <g:product_type>Oxygen Concentrator Accessories</g:product_type>
+      <g:product_type>Oxygen Concentrator</g:product_type>
+      <g:google_product_category>Health &amp; Beauty &gt; Health Care &gt; Respiratory Care</g:google_product_category>
     </item>
   </channel>
 </rss>
