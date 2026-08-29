@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commercial Quotation — Zemprolabs | Baemeds</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <!-- PDF Generation Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #0F172A;
+            --primary-dark: #0B132B;
+            --indigo-accent: #4F46E5;
+            --purple-accent: #6366F1;
+            --purple-light: #F3E8FF;
+            --purple-text: #6B21A8;
+            --blue-pill: #E0E7FF;
+            --blue-text: #3730A3;
+            --green-bg: #ECFDF5;
+            --green-border: #A7F3D0;
+            --green-text: #065F46;
+            --green-icon: #059669;
+            --text-dark: #0F172A;
+            --text-muted: #475569;
+            --text-light: #94A3B8;
+            --bg-canvas: #CBD5E1;
+            --bg-card: #F8FAFC;
+            --border-color: #E2E8F0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-canvas);
+            color: var(--text-dark);
+            line-height: 1.4;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Floating Action Bar */
+        .action-bar {
+            position: fixed;
+            top: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background: #ffffff;
+            padding: 10px 24px;
+            border-radius: 50px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .document-tag {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #10B981;
+            border-radius: 50%;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-action {
+            background-color: var(--primary);
+            color: #ffffff;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 30px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 600;
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 4px rgba(15, 23, 42, 0.25);
+        }
+
+        .btn-action:hover {
+            background-color: var(--indigo-accent);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary-action {
+            background-color: #F1F5F9;
+            color: var(--text-dark);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 600;
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-secondary-action:hover {
+            background-color: #E2E8F0;
+        }
+
+        /* Document Container - Stacking 2 A4 Pages */
+        .document-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            padding: 90px 20px 40px 20px;
+        }
+
+        .a4-page {
+            width: 210mm;
+            height: 297mm;
+            min-height: 297mm;
+            max-height: 297mm;
+            background: #ffffff;
+            box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.15);
+            padding: 10mm 13mm;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+        }
+
+        .top-stripe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #4F46E5 0%, #3B82F6 100%);
+        }
+
+        /* Header Layout */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 2px solid #F1F5F9;
+            padding-bottom: 8px;
+            margin-bottom: 8px;
+        }
+
+        .brand-details h1 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 800;
+            font-size: 1.55rem;
+            color: var(--primary);
+            letter-spacing: -0.03em;
+            text-transform: lowercase;
+            line-height: 1;
+        }
+
+        .brand-details p {
+            font-size: 0.70rem;
+            color: var(--text-muted);
+            margin-top: 3px;
+            font-weight: 500;
+        }
+
+        .quote-meta-box {
+            text-align: right;
+        }
+
+        .proposal-badge {
+            display: inline-block;
+            background-color: var(--blue-pill);
+            color: var(--blue-text);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 3px 10px;
+            border-radius: 50px;
+            margin-bottom: 4px;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: auto auto;
+            gap: 1px 8px;
+            font-size: 0.68rem;
+        }
+
+        .meta-label {
+            color: var(--text-muted);
+            text-align: right;
+        }
+
+        .meta-value {
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        /* Party Section (Prepared For / Prepared By) */
+        .parties-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .party-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 8px 12px;
+        }
+
+        .party-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3px;
+        }
+
+        .party-title {
+            font-size: 0.58rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .scope-tag-blue {
+            font-size: 0.58rem;
+            font-weight: 600;
+            background: #DBEAFE;
+            color: #1E40AF;
+            padding: 1px 7px;
+            border-radius: 10px;
+            border: 1px solid #BFDBFE;
+        }
+
+        .scope-tag-purple {
+            font-size: 0.58rem;
+            font-weight: 600;
+            background: var(--purple-light);
+            color: var(--purple-text);
+            padding: 1px 7px;
+            border-radius: 10px;
+            border: 1px solid #D8B4FE;
+        }
+
+        .party-name {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 800;
+            font-size: 0.90rem;
+            color: var(--primary);
+        }
+
+        .party-subtext {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            margin-top: 1px;
+        }
+
+        /* Project Hero Title Box */
+        .project-hero {
+            background-color: #0F172A;
+            color: #ffffff;
+            border-radius: 6px;
+            padding: 9px 14px;
+            margin-bottom: 8px;
+        }
+
+        .project-hero-eyebrow {
+            font-size: 0.58rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #93C5FD;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .project-hero-title {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 800;
+            font-size: 0.88rem;
+            line-height: 1.25;
+            letter-spacing: -0.01em;
+            margin-bottom: 6px;
+        }
+
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .tag-chip {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 0.58rem;
+            font-weight: 600;
+            padding: 2px 7px;
+            border-radius: 4px;
+            color: #F1F5F9;
+        }
+
+        /* Services Table */
+        .services-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 6px;
+        }
+
+        .services-table th {
+            background-color: var(--bg-card);
+            color: var(--text-muted);
+            font-size: 0.58rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            font-weight: 700;
+            padding: 5px 8px;
+            text-align: left;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .services-table th.th-price {
+            text-align: right;
+        }
+
+        .service-row td {
+            padding: 5px 8px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: top;
+        }
+
+        .service-cell-main {
+            width: 25%;
+        }
+
+        .service-title-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .service-icon-box {
+            width: 20px;
+            height: 20px;
+            background: #F1F5F9;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.78rem;
+            flex-shrink: 0;
+        }
+
+        .service-name {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            font-size: 0.72rem;
+            color: var(--primary);
+            line-height: 1.2;
+        }
+
+        .service-scope-cell {
+            width: 60%;
+        }
+
+        .deliverables-list {
+            list-style: none;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5px;
+        }
+
+        .deliverables-list li {
+            font-size: 0.62rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: flex-start;
+            gap: 5px;
+            line-height: 1.25;
+        }
+
+        .check-badge {
+            color: var(--purple-accent);
+            font-weight: 800;
+            font-size: 0.65rem;
+            line-height: 1;
+            margin-top: 1px;
+        }
+
+        .service-price-cell {
+            width: 15%;
+            text-align: right;
+        }
+
+        .price-badge {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            font-size: 0.72rem;
+            color: var(--primary);
+            background: #ffffff;
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            display: inline-block;
+            white-space: nowrap;
+        }
+
+        /* Total Financial Retainer Card */
+        .total-summary-card {
+            background-color: #0F172A;
+            color: #ffffff;
+            border-radius: 6px;
+            padding: 10px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 4px;
+        }
+
+        .total-info h3 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 800;
+            letter-spacing: -0.01em;
+        }
+
+        .total-info p {
+            font-size: 0.62rem;
+            color: #94A3B8;
+            margin-top: 2px;
+        }
+
+        .total-amount-box {
+            text-align: right;
+        }
+
+        .amount-number {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: #ffffff;
+            line-height: 1;
+        }
+
+        .amount-period {
+            font-size: 0.60rem;
+            color: #94A3B8;
+            margin-top: 3px;
+        }
+
+        /* Page Footer */
+        .page-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #F1F5F9;
+            padding-top: 6px;
+            font-size: 0.62rem;
+            color: var(--text-light);
+        }
+
+        /* Page 2 Styles */
+        .page-2-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #F1F5F9;
+            padding-bottom: 10px;
+            margin-bottom: 14px;
+        }
+
+        .page-2-brand {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 800;
+            font-size: 1.05rem;
+            color: var(--primary);
+        }
+
+        .page-2-ref {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .terms-card-large {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 14px;
+        }
+
+        .terms-card-large h4 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .terms-grid-large {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px 14px;
+        }
+
+        .term-box-large {
+            display: flex;
+            gap: 8px;
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+            background: #ffffff;
+            padding: 10px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .term-num-large {
+            font-weight: 800;
+            color: var(--indigo-accent);
+            font-size: 0.75rem;
+        }
+
+        .usa-scope-box-large {
+            background-color: var(--green-bg);
+            border: 1px solid var(--green-border);
+            border-radius: 8px;
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--green-text);
+            margin-bottom: 20px;
+        }
+
+        .usa-scope-icon {
+            color: var(--green-icon);
+            font-size: 1.1rem;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+
+        .usa-scope-text-large {
+            font-size: 0.70rem;
+            line-height: 1.4;
+        }
+
+        .signatures-section-large {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 18px;
+        }
+
+        .sig-block-large {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100px;
+        }
+
+        .sig-title-large {
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .sig-line-large {
+            border-bottom: 2px solid var(--primary);
+            margin-bottom: 6px;
+        }
+
+        .sig-name-large {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            font-size: 0.88rem;
+            color: var(--primary);
+        }
+
+        .sig-role-large {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+        }
+
+        /* Print Styles */
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 0;
+            }
+            html, body {
+                width: 210mm !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                background: #ffffff !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .action-bar {
+                display: none !important;
+            }
+            .document-container {
+                gap: 0 !important;
+                padding: 0 !important;
+            }
+            .a4-page {
+                box-shadow: none !important;
+                width: 210mm !important;
+                height: 297mm !important;
+                min-height: 297mm !important;
+                max-height: 297mm !important;
+                padding: 10mm 13mm !important;
+                margin: 0 !important;
+                page-break-after: always !important;
+                break-after: page !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Floating Action Bar -->
+<div class="action-bar">
+    <div class="document-tag">
+        <div class="status-dot"></div>
+        Zemprolabs Quotation #ZEMPRO-BAEMEDS-001 (Page 1: Scope &amp; Pricing | Page 2: Terms &amp; Signatures)
+    </div>
+    <div class="btn-group">
+        <button class="btn-secondary-action" onclick="window.print()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+            Print / Save Vector PDF
+        </button>
+        <button class="btn-action" id="btn-download-pdf" onclick="generatePDF()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Download 2-Page PDF
+        </button>
+    </div>
+</div>
+
+<!-- Main Document Container Stacking Page 1 and Page 2 -->
+<div class="document-container" id="quotation-document">
+    
+    <!-- PAGE 1: Overview, Deliverables & Pricing -->
+    <div class="a4-page page-1">
+        <div class="top-stripe"></div>
+        
+        <div>
+            <!-- Document Header -->
+            <div class="header">
+                <div class="brand-details">
+                    <h1>zemprolabs</h1>
+                    <p>contact@zemprolabs.com • zemprolabs.com</p>
+                </div>
+                <div class="quote-meta-box">
+                    <div class="proposal-badge">SERVICE QUOTATION</div>
+                    <div class="meta-grid">
+                        <div class="meta-label">Quote Ref:</div>
+                        <div class="meta-value">#ZEMPRO-BAEMEDS-001</div>
+                        <div class="meta-label">Issue Date:</div>
+                        <div class="meta-value">29 July 2026</div>
+                        <div class="meta-label">Validity:</div>
+                        <div class="meta-value">30 Days</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Party Information Cards -->
+            <div class="parties-section">
+                <div class="party-card">
+                    <div class="party-header">
+                        <span class="party-title">PREPARED FOR</span>
+                        <span class="scope-tag-blue">🇺🇸 USA Business Unit</span>
+                    </div>
+                    <p class="party-name">baemeds</p>
+                    <p class="party-subtext">Services tailored for Baemeds USA Operations</p>
+                </div>
+                <div class="party-card">
+                    <div class="party-header">
+                        <span class="party-title">PREPARED BY</span>
+                        <span class="scope-tag-purple">Authorized Partner</span>
+                    </div>
+                    <p class="party-name">zemprolabs</p>
+                    <p class="party-subtext">Digital &amp; Technical Operations Team</p>
+                </div>
+            </div>
+
+            <!-- Project Hero Title -->
+            <div class="project-hero">
+                <div class="project-hero-eyebrow">PROJECT PROPOSAL SCOPE</div>
+                <h2 class="project-hero-title">Integrated Sourcing, SEO &amp; Digital Marketing Operations</h2>
+                <div class="tags-container">
+                    <span class="tag-chip">Product Sourcing</span>
+                    <span class="tag-chip">SEO</span>
+                    <span class="tag-chip">Google Ads</span>
+                    <span class="tag-chip">Social Media</span>
+                </div>
+            </div>
+
+            <!-- Detailed Services Table -->
+            <table class="services-table">
+                <thead>
+                    <tr>
+                        <th style="width: 25%;">SERVICE MODULE</th>
+                        <th style="width: 60%;">SCOPE OF DELIVERABLES</th>
+                        <th style="width: 15%;" class="th-price">MONTHLY<br>RETAINER</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Item 1: Product Research & Sourcing -->
+                    <tr class="service-row">
+                        <td class="service-cell-main">
+                            <div class="service-title-group">
+                                <div class="service-icon-box">🔍</div>
+                                <div class="service-name">Product Research &amp; Sourcing</div>
+                            </div>
+                        </td>
+                        <td class="service-scope-cell">
+                            <ul class="deliverables-list">
+                                <li><span class="check-badge">✓</span> Product research &amp; market comparison</li>
+                                <li><span class="check-badge">✓</span> Dealer/vendor identification &amp; quotations</li>
+                                <li><span class="check-badge">✓</span> Collating &amp; presenting dealer rate comparison</li>
+                                <li><span class="check-badge">✓</span> Basic cost-benefit summaries for sourcing decisions</li>
+                            </ul>
+                        </td>
+                        <td class="service-price-cell">
+                            <span class="price-badge">₹ 5,000</span>
+                        </td>
+                    </tr>
+
+                    <!-- Item 2: Search Engine Optimization -->
+                    <tr class="service-row">
+                        <td class="service-cell-main">
+                            <div class="service-title-group">
+                                <div class="service-icon-box">📈</div>
+                                <div class="service-name">Search Engine Optimization</div>
+                            </div>
+                        </td>
+                        <td class="service-scope-cell">
+                            <ul class="deliverables-list">
+                                <li><span class="check-badge">✓</span> On-page SEO (meta tags, headings, product pages)</li>
+                                <li><span class="check-badge">✓</span> Technical SEO checks (site speed, indexing)</li>
+                                <li><span class="check-badge">✓</span> Keyword tracking &amp; monthly ranking reports</li>
+                                <li><span class="check-badge">✓</span> Content &amp; blog SEO recommendations</li>
+                            </ul>
+                        </td>
+                        <td class="service-price-cell">
+                            <span class="price-badge">₹ 5,000</span>
+                        </td>
+                    </tr>
+
+                    <!-- Item 3: Google Ads Management -->
+                    <tr class="service-row">
+                        <td class="service-cell-main">
+                            <div class="service-title-group">
+                                <div class="service-icon-box">🎯</div>
+                                <div class="service-name">Google Ads Management</div>
+                            </div>
+                        </td>
+                        <td class="service-scope-cell">
+                            <ul class="deliverables-list">
+                                <li><span class="check-badge">✓</span> Campaign setup &amp; structuring</li>
+                                <li><span class="check-badge">✓</span> Ongoing optimization (bids, keywords, ad copy)</li>
+                                <li><span class="check-badge">✓</span> Monthly performance report (CTR, CPC, ROAS)</li>
+                                <li><span class="check-badge">✓</span> Ad spend budget oversight</li>
+                            </ul>
+                        </td>
+                        <td class="service-price-cell">
+                            <span class="price-badge">₹ 10,000</span>
+                        </td>
+                    </tr>
+
+                    <!-- Item 4: Social Media Management -->
+                    <tr class="service-row">
+                        <td class="service-cell-main">
+                            <div class="service-title-group">
+                                <div class="service-icon-box">📱</div>
+                                <div class="service-name">Social Media Management</div>
+                            </div>
+                        </td>
+                        <td class="service-scope-cell">
+                            <ul class="deliverables-list">
+                                <li><span class="check-badge">✓</span> Content scheduling &amp; regular posting</li>
+                                <li><span class="check-badge">✓</span> Community management (comments &amp; DM responses)</li>
+                                <li><span class="check-badge">✓</span> Profile bio, links, &amp; highlights optimization</li>
+                                <li><span class="check-badge">✓</span> Monthly engagement &amp; growth reporting</li>
+                                <li><span class="check-badge">✓</span> Basic custom content creation</li>
+                            </ul>
+                        </td>
+                        <td class="service-price-cell">
+                            <span class="price-badge">₹ 5,000</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div>
+            <!-- Total Financial Retainer Box -->
+            <div class="total-summary-card">
+                <div class="total-info">
+                    <h3>TOTAL MONTHLY RETAINER</h3>
+                    <p>All 4 integrated service modules included in single retainer</p>
+                </div>
+                <div class="total-amount-box">
+                    <div class="amount-number">₹ 25,000</div>
+                    <div class="amount-period">per calendar month (INR)</div>
+                </div>
+            </div>
+
+            <div class="page-footer">
+                <span>Zemprolabs Proposal Ref: #ZEMPRO-BAEMEDS-001</span>
+                <span>Page 1 of 2</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 2: Terms, Execution Guidelines & Signatures -->
+    <div class="a4-page page-2">
+        <div class="top-stripe"></div>
+
+        <div>
+            <div class="page-2-header">
+                <div class="page-2-brand">zemprolabs • Terms &amp; Execution Agreement</div>
+                <div class="page-2-ref">Quote Ref: #ZEMPRO-BAEMEDS-001</div>
+            </div>
+
+            <!-- Comprehensive 8-Clause Terms & Conditions Grid -->
+            <div class="terms-card-large">
+                <h4>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    TERMS &amp; EXECUTION GUIDELINES
+                </h4>
+                <div class="terms-grid-large">
+                    <div class="term-box-large">
+                        <span class="term-num-large">1.</span>
+                        <div><strong>Payment Terms:</strong> Monthly retainer fee of ₹ 25,000 is due on the 1st of each calendar month prior to starting the service cycle.</div>
+                    </div>
+                    <div class="term-box-large">
+                        <span class="term-num-large">2.</span>
+                        <div><strong>Ad Spend Policy:</strong> Google Ads ad spend is paid directly by baemeds to Google and is strictly separate from management fees.</div>
+                    </div>
+                    <div class="term-box-large">
+                        <span class="term-num-large">3.</span>
+                        <div><strong>Termination &amp; Notice:</strong> Either party may terminate agreement by providing a 30-day written notice prior to the start of next cycle.</div>
+                    </div>
+                    <div class="term-box-large">
+                        <span class="term-num-large">4.</span>
+                        <div><strong>IP Ownership:</strong> All custom graphics, code, and assets created belong exclusively to baemeds upon full retainer payment.</div>
+                    </div>
+                    <div class="term-box-large">
+                        <span class="term-num-large">5.</span>
+                        <div><strong>Confidentiality:</strong> Both parties maintain strict confidentiality regarding operational analytics, vendor rates, and trade secrets.</div>
+                    </div>
+                    <div class="term-box-large">
+                        <span class="term-num-large">6.</span>
+                        <div><strong>Contract Renewal:</strong> Services operate on a month-to-month retainer and automatically renew on the 1st unless notice is given per clause 3.</div>
+                    </div>
+                    <div class="term-box-large">
+                        <span class="term-num-large">7.</span>
+                        <div><strong>Scope Exclusions:</strong> Custom standalone app builds, site re-architecting, or video shoots outside this scope will be quoted separately.</div>
+                    </div>
+                    <div class="term-box-large">
+                        <span class="term-num-large">8.</span>
+                        <div><strong>Client Access:</strong> Client will provide necessary storefront, repository, ad account, and social access required for execution.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scope Limitation Notice Box -->
+            <div class="usa-scope-box-large">
+                <div class="usa-scope-icon">ⓘ</div>
+                <div class="usa-scope-text-large">
+                    <strong>Scope Limitation Notice:</strong> This quotation and agreement applies exclusively to <strong>baemeds USA operations</strong> and is legally separate from the Indian baemeds entity (Mohsin Surgicals). Services, pricing, and deliverables apply solely to the USA business.
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <!-- Executive Signatures Section -->
+            <div class="signatures-section-large">
+                <div class="sig-block-large">
+                    <span class="sig-title-large">PREPARED BY (ZEMPROLABS)</span>
+                    <div>
+                        <div class="sig-line-large"></div>
+                        <div class="sig-name-large">Authorized Representative</div>
+                        <div class="sig-role-large">Zemprolabs Operations</div>
+                    </div>
+                </div>
+                <div class="sig-block-large">
+                    <span class="sig-title-large">ACCEPTED &amp; APPROVED (BAEMEDS)</span>
+                    <div>
+                        <div class="sig-line-large"></div>
+                        <div class="sig-name-large">Authorized Signatory</div>
+                        <div class="sig-role-large">Baemeds USA Operations</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page-footer">
+                <span>Confidential &amp; Proprietary • Zemprolabs</span>
+                <span>Page 2 of 2</span>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    async function generatePDF() {
+        const btn = document.getElementById('btn-download-pdf');
+        if (!btn) return;
+        const originalText = btn.innerHTML;
+        
+        try {
+            btn.disabled = true;
+            btn.style.opacity = '0.8';
+            btn.innerHTML = `
+                <svg class="spin-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M21 12a9 9 0 1 1-6.219-8.56" stroke-linecap="round"></path>
+                </svg>
+                Generating PDF...
+            `;
+
+            document.body.classList.add('pdf-export-mode');
+            await new Promise(resolve => setTimeout(resolve, 200));
+
+            const page1 = document.querySelector('.page-1');
+            const page2 = document.querySelector('.page-2');
+
+            const { jsPDF } = window.jspdf || window;
+            const pdf = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: 'a4',
+                compress: true
+            });
+
+            // Capture Page 1 into PDF Page 1
+            const canvas1 = await html2canvas(page1, {
+                scale: 2,
+                useCORS: true,
+                logging: false,
+                backgroundColor: '#ffffff',
+                scrollX: 0,
+                scrollY: 0
+            });
+            const imgData1 = canvas1.toDataURL('image/jpeg', 1.0);
+            pdf.addImage(imgData1, 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
+
+            // Capture Page 2 into PDF Page 2
+            const canvas2 = await html2canvas(page2, {
+                scale: 2,
+                useCORS: true,
+                logging: false,
+                backgroundColor: '#ffffff',
+                scrollX: 0,
+                scrollY: 0
+            });
+            const imgData2 = canvas2.toDataURL('image/jpeg', 1.0);
+            pdf.addPage('a4', 'portrait');
+            pdf.addImage(imgData2, 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
+
+            pdf.save('Zemprolabs_Commercial_Quotation_Baemeds_USA.pdf');
+
+        } catch (err) {
+            console.error("Multi-page PDF generation error:", err);
+            window.print();
+        } finally {
+            document.body.classList.remove('pdf-export-mode');
+            btn.disabled = false;
+            btn.style.opacity = '1';
+            btn.innerHTML = originalText;
+        }
+    }
+</script>
+
+</body>
+</html>
