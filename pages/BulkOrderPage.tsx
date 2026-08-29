@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Building2, CheckCircle2, FileText, Mail, MessageCircle, PackageCheck, Phone, Send, Trash2, UploadCloud } from 'lucide-react';
+import SEO from '../components/SEO';
 import { APP_NAME, CONTACT_EMAIL, CONTACT_PHONE } from '../constants';
 import { Link } from '../context/CartContext';
 import { useReveal } from '../lib/useReveal';
@@ -77,6 +78,11 @@ const BulkOrderPage: React.FC = () => {
 
   return (
     <main ref={revealRef} className="min-h-screen">
+      <SEO
+        title="Hospital Bulk Orders & Institutional Medical Supplies"
+        description="Request wholesale quotations for hospital equipment, ICU setups, diagnostic devices, and bulk medical consumables across Hyderabad and India."
+        canonical="/bulk-orders"
+      />
       <section className="overflow-hidden bg-medical-dark text-white">
         <div className="container mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:px-6 sm:py-16 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
           <div>

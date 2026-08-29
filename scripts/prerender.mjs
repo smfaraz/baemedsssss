@@ -124,7 +124,12 @@ async function prerender() {
         await page.goto(url, { waitUntil: 'domcontentloaded' });
         await page.waitForFunction(() => !document.querySelector('[aria-busy="true"]'), { timeout: 6000 }).catch(() => null);
 
-        const html = await page.content();
+        let html = await page.content();
+        
+        // Ensure accurate per-route canonical and OpenGraph URL
+        const canonicalUrl = `https://www.baemeds.in${route === '/' ? '/' : (route.startsWith('/') ? route : '/' + route)}`;
+        html = html.replace(/<link rel="canonical"[^>]*>/i, `<link rel="canonical" href="${canonicalUrl}" />`);
+        html = html.replace(/<meta property="og:url"[^>]*>/i, `<meta property="og:url" content="${canonicalUrl}" />`);
         
         let outPath;
         if (route === '/') {

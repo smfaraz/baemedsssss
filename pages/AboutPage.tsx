@@ -1,5 +1,6 @@
 import React from 'react';
 import { ArrowRight, Building2, CheckCircle2, Headphones, MapPin, PackageSearch, Phone } from 'lucide-react';
+import SEO from '../components/SEO';
 import { APP_NAME, CONTACT_PHONE } from '../constants';
 import { Link } from '../context/CartContext';
 import { useReveal } from '../lib/useReveal';
@@ -30,6 +31,11 @@ const AboutPage: React.FC = () => {
 
   return (
     <main className="overflow-hidden" style={{ backgroundColor: '#f6f3ee' }}>
+      <SEO
+        title="About Us — Trusted Medical Equipment Supplier Hyderabad"
+        description="BaeMeds by Mohsin Enterprises is Hyderabad's certified medical equipment and DME distributor for hospitals, clinics, and home healthcare."
+        canonical="/about"
+      />
       <section className="relative border-b border-slate-200 bg-medical-dark text-white">
         <div className="container mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:px-6 sm:py-16 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:py-20 reveal-on-scroll" ref={heroRef}>
           <div>

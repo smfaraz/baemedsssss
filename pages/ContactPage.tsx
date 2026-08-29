@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowRight, Building2, CheckCircle2, Mail, MapPin, MessageCircle, Phone, Send } from 'lucide-react';
+import SEO from '../components/SEO';
 import { APP_NAME, CONTACT_EMAIL, CONTACT_PHONE } from '../constants';
 import { Link } from '../context/CartContext';
 import { useReveal } from '../lib/useReveal';
@@ -36,6 +37,11 @@ const ContactPage: React.FC = () => {
 
   return (
     <main className="min-h-screen" style={{ backgroundColor: '#f6f3ee' }}>
+      <SEO
+        title="Contact Us & 24/7 Medical Equipment Support Hyderabad"
+        description="Get in touch with BaeMeds Hyderabad for emergency oxygen delivery, BiPAP machine rentals, wheelchair demos, and customer support. Call +91 93903 49389."
+        canonical="/contact"
+      />
       <section className="bg-medical-dark text-white">
         <div className="container mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
           <p className="text-sm font-bold uppercase tracking-[0.18em] text-medical-accent">Contact {APP_NAME}</p>
