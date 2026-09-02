@@ -21,6 +21,8 @@ import ThankYouPage from './pages/ThankYouPage';
 import NotFoundPage from './pages/NotFoundPage';
 import AdminPage from './pages/AdminPage';
 import OxygenRentalGuidePage from './pages/OxygenRentalGuidePage';
+import BipapRentalHyderabadPage from './pages/BipapRentalHyderabadPage';
+import PatientMonitorHyderabadPage from './pages/PatientMonitorHyderabadPage';
 import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
 import { ReviewsProvider } from './context/ReviewsContext';
@@ -57,6 +59,8 @@ function App() {
                 <Route path="/bulk-orders" element={<BulkOrderPage />} />
                 <Route path="/guides/oxygen-concentrator-rental-hyderabad" element={<OxygenRentalGuidePage />} />
                 <Route path="/oxygen-concentrator-rental-hyderabad" element={<OxygenRentalGuidePage />} />
+                <Route path="/bipap-machine-on-rent-hyderabad" element={<BipapRentalHyderabadPage />} />
+                <Route path="/patient-monitor-price-hyderabad" element={<PatientMonitorHyderabadPage />} />
                 <Route path="/about" element={<AboutPage />} />
                 <Route path="/contact" element={<ContactPage />} />
                 <Route path="/policies/privacy" element={<PolicyPage type="privacy" />} />

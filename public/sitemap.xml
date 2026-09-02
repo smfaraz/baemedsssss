@@ -3,169 +3,187 @@
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://www.baemeds.in/</loc>
-    <lastmod>2026-08-29</lastmod>
+    <lastmod>2026-09-02</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.baemeds.in/products</loc>
-    <lastmod>2026-08-29</lastmod>
+    <lastmod>2026-09-02</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://www.baemeds.in/guides/oxygen-concentrator-rental-hyderabad</loc>
-    <lastmod>2026-08-29</lastmod>
-    <changefreq>weekly</changefreq>
+    <loc>https://www.baemeds.in/oxygen-concentrator-rental-hyderabad</loc>
+    <lastmod>2026-09-02</lastmod>
+    <changefreq>daily</changefreq>
     <priority>0.95</priority>
   </url>
   <url>
+    <loc>https://www.baemeds.in/bipap-machine-on-rent-hyderabad</loc>
+    <lastmod>2026-09-02</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.95</priority>
+  </url>
+  <url>
+    <loc>https://www.baemeds.in/patient-monitor-price-hyderabad</loc>
+    <lastmod>2026-09-02</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.95</priority>
+  </url>
+  <url>
+    <loc>https://www.baemeds.in/guides/oxygen-concentrator-rental-hyderabad</loc>
+    <lastmod>2026-09-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.90</priority>
+  </url>
+  <url>
     <loc>https://www.baemeds.in/bulk-orders</loc>
-    <lastmod>2026-08-29</lastmod>
+    <lastmod>2026-09-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.baemeds.in/about</loc>
-    <lastmod>2026-08-29</lastmod>
+    <lastmod>2026-09-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://www.baemeds.in/contact</loc>
-    <lastmod>2026-08-29</lastmod>
+    <lastmod>2026-09-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://www.baemeds.in/policies/privacy</loc>
-    <lastmod>2026-08-29</lastmod>
+    <lastmod>2026-09-02</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://www.baemeds.in/policies/terms</loc>
-    <lastmod>2026-08-29</lastmod>
+    <lastmod>2026-09-02</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://www.baemeds.in/policies/shipping</loc>
-    <lastmod>2026-08-29</lastmod>
+    <lastmod>2026-09-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://www.baemeds.in/policies/returns</loc>
-    <lastmod>2026-08-29</lastmod>
+    <lastmod>2026-09-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://www.baemeds.in/products?category=Oxygen%20Concentrator</loc>
-    <lastmod>2026-08-29</lastmod>
+    <lastmod>2026-09-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://www.baemeds.in/products?category=BiPAP</loc>
-    <lastmod>2026-08-29</lastmod>
+    <lastmod>2026-09-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://www.baemeds.in/products?category=CPAP</loc>
-    <lastmod>2026-08-29</lastmod>
+    <lastmod>2026-09-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://www.baemeds.in/products?category=Patient%20Monitor</loc>
-    <lastmod>2026-08-29</lastmod>
+    <lastmod>2026-09-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://www.baemeds.in/products?category=Masks%20%26%20Accessories</loc>
-    <lastmod>2026-08-29</lastmod>
+    <lastmod>2026-09-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://www.baemeds.in/products?category=ECG%20Machine</loc>
-    <lastmod>2026-08-29</lastmod>
+    <lastmod>2026-09-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://www.baemeds.in/products?category=BP%20Monitor</loc>
-    <lastmod>2026-08-29</lastmod>
+    <lastmod>2026-09-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://www.baemeds.in/products?category=Glucometer</loc>
-    <lastmod>2026-08-29</lastmod>
+    <lastmod>2026-09-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://www.baemeds.in/products?category=Nebulizer</loc>
-    <lastmod>2026-08-29</lastmod>
+    <lastmod>2026-09-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://www.baemeds.in/products?category=Suction%20Machine</loc>
-    <lastmod>2026-08-29</lastmod>
+    <lastmod>2026-09-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://www.baemeds.in/products?category=Thermometer</loc>
-    <lastmod>2026-08-29</lastmod>
+    <lastmod>2026-09-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://www.baemeds.in/products?category=Hospital%20Furniture</loc>
-    <lastmod>2026-08-29</lastmod>
+    <lastmod>2026-09-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://www.baemeds.in/products?category=Wheelchair</loc>
-    <lastmod>2026-08-29</lastmod>
+    <lastmod>2026-09-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://www.baemeds.in/products?category=Syringe%20Pump</loc>
-    <lastmod>2026-08-29</lastmod>
+    <lastmod>2026-09-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://www.baemeds.in/products?category=Defibrillator</loc>
-    <lastmod>2026-08-29</lastmod>
+    <lastmod>2026-09-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://www.baemeds.in/products?category=Sterilizer</loc>
-    <lastmod>2026-08-29</lastmod>
+    <lastmod>2026-09-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://www.baemeds.in/products?category=Orthopedic</loc>
-    <lastmod>2026-08-29</lastmod>
+    <lastmod>2026-09-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://www.baemeds.in/products/resmed-airsense-10-autoset</loc>
-    <lastmod>2026-08-19</lastmod>
+    <lastmod>2026-09-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.80</priority>
     <image:image>
@@ -187,7 +205,7 @@
   </url>
   <url>
     <loc>https://www.baemeds.in/products/resmed-lumis-100-vpap-st-bipap-tripack</loc>
-    <lastmod>2026-08-18</lastmod>
+    <lastmod>2026-09-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.80</priority>
     <image:image>
@@ -1489,6 +1507,142 @@
     <image:image>
       <image:loc>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/ever_flo_filter.jpg?v=1787235476</image:loc>
       <image:title>EverFlo Oxygen Concentrator Filter product photo</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.baemeds.in/products/tynor-contoured-ls-support-grey-medium</loc>
+    <lastmod>2026-09-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.80</priority>
+    <image:image>
+      <image:loc>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/1_4ae46b08-5b68-40ab-82eb-5de2e273ffe0.jpg?v=1788287142</image:loc>
+      <image:title>TYNOR Contoured L.S. Support, Grey, Medium</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/2_8553f8b1-e364-4b2e-bf96-65e0d3659d3e.jpg?v=1788369628</image:loc>
+      <image:title>TYNOR Contoured L.S. Support - side view</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/3_80312f06-78fb-4f14-b410-2d58343abd16.jpg?v=1788369628</image:loc>
+      <image:title>TYNOR Contoured L.S. Support - back view</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.baemeds.in/products/tynor-abdominal-support-belt-9inch-grey-medium</loc>
+    <lastmod>2026-09-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.80</priority>
+    <image:image>
+      <image:loc>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/1_bf33e145-d2e9-4090-b2ea-bc8f60fbe47c.jpg?v=1788287147</image:loc>
+      <image:title>TYNOR Abdominal Support Belt 9 inch, Grey, Medium</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.baemeds.in/products/tynor-posture-corrector-grey-medium</loc>
+    <lastmod>2026-09-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.80</priority>
+    <image:image>
+      <image:loc>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/1_-_2026-06-03T115434.750.jpg?v=1788287152</image:loc>
+      <image:title>Tynor Posture Corrector, Grey, Medium</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.baemeds.in/products/tynor-clavicle-brace-fastening-tape-grey-large</loc>
+    <lastmod>2026-09-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.80</priority>
+    <image:image>
+      <image:loc>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/1_99.jpg?v=1788287155</image:loc>
+      <image:title>TYNOR Clavicle Brace with Fastening Tape, Grey, Large</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.baemeds.in/products/tynor-lumbo-sacral-belt-grey-large</loc>
+    <lastmod>2026-09-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.80</priority>
+    <image:image>
+      <image:loc>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/1_e755e758-ef80-497b-97e5-fde33ea9f015.jpg?v=1788287159</image:loc>
+      <image:title>TYNOR Lumbo Sacral Belt, Grey, Large</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/2_80d36f24-02d6-4708-b51f-96e587ff7592.jpg?v=1788369618</image:loc>
+      <image:title>TYNOR Lumbo Sacral Belt, Grey - side view</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/3_9888caf1-148a-44bd-8968-05cef12030b2.jpg?v=1788369618</image:loc>
+      <image:title>TYNOR Lumbo Sacral Belt, Grey - back view</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.baemeds.in/products/tynor-chest-binder-grey-medium</loc>
+    <lastmod>2026-09-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.80</priority>
+    <image:image>
+      <image:loc>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/1_94.jpg?v=1788287161</image:loc>
+      <image:title>TYNOR Chest Binder, Grey, Medium</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.baemeds.in/products/tynor-hernia-belt-grey-regular</loc>
+    <lastmod>2026-09-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.80</priority>
+    <image:image>
+      <image:loc>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/1_d47a9631-aa77-4e6e-8a90-ca7723bbe4d1.jpg?v=1788287167</image:loc>
+      <image:title>TYNOR Hernia Belt, Grey, Regular</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.baemeds.in/products/tynor-rib-belt-grey-regular</loc>
+    <lastmod>2026-09-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.80</priority>
+    <image:image>
+      <image:loc>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/1_93.jpg?v=1788287175</image:loc>
+      <image:title>TYNOR Rib Belt, Grey, Regular</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.baemeds.in/products/tynor-shoulder-support-neo-grey-universal</loc>
+    <lastmod>2026-09-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.80</priority>
+    <image:image>
+      <image:loc>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/1_d47ca4dd-2b20-41fc-90a8-86cd8d135414.jpg?v=1788287182</image:loc>
+      <image:title>TYNOR Shoulder Support Neo, Grey, Universal</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.baemeds.in/products/tynor-knee-immobiliser-19inch-grey-small</loc>
+    <lastmod>2026-09-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.80</priority>
+    <image:image>
+      <image:loc>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/1_6c0869b7-6527-4184-9ddd-5c968d6a6168.jpg?v=1788287186</image:loc>
+      <image:title>TYNOR Knee Immobiliser 19 inch, Grey, Small</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.baemeds.in/products/tynor-heating-pad-grey-xl</loc>
+    <lastmod>2026-09-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.80</priority>
+    <image:image>
+      <image:loc>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/1_2_fa039cf9-5a29-4528-8273-d8bbaa502b9e.jpg?v=1788287190</image:loc>
+      <image:title>Tynor Heating Pad, Grey, XL</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://www.baemeds.in/products/tynor-taylors-brace-long-grey-universal</loc>
+    <lastmod>2026-09-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.80</priority>
+    <image:image>
+      <image:loc>https://cdn.shopify.com/s/files/1/0723/4486/2762/files/1_e605590e-cbda-42c9-95ce-ef3d2a9d964b.jpg?v=1788287194</image:loc>
+      <image:title>TYNOR Taylor&apos;s Brace Long, Grey, Universal</image:title>
     </image:image>
   </url>
 </urlset>

@@ -97,6 +97,9 @@ async function prerender() {
   const routesToPrerender = [
     '/',
     '/products',
+    '/oxygen-concentrator-rental-hyderabad',
+    '/bipap-machine-on-rent-hyderabad',
+    '/patient-monitor-price-hyderabad',
     '/guides/oxygen-concentrator-rental-hyderabad',
     '/about',
     '/contact',

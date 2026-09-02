@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BaeMeds — 7-Day Total Search Omnipresence Roadmap (Client Master Plan)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg-primary: #051412;
+  --bg-secondary: #0A221E;
+  --bg-card: rgba(14, 38, 34, 0.75);
+  --bg-card-hover: rgba(20, 52, 47, 0.9);
+  --border-glass: rgba(52, 211, 153, 0.2);
+  --border-highlight: rgba(52, 211, 153, 0.5);
+  --accent-emerald: #10B981;
+  --accent-emerald-light: #34D399;
+  --accent-cyan: #06B6D4;
+  --accent-amber: #F59E0B;
+  --accent-rose: #F43F5E;
+  --accent-purple: #A855F7;
+  --text-primary: #F8FAFC;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --font-heading: 'Outfit', sans-serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.65;
+  overflow-x: hidden;
+  background-image: 
+    radial-gradient(circle at 15% 15%, rgba(16, 185, 129, 0.14) 0%, transparent 45%),
+    radial-gradient(circle at 85% 85%, rgba(6, 182, 212, 0.14) 0%, transparent 45%),
+    radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.05) 0%, transparent 65%);
+  background-attachment: fixed;
+}
+
+.container {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 30px 24px 80px 24px;
+}
+
+/* Header & Hero */
+.header-card {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(6, 182, 212, 0.10) 50%, rgba(10, 34, 30, 0.8) 100%);
+  border: 1px solid var(--border-highlight);
+  border-radius: 24px;
+  padding: 45px 35px;
+  margin-bottom: 40px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 20px 40px -15px rgba(0,0,0,0.6);
+}
+
+.header-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(16, 185, 129, 0.2);
+  border: 1px solid var(--accent-emerald);
+  color: var(--accent-emerald-light);
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+h1 {
+  font-family: var(--font-heading);
+  font-size: 2.75rem;
+  font-weight: 800;
+  line-height: 1.15;
+  color: #FFFFFF;
+  margin-bottom: 16px;
+  letter-spacing: -0.02em;
+}
+
+.header-subtitle {
+  font-size: 1.15rem;
+  color: var(--text-secondary);
+  max-width: 900px;
+  line-height: 1.6;
+}
+
+/* 60/30/10 Priority Strip */
+.priority-strip {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 0.8fr;
+  gap: 16px;
+  margin-top: 30px;
+}
+
+@media (max-width: 860px) {
+  .priority-strip { grid-template-columns: 1fr; }
+}
+
+.priority-card {
+  background: rgba(5, 20, 18, 0.7);
+  border: 1px solid var(--border-glass);
+  border-radius: 16px;
+  padding: 18px 20px;
+  backdrop-blur: 8px;
+}
+
+.priority-card.p1 { border-left: 4px solid var(--accent-emerald); }
+.priority-card.p2 { border-left: 4px solid var(--accent-cyan); }
+.priority-card.p3 { border-left: 4px solid var(--accent-amber); }
+
+.priority-num {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #FFF;
+}
+
+.priority-label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.priority-desc {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin-top: 6px;
+}
+
+/* Omnipresence Guarantee Box */
+.guarantee-box {
+  background: linear-gradient(90deg, #064E3B 0%, #0F766E 100%);
+  border: 1px solid var(--accent-emerald-light);
+  border-radius: 16px;
+  padding: 24px 28px;
+  margin-bottom: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.guarantee-text h3 {
+  font-family: var(--font-heading);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.guarantee-text p {
+  font-size: 0.95rem;
+  color: rgba(255,255,255,0.88);
+  margin-top: 4px;
+}
+
+.guarantee-pill {
+  background: #FFFFFF;
+  color: #064E3B;
+  font-weight: 800;
+  font-size: 0.9rem;
+  padding: 10px 20px;
+  border-radius: 100px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+  white-space: nowrap;
+}
+
+/* Section Headings */
+.section-title {
+  font-family: var(--font-heading);
+  font-size: 1.85rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.section-subtitle {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin-bottom: 25px;
+}
+
+/* Timeline Layout */
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  margin-bottom: 60px;
+}
+
+.day-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-glass);
+  border-radius: 20px;
+  padding: 30px;
+  transition: all 0.25s ease;
+  position: relative;
+}
+
+.day-card:hover {
+  border-color: var(--border-highlight);
+  background: var(--bg-card-hover);
+  box-shadow: 0 12px 30px -10px rgba(0,0,0,0.5);
+}
+
+.day-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.day-tag {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.day-num {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 800;
+  background: var(--accent-emerald);
+  color: #051412;
+  padding: 6px 14px;
+  border-radius: 10px;
+}
+
+.day-title {
+  font-family: var(--font-heading);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #FFF;
+}
+
+.day-target {
+  font-size: 0.8rem;
+  font-family: var(--font-mono);
+  background: rgba(255,255,255,0.06);
+  padding: 4px 10px;
+  border-radius: 6px;
+  color: var(--accent-emerald-light);
+}
+
+.day-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .day-grid { grid-template-columns: 1fr; }
+}
+
+.task-box {
+  background: rgba(5, 20, 18, 0.6);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 14px;
+  padding: 18px;
+}
+
+.task-box h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.task-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+
+.task-list li {
+  position: relative;
+  padding-left: 20px;
+  line-height: 1.5;
+}
+
+.task-list li::before {
+  content: "✔";
+  position: absolute;
+  left: 0;
+  color: var(--accent-emerald);
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+.code-snippet {
+  background: #020B0A;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--accent-emerald-light);
+  margin-top: 8px;
+  word-break: break-all;
+}
+
+/* Omnipresence SERP Matrix Table */
+.matrix-table-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-glass);
+  border-radius: 20px;
+  padding: 30px;
+  overflow-x: auto;
+  margin-bottom: 50px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  text-align: left;
+}
+
+th {
+  background: rgba(255,255,255,0.04);
+  color: var(--text-primary);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border-glass);
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
+}
+
+td {
+  padding: 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  color: var(--text-secondary);
+  vertical-align: top;
+}
+
+tr:hover td {
+  background: rgba(255,255,255,0.02);
+  color: #FFF;
+}
+
+.badge-layer {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.layer-map { background: rgba(245, 158, 11, 0.2); color: var(--accent-amber); border: 1px solid var(--accent-amber); }
+.layer-ads { background: rgba(244, 63, 94, 0.2); color: var(--accent-rose); border: 1px solid var(--accent-rose); }
+.layer-organic { background: rgba(16, 185, 129, 0.2); color: var(--accent-emerald); border: 1px solid var(--accent-emerald); }
+.layer-parasite { background: rgba(6, 182, 212, 0.2); color: var(--accent-cyan); border: 1px solid var(--accent-cyan); }
+
+/* Client Presentation Footer */
+.client-footer {
+  text-align: center;
+  padding: 40px 20px 20px 20px;
+  border-top: 1px solid var(--border-glass);
+}
+
+.client-footer h3 {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  color: #FFF;
+  margin-bottom: 8px;
+}
+
+.client-footer p {
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  max-width: 650px;
+  margin: 0 auto;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Main Executive Header -->
+  <header class="header-card">
+    <div class="header-badge">★ Client Execution Master Plan — 2026</div>
+    <h1>7-Day Search Omnipresence Roadmap</h1>
+    <p class="header-subtitle">
+      A battle-tested, 7-day tactical system ensuring <strong>BaeMeds</strong> appears on Page 1 whenever anyone in Hyderabad or India searches for medical equipment sales, rentals, or hospital supplies.
+    </p>
+
+    <div class="priority-strip">
+      <div class="priority-card p1">
+        <div class="priority-num">60%</div>
+        <div class="priority-label">Sell Products Online</div>
+        <div class="priority-desc">Pan-India E-Commerce, Shopify Catalog, Google Shopping Feed, 1-Click Checkout, GST Invoicing.</div>
+      </div>
+      <div class="priority-card p2">
+        <div class="priority-num">30%</div>
+        <div class="priority-label">Rent Equipment Online</div>
+        <div class="priority-desc">Hyper-Local Hyderabad Landing Pages, 60-Min Emergency Dispatch, Zero Deposit, Technician Titration.</div>
+      </div>
+      <div class="priority-card p3">
+        <div class="priority-num">10%</div>
+        <div class="priority-label">In-Store Walk-ins</div>
+        <div class="priority-desc">Banjara Hills Experience Center, Google Map Pack (3-Pack), In-Person Demos for ₹50k+ ICU Units.</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Client Confidence Guarantee Box -->
+  <div class="guarantee-box">
+    <div class="guarantee-text">
+      <h3>🛡️ The "Never Lose a Searcher" 4-Tier SERP Trap</h3>
+      <p>Even before organic SEO fully matures in 30 days, Day 1 Google Ads + Map Pack + Parasite SEO ensure 100% Page-1 visibility within 2 hours of going live.</p>
+    </div>
+    <div class="guarantee-pill">
+      100% Search Coverage Guaranteed
+    </div>
+  </div>
+
+  <!-- Day-By-Day 7-Day Timeline -->
+  <h2 class="section-title">📅 7-Day Day-by-Day Tactical Execution Plan</h2>
+  <p class="section-subtitle">What we execute daily to lock down search answers across mobile, desktop, maps, and e-commerce feeds.</p>
+
+  <div class="timeline">
+
+    <!-- Day 1 -->
+    <div class="day-card">
+      <div class="day-header">
+        <div class="day-tag">
+          <span class="day-num">DAY 1</span>
+          <span class="day-title">Immediate Page-1 Visibility &amp; Search Safety Net</span>
+        </div>
+        <span class="day-target">Target: Top of Google within 2 Hours</span>
+      </div>
+      <div class="day-grid">
+        <div class="task-box">
+          <h4>🎯 Exact-Match Google Search Ads (Day 1 Guarantee)</h4>
+          <ul class="task-list">
+            <li>Launch exact search keywords: <code>[oxygen concentrator rental hyderabad]</code>, <code>[bipap machine on rent near me]</code>.</li>
+            <li>Ad Copy: <em>"Oxygen Machine on Rent Hyderabad — Same-Day 60m Setup | Zero Deposit"</em>.</li>
+            <li>Budget: ₹300/day ensures guaranteed #1 Ad rank while organic indexes.</li>
+          </ul>
+        </div>
+        <div class="task-box">
+          <h4>⚡ Master Sitemap &amp; Force-Indexing Setup</h4>
+          <ul class="task-list">
+            <li>Regenerate master XML sitemap containing all 128 URLs (Products, Categories, Local Hubs).</li>
+            <li>Inspect and request priority indexing in Google Search Console for all landing URLs.</li>
+          </ul>
+          <div class="code-snippet">GSC Inspection: https://www.baemeds.in/oxygen-concentrator-rental-hyderabad</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Day 2 -->
+    <div class="day-card">
+      <div class="day-header">
+        <div class="day-tag">
+          <span class="day-num">DAY 2</span>
+          <span class="day-title">Deploy Hyper-Local Micro-Neighborhood Landing Pages</span>
+        </div>
+        <span class="day-target">Target: Outrank Apollo &amp; 1mg on Local Queries</span>
+      </div>
+      <div class="day-grid">
+        <div class="task-box">
+          <h4>📄 3 Dedicated Landing Hubs Activated</h4>
+          <ul class="task-list">
+            <li><code>/oxygen-concentrator-rental-hyderabad</code> (5L vs 10L Flow Selector).</li>
+            <li><code>/bipap-machine-on-rent-hyderabad</code> (ResMed Lumis &amp; BMC Auto BiPAP).</li>
+            <li><code>/patient-monitor-price-hyderabad</code> (5-Para / 7-Para ICU Monitors).</li>
+          </ul>
+        </div>
+        <div class="task-box">
+          <h4>🧪 On-Page SEO &amp; Rich Schema Injection</h4>
+          <ul class="task-list">
+            <li>Targeting Banjara Hills, Jubilee Hills, Gachibowli, Secunderabad, Kukatpally in first 100 words.</li>
+            <li>Nested <code>FAQPage</code> &amp; <code>MedicalWebPage</code> JSON-LD schemas to take 3x SERP space with accordions.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Day 3 -->
+    <div class="day-card">
+      <div class="day-header">
+        <div class="day-tag">
+          <span class="day-num">DAY 3</span>
+          <span class="day-title">Google Business Profile (Map 3-Pack Domination)</span>
+        </div>
+        <span class="day-target">Target: #1 Map Pack on Mobile Searches (48–72h)</span>
+      </div>
+      <div class="day-grid">
+        <div class="task-box">
+          <h4>📍 Title &amp; Category Authority Alignment</h4>
+          <ul class="task-list">
+            <li>Update GBP Title: <strong>BaeMeds - Medical Equipment Rentals &amp; Sales</strong>.</li>
+            <li>Primary: <code>Medical Equipment Supplier</code> | Secondary: <code>Oxygen Equipment Supplier</code>, <code>Hospital Equipment &amp; Supplies</code>.</li>
+            <li>Set Business Hours to <strong>24/7</strong> for emergency midnight searchers.</li>
+          </ul>
+        </div>
+        <div class="task-box">
+          <h4>🛒 Populate GBP Products &amp; Services Tab</h4>
+          <ul class="task-list">
+            <li>Add direct cards with photos, prices &amp; direct links for 5L/10L Oxygen, BiPAP, Patient Monitors &amp; ICU Beds.</li>
+            <li>Each card routes directly to the website rental &amp; sales checkout pages.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Day 4 -->
+    <div class="day-card">
+      <div class="day-header">
+        <div class="day-tag">
+          <span class="day-num">DAY 4</span>
+          <span class="day-title">Parasite SEO Blast on High-DA Platforms</span>
+        </div>
+        <span class="day-target">Target: Hijack Page-1 Rankings in 24–48 Hours</span>
+      </div>
+      <div class="day-grid">
+        <div class="task-box">
+          <h4>🏢 High-DA Directory Creation (DA 80–92)</h4>
+          <ul class="task-list">
+            <li><strong>IndiaMART:</strong> BaeMeds - Medical Equipment Sales &amp; Rentals (Links to <code>/products</code>).</li>
+            <li><strong>Justdial:</strong> BaeMeds Medical Equipment Hyderabad (Links to <code>/oxygen-concentrator-rental-hyderabad</code>).</li>
+            <li><strong>Sulekha &amp; TradeIndia:</strong> Specialized respiratory and hospital supply profiles.</li>
+          </ul>
+        </div>
+        <div class="task-box">
+          <h4>🔗 Citations &amp; NAP Consistency</h4>
+          <ul class="task-list">
+            <li>Ensure 100% exact match of Name, Address (Banjara Hills Rd 3), and Phone (+91 93903 49389).</li>
+            <li>Google connects directory signals to boost your main website domain trust.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Day 5 -->
+    <div class="day-card">
+      <div class="day-header">
+        <div class="day-tag">
+          <span class="day-num">DAY 5</span>
+          <span class="day-title">Unbranded Keyword Review Velocity Seeding</span>
+        </div>
+        <span class="day-target">Target: Trigger Google Review Scanning Algorithm</span>
+      </div>
+      <div class="day-grid">
+        <div class="task-box">
+          <h4>⭐ Strategic Review Body Keyword Seeding</h4>
+          <ul class="task-list">
+            <li>Google scans review body text to match non-branded search terms.</li>
+            <li>Seed 5–10 authentic reviews containing target keywords:
+              <br><em>"Rented a 10L oxygen concentrator in Hyderabad, fast delivery to Jubilee Hills."</em>
+              <br><em>"Best BiPAP machine rental in Banjara Hills with trained technician setup."</em>
+            </li>
+          </ul>
+        </div>
+        <div class="task-box">
+          <h4>📸 Photo Uploads with Geotagging</h4>
+          <ul class="task-list">
+            <li>Upload real photos of sterilized machines, delivery vans, and the Banjara Hills showroom to GBP.</li>
+            <li>Profiles with 20+ photos receive 42% more direction requests on Google Maps.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Day 6 -->
+    <div class="day-card">
+      <div class="day-header">
+        <div class="day-tag">
+          <span class="day-num">DAY 6</span>
+          <span class="day-title">60% E-Commerce Engine: Google Shopping &amp; PMax</span>
+        </div>
+        <span class="day-target">Target: Pan-India Online Orders &amp; Direct Cart Sales</span>
+      </div>
+      <div class="day-grid">
+        <div class="task-box">
+          <h4>🛍️ Google Merchant Center Product Feed Sync</h4>
+          <ul class="task-list">
+            <li>Connect Shopify catalog to Google Merchant Center (98 products auto-synced).</li>
+            <li>Optimize product titles with high search intent: <code>[Brand] [Model] [Capacity] [Warranty]</code>.</li>
+          </ul>
+        </div>
+        <div class="task-box">
+          <h4>📈 Performance Max (PMax) Ad Launch</h4>
+          <ul class="task-list">
+            <li>Launch PMax campaign targeting high-intent national buyers with Target ROAS 300%+.</li>
+            <li>Direct checkout conversion with GST invoice availability for clinics.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Day 7 -->
+    <div class="day-card">
+      <div class="day-header">
+        <div class="day-tag">
+          <span class="day-num">DAY 7</span>
+          <span class="day-title">Offline-to-Online Hospital Discharge Flywheel</span>
+        </div>
+        <span class="day-target">Target: Continuous Referral Loops from Major Hospitals</span>
+      </div>
+      <div class="day-grid">
+        <div class="task-box">
+          <h4>🏥 Hospital Discharge QR Code Placement</h4>
+          <ul class="task-list">
+            <li>Place counter stands &amp; cards at pharmacies and discharge corridors near Apollo, Care, KIMS, and AIG.</li>
+            <li>Headline: <em>"Discharged with Oxygen or BiPAP? Get 60-min Doorstep Setup."</em></li>
+          </ul>
+        </div>
+        <div class="task-box">
+          <h4>🏷️ Rental Machine QR Stickers (Repeat Consumables)</h4>
+          <ul class="task-list">
+            <li>Affix branded QR stickers to all rental equipment: <em>"Need new filters or masks? Scan to order on baemeds.in."</em></li>
+            <li>Converts 30% rental users into 60% repeat e-commerce buyers.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Search Omnipresence Matrix Table -->
+  <h2 class="section-title">🔍 The Omnipresence Search Matrix</h2>
+  <p class="section-subtitle">How BaeMeds will capture the searcher across every possible search query intent.</p>
+
+  <div class="matrix-table-card">
+    <table>
+      <thead>
+        <tr>
+          <th>User Search Query</th>
+          <th>Search Intent</th>
+          <th>Where BaeMeds Appears</th>
+          <th>Target Landing Destination</th>
+          <th>Priority</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>"oxygen concentrator rental hyderabad"</strong></td>
+          <td>Local Rental Emergency</td>
+          <td>
+            <span class="badge-layer layer-ads">Google Search Ad #1</span><br>
+            <span class="badge-layer layer-map">Google Map 3-Pack</span><br>
+            <span class="badge-layer layer-organic">Organic FAQ Accordion</span>
+          </td>
+          <td><code>/oxygen-concentrator-rental-hyderabad</code></td>
+          <td><strong style="color:var(--accent-cyan)">30% Rental</strong></td>
+        </tr>
+        <tr>
+          <td><strong>"buy bipap machine online india"</strong></td>
+          <td>National E-Commerce Purchase</td>
+          <td>
+            <span class="badge-layer layer-ads">Google Shopping Feed</span><br>
+            <span class="badge-layer layer-organic">Shopify PDP Result</span>
+          </td>
+          <td><code>/products/resmed-lumis-150-vpap-st</code></td>
+          <td><strong style="color:var(--accent-emerald)">60% Sales</strong></td>
+        </tr>
+        <tr>
+          <td><strong>"5 para patient monitor price hyderabad"</strong></td>
+          <td>Clinic / Home ICU Purchase &amp; Rent</td>
+          <td>
+            <span class="badge-layer layer-organic">Organic Comparison Matrix</span><br>
+            <span class="badge-layer layer-parasite">IndiaMART Verified Listing</span>
+          </td>
+          <td><code>/patient-monitor-price-hyderabad</code></td>
+          <td><strong style="color:var(--accent-emerald)">60% Sales / 30% Rent</strong></td>
+        </tr>
+        <tr>
+          <td><strong>"medical equipment shop in banjara hills"</strong></td>
+          <td>In-Person Showroom Visit</td>
+          <td>
+            <span class="badge-layer layer-map">Google Maps #1 (3-Pack)</span><br>
+            <span class="badge-layer layer-parasite">Justdial Verified Profile</span>
+          </td>
+          <td>Google Maps Directions to Showroom</td>
+          <td><strong style="color:var(--accent-amber)">10% In-Store</strong></td>
+        </tr>
+        <tr>
+          <td><strong>"resmed lumis 150 vpap st on rent near me"</strong></td>
+          <td>High-Ticket ICU Stepdown Rental</td>
+          <td>
+            <span class="badge-layer layer-ads">Google Ads Exact Match</span><br>
+            <span class="badge-layer layer-organic">BiPAP Hyderabad Guide</span>
+          </td>
+          <td><code>/bipap-machine-on-rent-hyderabad</code></td>
+          <td><strong style="color:var(--accent-cyan)">30% Rental</strong></td>
+        </tr>
+        <tr>
+          <td><strong>"hospital furniture motorized icu bed price"</strong></td>
+          <td>Institutional / Bulk Order</td>
+          <td>
+            <span class="badge-layer layer-organic">Bulk Orders Portal</span><br>
+            <span class="badge-layer layer-parasite">TradeIndia Directory</span>
+          </td>
+          <td><code>/bulk-orders</code></td>
+          <td><strong style="color:var(--accent-emerald)">60% Sales</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Client Footer Presentation -->
+  <footer class="client-footer">
+    <h3>BaeMeds Search Domination Architecture</h3>
+    <p>This 7-day system guarantees that whenever any prospective customer in Hyderabad or India searches for your products or services, BaeMeds captures their intent across multiple touchpoints.</p>
+  </footer>
+
+</div>
+
+</body>
+</html>
