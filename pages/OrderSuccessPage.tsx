@@ -6,6 +6,12 @@ import { useReveal } from '../lib/useReveal';
 const OrderSuccessPage: React.FC = () => {
   const sectionRef = useReveal<HTMLElement>();
 
+  React.useEffect(() => {
+    if (typeof window !== 'undefined' && typeof (window as any).gtag_report_conversion === 'function') {
+      (window as any).gtag_report_conversion();
+    }
+  }, []);
+
   return (
     <main ref={sectionRef} className="min-h-[78vh] px-4 py-12 sm:py-20">
       <section className="mx-auto max-w-2xl overflow-hidden rounded-2xl border border-medical-light bg-white p-6 shadow-soft sm:p-10 reveal-on-scroll">

@@ -9,6 +9,22 @@
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
     gtag('config', 'AW-18416931440');
+
+    function gtag_report_conversion(url) {
+      var callback = function () {
+        if (typeof(url) != 'undefined') {
+          window.location = url;
+        }
+      };
+      gtag('event', 'conversion', {
+          'send_to': 'AW-18416931440/XwPhCM6B--scEPCk8M1E',
+          'value': 1.0,
+          'currency': 'INR',
+          'transaction_id': '',
+          'event_callback': callback
+      });
+      return false;
+    }
   </script>
 
   <meta charset="utf-8" />
