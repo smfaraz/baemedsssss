@@ -389,6 +389,88 @@ const HomePage: React.FC = () => {
         </section>
       )}
 
+      <section className="reveal-on-scroll border-t border-slate-200 bg-slate-50 px-4 py-14">
+        <div className="container mx-auto max-w-4xl">
+          <div className="text-center mb-10">
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-medical-primary">Frequently Asked Questions</p>
+            <h2 className="mt-2 text-3xl font-black text-slate-900 sm:text-4xl">Medical Equipment &amp; Rental FAQs in Hyderabad</h2>
+            <p className="mt-3 text-base text-slate-600">Everything you need to know about renting and buying home healthcare equipment from BaeMeds.</p>
+          </div>
+
+          <div className="space-y-4">
+            <details className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm [&_summary::-webkit-details-marker]:hidden" open>
+              <summary className="flex cursor-pointer items-center justify-between gap-1.5 text-slate-900 font-bold text-lg">
+                <h3>How does medical equipment rental work in Hyderabad?</h3>
+                <span className="shrink-0 rounded-full bg-slate-100 p-1.5 text-slate-900 transition duration-300 group-open:-rotate-180">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="size-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </span>
+              </summary>
+              <p className="mt-4 leading-relaxed text-slate-600">
+                BaeMeds offers flexible weekly and monthly rental plans for 5L and 10L oxygen concentrators, BiPAP and CPAP sleep apnea devices, multipara patient monitors, and motorized ICU hospital beds. Simply select your equipment online or call our helpline (+91 93903 49389). Our biomedical technicians deliver, install, and provide a full operational demonstration right at your home.
+              </p>
+            </details>
+
+            <details className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm [&_summary::-webkit-details-marker]:hidden">
+              <summary className="flex cursor-pointer items-center justify-between gap-1.5 text-slate-900 font-bold text-lg">
+                <h3>How fast is doorstep delivery across Hyderabad?</h3>
+                <span className="shrink-0 rounded-full bg-slate-100 p-1.5 text-slate-900 transition duration-300 group-open:-rotate-180">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="size-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </span>
+              </summary>
+              <p className="mt-4 leading-relaxed text-slate-600">
+                We provide same-day doorstep dispatch and emergency 2-hour delivery across all Hyderabad and Secunderabad zones, including Banjara Hills, Jubilee Hills, Gachibowli, Hitec City, Madhapur, Kondapur, Kukatpally, Begumpet, Secunderabad, and LB Nagar.
+              </p>
+            </details>
+
+            <details className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm [&_summary::-webkit-details-marker]:hidden">
+              <summary className="flex cursor-pointer items-center justify-between gap-1.5 text-slate-900 font-bold text-lg">
+                <h3>Are rented medical devices clinically sanitized before delivery?</h3>
+                <span className="shrink-0 rounded-full bg-slate-100 p-1.5 text-slate-900 transition duration-300 group-open:-rotate-180">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="size-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </span>
+              </summary>
+              <p className="mt-4 leading-relaxed text-slate-600">
+                Yes, patient safety is our highest priority. Every piece of equipment undergoes a rigorous multi-step biomedical sanitization protocol before every dispatch. All respiratory units are supplied with brand new, sealed patient consumables including HEPA/bacterial filters, masks, and tubing.
+              </p>
+            </details>
+
+            <details className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm [&_summary::-webkit-details-marker]:hidden">
+              <summary className="flex cursor-pointer items-center justify-between gap-1.5 text-slate-900 font-bold text-lg">
+                <h3>Can I purchase brand new medical devices with official warranty?</h3>
+                <span className="shrink-0 rounded-full bg-slate-100 p-1.5 text-slate-900 transition duration-300 group-open:-rotate-180">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="size-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </span>
+              </summary>
+              <p className="mt-4 leading-relaxed text-slate-600">
+                Yes, BaeMeds is an authorized distributor and dealer for leading global and Indian medical brands including ResMed, Philips Respironics, Oxymed, and BPL Medical Technologies. All new products include full manufacturer warranties, official GST invoices, and after-sales support.
+              </p>
+            </details>
+
+            <details className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm [&_summary::-webkit-details-marker]:hidden">
+              <summary className="flex cursor-pointer items-center justify-between gap-1.5 text-slate-900 font-bold text-lg">
+                <h3>Do you provide GST invoices for medical insurance claims?</h3>
+                <span className="shrink-0 rounded-full bg-slate-100 p-1.5 text-slate-900 transition duration-300 group-open:-rotate-180">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="size-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </span>
+              </summary>
+              <p className="mt-4 leading-relaxed text-slate-600">
+                Yes. Every rental and purchase from BaeMeds comes with an official GST tax invoice with serial number verification, which can be submitted for health insurance reimbursement, corporate medical allowances, and hospital documentation.
+              </p>
+            </details>
+          </div>
+        </div>
+      </section>
+
       <section className="reveal-on-scroll bg-medical-dark px-4 py-12 text-white">
         <div className="container mx-auto flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
           <div className="flex items-start gap-4">
