@@ -14,6 +14,19 @@
       ]
     }
   ],
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "baemeds.in"
+        }
+      ],
+      "destination": "https://www.baemeds.in/:path*",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/((?!api/|.*\\.[\\w]+$).*)",
