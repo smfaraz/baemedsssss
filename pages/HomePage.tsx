@@ -78,8 +78,8 @@ const RentalPromotion: React.FC = () => (
       <div className="absolute inset-0 bg-gradient-to-r from-medical-dark via-medical-dark/95 to-medical-dark/20" aria-hidden="true" />
       <div className="relative max-w-xl px-6 py-9 sm:px-9 sm:py-12">
         <p className="text-xs font-black uppercase tracking-[0.2em] text-medical-accent">Flexible home care</p>
-        <h2 id="rental-promotion-title" className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">Rent the equipment you need.</h2>
-        <p className="mt-3 max-w-md text-sm leading-6 text-slate-200 sm:text-base">Explore medical equipment for short-term recovery, home care, and changing needs. Ask our team about availability, duration, delivery, and rental terms.</p>
+        <h1 id="rental-promotion-title" className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">Medical Equipment Sales &amp; Rentals in Hyderabad</h1>
+        <p className="mt-3 max-w-md text-sm leading-6 text-slate-200 sm:text-base">Certified Oxygen Concentrators, BiPAP &amp; CPAP Machines, ICU Hospital Beds, and Patient Monitors with fast same-day delivery across Hyderabad.</p>
         <div className="mt-6 flex flex-col gap-3 sm:flex-row">
           <Link to="/guides/oxygen-concentrator-rental-hyderabad" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-medical-accent px-5 font-black text-medical-dark hover:bg-white"><ArrowRight size={18} /> Oxygen Rental Guide &amp; Rates</Link>
           <Link to="/products?category=Oxygen%20Concentrator" className="inline-flex min-h-12 items-center justify-center rounded-xl border border-white/40 px-5 font-bold text-white hover:bg-white/10">Browse all equipment</Link>
