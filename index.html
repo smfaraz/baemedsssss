@@ -209,7 +209,8 @@
   height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <!-- End Google Tag Manager (noscript) -->
 
-  <div id="root">
+  <!-- SEO Fallback: visible only to crawlers with JavaScript disabled (Googlebot reads noscript) -->
+  <noscript>
     <div style="padding: 2rem 1rem; max-width: 1200px; margin: 0 auto; font-family: system-ui, -apple-system, sans-serif; color: #1e293b;">
       <header style="padding-bottom: 1rem; border-bottom: 1px solid #e2e8f0; margin-bottom: 1.5rem;">
         <nav aria-label="Main Navigation">
@@ -230,7 +231,7 @@
 
         <section style="margin-bottom: 2.5rem;">
           <h2 style="font-size: 1.4rem; font-weight: 700; color: #0f172a; margin-bottom: 1rem;">Primary Medical Equipment Categories &amp; Certified Supplies</h2>
-          
+
           <div style="margin-bottom: 1.5rem;">
             <h3 style="font-size: 1.15rem; font-weight: 600; color: #1e293b; margin-bottom: 0.5rem;">Respiratory &amp; Sleep Apnea Care</h3>
             <p style="font-size: 0.95rem; color: #64748b; margin-bottom: 0.5rem;">Certified medical oxygen concentrators (5L &amp; 10L), BiPAP &amp; CPAP devices for COPD, sleep apnea, and post-hospital respiratory support.</p>
@@ -278,7 +279,7 @@
 
         <section style="margin-bottom: 2rem;">
           <h2 style="font-size: 1.3rem; font-weight: 700; color: #0f172a; margin-bottom: 0.75rem;">Medical Equipment &amp; Rental FAQs in Hyderabad</h2>
-          
+
           <div style="margin-bottom: 1rem;">
             <h3 style="font-size: 1.05rem; font-weight: 600; color: #1e293b; margin-bottom: 0.25rem;">How does medical equipment rental work in Hyderabad?</h3>
             <p style="color: #475569; line-height: 1.6; margin: 0;">BaeMeds offers flexible weekly and monthly rental plans for 5L and 10L oxygen concentrators, BiPAP and CPAP sleep apnea devices, multipara patient monitors, and motorized ICU hospital beds. Simply select your equipment online or call our helpline (+91 93903 49389). Our biomedical technicians deliver, install, and provide a full operational demonstration right at your home.</p>
@@ -313,7 +314,10 @@
         </section>
       </main>
     </div>
-  </div>
+  </noscript>
+
+  <!-- React mounts here — left EMPTY so React renders the full UI -->
+  <div id="root"></div>
 
   <script type="module" src="./index.tsx"></script>
 </body>
