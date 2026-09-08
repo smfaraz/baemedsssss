@@ -16,6 +16,11 @@
   ],
   "redirects": [
     {
+      "source": "/guides/oxygen-concentrator-rental-hyderabad",
+      "destination": "https://www.baemeds.in/oxygen-concentrator-rental-hyderabad",
+      "permanent": true
+    },
+    {
       "source": "/:path*",
       "has": [
         {

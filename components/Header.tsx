@@ -373,7 +373,7 @@ const Header: React.FC = () => {
             )}
           </div>
           <Link to="/products?category=Oxygen%20Concentrator" className="hover:text-medical-primary">Respiratory care</Link>
-          <Link to="/guides/oxygen-concentrator-rental-hyderabad" className="inline-flex items-center gap-1 text-teal-800 bg-teal-50 px-2.5 py-1 rounded-lg border border-teal-200/80 hover:bg-teal-100 hover:text-teal-950 font-bold transition text-xs">
+          <Link to="/oxygen-concentrator-rental-hyderabad" className="inline-flex items-center gap-1 text-teal-800 bg-teal-50 px-2.5 py-1 rounded-lg border border-teal-200/80 hover:bg-teal-100 hover:text-teal-950 font-bold transition text-xs">
             Oxygen Rentals
           </Link>
           <Link to="/products?category=Patient%20Monitor" className="hover:text-medical-primary">Diagnostics</Link>
@@ -418,7 +418,7 @@ const Header: React.FC = () => {
 
             <div className="mb-4">
               <Link
-                to="/guides/oxygen-concentrator-rental-hyderabad"
+                to="/oxygen-concentrator-rental-hyderabad"
                 onClick={closeMenu}
                 className="flex min-h-12 items-center justify-between rounded-xl bg-teal-50 border border-teal-200 px-3 text-sm font-bold text-teal-900 shadow-sm"
               >

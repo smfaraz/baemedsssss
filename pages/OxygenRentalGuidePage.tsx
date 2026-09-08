@@ -198,7 +198,7 @@ export const OxygenRentalGuidePage: React.FC = () => {
     name: 'Oxygen Concentrator Rental in Hyderabad: The Definitive Clinical & Patient Guide (2026)',
     headline: 'Oxygen Concentrator Rental in Hyderabad: 5L vs 10L Machines, Rental Costs, Setup Protocols & Locality Delivery',
     description: 'Comprehensive medical and clinical authority guide on renting home oxygen concentrators in Hyderabad. Compare 5L vs 10L machines, calculate flow costs, review safety protocols, and request rapid 60-minute delivery.',
-    url: `${SITE_URL}/guides/oxygen-concentrator-rental-hyderabad`,
+    url: `${SITE_URL}/oxygen-concentrator-rental-hyderabad`,
     image: `${SITE_URL}/baemeds-social-preview.jpg`,
     datePublished: '2026-01-15T09:00:00+05:30',
     dateModified: '2026-08-26T12:00:00+05:30',
@@ -269,7 +269,7 @@ export const OxygenRentalGuidePage: React.FC = () => {
         '@type': 'ListItem',
         position: 3,
         name: 'Oxygen Concentrator Rental Hyderabad',
-        item: `${SITE_URL}/guides/oxygen-concentrator-rental-hyderabad`,
+        item: `${SITE_URL}/oxygen-concentrator-rental-hyderabad`,
       },
     ],
   };
@@ -279,7 +279,7 @@ export const OxygenRentalGuidePage: React.FC = () => {
       <SEO
         title="Oxygen Concentrator Rental in Hyderabad (5L & 10L) – Rates, Clinical Guide & Fast Delivery"
         description="Comprehensive 2026 medical guide to renting 5L & 10L oxygen concentrators in Hyderabad. Live rental cost calculator, 5L vs 10L comparison, safety checklist, and 60-min delivery."
-        canonical="/guides/oxygen-concentrator-rental-hyderabad"
+        canonical="/oxygen-concentrator-rental-hyderabad"
       />
 
       <Helmet>

@@ -100,7 +100,6 @@ async function prerender() {
     '/oxygen-concentrator-rental-hyderabad',
     '/bipap-machine-on-rent-hyderabad',
     '/patient-monitor-price-hyderabad',
-    '/guides/oxygen-concentrator-rental-hyderabad',
     '/about',
     '/contact',
     '/bulk-orders',

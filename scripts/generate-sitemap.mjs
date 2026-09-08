@@ -88,7 +88,6 @@ async function generateCompleteSitemap() {
     { path: '/oxygen-concentrator-rental-hyderabad', priority: '0.95', changefreq: 'daily' },
     { path: '/bipap-machine-on-rent-hyderabad', priority: '0.95', changefreq: 'daily' },
     { path: '/patient-monitor-price-hyderabad', priority: '0.95', changefreq: 'daily' },
-    { path: '/guides/oxygen-concentrator-rental-hyderabad', priority: '0.90', changefreq: 'weekly' },
     { path: '/bulk-orders', priority: '0.8', changefreq: 'weekly' },
     { path: '/about', priority: '0.7', changefreq: 'monthly' },
     { path: '/contact', priority: '0.7', changefreq: 'monthly' },
