@@ -427,7 +427,7 @@ const SupportCenter: React.FC = () => {
                       {message.products.map((product) => (
                         <article key={product.id} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
                           <div className="flex gap-3">
-                            <img src={product.image} alt="" className="h-14 w-14 shrink-0 rounded-lg bg-white object-contain" loading="lazy" />
+                            <img src={product.image} alt={product.title} className="h-14 w-14 shrink-0 rounded-lg bg-white object-contain" loading="lazy" />
                             <div className="min-w-0 flex-1">
                               <h3 className="line-clamp-2 text-xs font-black leading-4 text-medical-dark">{product.title}</h3>
                               <p className="mt-1 text-xs font-bold text-medical-primary">{formatPrice(product.price)}</p>

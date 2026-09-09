@@ -130,7 +130,7 @@ const CategoryTile: React.FC<CategoryTileProps> = ({ name, slug, image, icon, co
     >
       <div className="relative h-36 overflow-hidden bg-medical-light">
         {image && !imageFailed ? (
-          <img src={image} alt="" className="h-full w-full object-contain bg-white p-2 transition duration-500 group-hover:scale-105" loading="lazy" onError={() => setImageFailed(true)} />
+          <img src={image} alt={`${name} medical equipment category`} className="h-full w-full object-contain bg-white p-2 transition duration-500 group-hover:scale-105" loading="lazy" onError={() => setImageFailed(true)} />
         ) : (
           <span className="flex h-full items-center justify-center text-medical-primary">{icon}</span>
         )}
@@ -271,8 +271,8 @@ const HomePage: React.FC = () => {
   return (
     <div ref={revealRef} className="bg-[#f6f3ee]">
       <SEO
-        title="Medical equipment for home and hospitals"
-        description="Shop oxygen concentrators, BiPAP and CPAP machines, patient monitors, mobility aids, and hospital equipment from Baemeds."
+        title="Medical Equipment Sales &amp; Rental in Hyderabad"
+        description="Shop and rent certified oxygen concentrators, BiPAP/CPAP machines, patient monitors, and hospital equipment in Hyderabad with fast same-day delivery."
       />
 
       <section className="hero-stage overflow-hidden bg-medical-dark text-white">
@@ -303,7 +303,7 @@ const HomePage: React.FC = () => {
                   className="mx-2 flex w-40 shrink-0 flex-col overflow-hidden rounded-2xl border border-white/15 bg-white shadow-xl sm:w-48"
                 >
                   <div className="h-28 bg-white p-3 sm:h-32">
-                    <img src={product.image} alt="" loading="lazy" className="h-full w-full object-contain" />
+                    <img src={product.image} alt={product.title} loading="lazy" className="h-full w-full object-contain" />
                   </div>
                   <div className="border-t border-slate-100 px-3 py-2.5">
                     <p className="line-clamp-1 text-xs font-black text-medical-dark">{product.title}</p>

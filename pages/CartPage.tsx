@@ -123,7 +123,7 @@ const CartPage: React.FC = () => {
               {cart.map((item, idx) => (
                 <li key={item.lineItemId || item.id} className="grid gap-4 p-4 sm:grid-cols-[7rem_minmax(0,1fr)] sm:p-6 motion-lift" style={{ ['--reveal-delay' as any]: `${idx * 50}ms` }}>
                   <Link to={`/products/${item.handle || item.id}`} className="flex aspect-square w-24 items-center justify-center overflow-hidden rounded-xl bg-medical-light sm:w-28" aria-label={`View ${item.title}`}>
-                    {item.image ? <img src={item.image} alt="" className="h-full w-full object-contain p-2" /> : <ShoppingCart className="text-medical-text/20" />}
+                    {item.image ? <img src={item.image} alt={item.title} className="h-full w-full object-contain p-2" /> : <ShoppingCart className="text-medical-text/20" />}
                   </Link>
                   <div className="min-w-0">
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
