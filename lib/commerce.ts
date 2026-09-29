@@ -11,25 +11,25 @@ import rawCatalog from '../data/catalog_seed.json';
 let catalogCache: Product[] = (rawCatalog as unknown as Product[]) || [];
 
 export const CATEGORY_KEYWORDS: Record<string, string[]> = {
-  "Oxygen Concentrator": ["oxygen concentrator", "concentrator", "oxygen generator", "evox oxygen", "oxy med"],
-  "BiPAP": ["bipap", "bi-level", "bilevel", "vpap", "lumis"],
-  "CPAP": ["cpap", "auto cpap", "sleep apnea", "airsense", "resmart"],
-  "Patient Monitor": ["patient monitor", "multipara monitor", "vital signs monitor", "pulse oximeter"],
-  "ECG Machine": ["ecg", "ekg", "electrocardiogram", "cardiograph"],
-  "BP Monitor": ["bp", "blood pressure", "sphygmomanometer", "hypertension"],
-  "Glucometer": ["glucometer", "glucose", "blood sugar", "diabetes", "accu-chek"],
-  "Nebulizer": ["nebulizer", "compressor", "mesh", "inhaler", "omron"],
-  "Suction Machine": ["suction", "aspirator", "vacuum", "phlegm"],
-  "Syringe Pump": ["syringe pump", "infusion pump", "perfusor"],
-  "Defibrillator": ["defibrillator", "aed", "shock"],
-  "Sterilizer": ["sterilizer", "autoclave", "disinfection"],
-  "Thermometer": ["thermometer", "infrared thermometer", "temperature gun"],
+  "Oxygen Concentrators": ["oxygen concentrator", "oxygen concentrators", "concentrator", "concentrators", "oxygen generator", "portable oxygen concentrator", "portable concentrator", "5 liter concentrators", "10 liter concentrators", "respiratory therapy", "oxygen therapy"],
+  "BiPAP Machines": ["bipap", "bipap machines", "bi-level", "bilevel", "vpap", "lumis"],
+  "CPAP Machines": ["cpap", "cpap machines", "auto cpap", "sleep apnea", "airsense", "resmart"],
+  "Patient Monitors": ["patient monitor", "patient monitors", "patient monitoring", "multipara monitor", "vital signs monitor", "pulse oximeter", "pulse oximeters"],
+  "ECG Machines": ["ecg", "ekg", "electrocardiogram", "cardiograph"],
+  "Blood Pressure Monitors": ["bp", "bp monitor", "blood pressure", "blood pressure monitors", "sphygmomanometer", "hypertension"],
+  "Glucometers": ["glucometer", "glucometers", "glucose", "blood sugar", "diabetes", "accu-chek"],
+  "Nebulizers": ["nebulizer", "nebulizers", "compressor nebulizer", "mesh", "inhaler", "omron"],
+  "Suction Machines": ["suction", "suction machine", "suction machines", "aspirator", "vacuum", "phlegm"],
+  "Syringe Pumps": ["syringe pump", "syringe pumps", "infusion pump", "perfusor"],
+  "Defibrillators": ["defibrillator", "defibrillators", "aed", "shock"],
+  "Sterilizers": ["sterilizer", "sterilizers", "autoclave", "disinfection"],
+  "Thermometers": ["thermometer", "thermometers", "infrared thermometer", "temperature gun"],
   "Hospital Furniture": ["hospital bed", "medical bed", "fowler bed", "hospital mattress", "overbed table", "examination table", "hospital trolley", "stretcher"],
-  "Wheelchair": ["wheelchair", "karma", "walker", "commode"],
-  "Orthopedic": ["orthopedic", "orthopaedic", "knee support", "back support", "cervical collar", "brace", "splint"],
-  "Masks & Accessories": ["cpap mask", "bipap mask", "oxygen mask", "nasal mask", "full face mask", "oxygen cannula", "cpap tubing"],
-  "Breast Pump": ["breast pump", "breastpump", "lactation", "maternity", "medela", "ameda", "spectra"],
-  "Incontinence": ["briefs", "underwear", "incontinence", "adult brief", "diaper", "underpad", "chux"]
+  "Wheelchairs": ["wheelchair", "wheelchairs", "mobility & wheelchairs", "mobility", "transport chair", "commode", "walker"],
+  "Orthopedic Supports": ["orthopedic", "orthopaedic", "knee support", "back support", "cervical collar", "brace", "splint"],
+  "Masks & Accessories": ["cpap mask", "bipap mask", "oxygen mask", "nasal mask", "full face mask", "oxygen cannula", "cpap tubing", "respiratory supplies", "respiratory accessories"],
+  "Breast Pumps": ["breast pump", "breast pumps", "breastpump", "lactation", "maternity", "medela", "ameda", "spectra"],
+  "Incontinence & Care": ["incontinence", "incontinence & care", "briefs", "underwear", "adult brief", "diaper", "underpad", "chux"]
 };
 
 export const normalizeCategoryKey = (value: string): string =>
@@ -38,8 +38,14 @@ export const normalizeCategoryKey = (value: string): string =>
 export const resolveCategoryName = (categoryOrSlug: string): string => {
   const cleanInput = normalizeCategoryKey(categoryOrSlug);
   for (const [canonicalName, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
-    if (normalizeCategoryKey(canonicalName) === cleanInput) return canonicalName;
-    if (keywords.some((kw) => normalizeCategoryKey(kw) === cleanInput)) return canonicalName;
+    const normCanonical = normalizeCategoryKey(canonicalName);
+    if (normCanonical === cleanInput) return canonicalName;
+    if (keywords.some((kw) => {
+      const normKw = normalizeCategoryKey(kw);
+      return cleanInput === normKw || cleanInput.includes(normKw) || normKw.includes(cleanInput);
+    })) {
+      return canonicalName;
+    }
   }
   return categoryOrSlug;
 };

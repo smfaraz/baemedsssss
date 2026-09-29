@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import {
   ArrowRight,
   Building2,
+  CheckCircle2,
   Clock3,
   PackageCheck,
 } from 'lucide-react';
@@ -9,18 +10,13 @@ import ProductCard from '../components/ProductCard';
 import ProductCardSkeleton from '../components/ProductCardSkeleton';
 import SEO from '../components/SEO';
 import TrustBadges from '../components/TrustBadges';
-import { APP_NAME, CATEGORIES, CONTACT_PHONE } from '../constants';
+import { CATEGORIES, CONTACT_PHONE } from '../constants';
 import { Link } from '../context/CartContext';
 import { getRecentlyViewedProducts } from '../lib/recentlyViewed';
-import { fetchAllProducts, fetchProductsByCategory } from '../lib/commerce';
+import { fetchAllProducts, resolveCategoryName } from '../lib/commerce';
 import { useReveal } from '../lib/useReveal';
 import { Product } from '../types';
 import { formatPrice } from '../lib/marketConfig';
-
-const categoryKey = (value: string) => value
-  .toLowerCase()
-  .replace(/&/g, 'and')
-  .replace(/[^a-z0-9]/g, '');
 
 const tileAccents = [
   'bg-sky-100 text-sky-700',
@@ -52,13 +48,13 @@ const OfferCountdownBanner: React.FC = () => {
           <div className="flex items-start gap-3">
             <span className="mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/15"><Clock3 size={23} /></span>
             <div>
-              <p className="text-xs font-black uppercase tracking-[0.16em] text-rose-100">Baemeds offer window</p>
-              <h2 className="mt-1 text-xl font-black tracking-tight sm:text-2xl">Save on essential equipment</h2>
-              <p className="mt-1 text-sm text-rose-100">Offer pricing is item-specific and availability is confirmed before fulfilment.</p>
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-rose-100">BaeMeds Offer Window</p>
+              <h2 className="mt-1 text-xl font-black tracking-tight sm:text-2xl">Save on Essential Home &amp; Hospital Equipment</h2>
+              <p className="mt-1 text-sm text-rose-100">Inspected, factory-sealed equipment with manufacturer warranties and itemized FSA/HSA invoices.</p>
             </div>
           </div>
           <div className="shrink-0" aria-live="polite">
-            <p className="mb-1 text-[10px] font-black uppercase tracking-[0.16em] text-rose-100">Offer ends in</p>
+            <p className="mb-1 text-[10px] font-black uppercase tracking-[0.16em] text-rose-100">Special Pricing Ends In</p>
             <div className="flex items-center gap-1.5 font-mono text-lg font-black sm:text-xl">
               <span className="rounded-lg bg-white px-2 py-1 text-rose-700">{days}d</span>
               <span>:</span><span className="rounded-lg bg-white px-2 py-1 text-rose-700">{unit(hours)}</span>
@@ -78,25 +74,24 @@ const EquipmentPromotion: React.FC = () => (
       <img src="/rental-hero.png" alt="Medical equipment available across the United States" className="absolute inset-0 h-full w-full object-cover object-right" />
       <div className="absolute inset-0 bg-gradient-to-r from-medical-dark via-medical-dark/95 to-medical-dark/20" aria-hidden="true" />
       <div className="relative max-w-xl px-6 py-9 sm:px-9 sm:py-12">
-        <p className="text-xs font-black uppercase tracking-[0.2em] text-medical-accent">Nationwide US Equipment</p>
-        <h1 id="equipment-promotion-title" className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">Durable Medical Equipment &amp; Home Care Supplies</h1>
+        <p className="text-xs font-black uppercase tracking-[0.2em] text-teal-300">Nationwide US Equipment</p>
+        <h2 id="equipment-promotion-title" className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">Durable Medical Equipment &amp; Home Care Supplies</h2>
         <p className="mt-3 max-w-md text-sm leading-6 text-slate-200 sm:text-base">Certified Oxygen Concentrators, BiPAP &amp; CPAP Systems, Wheelchairs, and ICU Patient Monitors with reliable insured carrier shipping across all 50 US states.</p>
         <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-          <Link to="/products?category=Oxygen%20Concentrator" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-medical-accent px-5 font-black text-medical-dark hover:bg-white"><ArrowRight size={18} /> Oxygen Concentrators</Link>
-          <Link to="/products" className="inline-flex min-h-12 items-center justify-center rounded-xl border border-white/40 px-5 font-bold text-white hover:bg-white/10">Browse all equipment</Link>
+          <Link to="/products?category=Oxygen%20Concentrators" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-teal-400 px-5 font-black text-slate-950 hover:bg-white transition duration-200"><ArrowRight size={18} /> Oxygen Concentrators</Link>
+          <Link to="/products" className="inline-flex min-h-12 items-center justify-center rounded-xl border border-white/40 px-5 font-bold text-white hover:bg-white/10 transition duration-200">Browse Full Catalog</Link>
         </div>
       </div>
     </div>
   </section>
 );
 
-
 const LegacyAndReviews: React.FC = () => (
   <section className="border-y border-slate-200 bg-gradient-to-br from-slate-50 via-white to-slate-100 py-10 md:py-14">
     <div className="container mx-auto grid gap-6 px-4 lg:grid-cols-[0.9fr_1.1fr] lg:items-stretch">
       <div className="relative overflow-hidden rounded-3xl border border-medical-dark bg-medical-dark p-6 text-white shadow-xl sm:p-8">
         <div className="absolute -right-16 -top-20 h-48 w-48 rounded-full border-[22px] border-white/15" aria-hidden="true" />
-        <p className="text-xs font-black uppercase tracking-[0.2em] text-medical-accent">Quality Assurance</p>
+        <p className="text-xs font-black uppercase tracking-[0.2em] text-teal-300">Quality Assurance</p>
         <p className="mt-3 text-7xl font-black leading-none tracking-[-0.08em] sm:text-8xl">50</p>
         <h2 className="mt-2 text-2xl font-black sm:text-3xl">States Covered Nationwide</h2>
         <p className="mt-3 max-w-md text-sm leading-6 text-slate-200">Providing patients, clinics, and care facilities with pre-calibrated, verified medical equipment and dedicated technical support.</p>
@@ -143,18 +138,18 @@ const CategoryTile: React.FC<CategoryTileProps> = ({ name, slug, image, icon, co
   return (
     <Link
       to={`/products?category=${encodeURIComponent(slug)}`}
-      className="category-tile motion-lift group relative min-w-[168px] snap-start overflow-hidden rounded-2xl border border-slate-200 bg-slate-900 shadow-soft md:min-w-0"
+      className="category-tile motion-lift group relative min-w-[168px] snap-start overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-soft md:min-w-0"
     >
-      <div className="relative h-36 overflow-hidden bg-medical-light">
+      <div className="relative h-36 overflow-hidden bg-slate-50">
         {image && !imageFailed ? (
-          <img src={image} alt={`${name} medical equipment category`} className="h-full w-full object-contain bg-white p-2 transition duration-500 group-hover:scale-105" loading="lazy" onError={() => setImageFailed(true)} />
+          <img src={image} alt={`${name} medical equipment category`} className="h-full w-full object-contain bg-white p-3 transition duration-500 group-hover:scale-105" loading="lazy" onError={() => setImageFailed(true)} />
         ) : (
           <span className="flex h-full items-center justify-center text-medical-primary">{icon}</span>
         )}
-        <span className={`absolute left-3 top-3 flex h-9 w-9 items-center justify-center rounded-xl shadow-sm ${accent}`}>{icon}</span>
+        <span className={`absolute left-3 top-3 flex h-8 w-8 items-center justify-center rounded-xl shadow-sm ${accent}`}>{icon}</span>
       </div>
-      <div className="flex min-h-20 flex-col justify-center bg-white px-4 py-3">
-        <span className="text-sm font-black leading-5 text-medical-dark">{name}</span>
+      <div className="flex min-h-20 flex-col justify-center bg-white px-4 py-3 border-t border-slate-100">
+        <span className="text-sm font-black leading-5 text-medical-dark group-hover:text-medical-primary transition">{name}</span>
         <span className="mt-1 text-xs font-semibold text-slate-500">{count} {count === 1 ? 'product' : 'products'}</span>
       </div>
     </Link>
@@ -214,8 +209,9 @@ const ProductShelf: React.FC<ProductShelfProps> = ({
 
 const HomePage: React.FC = () => {
   const [popularProducts, setPopularProducts] = useState<Product[]>([]);
-  const [newArrivals, setNewArrivals] = useState<Product[]>([]);
   const [respiratoryProducts, setRespiratoryProducts] = useState<Product[]>([]);
+  const [mobilityProducts, setMobilityProducts] = useState<Product[]>([]);
+  const [diagnosticProducts, setDiagnosticProducts] = useState<Product[]>([]);
   const [catalogueProducts, setCatalogueProducts] = useState<Product[]>([]);
   const [recentlyViewedProducts] = useState(() => getRecentlyViewedProducts().slice(0, 4));
   const [isLoading, setIsLoading] = useState(true);
@@ -225,35 +221,60 @@ const HomePage: React.FC = () => {
 
     const loadProducts = async () => {
       try {
-        const [allProducts, oxygenProducts, bipapProducts] = await Promise.all([
-          fetchAllProducts(),
-          fetchProductsByCategory('Oxygen Concentrator'),
-          fetchProductsByCategory('BiPAP'),
-        ]);
-
+        const allProducts = await fetchAllProducts();
         if (!isMounted) return;
         setCatalogueProducts(allProducts);
-        const inStockProducts = allProducts.filter((product) => product.inStock);
 
-        // Curate actual core equipment that customers purchase
-        const heroes = inStockProducts.filter((p) => p.tags?.includes('Flagship Hero'));
-        const coreEquipment = inStockProducts.filter((p) =>
-          !p.tags?.includes('Flagship Hero') &&
-          p.price >= 60 &&
-          !/filter|tubing|connector|adapter|wrench|bracket|screw|clip|cuff/i.test(p.title)
+        // 1. Popular Products: Flagship hero equipment with multi-angle galleries
+        const bestSellerIds = [
+          'gid://shopify/Product/hero-dv-525ds',
+          'gid://shopify/Product/hero-ino-is-501-na8',
+          'gid://shopify/Product/hero-dr-k3',
+          'gid://shopify/Product/hero-dv-1025ds',
+        ];
+        const bestSellers = bestSellerIds
+          .map((id) => allProducts.find((p) => p.id === id))
+          .filter(Boolean) as Product[];
+        setPopularProducts(bestSellers);
+
+        // 2. Respiratory care shelf: DeVilbiss 5L, Inogen Rove 6, PulmoNeb LT, Drive Power Neb
+        const respiratoryIds = [
+          'gid://shopify/Product/hero-dv-525ds',
+          'gid://shopify/Product/hero-ino-is-501-na8',
+          'gid://shopify/Product/hero-dv-3655ltr',
+          'gid://shopify/Product/hero-dr-18081',
+        ];
+        const respiratory = respiratoryIds
+          .map((id) => allProducts.find((p) => p.id === id))
+          .filter(Boolean) as Product[];
+        setRespiratoryProducts(respiratory);
+
+        // 3. Mobility shelf: Cruiser III, Sentra EC Bariatric, Cruiser X4, Cylinder Cart
+        const mobilityIds = [
+          'gid://shopify/Product/hero-dr-k3',
+          'gid://shopify/Product/hero-dr-stdec',
+          'gid://shopify/Product/hero-dr-cx4',
+          'gid://shopify/Product/hero-dr-13002sv-6',
+        ];
+        const mobility = mobilityIds
+          .map((id) => allProducts.find((p) => p.id === id))
+          .filter(Boolean) as Product[];
+        setMobilityProducts(mobility);
+
+        // 4. Clinical diagnostics & monitoring shelf
+        const diagnosticIds = ['gid://shopify/Product/hero-mq-mq3000'];
+        const diagBase = diagnosticIds
+          .map((id) => allProducts.find((p) => p.id === id))
+          .filter(Boolean) as Product[];
+        const additionalDiag = allProducts.filter(
+          (p) =>
+            p.inStock &&
+            !diagBase.some((d) => d.id === p.id) &&
+            /monitor|oximeter|glucometer|sphygmomanometer/i.test(p.title) &&
+            !/connector|hose|tubing|bulb|bracket|adapter|wrench|strip|lancet/i.test(p.title) &&
+            p.price >= 15
         );
-        const topSellers = [...heroes, ...coreEquipment];
-
-        setPopularProducts(topSellers.slice(0, 4));
-        setNewArrivals(topSellers.slice(4, 8));
-
-        // Respiratory care shelf: actual concentrators, BiPAP, and CPAP systems
-        const coreRespiratory = inStockProducts.filter((p) =>
-          /concentrator|bipap|cpap|pulmoneb|nebulizer system/i.test(p.title) &&
-          p.price >= 40 &&
-          !/filter|tubing|connector|adapter|bracket/i.test(p.title)
-        );
-        setRespiratoryProducts(coreRespiratory.slice(0, 4));
+        setDiagnosticProducts([...diagBase, ...additionalDiag].slice(0, 4));
       } catch (error) {
         console.error('Failed to load homepage products:', error);
       } finally {
@@ -267,17 +288,16 @@ const HomePage: React.FC = () => {
     };
   }, []);
 
-
   const availableCategories = useMemo(() => CATEGORIES
     .filter((category) => category.name !== 'ECG Machines')
     .map((category) => {
-      const requestedCategory = categoryKey(category.slug || category.name);
-      const matches = catalogueProducts.filter((product) => categoryKey(product.category) === requestedCategory);
+      const canonical = resolveCategoryName(category.slug || category.name);
+      const matches = catalogueProducts.filter((product) => resolveCategoryName(product.category) === canonical);
       return {
         name: category.name,
         slug: category.slug || category.name,
         icon: category.icon,
-        image: matches.find((product) => product.image)?.image || category.image,
+        image: category.image || matches.find((product) => product.image)?.image,
         count: matches.length,
       };
     })
@@ -288,15 +308,30 @@ const HomePage: React.FC = () => {
 
   // Showcase flagship products and core medical equipment in the continuous marquee reel
   const heroReel = useMemo(() => {
-    const heroes = catalogueProducts.filter((product) => product.inStock && product.tags?.includes('Flagship Hero'));
-    const coreMachines = catalogueProducts.filter((product) =>
-      product.inStock &&
-      product.price >= 50 &&
-      !product.tags?.includes('Flagship Hero') &&
-      !/filter|tubing|connector|adapter|wrench|bracket|screw|clip|cuff/i.test(product.title)
+    const heroMachineIds = [
+      'gid://shopify/Product/hero-dv-525ds',
+      'gid://shopify/Product/hero-dv-1025ds',
+      'gid://shopify/Product/hero-dr-k3',
+      'gid://shopify/Product/hero-dr-stdec',
+      'gid://shopify/Product/hero-dr-cx4',
+      'gid://shopify/Product/hero-ino-is-501-na8',
+      'gid://shopify/Product/hero-dv-3655ltr',
+      'gid://shopify/Product/hero-dr-18081',
+      'gid://shopify/Product/hero-mq-mq3000',
+      'gid://shopify/Product/hero-dr-13002sv-6',
+    ];
+    const topHeroMachines = heroMachineIds
+      .map((id) => catalogueProducts.find((p) => p.id === id))
+      .filter(Boolean) as Product[];
+
+    const additionalMachines = catalogueProducts.filter((p) =>
+      p.inStock &&
+      p.price >= 80 &&
+      !topHeroMachines.some((m) => m.id === p.id) &&
+      !/filter|tubing|connector|adapter|wrench|bracket|screw|clip|cuff|case|bag|cannula|mask|valve/i.test(p.title)
     );
-    const combined = [...heroes, ...coreMachines];
-    return combined.slice(0, 12);
+
+    return [...topHeroMachines, ...additionalMachines].slice(0, 14);
   }, [catalogueProducts]);
 
   return (
@@ -306,40 +341,57 @@ const HomePage: React.FC = () => {
         description="Shop certified oxygen concentrators, BiPAP/CPAP systems, patient monitors, wheelchairs, and hospital supplies across the United States with fast nationwide shipping."
       />
 
-      <section className="hero-stage overflow-hidden bg-medical-dark text-white">
-
-        <div className="container mx-auto px-4 py-9 text-center md:py-12">
-          <p className="chip-accent inline-flex rounded-full px-3.5 py-1.5 text-xs font-black uppercase tracking-[0.14em]">
-            Home care, clinical &amp; hospital equipment
-          </p>
-          <h1 className="mx-auto mt-4 max-w-3xl text-2xl font-black leading-tight tracking-tight sm:text-3xl">
-            Trusted medical equipment, delivered across the United States.
+      {/* Hero Stage */}
+      <section className="hero-stage overflow-hidden bg-gradient-to-b from-slate-950 via-medical-dark to-slate-900 text-white">
+        <div className="container mx-auto px-4 pt-10 pb-8 text-center md:pt-14 md:pb-10">
+          <div className="inline-flex items-center gap-2 rounded-full border border-teal-400/30 bg-teal-500/10 px-4 py-1.5 text-xs font-black uppercase tracking-[0.16em] text-teal-300">
+            <span className="h-2 w-2 rounded-full bg-teal-400 animate-pulse" />
+            Authorized US Medical Equipment Distributor • 50 States Nationwide
+          </div>
+          <h1 className="mx-auto mt-4 max-w-4xl text-3xl font-black leading-tight tracking-tight sm:text-4xl md:text-5xl">
+            Hospital-Grade &amp; Home Medical Equipment, <span className="text-teal-400">Delivered Direct</span>
           </h1>
-          <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
-            <Link to="/products" className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-white px-6 font-bold text-medical-dark hover:bg-medical-accent">
-              Shop all equipment <ArrowRight size={19} />
+          <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-slate-300 sm:text-base md:text-lg">
+            Certified Oxygen Concentrators, CPAP &amp; BiPAP Sleep Therapy Systems, Wheelchairs, and Diagnostic Monitors. Factory-sealed with manufacturer warranty and FSA/HSA payment cards accepted.
+          </p>
+          <div className="mt-6 flex flex-wrap justify-center gap-3">
+            <Link to="/products" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-teal-400 px-6 font-black text-slate-950 shadow-lg shadow-teal-500/20 hover:bg-white transition duration-200">
+              Browse All Equipment <ArrowRight size={19} />
             </Link>
-            <Link to="/contact" className="flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/45 px-6 font-bold text-white hover:bg-white/10">
-              Talk to product support
+            <Link to="/products?category=Oxygen%20Concentrators" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/10 px-5 font-bold text-white hover:bg-white/20 transition duration-200">
+              Oxygen Concentrators
             </Link>
+            <Link to="/products?category=Wheelchairs" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/10 px-5 font-bold text-white hover:bg-white/20 transition duration-200">
+              Wheelchairs &amp; Mobility
+            </Link>
+            <Link to="/contact" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 px-5 font-bold text-slate-300 hover:text-white hover:bg-white/10 transition duration-200">
+              Clinical Support
+            </Link>
+          </div>
+
+          <div className="mx-auto mt-7 flex max-w-3xl flex-wrap items-center justify-center gap-y-2 gap-x-6 text-xs font-semibold text-slate-300">
+            <span className="flex items-center gap-1.5"><CheckCircle2 size={15} className="text-teal-400" /> 100% Brand New &amp; Factory-Sealed</span>
+            <span className="flex items-center gap-1.5"><CheckCircle2 size={15} className="text-teal-400" /> FSA / HSA Cards Accepted</span>
+            <span className="flex items-center gap-1.5"><CheckCircle2 size={15} className="text-teal-400" /> Insured 2–4 Day Carrier Delivery</span>
+            <span className="flex items-center gap-1.5"><CheckCircle2 size={15} className="text-teal-400" /> Direct Support Desk: {CONTACT_PHONE}</span>
           </div>
         </div>
 
         {heroReel.length > 0 && (
-          <div className="marquee-track relative overflow-hidden pb-10 md:pb-12" aria-label="Featured products">
+          <div className="marquee-track relative overflow-hidden pb-10 md:pb-12" aria-label="Featured equipment">
             <div className="marquee">
               {[...heroReel, ...heroReel].map((product, index) => (
                 <Link
                   key={`${product.id}-${index}`}
                   to={`/products/${product.handle}`}
-                  className="mx-2 flex w-40 shrink-0 flex-col overflow-hidden rounded-2xl border border-white/15 bg-white shadow-xl sm:w-48"
+                  className="mx-2 flex w-44 shrink-0 flex-col overflow-hidden rounded-2xl border border-white/15 bg-white shadow-xl sm:w-52 transition hover:-translate-y-1 duration-200"
                 >
-                  <div className="h-28 bg-white p-3 sm:h-32">
+                  <div className="h-32 bg-white p-3 sm:h-36">
                     <img src={product.image} alt={product.title} loading="lazy" className="h-full w-full object-contain" />
                   </div>
-                  <div className="border-t border-slate-100 px-3 py-2.5">
+                  <div className="border-t border-slate-100 bg-white px-3.5 py-3">
                     <p className="line-clamp-1 text-xs font-black text-medical-dark">{product.title}</p>
-                    <p className="mt-0.5 text-xs font-black text-medical-primary">{formatPrice(product.price)}</p>
+                    <p className="mt-1 text-xs font-black text-teal-700">{formatPrice(product.price)}</p>
                   </div>
                 </Link>
               ))}
@@ -348,23 +400,29 @@ const HomePage: React.FC = () => {
         )}
       </section>
 
-      <section className="reveal-on-scroll border-b border-slate-200 bg-white py-9 md:py-12">
+      {/* Category Grid: Browse by Clinical Need */}
+      <section className="reveal-on-scroll border-b border-slate-200 bg-white py-10 md:py-14">
         <div className="container mx-auto px-4">
-          <div className="mb-5 flex items-end justify-between gap-4">
+          <div className="mb-6 flex items-end justify-between gap-4">
             <div>
-              <h2 className="text-2xl font-black tracking-tight text-medical-text md:text-3xl">Shop by need</h2>
-              <p className="mt-1 text-sm text-slate-600">Browse equipment by category.</p>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-medical-primary">Comprehensive Catalog</p>
+              <h2 className="mt-1 text-2xl font-black tracking-tight text-medical-text md:text-3xl">Shop by Category</h2>
+              <p className="mt-1 text-sm text-slate-600">Select certified home medical equipment and clinical care categories.</p>
             </div>
-            <Link to="/products" className="hidden text-sm font-bold text-medical-primary hover:text-medical-dark sm:block">Complete catalogue</Link>
+            <Link to="/products" className="hidden text-sm font-bold text-medical-primary hover:text-medical-dark sm:block">
+              View Complete Catalog ({catalogueProducts.length.toLocaleString()} items) &rarr;
+            </Link>
           </div>
 
           {isLoading ? (
-            <div className="-mx-4 flex gap-3 overflow-hidden px-4 md:mx-0 md:grid md:grid-cols-4 md:px-0 lg:grid-cols-5">
+            <div className="-mx-4 flex gap-3 overflow-hidden px-4 md:mx-0 md:grid md:grid-cols-4 md:px-0 lg:grid-cols-6">
               {Array.from({ length: 6 }).map((_, index) => <div key={index} className="h-56 min-w-[168px] animate-pulse rounded-2xl bg-slate-100 md:min-w-0" />)}
             </div>
           ) : availableCategories.length > 0 ? (
-            <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-3 md:mx-0 md:grid md:grid-cols-4 md:overflow-visible md:px-0 lg:flex lg:flex-wrap lg:justify-center">
-              {availableCategories.map((category, index) => <CategoryTile key={category.slug} {...category} accent={tileAccents[index % tileAccents.length]} />)}
+            <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-3 md:mx-0 md:grid md:grid-cols-3 md:overflow-visible md:px-0 lg:grid-cols-6">
+              {availableCategories.map((category, index) => (
+                <CategoryTile key={category.slug} {...category} accent={tileAccents[index % tileAccents.length]} />
+              ))}
             </div>
           ) : (
             <div className="surface-card px-5 py-8 text-center">
@@ -375,46 +433,64 @@ const HomePage: React.FC = () => {
         </div>
       </section>
 
-      <TrustBadges />
-
-      <LegacyAndReviews />
-
-      <EquipmentPromotion />
-
-      <OfferCountdownBanner />
-
-
+      {/* Shelf 1: Flagship Hospital & Home Care Equipment */}
       <ProductShelf
-        title="Essential equipment"
-        description="Home-care and clinical equipment."
+        title="Essential Hospital &amp; Home Equipment"
+        description="Our highest-rated, verified flagship devices trusted by patients and healthcare practitioners."
         products={popularProducts}
         isLoading={isLoading}
         viewAllPath="/products"
       />
 
+      {/* Trust Badges */}
+      <TrustBadges />
+
+      {/* Shelf 2: Respiratory Therapy & Oxygen Care */}
       <section className="border-y border-slate-200 bg-white">
         <ProductShelf
-          title="Respiratory care"
-          description="Oxygen concentrators, BiPAP and CPAP equipment with support for selection and setup."
+          title="Respiratory Therapy &amp; Oxygen Care"
+          description="High-flow home oxygen concentrators, portable travel POCs, and clinical compressor nebulizer systems."
           products={respiratoryProducts}
           isLoading={isLoading}
-          viewAllPath="/products?category=Oxygen%20Concentrator"
+          viewAllPath="/products?category=Oxygen%20Concentrators"
         />
       </section>
 
+      {/* Quality Assurance & Compliance */}
+      <LegacyAndReviews />
+
+      {/* Shelf 3: Mobility & Wheelchairs */}
       <ProductShelf
-        title="Recently added"
-        description="New products currently in stock."
-        products={newArrivals}
+        title="Mobility &amp; Wheelchairs"
+        description="Lightweight transport chairs, high-strength dual-axle wheelchairs, and heavy-duty bariatric mobility systems."
+        products={mobilityProducts}
         isLoading={isLoading}
-        viewAllPath="/products"
+        viewAllPath="/products?category=Wheelchairs"
       />
 
+      {/* Shelf 4: Clinical Monitoring & Diagnostics */}
+      <section className="border-y border-slate-200 bg-white">
+        <ProductShelf
+          title="Clinical Monitoring &amp; Diagnostics"
+          description="OLED fingertip pulse oximeters, blood pressure monitors, sleep study recorders, and glucose testing kits."
+          products={diagnosticProducts}
+          isLoading={isLoading}
+          viewAllPath="/products?category=Patient%20Monitors"
+        />
+      </section>
+
+      {/* Equipment Promotion Banner */}
+      <EquipmentPromotion />
+
+      {/* Offer Countdown Banner */}
+      <OfferCountdownBanner />
+
+      {/* Recently Viewed Shelf */}
       {recentlyViewedProducts.length > 0 && (
         <section className="border-t border-slate-200 bg-white">
           <ProductShelf
-            title="Recently viewed"
-            description="Products viewed in this browser."
+            title="Recently Viewed"
+            description="Products you recently inspected in this browser."
             products={recentlyViewedProducts}
             isLoading={false}
             viewAllPath="/products"
@@ -422,6 +498,7 @@ const HomePage: React.FC = () => {
         </section>
       )}
 
+      {/* FAQ Section */}
       <section className="reveal-on-scroll border-t border-slate-200 bg-slate-50 px-4 py-14">
         <div className="container mx-auto max-w-4xl">
           <div className="text-center mb-10">
@@ -473,10 +550,9 @@ const HomePage: React.FC = () => {
               </p>
             </details>
 
-
             <details className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm [&_summary::-webkit-details-marker]:hidden">
               <summary className="flex cursor-pointer items-center justify-between gap-1.5 text-slate-900 font-bold text-lg">
-                <h3>Can I purchase brand new medical devices with official warranty?</h3>
+                <h3>Is BaeMeds an authorized medical equipment distributor?</h3>
                 <span className="shrink-0 rounded-full bg-slate-100 p-1.5 text-slate-900 transition duration-300 group-open:-rotate-180">
                   <svg xmlns="http://www.w3.org/2000/svg" className="size-5" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -484,7 +560,7 @@ const HomePage: React.FC = () => {
                 </span>
               </summary>
               <p className="mt-4 leading-relaxed text-slate-600">
-                Yes, BaeMeds is an authorized dealer for leading global and US medical manufacturers including ResMed, Philips Respironics, Drive DeVilbiss, Inogen, and CAIRE. All new products include full manufacturer warranties, itemized invoices with HCPCS coding, and dedicated technical support.
+                Yes, BaeMeds supplies leading global and US medical manufacturers including Drive DeVilbiss, Inogen, ResMed, Philips Respironics, and McKesson. All products include full manufacturer warranties, itemized invoices with HCPCS coding, and dedicated technical support.
               </p>
             </details>
 
@@ -505,17 +581,18 @@ const HomePage: React.FC = () => {
         </div>
       </section>
 
+      {/* Institutional / Bulk Orders */}
       <section className="reveal-on-scroll bg-medical-dark px-4 py-12 text-white">
         <div className="container mx-auto flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
           <div className="flex items-start gap-4">
             <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/15"><Building2 size={25} /></span>
             <div>
               <h2 className="text-2xl font-black">Buying for a hospital, clinic, or institution?</h2>
-              <p className="mt-1 text-sm text-white/85">Send a requirement list for availability, product matching, and a quotation.</p>
+              <p className="mt-1 text-sm text-white/85">Send a requirement list for institutional pricing, bulk availability, and formal quotation.</p>
             </div>
           </div>
-          <Link to="/bulk-orders" className="flex min-h-12 w-full shrink-0 items-center justify-center rounded-xl bg-white px-6 font-bold text-medical-dark hover:bg-medical-accent md:w-auto">
-            Request a quotation
+          <Link to="/bulk-orders" className="flex min-h-12 w-full shrink-0 items-center justify-center rounded-xl bg-teal-400 px-6 font-black text-slate-950 hover:bg-white transition duration-200 md:w-auto">
+            Request Institutional Quotation
           </Link>
         </div>
       </section>
