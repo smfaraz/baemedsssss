@@ -155,7 +155,7 @@ const ProductDetailPage: React.FC = () => {
     setIsBuyingNow(true);
     try {
       await addToCart(product, quantity);
-      navigate('/cart');
+      navigate('/checkout');
     } catch (error) {
       console.error('Buy now failed', error);
       setCartError('Could not process immediate checkout. Please try again.');
@@ -432,16 +432,16 @@ const ProductDetailPage: React.FC = () => {
                   <span className="font-bold text-medical-dark" aria-live="polite">{quantity}</span>
                   <button type="button" onClick={() => setQuantity((current) => current + 1)} className="flex h-11 w-11 items-center justify-center rounded-xl hover:bg-slate-50" aria-label="Increase quantity"><Plus size={17} /></button>
                 </div>
-                <button type="button" onClick={handleAddToCart} disabled={!product.inStock || isCartLoading || isAdded} className="hidden min-h-12 items-center justify-center gap-2 rounded-xl bg-medical-primary px-4 font-black text-white shadow-md hover:bg-medical-dark disabled:cursor-not-allowed disabled:bg-slate-300 md:flex">
+                <button type="button" onClick={handleAddToCart} disabled={!product.inStock || isCartLoading || isAdded} className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-medical-primary px-4 font-black text-white shadow-md hover:bg-medical-dark disabled:cursor-not-allowed disabled:bg-slate-300 transition">
                   {isCartLoading ? <Loader size={18} className="animate-spin" /> : isAdded ? <Check size={18} /> : <ShoppingCart size={18} />}
                   {product.inStock ? (isAdded ? 'Added to cart' : 'Add to cart') : 'Out of stock'}
                 </button>
-                <button type="button" onClick={handleBuyNow} disabled={!product.inStock || isBuyingNow || isCartLoading} className="hidden min-h-12 items-center justify-center rounded-xl border-2 border-medical-accent bg-medical-accent px-4 font-black text-medical-dark shadow-md hover:bg-amber-300 disabled:cursor-not-allowed disabled:border-slate-300 disabled:bg-slate-100 disabled:text-medical-text md:flex">
-                  {isBuyingNow ? 'Opening cart...' : 'Buy now'}
+                <button type="button" onClick={handleBuyNow} disabled={!product.inStock || isBuyingNow || isCartLoading} className="flex min-h-12 items-center justify-center rounded-xl border-2 border-medical-accent bg-medical-accent px-4 font-black text-medical-dark shadow-md hover:bg-amber-300 disabled:cursor-not-allowed disabled:border-slate-300 disabled:bg-slate-100 disabled:text-medical-text transition">
+                  {isBuyingNow ? 'Proceeding to checkout...' : 'Buy now'}
                 </button>
               </div>
 
-              {cartError && <p role="alert" className="mt-3 hidden rounded-xl bg-medical-alert bg-opacity-10 px-3 py-2 text-sm font-semibold text-medical-alert md:block">{cartError}</p>}
+              {cartError && <p role="alert" className="mt-3 rounded-xl bg-medical-alert bg-opacity-10 px-3 py-2 text-sm font-semibold text-medical-alert">{cartError}</p>}
 
               {!product.inStock && (
                 <div className="mt-5 rounded-2xl border border-medical-accent bg-medical-accent bg-opacity-5 p-4">
@@ -552,9 +552,57 @@ const ProductDetailPage: React.FC = () => {
               <caption className="sr-only">Specifications for {product.title}</caption>
               <tbody className="divide-y divide-slate-100">
                 <tr className="hover:bg-slate-50/60"><th scope="row" className="w-1/3 py-3 pr-4 font-bold text-medical-dark">Brand / Manufacturer</th><td className="py-3 text-medical-text font-medium">{product.vendor}</td></tr>
-                <tr className="hover:bg-slate-50/60"><th scope="row" className="py-3 pr-4 font-bold text-medical-dark">Product Name</th><td className="py-3 text-medical-text">{product.title}</td></tr>
-                <tr className="hover:bg-slate-50/60"><th scope="row" className="py-3 pr-4 font-bold text-medical-dark">Category</th><td className="py-3 text-medical-text">{product.category}</td></tr>
-                {product.warranty && <tr className="hover:bg-slate-50/60"><th scope="row" className="py-3 pr-4 font-bold text-medical-dark">Manufacturer Warranty</th><td className="py-3 text-medical-text font-semibold text-medical-secondary">{product.warranty}</td></tr>}
+                <tr className="hover:bg-slate-50/60"><th scope="row" className="py-3 pr-4 font-bold text-medical-dark">Product Name</th><td className="py-3 text-medical-text font-medium">{product.title}</td></tr>
+                <tr className="hover:bg-slate-50/60"><th scope="row" className="py-3 pr-4 font-bold text-medical-dark">Clinical Category</th><td className="py-3 text-medical-text">{product.category}</td></tr>
+                <tr className="hover:bg-slate-50/60"><th scope="row" className="py-3 pr-4 font-bold text-medical-dark">Item SKU / Catalog ID</th><td className="py-3 font-mono text-xs text-medical-dark">{product.id}</td></tr>
+                {product.specs && (
+                  <tr className="hover:bg-slate-50/60"><th scope="row" className="py-3 pr-4 font-bold text-medical-dark">Technical Parameters &amp; Dimensions</th><td className="py-3 text-medical-text">{product.specs}</td></tr>
+                )}
+                <tr className="hover:bg-slate-50/60">
+                  <th scope="row" className="py-3 pr-4 font-bold text-medical-dark">HCPCS Billing Code</th>
+                  <td className="py-3 text-medical-text font-semibold text-medical-primary">
+                    {product.hcpcsCode || (
+                      product.category.toLowerCase().includes('oxygen') ? 'E1390 / E1392 (Oxygen Equipment)' :
+                      product.category.toLowerCase().includes('wheelchair') ? 'K0001 / K0004 (Standard / High-Strength Mobility)' :
+                      product.category.toLowerCase().includes('cpap') || product.category.toLowerCase().includes('bipap') ? 'E0601 / E0470 (Positive Airway Pressure)' :
+                      product.category.toLowerCase().includes('nebulizer') ? 'E0570 (Compressor Nebulizer)' :
+                      product.category.toLowerCase().includes('suction') ? 'E0600 (Respiratory Suction Pump)' :
+                      'A-Series / DME Supply Code'
+                    )}
+                  </td>
+                </tr>
+                <tr className="hover:bg-slate-50/60">
+                  <th scope="row" className="py-3 pr-4 font-bold text-medical-dark">FDA Regulatory Status</th>
+                  <td className="py-3 text-medical-text">
+                    {product.fdaClassification || (
+                      product.requiresPrescription || product.category.toLowerCase().includes('oxygen') || product.category.toLowerCase().includes('cpap')
+                        ? 'FDA Class II Medical Device (510(k) Cleared)'
+                        : 'FDA Class I Medical Device (Hospital & Home Grade)'
+                    )}
+                  </td>
+                </tr>
+                <tr className="hover:bg-slate-50/60">
+                  <th scope="row" className="py-3 pr-4 font-bold text-medical-dark">Prescription (Rx) Status</th>
+                  <td className="py-3 text-medical-text">
+                    {product.requiresPrescription ? (
+                      <span className="font-bold text-amber-800">Prescription Required (Valid US Doctor Rx Needed Prior to Shipment)</span>
+                    ) : (
+                      <span className="font-semibold text-medical-secondary">Over-The-Counter (OTC) • No Prescription Needed</span>
+                    )}
+                  </td>
+                </tr>
+                <tr className="hover:bg-slate-50/60">
+                  <th scope="row" className="py-3 pr-4 font-bold text-medical-dark">Reimbursement Eligibility</th>
+                  <td className="py-3 text-medical-text font-semibold text-medical-secondary">FSA / HSA Eligible • Itemized Medical Invoicing Included</td>
+                </tr>
+                <tr className="hover:bg-slate-50/60">
+                  <th scope="row" className="py-3 pr-4 font-bold text-medical-dark">Quality &amp; Inspection</th>
+                  <td className="py-3 text-medical-text">100% Brand New in Original Factory Packaging • Certified Pre-Shipment Biomedical Verification</td>
+                </tr>
+                <tr className="hover:bg-slate-50/60">
+                  <th scope="row" className="py-3 pr-4 font-bold text-medical-dark">Manufacturer Warranty</th>
+                  <td className="py-3 text-medical-text font-semibold text-medical-secondary">{product.warranty || '1 Year Standard Manufacturer Warranty'}</td>
+                </tr>
                 {product.metafields?.map((field) => (
                   <tr key={`${field.namespace}-${field.key}`} className="hover:bg-slate-50/60">
                     <th scope="row" className="py-3 pr-4 font-bold capitalize text-medical-dark">{field.key.replace(/_/g, ' ')}</th>

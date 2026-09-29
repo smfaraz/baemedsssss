@@ -306,33 +306,7 @@ const HomePage: React.FC = () => {
 
   const revealRef = useReveal<HTMLDivElement>();
 
-  // Showcase flagship products and core medical equipment in the continuous marquee reel
-  const heroReel = useMemo(() => {
-    const heroMachineIds = [
-      'gid://shopify/Product/hero-dv-525ds',
-      'gid://shopify/Product/hero-dv-1025ds',
-      'gid://shopify/Product/hero-dr-k3',
-      'gid://shopify/Product/hero-dr-stdec',
-      'gid://shopify/Product/hero-dr-cx4',
-      'gid://shopify/Product/hero-ino-is-501-na8',
-      'gid://shopify/Product/hero-dv-3655ltr',
-      'gid://shopify/Product/hero-dr-18081',
-      'gid://shopify/Product/hero-mq-mq3000',
-      'gid://shopify/Product/hero-dr-13002sv-6',
-    ];
-    const topHeroMachines = heroMachineIds
-      .map((id) => catalogueProducts.find((p) => p.id === id))
-      .filter(Boolean) as Product[];
 
-    const additionalMachines = catalogueProducts.filter((p) =>
-      p.inStock &&
-      p.price >= 80 &&
-      !topHeroMachines.some((m) => m.id === p.id) &&
-      !/filter|tubing|connector|adapter|wrench|bracket|screw|clip|cuff|case|bag|cannula|mask|valve/i.test(p.title)
-    );
-
-    return [...topHeroMachines, ...additionalMachines].slice(0, 14);
-  }, [catalogueProducts]);
 
   return (
     <div ref={revealRef} className="bg-[#f6f3ee]">
@@ -341,63 +315,139 @@ const HomePage: React.FC = () => {
         description="Shop certified oxygen concentrators, BiPAP/CPAP systems, patient monitors, wheelchairs, and hospital supplies across the United States with fast nationwide shipping."
       />
 
-      {/* Hero Stage */}
-      <section className="hero-stage overflow-hidden bg-gradient-to-b from-slate-950 via-medical-dark to-slate-900 text-white">
-        <div className="container mx-auto px-4 pt-10 pb-8 text-center md:pt-14 md:pb-10">
-          <div className="inline-flex items-center gap-2 rounded-full border border-teal-400/30 bg-teal-500/10 px-4 py-1.5 text-xs font-black uppercase tracking-[0.16em] text-teal-300">
-            <span className="h-2 w-2 rounded-full bg-teal-400 animate-pulse" />
-            Authorized US Medical Equipment Distributor • 50 States Nationwide
-          </div>
-          <h1 className="mx-auto mt-4 max-w-4xl text-3xl font-black leading-tight tracking-tight sm:text-4xl md:text-5xl">
-            Hospital-Grade &amp; Home Medical Equipment, <span className="text-teal-400">Delivered Direct</span>
-          </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-slate-300 sm:text-base md:text-lg">
-            Certified Oxygen Concentrators, CPAP &amp; BiPAP Sleep Therapy Systems, Wheelchairs, and Diagnostic Monitors. Factory-sealed with manufacturer warranty and FSA/HSA payment cards accepted.
-          </p>
-          <div className="mt-6 flex flex-wrap justify-center gap-3">
-            <Link to="/products" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-teal-400 px-6 font-black text-slate-950 shadow-lg shadow-teal-500/20 hover:bg-white transition duration-200">
-              Browse All Equipment <ArrowRight size={19} />
-            </Link>
-            <Link to="/products?category=Oxygen%20Concentrators" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/10 px-5 font-bold text-white hover:bg-white/20 transition duration-200">
-              Oxygen Concentrators
-            </Link>
-            <Link to="/products?category=Wheelchairs" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/10 px-5 font-bold text-white hover:bg-white/20 transition duration-200">
-              Wheelchairs &amp; Mobility
-            </Link>
-            <Link to="/contact" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 px-5 font-bold text-slate-300 hover:text-white hover:bg-white/10 transition duration-200">
-              Clinical Support
-            </Link>
-          </div>
+      {/* Hero Section: Clean, Authentic US Medical Equipment Distributor */}
+      <section className="border-b border-slate-200 bg-gradient-to-b from-white via-slate-50/50 to-slate-100/60 py-10 lg:py-14">
+        <div className="container mx-auto px-4">
+          <div className="grid gap-10 lg:grid-cols-12 lg:items-center">
+            {/* Left Column: Authentic Brand Headline & Navigation */}
+            <div className="lg:col-span-7">
+              <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3.5 py-1 text-xs font-semibold text-slate-700 shadow-xs">
+                <span className="h-2 w-2 rounded-full bg-emerald-600" />
+                <span>Authorized US Medical Equipment Distributor</span>
+              </div>
 
-          <div className="mx-auto mt-7 flex max-w-3xl flex-wrap items-center justify-center gap-y-2 gap-x-6 text-xs font-semibold text-slate-300">
-            <span className="flex items-center gap-1.5"><CheckCircle2 size={15} className="text-teal-400" /> 100% Brand New &amp; Factory-Sealed</span>
-            <span className="flex items-center gap-1.5"><CheckCircle2 size={15} className="text-teal-400" /> FSA / HSA Cards Accepted</span>
-            <span className="flex items-center gap-1.5"><CheckCircle2 size={15} className="text-teal-400" /> Insured 2–4 Day Carrier Delivery</span>
-            <span className="flex items-center gap-1.5"><CheckCircle2 size={15} className="text-teal-400" /> Direct Support Desk: {CONTACT_PHONE}</span>
-          </div>
-        </div>
+              <h1 className="mt-4 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl leading-tight">
+                Medical Equipment &amp; Supplies, <span className="text-medical-primary">Delivered Direct</span>
+              </h1>
 
-        {heroReel.length > 0 && (
-          <div className="marquee-track relative overflow-hidden pb-10 md:pb-12" aria-label="Featured equipment">
-            <div className="marquee">
-              {[...heroReel, ...heroReel].map((product, index) => (
+              <p className="mt-4 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg">
+                Certified respiratory systems, mobility equipment, and diagnostic monitoring devices for home and clinical use. Factory-sealed with full manufacturer warranty and insured US nationwide delivery.
+              </p>
+
+              <div className="mt-6 flex flex-wrap items-center gap-3">
                 <Link
-                  key={`${product.id}-${index}`}
-                  to={`/products/${product.handle}`}
-                  className="mx-2 flex w-44 shrink-0 flex-col overflow-hidden rounded-2xl border border-white/15 bg-white shadow-xl sm:w-52 transition hover:-translate-y-1 duration-200"
+                  to="/products"
+                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-medical-primary px-6 font-bold text-white shadow-sm hover:bg-medical-dark transition"
                 >
-                  <div className="h-32 bg-white p-3 sm:h-36">
-                    <img src={product.image} alt={product.title} loading="lazy" className="h-full w-full object-contain" />
-                  </div>
-                  <div className="border-t border-slate-100 bg-white px-3.5 py-3">
-                    <p className="line-clamp-1 text-xs font-black text-medical-dark">{product.title}</p>
-                    <p className="mt-1 text-xs font-black text-teal-700">{formatPrice(product.price)}</p>
-                  </div>
+                  Browse All Equipment <ArrowRight size={18} />
                 </Link>
-              ))}
+                <Link
+                  to="/products?category=Oxygen%20Concentrators"
+                  className="inline-flex min-h-12 items-center justify-center rounded-xl border border-slate-300 bg-white px-5 font-semibold text-slate-800 hover:border-medical-primary hover:text-medical-primary transition"
+                >
+                  Oxygen Concentrators
+                </Link>
+                <Link
+                  to="/products?category=Wheelchairs"
+                  className="inline-flex min-h-12 items-center justify-center rounded-xl border border-slate-300 bg-white px-5 font-semibold text-slate-800 hover:border-medical-primary hover:text-medical-primary transition"
+                >
+                  Wheelchairs
+                </Link>
+              </div>
+
+              <div className="mt-8 grid grid-cols-2 gap-3 border-t border-slate-200/80 pt-6 sm:grid-cols-4 text-xs font-medium text-slate-600">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
+                  <span>Factory Sealed</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
+                  <span>FSA / HSA Eligible</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
+                  <span>Insured US Shipping</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
+                  <span>Manufacturer Warranty</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column: Authentic Equipment Spotlight Cards */}
+            <div className="lg:col-span-5">
+              <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-soft sm:p-6">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="h-2 w-2 rounded-full bg-medical-primary" />
+                    <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Featured Equipment Spotlight</span>
+                  </div>
+                  <Link to="/products" className="text-xs font-bold text-medical-primary hover:underline">
+                    View All &rarr;
+                  </Link>
+                </div>
+
+                <div className="mt-4 space-y-3">
+                  <Link
+                    to="/products/devilbiss-5l-compact-oxygen-concentrator-525ds"
+                    className="group flex items-center gap-4 rounded-2xl border border-slate-100 bg-slate-50/60 p-3.5 transition hover:border-medical-primary/50 hover:bg-medical-light/30"
+                  >
+                    <div className="h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-white p-1.5">
+                      <img
+                        src="https://imgcdn.mckesson.com/CumulusWeb/Images/Item_Detail/1183060_front.jpg"
+                        alt="DeVilbiss 5L Compact Oxygen Concentrator"
+                        className="h-full w-full object-contain"
+                      />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">DeVilbiss Healthcare</span>
+                      <h3 className="truncate text-sm font-bold text-slate-900 group-hover:text-medical-primary transition">
+                        DeVilbiss 5L Compact Oxygen Concentrator
+                      </h3>
+                      <p className="text-xs text-slate-500">Continuous Flow 0.5–5.0 LPM • OSD Sensor</p>
+                      <p className="mt-1 text-sm font-black text-slate-900">$795.00</p>
+                    </div>
+                  </Link>
+
+                  <Link
+                    to="/products/drive-cruiser-iii-light-wheelchair-flip-back-arms-elevating-leg-rests"
+                    className="group flex items-center gap-4 rounded-2xl border border-slate-100 bg-slate-50/60 p-3.5 transition hover:border-medical-primary/50 hover:bg-medical-light/30"
+                  >
+                    <div className="h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-white p-1.5">
+                      <img
+                        src="https://imgcdn.mckesson.com/CumulusWeb/Images/Item_Detail/438317_front.jpg"
+                        alt="Drive Cruiser III Light Wheelchair"
+                        className="h-full w-full object-contain"
+                      />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Drive Medical</span>
+                      <h3 className="truncate text-sm font-bold text-slate-900 group-hover:text-medical-primary transition">
+                        Drive Cruiser III Light Wheelchair
+                      </h3>
+                      <p className="text-xs text-slate-500">Flip-Back Arms • Elevating Leg Rests • 300 lb</p>
+                      <p className="mt-1 text-sm font-black text-slate-900">$179.00</p>
+                    </div>
+                  </Link>
+                </div>
+
+                <div className="mt-4 flex flex-wrap items-center gap-1.5 pt-3 border-t border-slate-100 text-xs">
+                  <span className="text-slate-400 font-medium py-1">Popular Categories:</span>
+                  <Link to="/products?category=CPAP%20Machines" className="rounded-lg bg-slate-100 px-2.5 py-1 font-semibold text-slate-700 hover:bg-slate-200 transition">
+                    CPAP &amp; Sleep
+                  </Link>
+                  <Link to="/products?category=Nebulizers" className="rounded-lg bg-slate-100 px-2.5 py-1 font-semibold text-slate-700 hover:bg-slate-200 transition">
+                    Nebulizers
+                  </Link>
+                  <Link to="/products?category=Patient%20Monitors" className="rounded-lg bg-slate-100 px-2.5 py-1 font-semibold text-slate-700 hover:bg-slate-200 transition">
+                    Monitoring
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
-        )}
+        </div>
       </section>
 
       {/* Category Grid: Browse by Clinical Need */}

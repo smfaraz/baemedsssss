@@ -339,8 +339,11 @@ export const fetchRecommendedProducts = async (currentProduct: Product, limit: n
       const itemCat = (item.category || '').toLowerCase();
       const itemVendor = (item.vendor || '').toLowerCase();
 
-      // Direct category match
-      if (itemCat && itemCat === currentCategory) score += 10;
+      // Direct category match using canonical resolver
+      const currentCanonical = resolveCategoryName(currentProduct.category || '');
+      const itemCanonical = resolveCategoryName(item.category || '');
+      if (itemCanonical && itemCanonical === currentCanonical) score += 15;
+      else if (itemCat && itemCat === currentCategory) score += 10;
 
       // Clinical cross-relevance
       if (currentCategory.includes('oxygen') || currentCategory.includes('respiratory')) {
