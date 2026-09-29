@@ -5,7 +5,7 @@ import ProductCardSkeleton from '../components/ProductCardSkeleton';
 import SEO from '../components/SEO';
 import { CONTACT_PHONE } from '../constants';
 import { Link, useNavigate, useSearchParams } from '../context/CartContext';
-import { fetchAllProducts, searchProducts } from '../lib/shopify';
+import { fetchAllProducts, searchProducts } from '../lib/commerce';
 import { Product } from '../types';
 
 type SortOption = 'relevance' | 'price-asc' | 'price-desc' | 'name-asc';
@@ -88,7 +88,6 @@ const SearchPage: React.FC = () => {
   };
 
   const phoneHref = `tel:${CONTACT_PHONE.replace(/[^+\d]/g, '')}`;
-  const whatsappHref = `https://wa.me/${CONTACT_PHONE.replace(/\D/g, '')}?text=${encodeURIComponent(`Hello Baemeds, I am looking for ${query || 'medical equipment'}.`)}`;
 
   return (
     <main className="min-h-screen bg-medical-light pb-16 pt-6 sm:pt-9">
@@ -101,7 +100,7 @@ const SearchPage: React.FC = () => {
             <label className="relative flex-1">
               <span className="sr-only">Search the product catalogue</span>
               <Search className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-medical-text" size={20} />
-              <input autoFocus={!query} type="search" value={searchInput} onChange={(event) => setSearchInput(event.target.value)} placeholder="Try oxygen, CPAP, wheelchairâ€¦" className="min-h-12 w-full rounded-xl border border-white/20 bg-white py-3 pl-12 pr-4 text-base text-medical-dark outline-none placeholder:text-medical-text focus:ring-2 focus:ring-teal-300" />
+              <input autoFocus={!query} type="search" value={searchInput} onChange={(event) => setSearchInput(event.target.value)} placeholder="Try oxygen, CPAP, wheelchair…" className="min-h-12 w-full rounded-xl border border-white/20 bg-white py-3 pl-12 pr-4 text-base text-medical-dark outline-none placeholder:text-medical-text focus:ring-2 focus:ring-teal-300" />
             </label>
             <button type="submit" disabled={!searchInput.trim()} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-medical-primary px-6 font-bold text-white transition-colors hover:bg-teal-600 disabled:cursor-not-allowed disabled:opacity-50">Search catalogue<ArrowRight size={18} /></button>
           </form>
@@ -116,7 +115,7 @@ const SearchPage: React.FC = () => {
           </section>
         ) : isLoading ? (
           <section className="mt-6">
-            <p className="mb-4 text-sm font-semibold text-medical-text" aria-live="polite">Searching for â€œ{query}â€â€¦</p>
+            <p className="mb-4 text-sm font-semibold text-medical-text" aria-live="polite">Searching for “{query}”…</p>
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" aria-busy="true">
               {Array.from({ length: 8 }).map((_, index) => <ProductCardSkeleton key={index} />)}
             </div>
@@ -128,14 +127,14 @@ const SearchPage: React.FC = () => {
             <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-medical-text">{loadError} Retry or contact the team for a current quotation.</p>
             <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
               <button type="button" onClick={() => setReloadKey((value) => value + 1)} className="min-h-11 rounded-xl bg-medical-primary px-5 font-bold text-white">Retry search</button>
-              <a href={phoneHref} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 px-5 font-bold text-medical-dark"><Phone size={17} />Call us</a>
+              <a href={phoneHref} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 px-5 font-bold text-medical-dark"><Phone size={17} />Call toll-free</a>
             </div>
           </section>
         ) : sortedProducts.length ? (
           <section className="mt-6" aria-labelledby="search-results-heading">
             <div className="mb-5 flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="px-1">
-                <h2 id="search-results-heading" className="font-bold text-medical-dark">Results for â€œ{query}â€</h2>
+                <h2 id="search-results-heading" className="font-bold text-medical-dark">Results for “{query}”</h2>
                 <p className="text-sm text-medical-text">{sortedProducts.length} product{sortedProducts.length === 1 ? '' : 's'} found</p>
               </div>
               <label className="flex min-h-11 items-center gap-2 rounded-xl bg-medical-light px-3 text-sm font-semibold text-slate-700">
@@ -155,11 +154,11 @@ const SearchPage: React.FC = () => {
         ) : (
           <section className="mt-6 rounded-3xl border border-slate-200 bg-white p-7 text-center sm:p-12">
             <SearchX size={44} className="mx-auto text-slate-300" />
-            <h2 className="mt-4 text-xl font-bold text-medical-dark">No catalogue match for â€œ{query}â€</h2>
-            <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-medical-text">Check the spelling, try a broader product word, or send the team the model name or a photo.</p>
+            <h2 className="mt-4 text-xl font-bold text-medical-dark">No catalogue match for “{query}”</h2>
+            <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-medical-text">Check the spelling, try a broader product word, or contact our clinical team to locate the item.</p>
             <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
               <Link to="/products" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-medical-primary px-5 font-bold text-white">Browse all products</Link>
-              <a href={whatsappHref} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 px-5 font-bold text-medical-dark"><MessageCircle size={17} />Ask on WhatsApp</a>
+              <a href={phoneHref} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 px-5 font-bold text-medical-dark"><Phone size={17} />Call Toll-Free</a>
               <Link to="/contact" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 px-5 font-bold text-medical-dark">Contact us</Link>
             </div>
           </section>

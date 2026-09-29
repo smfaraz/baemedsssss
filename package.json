@@ -1,5 +1,5 @@
 {
-  "name": "baemeds-storefront-in",
+  "name": "baemeds-storefront-us",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,6 +10,8 @@
     "prerender": "node scripts/prerender.mjs",
     "preview": "vite preview",
     "lint": "tsc --noEmit",
+    "test": "tsx tests/us-market.test.ts && tsx tests/native-commerce.test.ts && tsx tests/admin-rbac.test.ts",
+    "seed:supabase": "node scripts/seed-supabase-catalog.mjs",
     "shots": "node scripts/mobile-shots.mjs"
   },
   "dependencies": {
@@ -25,7 +27,6 @@
     "react-dom": "^19.2.4",
     "react-helmet-async": "^3.0.0",
     "react-router-dom": "^7.18.2",
-    "shopify-buy": "^2.21.1",
     "tailwindcss": "^4.2.0"
   },
   "devDependencies": {

@@ -20,11 +20,26 @@ import {
   User
 } from 'lucide-react';
 
-export const APP_NAME = "Baemeds";
-export const SITE_DOMAIN = "baemeds.in";
-export const SITE_URL = "https://www.baemeds.in";
-export const CONTACT_PHONE = "+91 93903 49389";
-export const CONTACT_EMAIL = "sales@baemeds.in";
+export const APP_NAME = "BaeMeds";
+export const SITE_DOMAIN = "baemeds.com";
+export const SITE_URL = "https://www.baemeds.com";
+export const CONTACT_PHONE = "+1 (800) 555-0199";
+export const CONTACT_PHONE_RAW = "+18005550199";
+export const CONTACT_EMAIL = "support@baemeds.com";
+
+export const MARKET = "US";
+export const DEFAULT_COUNTRY = "United States";
+export const DEFAULT_COUNTRY_CODE = "US";
+export const DEFAULT_CURRENCY = "USD";
+export const DEFAULT_CURRENCY_SYMBOL = "$";
+export const DEFAULT_LOCALE = "en-US";
+export const DEFAULT_TIMEZONE = "America/New_York";
+export const COMPANY_NAME = "BaeMeds Healthcare USA LLC";
+export const COMPANY_ADDRESS = "1209 Orange Street, Wilmington, DE 19801";
+
+export const SUPPORT_EMAIL = CONTACT_EMAIL;
+export const LEGAL_ENTITY_NAME = COMPANY_NAME;
+export const STORE_ADDRESS = COMPANY_ADDRESS;
 
 // Product data is fetched from Shopify.
 export const PRODUCTS: Product[] = [];

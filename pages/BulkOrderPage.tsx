@@ -1,13 +1,10 @@
 import React, { useState } from 'react';
-import { Building2, CheckCircle2, FileText, Mail, MessageCircle, PackageCheck, Phone, Send, Trash2, UploadCloud } from 'lucide-react';
+import { Building2, CheckCircle2, FileText, Mail, PackageCheck, Phone, Send, Trash2, UploadCloud } from 'lucide-react';
 import SEO from '../components/SEO';
 import { APP_NAME, CONTACT_EMAIL, CONTACT_PHONE } from '../constants';
 import { Link } from '../context/CartContext';
 import { useReveal } from '../lib/useReveal';
 import { submitEnquiry } from '../lib/enquiries';
-
-const whatsappNumber = CONTACT_PHONE.replace(/\D/g, '');
-const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent('Hello Baemeds, I need a quote for a bulk medical equipment order.')}`;
 
 const allowedTypes = [
   'application/pdf',
@@ -65,7 +62,7 @@ const BulkOrderPage: React.FC = () => {
       : '';
     const subject = encodeURIComponent(`Bulk order quote request: ${organisation}`);
     const body = encodeURIComponent(
-      `Baemeds bulk order quote request\n\nName: ${name}\nOrganisation: ${organisation}\nEmail: ${email}\nPhone: ${phone}\nDelivery location: ${location || 'Not provided'}\n${attachmentNote}\nProducts and details:\n${requirements}`,
+      `BaeMeds US bulk order quote request\n\nName: ${name}\nOrganisation: ${organisation}\nEmail: ${email}\nPhone: ${phone}\nDelivery location: ${location || 'Not provided'}\n${attachmentNote}\nProducts and details:\n${requirements}`,
     );
 
     setEmailDraftOpened(true);
@@ -80,32 +77,32 @@ const BulkOrderPage: React.FC = () => {
     <main ref={revealRef} className="min-h-screen">
       <SEO
         title="Hospital Bulk Orders & Institutional Medical Supplies"
-        description="Request wholesale quotations for hospital equipment, ICU setups, diagnostic devices, and bulk medical consumables across Hyderabad and India."
+        description="Request wholesale quotations for hospital equipment, ICU setups, diagnostic devices, and bulk medical supplies across the United States."
         canonical="/bulk-orders"
       />
       <section className="overflow-hidden bg-medical-dark text-white">
         <div className="container mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:px-6 sm:py-16 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
           <div>
-            <p className="text-sm font-bold uppercase tracking-[0.18em] text-medical-accent">Bulk orders</p>
-            <h1 className="mt-3 max-w-2xl text-2xl font-bold leading-tight sm:text-3xl">Build a clearer medical equipment quotation request</h1>
+            <p className="text-sm font-bold uppercase tracking-[0.18em] text-medical-accent">Institutional & Bulk Orders</p>
+            <h1 className="mt-3 max-w-2xl text-2xl font-bold leading-tight sm:text-3xl">Clinical Equipment & Wholesale RFP Procurement</h1>
             <p className="mt-5 max-w-2xl text-base leading-7 text-slate-200 sm:text-lg">
-              Send the product names, quantities, key details, and delivery city. The {APP_NAME} team will check the list and reply with the next steps.
+              Submit product names, quantities, facility specifications, and delivery timelines. The {APP_NAME} institutional sales desk will prepare an itemized quotation with Net 30 terms and tax exemption support.
             </p>
             <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-              <a href={`tel:${CONTACT_PHONE}`} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 font-bold text-medical-dark hover:bg-slate-100">
-                <Phone size={18} aria-hidden="true" /> Call about a bulk order
+              <a href={`tel:${CONTACT_PHONE.replace(/\D/g, '')}`} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 font-bold text-medical-dark hover:bg-slate-100">
+                <Phone size={18} aria-hidden="true" /> Call {CONTACT_PHONE}
               </a>
-              <a href={whatsappUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-white/30 px-5 py-3 font-bold text-white hover:bg-white/10">
-                <MessageCircle size={18} aria-hidden="true" /> Start on WhatsApp
+              <a href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent('Institutional Quote Request')}`} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-white/30 px-5 py-3 font-bold text-white hover:bg-white/10">
+                <Mail size={18} aria-hidden="true" /> Email Procurement Desk
               </a>
             </div>
           </div>
 
           <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
             {[
-              { icon: FileText, title: 'Share your list', text: 'Add product names, quantities, key details, and preferred brands.' },
-              { icon: PackageCheck, title: 'We check the details', text: 'We check stock, alternatives, delivery, and any help you may need.' },
-              { icon: Building2, title: 'Get the next steps', text: 'Price and order terms are confirmed separately in writing.' },
+              { icon: FileText, title: 'Share your requirements', text: 'Provide equipment models, quantities, and clinical specifications.' },
+              { icon: PackageCheck, title: 'Procurement review', text: 'We verify inventory, shipping logistics, and freight coordination.' },
+              { icon: Building2, title: 'Formal quotation', text: 'Receive an itemized quote with institutional pricing and PO terms.' },
             ].map(({ icon: Icon, title, text }) => (
               <article key={title} className="rounded-2xl border border-white/15 bg-white/10 p-4">
                 <div className="flex gap-3">
@@ -124,14 +121,14 @@ const BulkOrderPage: React.FC = () => {
       <section className="container mx-auto grid max-w-6xl gap-7 px-4 py-10 sm:px-6 sm:py-14 lg:grid-cols-[0.7fr_1.3fr] lg:gap-8">
         <aside className="space-y-5 lg:sticky lg:top-28 lg:self-start">
           <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-soft">
-            <h2 className="text-xl font-bold text-medical-dark">What to send us</h2>
+            <h2 className="text-xl font-bold text-medical-dark">Information to include</h2>
             <ul className="mt-5 space-y-4 text-sm leading-6 text-slate-600">
               {[
-                'Product name, model, or important features',
-                'Estimated quantity for each product',
-                'Delivery location and required timeline',
-                'Installation, training, or warranty questions',
-                'Organisation and GST billing details if needed',
+                'Product name, model, HCPCS code, or required specifications',
+                'Estimated quantity for each device or supply',
+                'Facility destination (State / ZIP) and required delivery timeline',
+                'Medical freight, liftgate, or inside delivery requirements',
+                'Tax-exempt certificate / EIN or purchase order number',
               ].map((item) => (
                 <li key={item} className="flex gap-3">
                   <CheckCircle2 className="mt-0.5 shrink-0 text-medical-primary" size={18} aria-hidden="true" />
@@ -209,7 +206,7 @@ const BulkOrderPage: React.FC = () => {
                     <FileText className="shrink-0 text-medical-primary" size={22} aria-hidden="true" />
                     <div className="min-w-0">
                       <p className="truncate text-sm font-bold text-medical-dark">{attachedFile.name}</p>
-                      <p className="text-xs text-slate-500">{attachedFile.size} Â· attach manually before sending</p>
+                      <p className="text-xs text-slate-500">{attachedFile.size} • attach manually before sending</p>
                     </div>
                   </div>
                   <button type="button" onClick={handleRemoveFile} aria-label={`Remove ${attachedFile.name}`} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-slate-600 hover:bg-white hover:text-medical-alert">
@@ -228,15 +225,12 @@ const BulkOrderPage: React.FC = () => {
       </section>
 
       <section className="bg-white">
-        <div className="container mx-auto grid max-w-6xl gap-5 px-4 py-10 sm:px-6 sm:grid-cols-3">
-          <a href={`tel:${CONTACT_PHONE}`} className="flex min-h-11 items-center gap-3 rounded-2xl border border-slate-200 p-4 hover:border-medical-primary hover:bg-medical-light">
-            <Phone className="shrink-0 text-medical-primary" size={21} aria-hidden="true" /><span><strong className="block text-sm text-medical-dark">Call</strong><span className="text-xs text-slate-500">{CONTACT_PHONE}</span></span>
-          </a>
-          <a href={whatsappUrl} target="_blank" rel="noreferrer" className="flex min-h-11 items-center gap-3 rounded-2xl border border-slate-200 p-4 hover:border-medical-primary hover:bg-medical-light">
-            <MessageCircle className="shrink-0 text-medical-primary" size={21} aria-hidden="true" /><span><strong className="block text-sm text-medical-dark">WhatsApp</strong><span className="text-xs text-slate-500">Send the requirement list</span></span>
+        <div className="container mx-auto grid max-w-6xl gap-5 px-4 py-10 sm:px-6 sm:grid-cols-2">
+          <a href={`tel:${CONTACT_PHONE.replace(/\D/g, '')}`} className="flex min-h-11 items-center gap-3 rounded-2xl border border-slate-200 p-4 hover:border-medical-primary hover:bg-medical-light">
+            <Phone className="shrink-0 text-medical-primary" size={21} aria-hidden="true" /><span><strong className="block text-sm text-medical-dark">Toll-Free Phone</strong><span className="text-xs text-slate-500">{CONTACT_PHONE} (Mon–Fri 8am–8pm EST)</span></span>
           </a>
           <a href={`mailto:${CONTACT_EMAIL}`} className="flex min-h-11 items-center gap-3 rounded-2xl border border-slate-200 p-4 hover:border-medical-primary hover:bg-medical-light">
-            <Mail className="shrink-0 text-medical-primary" size={21} aria-hidden="true" /><span className="min-w-0"><strong className="block text-sm text-medical-dark">Email</strong><span className="block truncate text-xs text-slate-500">{CONTACT_EMAIL}</span></span>
+            <Mail className="shrink-0 text-medical-primary" size={21} aria-hidden="true" /><span className="min-w-0"><strong className="block text-sm text-medical-dark">Institutional Sales Email</strong><span className="block truncate text-xs text-slate-500">{CONTACT_EMAIL}</span></span>
           </a>
         </div>
       </section>

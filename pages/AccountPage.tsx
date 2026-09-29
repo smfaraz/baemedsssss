@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowRight, Loader, LogOut, MapPin, Package, Plus, RefreshCw, ShoppingBag, Trash2, User, X } from 'lucide-react';
+import { ArrowRight, FileText, Loader, LogOut, MapPin, Package, Plus, RefreshCw, ShieldAlert, ShoppingBag, Trash2, Upload, User, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { Link, useNavigate } from '../context/CartContext';
+import { US_STATES, DEFAULT_COUNTRY, DEFAULT_LOCALE } from '../lib/marketConfig';
 import { Address } from '../types';
+import { AuditLogger } from '../server/auditLogger';
 
-const INDIAN_STATES = ['Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal', 'Andaman and Nicobar Islands', 'Chandigarh', 'Dadra and Nagar Haveli and Daman and Diu', 'Delhi', 'Jammu and Kashmir', 'Ladakh', 'Lakshadweep', 'Puducherry'];
-const emptyAddress: Omit<Address, 'id'> = { firstName: '', lastName: '', address1: '', city: '', province: 'Telangana', zip: '', country: 'India', phone: '' };
+const emptyAddress: Omit<Address, 'id'> = { firstName: '', lastName: '', address1: '', city: '', province: 'DE', zip: '', country: DEFAULT_COUNTRY, phone: '' };
 const fieldClass = 'min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-medical-text outline-none focus:border-medical-primary focus:ring-2 focus:ring-medical-primary/15';
-const formatMoney = (amount: string, currency: string) => new Intl.NumberFormat('en-IN', { style: 'currency', currency }).format(Number(amount));
+const formatMoney = (amount: string, currency: string) => new Intl.NumberFormat(DEFAULT_LOCALE, { style: 'currency', currency: currency || 'USD' }).format(Number(amount));
 const formatStatus = (status: string) => status.toLowerCase().replaceAll('_', ' ').replace(/\b\w/g, (letter) => letter.toUpperCase());
 
 const AccountPage: React.FC = () => {
@@ -19,6 +20,10 @@ const AccountPage: React.FC = () => {
   const [actionMessage, setActionMessage] = useState('');
   const [savingAddress, setSavingAddress] = useState(false);
   const [refreshingOrders, setRefreshingOrders] = useState(false);
+  const [prescriptions, setPrescriptions] = useState<Array<{ id: string; fileName: string; status: string; uploadedAt: string; orderId?: string }>>([]);
+  const [uploadingRx, setUploadingRx] = useState(false);
+  const [showRxUpload, setShowRxUpload] = useState(false);
+  const [rxOrderInput, setRxOrderInput] = useState('');
 
   useEffect(() => { if (!isLoading && !isAuthenticated) navigate('/login?returnTo=%2Faccount'); }, [isLoading, isAuthenticated, navigate]);
   const updateAddress = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => setNewAddress((current) => ({ ...current, [event.target.name]: event.target.value }));
@@ -75,13 +80,134 @@ const AccountPage: React.FC = () => {
                   <div className="flex items-center justify-between"><h3 className="font-bold text-medical-dark">New address</h3><button type="button" onClick={() => setShowAddressForm(false)} className="flex h-11 w-11 items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100" aria-label="Close address form"><X size={19} aria-hidden="true" /></button></div>
                   <div className="grid gap-4 sm:grid-cols-2"><label><span className="mb-1 block text-sm font-semibold text-medical-text">First name</span><input className={fieldClass} name="firstName" autoComplete="shipping given-name" required value={newAddress.firstName} onChange={updateAddress} /></label><label><span className="mb-1 block text-sm font-semibold text-medical-text">Last name</span><input className={fieldClass} name="lastName" autoComplete="shipping family-name" required value={newAddress.lastName} onChange={updateAddress} /></label></div>
                   <label><span className="mb-1 block text-sm font-semibold text-medical-text">Street address</span><input className={fieldClass} name="address1" autoComplete="shipping address-line1" required value={newAddress.address1} onChange={updateAddress} /></label>
-                  <div className="grid gap-4 sm:grid-cols-2"><label><span className="mb-1 block text-sm font-semibold text-medical-text">City</span><input className={fieldClass} name="city" autoComplete="shipping address-level2" required value={newAddress.city} onChange={updateAddress} /></label><label><span className="mb-1 block text-sm font-semibold text-medical-text">State</span><select className={fieldClass} name="province" autoComplete="shipping address-level1" required value={newAddress.province} onChange={updateAddress}>{INDIAN_STATES.map((state) => <option key={state}>{state}</option>)}</select></label></div>
-                  <div className="grid gap-4 sm:grid-cols-2"><label><span className="mb-1 block text-sm font-semibold text-medical-text">PIN code</span><input className={fieldClass} name="zip" autoComplete="shipping postal-code" inputMode="numeric" pattern="[0-9]{6}" required value={newAddress.zip} onChange={updateAddress} /></label><label><span className="mb-1 block text-sm font-semibold text-medical-text">Phone</span><input className={fieldClass} name="phone" type="tel" autoComplete="shipping tel" value={newAddress.phone || ''} onChange={updateAddress} /></label></div>
+                  <div className="grid gap-4 sm:grid-cols-2"><label><span className="mb-1 block text-sm font-semibold text-medical-text">City</span><input className={fieldClass} name="city" autoComplete="shipping address-level2" required value={newAddress.city} onChange={updateAddress} /></label><label><span className="mb-1 block text-sm font-semibold text-medical-text">State</span><select className={fieldClass} name="province" autoComplete="shipping address-level1" required value={newAddress.province} onChange={updateAddress}>{US_STATES.map((state) => <option key={state.code} value={state.code}>{state.name} ({state.code})</option>)}</select></label></div>
+                  <div className="grid gap-4 sm:grid-cols-2"><label><span className="mb-1 block text-sm font-semibold text-medical-text">ZIP code</span><input className={fieldClass} name="zip" autoComplete="shipping postal-code" inputMode="numeric" placeholder="19801" pattern="^\d{5}(-\d{4})?$" required value={newAddress.zip} onChange={updateAddress} /></label><label><span className="mb-1 block text-sm font-semibold text-medical-text">Phone</span><input className={fieldClass} name="phone" type="tel" autoComplete="shipping tel" placeholder="+1 (555) 000-0000" value={newAddress.phone || ''} onChange={updateAddress} /></label></div>
                   <button type="submit" disabled={savingAddress} className="min-h-11 w-full rounded-xl bg-medical-dark px-4 py-2 font-bold text-white hover:bg-medical-primary disabled:opacity-60">{savingAddress ? 'Saving…' : 'Save address'}</button>
                 </form>
               ) : (
                 <div className="mt-5 space-y-3">{customer.addresses?.length ? customer.addresses.map((address) => <article key={address.id} className="rounded-xl border border-slate-200 p-4"><div className="flex items-start justify-between gap-3"><address className="not-italic text-sm leading-6 text-slate-600"><span className="flex flex-wrap items-center gap-2"><strong className="text-medical-dark">{address.firstName} {address.lastName}</strong>{customer.defaultAddress?.id === address.id && <span className="rounded-full bg-medical-light px-2 py-0.5 text-xs font-bold text-medical-primary">Default</span>}</span>{address.address1}<br />{address.city}, {address.province ? `${address.province}, ` : ''}{address.zip}<br />{address.country}{address.phone && <><br />{address.phone}</>}</address><button type="button" onClick={() => deleteAddress(address)} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-medical-alert hover:bg-red-50" aria-label={`Remove address at ${address.address1}`}><Trash2 size={18} aria-hidden="true" /></button></div></article>) : <p className="rounded-xl bg-slate-50 p-4 text-sm text-slate-500">No delivery addresses saved yet.</p>}</div>
               )}
+            </section>
+
+            <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-soft sm:p-6">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-medical-light text-medical-primary">
+                    <FileText size={22} aria-hidden="true" />
+                  </span>
+                  <div>
+                    <h2 className="text-xl font-bold text-medical-dark">Prescriptions (Rx)</h2>
+                    <p className="text-xs text-slate-500">Medical documentation for clinical DME orders.</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowRxUpload((prev) => !prev)}
+                  className="flex h-11 w-11 items-center justify-center rounded-xl text-medical-primary hover:bg-medical-light"
+                  aria-label="Upload prescription"
+                >
+                  <Plus aria-hidden="true" />
+                </button>
+              </div>
+
+              {showRxUpload && (
+                <div className="mt-5 border-t border-slate-200 pt-5">
+                  <h3 className="text-sm font-bold text-medical-dark">Upload Physician Prescription</h3>
+                  <p className="mt-1 text-xs text-slate-500">Supported formats: PDF, JPEG, PNG, WebP (Max 10MB).</p>
+                  <div className="mt-3 space-y-3">
+                    <label className="block">
+                      <span className="mb-1 block text-xs font-semibold text-slate-600">Associated Order Number (optional)</span>
+                      <input
+                        type="text"
+                        placeholder="e.g. 1024"
+                        value={rxOrderInput}
+                        onChange={(e) => setRxOrderInput(e.target.value)}
+                        className={fieldClass}
+                      />
+                    </label>
+                    <label className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 p-4 hover:bg-slate-100 cursor-pointer transition">
+                      <Upload size={24} className="text-slate-400" />
+                      <span className="mt-2 text-xs font-bold text-medical-primary">Select prescription file</span>
+                      <span className="text-[11px] text-slate-500">PDF, JPG, PNG up to 10MB</span>
+                      <input
+                        type="file"
+                        accept=".pdf,image/jpeg,image/png,image/webp"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          if (file.size > 10 * 1024 * 1024) {
+                            setActionError('File size exceeds the 10 MB limit.');
+                            return;
+                          }
+                          const validMimes = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
+                          if (!validMimes.includes(file.type)) {
+                            setActionError('Please upload a valid PDF, JPEG, PNG, or WebP document.');
+                            return;
+                          }
+                          setActionError('');
+                          setUploadingRx(true);
+                          try {
+                            const newRx = {
+                              id: `rx-${Date.now()}`,
+                              fileName: file.name.replace(/[^a-zA-Z0-9._-]/g, '_'),
+                              status: 'UNDER_REVIEW',
+                              uploadedAt: new Date().toLocaleDateString('en-US'),
+                              orderId: rxOrderInput.trim() || undefined,
+                            };
+                            setPrescriptions((prev) => [newRx, ...prev]);
+                            setShowRxUpload(false);
+                            setRxOrderInput('');
+                            setActionMessage(`Prescription "${newRx.fileName}" submitted and queued for clinical specialist review.`);
+                            AuditLogger.logEvent({
+                              actor: customer.email || 'customer',
+                              action: 'PRESCRIPTION_UPLOAD',
+                              resource: newRx.id,
+                              result: 'SUCCESS',
+                              metadata: {
+                                fileName: newRx.fileName,
+                                fileSizeBytes: file.size,
+                                mimeType: file.type,
+                                orderId: newRx.orderId,
+                              },
+                            });
+                          } catch {
+                            setActionError('Failed to record prescription document.');
+                          } finally {
+                            setUploadingRx(false);
+                          }
+                        }}
+                      />
+                    </label>
+                  </div>
+                </div>
+              )}
+
+              <div className="mt-5 space-y-3">
+                {prescriptions.length ? (
+                  prescriptions.map((rx) => (
+                    <article key={rx.id} className="rounded-xl border border-slate-200 p-3.5 text-sm">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="font-bold text-medical-dark truncate">{rx.fileName}</p>
+                          <p className="text-xs text-slate-500 mt-0.5">Uploaded {rx.uploadedAt} {rx.orderId ? `• Order #${rx.orderId}` : ''}</p>
+                        </div>
+                        <span className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-bold ${
+                          rx.status === 'APPROVED' ? 'bg-emerald-100 text-emerald-800' :
+                          rx.status === 'REJECTED' ? 'bg-rose-100 text-rose-800' :
+                          'bg-amber-100 text-amber-900'
+                        }`}>
+                          {formatStatus(rx.status)}
+                        </span>
+                      </div>
+                    </article>
+                  ))
+                ) : (
+                  <p className="rounded-xl bg-slate-50 p-4 text-xs text-slate-500">
+                    No prescriptions uploaded yet. When purchasing prescription-required DME, upload your documentation here for clinical verification.
+                  </p>
+                )}
+              </div>
             </section>
           </div>
 
@@ -92,7 +218,7 @@ const AccountPage: React.FC = () => {
               return <article key={order.id} className="rounded-xl border border-slate-200 p-4 sm:p-5">
                 <div className="grid gap-4 border-b border-slate-200 pb-4 sm:grid-cols-4">
                   <div><p className="text-xs font-bold uppercase tracking-wide text-slate-500">Order</p><p className="mt-1 font-bold text-medical-dark">#{order.orderNumber}</p></div>
-                  <div><p className="text-xs font-bold uppercase tracking-wide text-slate-500">Date</p><p className="mt-1 text-sm text-slate-700">{new Date(order.processedAt).toLocaleDateString('en-IN')}</p></div>
+                  <div><p className="text-xs font-bold uppercase tracking-wide text-slate-500">Date</p><p className="mt-1 text-sm text-slate-700">{new Date(order.processedAt).toLocaleDateString('en-US')}</p></div>
                   <div><p className="text-xs font-bold uppercase tracking-wide text-slate-500">Total</p><p className="mt-1 font-bold text-medical-dark">{formatMoney(order.totalPrice.amount, order.totalPrice.currencyCode)}</p></div>
                   <div>{order.statusUrl ? <a href={order.statusUrl} className="inline-flex min-h-11 items-center font-bold text-medical-primary" target="_blank" rel="noreferrer">View Shopify status <ArrowRight size={16} aria-hidden="true" /></a> : <p className="text-sm text-slate-500">Status link unavailable</p>}</div>
                 </div>

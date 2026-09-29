@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { CATEGORIES } from '../constants';
 import { Link } from '../context/CartContext';
-import { fetchAllProducts } from '../lib/shopify';
+import { fetchAllProducts } from '../lib/commerce';
 import { Product } from '../types';
 
 const categoryKey = (value: string) => value.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]/g, '');

@@ -12,7 +12,7 @@ import xml.etree.ElementTree as ET
 
 ENDPOINT = "https://ptya1n-k0.myshopify.com/api/2024-07/graphql.json"
 ACCESS_TOKEN = "c1fb47a74eaec2fbafa70becac08f52b"
-STORE_URL = "https://baemeds.in"
+STORE_URL = "https://baemeds.com"
 
 query = """
 {
@@ -355,7 +355,7 @@ def sync():
         desc = re.sub(r'<[^>]+>', ' ', desc)
         desc = re.sub(r'\s+', ' ', desc).strip()
         if len(desc) < 10:
-            desc = f"{title} available with authorized warranty and express delivery across Hyderabad and India from BaeMeds."
+            desc = f"{title} available with authorized warranty and express nationwide delivery from BaeMeds."
             
         vendor = raw_vendor
         if vendor.lower() in ['mohsinsurgicals-web', 'baemeds-main', 'default']:
@@ -427,7 +427,7 @@ def sync():
         '<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">',
         '  <channel>',
         '    <title>BAE Meds Product Feed</title>',
-        '    <link>https://baemeds.in</link>',
+        '    <link>https://baemeds.com</link>',
         '    <description>Live Google Merchant Center feed with optimized Shopping Title attributes and categories</description>'
     ]
 

@@ -1,5 +1,5 @@
 async function checkLive() {
-  const res = await fetch('https://www.baemeds.in/sitemap.xml');
+  const res = await fetch('https://baemeds.com/sitemap.xml');
   console.log('HTTP Status:', res.status);
   console.log('Server / Cache headers:');
   console.log('  server:', res.headers.get('server'));
@@ -10,6 +10,6 @@ async function checkLive() {
   console.log('  etag:', res.headers.get('etag'));
   const text = await res.text();
   const count = (text.match(/<loc>/g) || []).length;
-  console.log('Current URLs in live baemeds.in/sitemap.xml:', count);
+  console.log('Current URLs in live baemeds.com/sitemap.xml:', count);
 }
 checkLive();

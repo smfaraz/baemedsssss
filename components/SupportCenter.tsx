@@ -2,16 +2,17 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Bot,
   ExternalLink,
-  MessageCircle,
+  Mail,
   MessageSquare,
   Phone,
   Send,
   ShoppingCart,
   X,
 } from 'lucide-react';
-import { APP_NAME, CONTACT_PHONE } from '../constants';
+import { APP_NAME, CONTACT_EMAIL, CONTACT_PHONE, SUPPORT_EMAIL } from '../constants';
 import { Link, useCart } from '../context/CartContext';
-import { fetchAllProducts } from '../lib/shopify';
+import { fetchAllProducts } from '../lib/commerce';
+import { formatPrice } from '../lib/marketConfig';
 import { Product } from '../types';
 
 interface MessageAction {
@@ -38,12 +39,13 @@ const productQuestions = [
 
 // Store-info suggestions: always available (not tied to a specific product).
 const infoQuestions = [
-  'Rental options',
+  'FSA / HSA & DME',
   'Hospital quote',
-  'Delivery & GST',
+  'Delivery & Tax',
   'Warranty',
   'Payment options',
 ];
+
 
 // Rotating soft colours so the suggestion row reads friendly, not one-note.
 const chipColors = [
@@ -81,12 +83,6 @@ const getTerms = (question: string) => normalize(question)
   .split(' ')
   .filter((term) => term.length > 1 && !ignoredTerms.has(term));
 
-const formatPrice = (price: number) => new Intl.NumberFormat('en-IN', {
-  style: 'currency',
-  currency: 'INR',
-  maximumFractionDigits: 0,
-}).format(price);
-
 const SupportCenter: React.FC = () => {
   const { addToCart } = useCart();
   const [isCenterOpen, setIsCenterOpen] = useState(false);
@@ -95,7 +91,7 @@ const SupportCenter: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'bot',
-      content: `I am ${APP_NAME} AI Bot. Tell me what you need, or choose a question below. I can help you find a product and place an order.`,
+      content: `I am ${APP_NAME} AI Assistant. Tell me what you need, or choose a question below. I can help you find products, check prescription requirements, and assist with checkout.`,
       actions: [
         { label: 'Browse catalogue', to: '/products' },
         { label: 'Contact us', to: '/contact' },
@@ -142,12 +138,12 @@ const SupportCenter: React.FC = () => {
     return userMessages[userMessages.length - 1]?.content || 'medical equipment and ordering';
   }, [messages]);
 
-  const whatsappHref = useMemo(() => {
-    const phone = CONTACT_PHONE.replace(/\D/g, '');
-    const text = encodeURIComponent(
-      `Hi ${APP_NAME}, I need help with: ${lastQuestion}. Please share the product link, current availability, and ordering steps.`,
+  const emailDraftHref = useMemo(() => {
+    const subject = encodeURIComponent(`Support request: ${lastQuestion.slice(0, 40)}`);
+    const body = encodeURIComponent(
+      `Hello ${APP_NAME} Support Team,\n\nI need assistance regarding: ${lastQuestion}\n\nPlease get back to me at your earliest convenience.\n`,
     );
-    return `https://wa.me/${phone}?text=${text}`;
+    return `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
   }, [lastQuestion]);
 
   const findMatchingProducts = (question: string) => {
@@ -186,36 +182,37 @@ const SupportCenter: React.FC = () => {
   const getStoreAnswer = (question: string) => {
     const normalizedQuestion = normalize(question);
 
-    if (/^(hi|hello|hey|hii+|namaste|good morning|good afternoon|good evening)\b/.test(normalizedQuestion)) {
+    if (/^(hi|hello|hey|hii+|good morning|good afternoon|good evening)\b/.test(normalizedQuestion)) {
       return {
-        content: `Hello! I am ${APP_NAME} AI Bot. Tell me a product (oxygen, CPAP, wheelchair, nebulizer, monitorâ€¦) or ask about delivery, rental, warranty, payment, or a hospital quote.`,
+        content: `Hello! I am ${APP_NAME} AI Assistant. Tell me a product (oxygen, CPAP, wheelchair, nebulizer, monitor…) or ask about nationwide shipping, FSA/HSA eligibility, warranty, payment methods, or institutional quotes.`,
         actions: [
           { label: 'Browse catalogue', to: '/products' },
-          { label: 'Hospital order', to: '/bulk-orders' },
+          { label: 'Institutional / PO Orders', to: '/bulk-orders' },
         ],
       };
     }
 
     if (/thank|thanks|thankyou|great|nice|good bot|awesome/.test(normalizedQuestion)) {
       return {
-        content: 'Happy to help! Ask me for another product, or reach the team on call or WhatsApp any time.',
+        content: 'Glad to help! Ask me for another product, or contact our US customer support team via phone or email anytime.',
         actions: [{ label: 'Contact us', to: '/contact' }],
       };
     }
 
     if (/rent|rental|lease|hire|monthly/.test(normalizedQuestion)) {
       return {
-        content: 'Selected equipment such as oxygen concentrators and hospital beds may be available on rent. Open a product to check if rental is offered, or send us the product and duration and we will confirm rental availability and terms.',
+        content: 'BaeMeds supplies brand-new, factory-sealed medical equipment for direct purchase with manufacturer warranty, FSA/HSA reimbursement receipts, and HCPCS billing codes. We do not provide equipment rentals in the US market.',
         actions: [
           { label: 'Browse catalogue', to: '/products' },
-          { label: 'Ask about rental', to: '/contact' },
+          { label: 'Contact sales desk', to: '/contact' },
         ],
       };
     }
 
-    if (/warranty|guarantee|install|installation|service|repair|amc|demo|training/.test(normalizedQuestion)) {
+
+    if (/warranty|guarantee|install|installation|service|repair|demo|training/.test(normalizedQuestion)) {
       return {
-        content: 'Warranty, installation, demo, and service support depend on the product and brand. Share the product name and we will confirm the warranty period and any installation or training help available.',
+        content: 'All our equipment includes standard manufacturer warranties (typically 1 to 5 years). OEM customer support, service parts, and device setup guides are included with every delivery.',
         actions: [
           { label: 'Contact support', to: '/contact' },
           { label: 'Browse catalogue', to: '/products' },
@@ -223,9 +220,9 @@ const SupportCenter: React.FC = () => {
       };
     }
 
-    if (/payment|pay|emi|installment|instalment|card|upi|net banking|cod|cash on delivery|advance/.test(normalizedQuestion)) {
+    if (/payment|pay|card|credit|debit|apple pay|google pay|fsa|hsa|financing/.test(normalizedQuestion)) {
       return {
-        content: 'Payment options and any EMI or advance terms are confirmed at checkout or by the team for larger orders. For invoices, ask for GST billing when you place the order.',
+        content: 'We accept all major US credit/debit cards (Visa, MasterCard, American Express, Discover), Apple Pay, Google Pay, and FSA/HSA cards. Itemized receipts suitable for insurance reimbursement are provided upon order completion.',
         actions: [
           { label: 'Go to cart', to: '/cart' },
           { label: 'Contact us', to: '/contact' },
@@ -233,9 +230,9 @@ const SupportCenter: React.FC = () => {
       };
     }
 
-    if (/brand|philips|resmed|bmc|oxymed|drdt|dr trust|omron|make|company|manufacturer|original|genuine/.test(normalizedQuestion)) {
+    if (/brand|philips|resmed|invacare|drive|omron|make|company|manufacturer|original|genuine/.test(normalizedQuestion)) {
       return {
-        content: 'We stock genuine equipment across leading medical brands. Search a brand name (for example ResMed or Philips) and I will show matching products, or browse the full catalogue by category.',
+        content: 'We stock 100% genuine medical equipment from leading FDA-compliant healthcare manufacturers including Philips Respironics, ResMed, Drive DeVilbiss, Invacare, and Omron.',
         actions: [
           { label: 'Browse catalogue', to: '/products' },
           { label: 'Contact us', to: '/contact' },
@@ -243,39 +240,39 @@ const SupportCenter: React.FC = () => {
       };
     }
 
-    if (/location|address|store|shop|visit|showroom|timing|hours|open|where|city|hyderabad/.test(normalizedQuestion)) {
+    if (/location|address|store|shop|visit|showroom|timing|hours|open|where|headquarters/.test(normalizedQuestion)) {
       return {
-        content: 'We are based in Hyderabad and ship across India. For the store address, opening hours, or a map, open the Contact page or call the team directly.',
+        content: 'BaeMeds Healthcare USA is headquartered in Wilmington, DE with certified distribution centers servicing all 50 states via USPS, UPS, and FedEx.',
         actions: [
-          { label: 'Contact & map', to: '/contact' },
-          { label: 'Call now', to: `tel:${CONTACT_PHONE.replace(/\s/g, '')}`, external: true },
+          { label: 'Contact & Info', to: '/contact' },
+          { label: 'Call now', to: `tel:${CONTACT_PHONE.replace(/\D/g, '')}`, external: true },
         ],
       };
     }
 
-    if (/price|cost|cheap|budget|discount|offer|deal|lowest|expensive/.test(normalizedQuestion)) {
+    if (/price|cost|budget|discount|offer|deal|lowest|quote/.test(normalizedQuestion)) {
       return {
-        content: 'Prices are shown on each product page, and discounted items display the current offer. Tell me a product or category and I will show options; for bulk pricing, request a hospital quotation.',
+        content: 'Prices are listed in USD ($) on each product page. For clinic, hospital, or bulk institutional pricing with tax-exempt purchase orders, please submit a quotation request.',
         actions: [
           { label: 'Browse catalogue', to: '/products' },
-          { label: 'Hospital quote', to: '/bulk-orders' },
+          { label: 'Institutional quote', to: '/bulk-orders' },
         ],
       };
     }
 
-    if (/contact|talk|human|agent|representative|number|phone|call|whatsapp|support/.test(normalizedQuestion)) {
+    if (/contact|talk|human|agent|representative|number|phone|call|support/.test(normalizedQuestion)) {
       return {
-        content: 'You can reach the team directly by call or WhatsApp, or use the Contact page for all options. I can also help you find a product right here.',
+        content: `You can reach our US support specialists toll-free at ${CONTACT_PHONE} (Mon–Fri 8am–8pm EST) or email ${CONTACT_EMAIL}.`,
         actions: [
           { label: 'Contact us', to: '/contact' },
-          { label: 'Call now', to: `tel:${CONTACT_PHONE.replace(/\s/g, '')}`, external: true },
+          { label: 'Call toll-free', to: `tel:${CONTACT_PHONE.replace(/\D/g, '')}`, external: true },
         ],
       };
     }
 
-    if (/hospital|bulk|quotation|quote|institution/.test(normalizedQuestion)) {
+    if (/hospital|bulk|quotation|quote|institution|tax exempt|ein/.test(normalizedQuestion)) {
       return {
-        content: 'For a hospital or institutional order, send the product names, quantities, organisation details, GST information, and delivery location. The team will verify availability and pricing before issuing a quotation.',
+        content: 'For hospitals, surgery centers, and government institutions, we accept Net 30 purchase orders and state sales tax exemption certificates. Submit your details through our institutional portal.',
         actions: [
           { label: 'Request quotation', to: '/bulk-orders' },
           { label: 'Contact us', to: '/contact' },
@@ -283,11 +280,11 @@ const SupportCenter: React.FC = () => {
       };
     }
 
-    if (/delivery|shipping|gst|tax/.test(normalizedQuestion)) {
+    if (/delivery|shipping|tax|sales tax/.test(normalizedQuestion)) {
       return {
-        content: 'GST billing is available for eligible orders. Serviceability, shipping charges, taxes, and delivery dates are confirmed at checkout or by our support team.',
+        content: 'We offer standard and expedited carrier shipping across all 50 US states with full door-to-door tracking. State sales tax is calculated automatically at checkout based on the delivery destination.',
         actions: [
-          { label: 'Shipping & delivery', to: '/policies/shipping' },
+          { label: 'Shipping Policy', to: '/policies/shipping' },
           { label: 'Contact us', to: '/contact' },
         ],
       };
@@ -295,7 +292,7 @@ const SupportCenter: React.FC = () => {
 
     if (/return|refund|cancel/.test(normalizedQuestion)) {
       return {
-        content: 'Return and refund eligibility depends on the written store policy, product condition, and timing. Read the policy first, then contact the team with your order number and product name.',
+        content: 'We offer a 30-day return policy for unopened, unsealed consumer supplies. Medical devices requiring prescriptions and hygiene-sensitive items are subject to FDA safety return guidelines.',
         actions: [
           { label: 'Read return policy', to: '/policies/returns' },
           { label: 'Contact us', to: '/contact' },
@@ -327,8 +324,8 @@ const SupportCenter: React.FC = () => {
     const storeAnswer = getStoreAnswer(question);
 
     const contactActions: MessageAction[] = [
-      { label: 'Call now', to: `tel:${CONTACT_PHONE.replace(/\s/g, '')}`, external: true },
-      { label: 'WhatsApp', to: `https://wa.me/${CONTACT_PHONE.replace(/\D/g, '')}?text=${encodeURIComponent(`Hi ${APP_NAME}, I need help with: ${question}.`)}`, external: true },
+      { label: 'Call Toll-Free', to: `tel:${CONTACT_PHONE.replace(/\s/g, '')}`, external: true },
+      { label: 'Email Support', to: `mailto:${SUPPORT_EMAIL}`, external: true },
     ];
 
     // Preset store questions always use the reviewed answer instead of being
@@ -360,7 +357,7 @@ const SupportCenter: React.FC = () => {
     const content = catalogueLoading
       ? 'Still loading. Try again shortly or contact us.'
       : catalogueError
-        ? 'Product search is temporarily unavailable. Use Contact Us, Call, or WhatsApp and our team will help you.'
+        ? 'Product search is temporarily unavailable. Use Contact Us, call toll-free, or email and our team will help you.'
         : 'I could not find that product. Try one product, brand, or category word such as oxygen, CPAP, monitor, suction, or nebulizer.';
 
     setMessages((current) => [...current, {
@@ -497,11 +494,11 @@ const SupportCenter: React.FC = () => {
               </button>
             </div>
             <div className="mt-3 grid grid-cols-2 gap-2">
-              <a href={`tel:${CONTACT_PHONE.replace(/\s/g, '')}`} className="flex min-h-11 items-center justify-center gap-2 rounded-xl border border-medical-primary text-xs font-black text-medical-dark hover:bg-medical-light">
+              <a href={`tel:${CONTACT_PHONE.replace(/\D/g, '')}`} className="flex min-h-11 items-center justify-center gap-2 rounded-xl border border-medical-primary text-xs font-black text-medical-dark hover:bg-medical-light">
                 <Phone size={16} /> Call now
               </a>
-              <a href={whatsappHref} target="_blank" rel="noopener noreferrer" className="flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#147d4f] text-xs font-black text-white hover:bg-[#0f6841]">
-                <MessageCircle size={16} /> WhatsApp
+              <a href={emailDraftHref} className="flex min-h-11 items-center justify-center gap-2 rounded-xl bg-medical-primary text-xs font-black text-white hover:bg-medical-dark">
+                <Mail size={16} /> Email Support
               </a>
             </div>
           </div>
@@ -510,14 +507,14 @@ const SupportCenter: React.FC = () => {
 
       {isCenterOpen && !isChatOpen && (
         <div className="reveal-up flex flex-col items-end gap-2">
-          <a href={`tel:${CONTACT_PHONE.replace(/\s/g, '')}`} className="flex min-h-11 items-center gap-3 rounded-full bg-white px-4 font-bold text-medical-dark shadow-lg ring-1 ring-slate-200">
+          <a href={`tel:${CONTACT_PHONE.replace(/\D/g, '')}`} className="flex min-h-11 items-center gap-3 rounded-full bg-white px-4 font-bold text-medical-dark shadow-lg ring-1 ring-slate-200">
             <Phone size={18} /> Call {CONTACT_PHONE}
           </a>
-          <a href={whatsappHref} target="_blank" rel="noopener noreferrer" className="flex min-h-11 items-center gap-3 rounded-full bg-[#147d4f] px-4 font-bold text-white shadow-lg">
-            <MessageCircle size={18} /> WhatsApp with message
+          <a href={`mailto:${CONTACT_EMAIL}`} className="flex min-h-11 items-center gap-3 rounded-full bg-medical-primary px-4 font-bold text-white shadow-lg">
+            <Mail size={18} /> Email Support
           </a>
           <button type="button" onClick={() => { setIsChatOpen(true); setIsCenterOpen(false); }} className="flex min-h-11 items-center gap-3 rounded-full bg-medical-dark px-4 font-bold text-white shadow-lg">
-            <Bot size={18} /> Open AI Bot
+            <Bot size={18} /> Open AI Assistant
           </button>
         </div>
       )}
@@ -527,7 +524,7 @@ const SupportCenter: React.FC = () => {
           type="button"
           onClick={() => setIsCenterOpen((current) => !current)}
           className={`tap-target inline-flex h-14 w-14 items-center justify-center rounded-full text-white shadow-2xl transition-colors ${isCenterOpen ? 'bg-slate-800' : 'bg-medical-primary hover:bg-medical-dark'}`}
-          aria-label={isCenterOpen ? 'Close support' : 'Open product support, call, and WhatsApp'}
+          aria-label={isCenterOpen ? 'Close support' : 'Open product support, call, and email'}
           aria-expanded={isCenterOpen}
         >
           {isCenterOpen ? <X size={23} /> : <MessageSquare size={24} />}

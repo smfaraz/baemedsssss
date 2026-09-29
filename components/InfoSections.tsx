@@ -18,7 +18,7 @@ export const BulkSupplySection: React.FC = () => {
               Send the product names, quantities, key details, and delivery city. We will check the list and reply with the next steps for a quote.
             </p>
             <ul className="mt-6 grid gap-3 text-sm text-slate-200 sm:grid-cols-3">
-              {['Simple order-list form', 'Add a document if helpful', 'Call and WhatsApp help'].map((item) => (
+              {['Simple order-list form', 'Add a document if helpful', 'Toll-Free Phone & Email'].map((item) => (
                 <li key={item} className="flex items-center gap-2">
                   <CheckCircle2 className="shrink-0 text-medical-accent" size={17} aria-hidden="true" />
                   <span>{item}</span>

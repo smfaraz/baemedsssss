@@ -5,10 +5,9 @@ import {
   fetchShopifyCart, 
   addItemToCart, 
   removeLineItemFromCart, 
-  updateLineItemInCart
-} from '../lib/shopify';
-
-import { attachCustomerToCart } from "../lib/shopify";
+  updateLineItemInCart,
+  attachCustomerToCart,
+} from '../lib/commerce';
 import { useAuth } from './AuthContext';
 
 
@@ -103,6 +102,15 @@ export const Routes: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 };
 
 export const Route: React.FC<{ path: string; element: React.ReactNode }> = ({ element }) => <>{element}</>;
+
+export const Navigate: React.FC<{ to: string; replace?: boolean }> = ({ to }) => {
+  const router = useContext(RouterContext);
+  useEffect(() => {
+    if (router) router.navigate(to);
+  }, [to, router]);
+  return null;
+};
+
 
 type LinkProps = Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
   to: string;

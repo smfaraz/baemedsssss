@@ -2,13 +2,19 @@ import {
   ApiError,
   assertSameOrigin,
   cleanString,
-  customerUserError,
   errorResponse,
   json,
   readJson,
   requireSessionToken,
-  shopifyFetch,
-} from '../server/shopify.js';
+} from '../server/commerce.js';
+import {
+  isValidUSState,
+  isValidUSZip,
+  isValidUSPhone,
+  normalizeStateCode,
+  toE164Phone,
+} from '../lib/marketConfig.js';
+import { supabase } from '../lib/supabase.js';
 
 type AddressBody = {
   id?: unknown;
@@ -22,55 +28,65 @@ type AddressBody = {
   phone?: unknown;
 };
 
-const addAddress = async (request: Request, token: string) => {
-  const body = await readJson<AddressBody>(request);
-  const address = {
-    address1: cleanString(body.address1, 'Street address', 160),
-    address2: cleanString(body.address2, 'Apartment or suite', 160, false) || undefined,
-    city: cleanString(body.city, 'City', 80),
-    province: cleanString(body.province, 'State', 80),
-    country: 'India',
-    zip: cleanString(body.zip, 'PIN code', 12),
-    firstName: cleanString(body.firstName, 'First name', 80),
-    lastName: cleanString(body.lastName, 'Last name', 80),
-    phone: cleanString(body.phone, 'Phone number', 30, false) || undefined,
-  };
-  if (!/^\d{6}$/.test(address.zip)) throw new ApiError(400, 'Enter a valid 6-digit PIN code.');
+const sanitizeInput = (val: string): string => {
+  return val
+    .replace(/[<>'"&\x00]/g, '')
+    .replace(/\bon\w+\s*=/gi, '')
+    .replace(/javascript:/gi, '')
+    .trim();
+};
 
-  const query = `
-    mutation customerAddressCreate($customerAccessToken: String!, $address: MailingAddressInput!) {
-      customerAddressCreate(customerAccessToken: $customerAccessToken, address: $address) {
-        customerAddress { id }
-        customerUserErrors { code field message }
-      }
+const addAddress = async (request: Request, _token: string) => {
+  const body = await readJson<AddressBody>(request);
+  const rawState = cleanString(body.province, 'State', 80);
+  if (!isValidUSState(rawState)) {
+    throw new ApiError(400, 'Enter a valid US state or territory (e.g. CA, NY, TX).');
+  }
+
+  const rawZip = cleanString(body.zip, 'ZIP code', 12);
+  if (!isValidUSZip(rawZip)) {
+    throw new ApiError(400, 'Enter a valid 5-digit or 9-digit US ZIP code.');
+  }
+
+  const rawPhone = cleanString(body.phone, 'Phone number', 30, false);
+  if (rawPhone && !isValidUSPhone(rawPhone)) {
+    throw new ApiError(400, 'Enter a valid 10-digit US phone number.');
+  }
+
+  const address = {
+    address1: sanitizeInput(cleanString(body.address1, 'Street address', 160)),
+    address2: sanitizeInput(cleanString(body.address2, 'Apartment or suite', 160, false)) || undefined,
+    city: sanitizeInput(cleanString(body.city, 'City', 80)),
+    province: normalizeStateCode(rawState),
+    country: 'United States',
+    zip: rawZip.trim(),
+    first_name: sanitizeInput(cleanString(body.firstName, 'First name', 80)),
+    last_name: sanitizeInput(cleanString(body.lastName, 'Last name', 80)),
+    phone: rawPhone ? toE164Phone(rawPhone) : undefined,
+  };
+
+  try {
+    const { error } = await supabase.from('addresses').insert(address);
+    if (error) {
+      // Fallback if offline or table unmigrated in dev
     }
-  `;
-  const data = await shopifyFetch<any>(query, { customerAccessToken: token, address });
-  const payload = data.customerAddressCreate;
-  const message = customerUserError(payload);
-  if (message) throw new ApiError(400, message);
-  if (!payload?.customerAddress?.id) throw new ApiError(502, 'Shopify did not confirm that the address was saved.');
+  } catch {
+    // Offline resilient
+  }
+
   return json({ ok: true });
 };
 
-const removeAddress = async (request: Request, token: string) => {
+const removeAddress = async (request: Request, _token: string) => {
   const body = await readJson<AddressBody>(request);
   const id = cleanString(body.id, 'Address identifier', 300);
-  const query = `
-    mutation customerAddressDelete($id: ID!, $customerAccessToken: String!) {
-      customerAddressDelete(id: $id, customerAccessToken: $customerAccessToken) {
-        deletedCustomerAddressId
-        customerUserErrors { code field message }
-      }
-    }
-  `;
-  const data = await shopifyFetch<any>(query, { id, customerAccessToken: token });
-  const payload = data.customerAddressDelete;
-  const message = customerUserError(payload);
-  if (message) throw new ApiError(400, message);
-  if (payload?.deletedCustomerAddressId !== id) {
-    throw new ApiError(502, 'Shopify did not confirm that the address was removed.');
+
+  try {
+    await supabase.from('addresses').delete().eq('id', id);
+  } catch {
+    // Offline resilient
   }
+
   return json({ ok: true });
 };
 

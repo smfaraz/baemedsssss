@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ArrowRight, Heart, ShoppingCart, Trash2 } from 'lucide-react';
 import { Link, useCart } from '../context/CartContext';
 import ProductCard from '../components/ProductCard';
-import { fetchAllProducts } from '../lib/shopify';
+import { fetchAllProducts } from '../lib/commerce';
 import { useReveal } from '../lib/useReveal';
 import { Product } from '../types';
 

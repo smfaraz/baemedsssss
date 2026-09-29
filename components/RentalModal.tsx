@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Calendar, CheckCircle2, Mail, MessageCircle, Phone, Send, X } from 'lucide-react';
+import { Calendar, CheckCircle2, Mail, Phone, Send, X } from 'lucide-react';
 import { APP_NAME, CONTACT_EMAIL, CONTACT_PHONE } from '../constants';
+import { formatPrice } from '../lib/marketConfig';
 import { Product } from '../types';
 import { submitEnquiry } from '../lib/enquiries';
 
@@ -27,22 +28,14 @@ const RentalModal: React.FC<RentalModalProps> = ({ product, isOpen, onClose }) =
 
   if (!isOpen) return null;
 
-  const formattedPrice = new Intl.NumberFormat('en-IN', {
-    style: 'currency',
-    currency: 'INR',
-    maximumFractionDigits: 0,
-  }).format(product.price);
-  const whatsappNumber = CONTACT_PHONE.replace(/\D/g, '');
-  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
-    `Hello Baemeds, I need rental information for ${product.title}. Preferred duration: ${formData.duration}.`,
-  )}`;
+  const formattedPrice = formatPrice(product.price);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setSubmitError('');
     const subject = encodeURIComponent(`Rental enquiry: ${product.title}`);
     const body = encodeURIComponent(
-      `Baemeds rental enquiry\n\nProduct: ${product.title}\nListed product price: ${formattedPrice}\nName: ${formData.name}\nPhone: ${formData.phone}\nEmail: ${formData.email}\nRequested duration: ${formData.duration}\n\nMessage:\n${formData.message || 'No additional message'}`,
+      `BaeMeds US rental enquiry\n\nProduct: ${product.title}\nListed product price: ${formattedPrice}\nName: ${formData.name}\nPhone: ${formData.phone}\nEmail: ${formData.email}\nRequested duration: ${formData.duration}\n\nMessage:\n${formData.message || 'No additional message'}`,
     );
 
     try {
@@ -110,8 +103,8 @@ const RentalModal: React.FC<RentalModalProps> = ({ product, isOpen, onClose }) =
                 <p>{submitted ? 'Your rental enquiry was saved successfully. An email draft was also opened for convenience.' : 'Your email draft was opened. Review it and press send in your email app.'}</p>
               </div>
               <div className="mt-4 grid gap-3 sm:grid-cols-3">
-                <a href={whatsappUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-medical-primary px-4 py-3 text-sm font-bold text-white hover:bg-medical-dark">
-                  <MessageCircle size={17} aria-hidden="true" /> WhatsApp
+                <a href={`mailto:${CONTACT_EMAIL}`} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-medical-primary px-4 py-3 text-sm font-bold text-white hover:bg-medical-dark">
+                  <Mail size={17} aria-hidden="true" /> Email Support
                 </a>
                 <a href={`tel:${CONTACT_PHONE}`} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-medical-primary/40 bg-white px-4 py-3 text-sm font-bold text-medical-dark hover:border-medical-primary">
                   <Phone size={17} aria-hidden="true" /> Call
@@ -166,8 +159,8 @@ const RentalModal: React.FC<RentalModalProps> = ({ product, isOpen, onClose }) =
 
           {!emailDraftOpened && (
             <div className="mt-5 grid gap-3 border-t border-slate-200 pt-5 sm:grid-cols-2">
-              <a href={whatsappUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 px-4 py-3 text-sm font-bold text-medical-text hover:border-medical-primary">
-                <MessageCircle size={17} aria-hidden="true" /> Ask on WhatsApp
+              <a href={`tel:${CONTACT_PHONE.replace(/[^\d+]/g, '')}`} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 px-4 py-3 text-sm font-bold text-medical-text hover:border-medical-primary">
+                <Phone size={17} aria-hidden="true" /> Call {CONTACT_PHONE}
               </a>
               <a href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(`Rental question: ${product.title}`)}`} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 px-4 py-3 text-sm font-bold text-medical-text hover:border-medical-primary">
                 <Mail size={17} aria-hidden="true" /> Email directly

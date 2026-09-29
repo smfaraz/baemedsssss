@@ -14,11 +14,12 @@ import { Link, useNavigate, useSearchParams } from '../context/CartContext';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { APP_NAME, CATEGORIES } from '../constants';
-import { fetchAllProducts, searchProducts } from '../lib/shopify';
+import { fetchAllProducts, searchProducts } from '../lib/commerce';
 import { FLY_TO_CART_EVENT, FlyToCartDetail } from '../lib/flyToCart';
 import { Product } from '../types';
 import TopBar from './TopBar';
 import BrandMark from './BrandMark';
+import { formatPrice } from '../lib/marketConfig';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -273,7 +274,7 @@ const Header: React.FC = () => {
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="truncate text-sm font-semibold text-slate-800">{product.title}</p>
-                          <p className="text-xs font-bold text-medical-primary">{new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(product.price)}</p>
+                          <p className="text-xs font-bold text-medical-primary">{formatPrice(product.price)}</p>
                         </div>
                       </Link>
                     ))}
@@ -373,8 +374,8 @@ const Header: React.FC = () => {
             )}
           </div>
           <Link to="/products?category=Oxygen%20Concentrator" className="hover:text-medical-primary">Respiratory care</Link>
-          <Link to="/oxygen-concentrator-rental-hyderabad" className="inline-flex items-center gap-1 text-teal-800 bg-teal-50 px-2.5 py-1 rounded-lg border border-teal-200/80 hover:bg-teal-100 hover:text-teal-950 font-bold transition text-xs">
-            Oxygen Rentals
+          <Link to="/guides/oxygen-concentrator-rental-guide" className="inline-flex items-center gap-1 text-teal-800 bg-teal-50 px-2.5 py-1 rounded-lg border border-teal-200/80 hover:bg-teal-100 hover:text-teal-950 font-bold transition text-xs">
+            Oxygen Rentals &amp; Guide
           </Link>
           <Link to="/products?category=Patient%20Monitor" className="hover:text-medical-primary">Diagnostics</Link>
           <Link to="/products?category=Hospital%20Furniture" className="hover:text-medical-primary">Mobility & furniture</Link>
@@ -418,12 +419,12 @@ const Header: React.FC = () => {
 
             <div className="mb-4">
               <Link
-                to="/oxygen-concentrator-rental-hyderabad"
+                to="/guides/oxygen-concentrator-rental-guide"
                 onClick={closeMenu}
                 className="flex min-h-12 items-center justify-between rounded-xl bg-teal-50 border border-teal-200 px-3 text-sm font-bold text-teal-900 shadow-sm"
               >
-                <span>Oxygen Rentals (Hyderabad)</span>
-                <span className="rounded bg-teal-700 px-1.5 py-0.5 text-[10px] font-bold text-white uppercase">60m Setup</span>
+                <span>Oxygen Therapy &amp; Rentals</span>
+                <span className="rounded bg-teal-700 px-1.5 py-0.5 text-[10px] font-bold text-white uppercase">US Delivery</span>
               </Link>
             </div>
 

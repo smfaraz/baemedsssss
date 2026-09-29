@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import DOMPurify from 'dompurify';
 import {
-  Calendar,
   Check,
   ChevronRight,
   FileText,
@@ -10,7 +9,6 @@ import {
   Loader,
   Mail,
   MapPin,
-  MessageCircle,
   Minus,
   Phone,
   Plus,
@@ -18,33 +16,29 @@ import {
   Share2,
   ShieldCheck,
   ShoppingCart,
+  Sparkles,
+  Star,
   Stethoscope,
   X,
 } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
-import RentalModal from '../components/RentalModal';
 import SEO from '../components/SEO';
 import { APP_NAME, CONTACT_EMAIL, CONTACT_PHONE } from '../constants';
 import { Link, useCart, useNavigate, useParams } from '../context/CartContext';
+import { useReviews } from '../context/ReviewsContext';
+import { ProductReviewsSection } from '../components/reviews/ProductReviewsSection';
 import { flyToCart } from '../lib/flyToCart';
 import { rememberRecentlyViewedProduct } from '../lib/recentlyViewed';
-import { fetchProductByHandle, fetchProductsByCategory, isRentalAvailable } from '../lib/shopify';
+import { fetchProductByHandle, fetchRecommendedProducts } from '../lib/commerce';
+import { formatPrice, isValidUSZip } from '../lib/marketConfig';
 import { Product } from '../types';
-import { submitEnquiry } from '../lib/enquiries';
-import WhatsAppIcon from '../components/WhatsAppIcon';
-
-type DetailTab = 'description' | 'specifications';
-
-const formatPrice = (price: number) => new Intl.NumberFormat('en-IN', {
-  style: 'currency',
-  currency: 'INR',
-  maximumFractionDigits: 0,
-}).format(price);
 
 const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { addToCart, addToWishlist, removeFromWishlist, isInWishlist, isLoading: isCartLoading } = useCart();
+  const { getReviewsSummary } = useReviews();
+
   const [product, setProduct] = useState<Product>();
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -52,16 +46,14 @@ const ProductDetailPage: React.FC = () => {
   const [activeImage, setActiveImage] = useState('');
   const [imageFailed, setImageFailed] = useState(false);
   const [quantity, setQuantity] = useState(1);
-  const [activeTab, setActiveTab] = useState<DetailTab>('description');
   const [isAdded, setIsAdded] = useState(false);
   const [isBuyingNow, setIsBuyingNow] = useState(false);
   const [cartError, setCartError] = useState('');
   const [isCopied, setIsCopied] = useState(false);
-  const [isRentalModalOpen, setIsRentalModalOpen] = useState(false);
   const [notifyEmail, setNotifyEmail] = useState('');
   const [emailAppOpened, setEmailAppOpened] = useState(false);
-  const [pincode, setPincode] = useState('');
-  const [pincodeStatus, setPincodeStatus] = useState<'idle' | 'valid' | 'invalid'>('idle');
+  const [zipCode, setZipCode] = useState('');
+  const [zipCodeStatus, setZipCodeStatus] = useState<'idle' | 'valid' | 'invalid'>('idle');
   const touchStartX = React.useRef<number | null>(null);
 
   useEffect(() => {
@@ -84,37 +76,39 @@ const ProductDetailPage: React.FC = () => {
         setImageFailed(false);
         setQuantity(1);
         setCartError('');
-        setPincode('');
-        setPincodeStatus('idle');
+        setZipCode('');
+        setZipCodeStatus('idle');
 
         if (loadedProduct) {
           try {
-            const related = await fetchProductsByCategory(loadedProduct.category);
-            if (!cancelled) setRelatedProducts(related.filter((item) => item.id !== loadedProduct.id).slice(0, 4));
-          } catch (error) {
-            console.error('Related products could not be loaded', error);
+            const recommended = await fetchRecommendedProducts(loadedProduct, 4);
+            if (!cancelled) {
+              setRelatedProducts(recommended);
+            }
+          } catch (relatedError) {
+            console.error('Could not load recommended products', relatedError);
             if (!cancelled) setRelatedProducts([]);
           }
         }
       } catch (error) {
-        console.error('Product could not be loaded', error);
-        if (!cancelled) {
-          setProduct(undefined);
-          setLoadError('This product could not be loaded right now.');
-        }
+        console.error('Failed to load product detail', error);
+        if (!cancelled) setLoadError('We could not load this product right now. Please try again or contact support.');
       } finally {
         if (!cancelled) setIsLoading(false);
       }
     };
 
     loadProduct();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [id]);
 
   const galleryImages = useMemo(() => {
     if (!product) return [];
     return [...new Set([product.image, ...(product.images || [])].filter(Boolean))];
   }, [product]);
+
   const changeGalleryImage = (direction: 1 | -1) => {
     if (galleryImages.length < 2) return;
     const currentIndex = Math.max(0, galleryImages.indexOf(activeImage));
@@ -122,44 +116,49 @@ const ProductDetailPage: React.FC = () => {
     setActiveImage(galleryImages[nextIndex]);
     setImageFailed(false);
   };
+
   const safeDescription = useMemo(
     () => DOMPurify.sanitize(product?.description || '', { USE_PROFILES: { html: true } }),
     [product?.description],
   );
 
+  const reviewsSummary = useMemo(() => {
+    if (!product) return { rating: 5, count: 0, breakdown: {}, recommendedPercentage: 100, photoCount: 0 };
+    return getReviewsSummary(product.id, product.rating, product.reviewCount);
+  }, [product, getReviewsSummary]);
+
   const discount = product?.compareAtPrice && product.compareAtPrice > product.price
     ? Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100)
     : 0;
   const inWishlist = product ? isInWishlist(product.id) : false;
-  const phoneHref = `tel:${CONTACT_PHONE.replace(/[^+\d]/g, '')}`;
-  const whatsappHref = product
-    ? `https://wa.me/${CONTACT_PHONE.replace(/\D/g, '')}?text=${encodeURIComponent(`Hello Baemeds, I would like to ask about ${product.title}: ${window.location.href}`)}`
-    : '#';
+  const phoneHref = `tel:${CONTACT_PHONE.replace(/\D/g, '')}`;
 
   const handleAddToCart = async (event?: React.MouseEvent<HTMLButtonElement>) => {
-    if (!product?.inStock) return;
-    if (event) flyToCart(event.currentTarget, product.image || activeImage || undefined);
+    if (!product || !product.inStock || isCartLoading) return;
     setCartError('');
     try {
+      if (event) {
+        flyToCart(event.currentTarget, activeImage || product.image);
+      }
       await addToCart(product, quantity);
       setIsAdded(true);
-      window.setTimeout(() => setIsAdded(false), 1800);
+      window.setTimeout(() => setIsAdded(false), 2200);
     } catch (error) {
-      console.error('Could not add product to cart', error);
-      setCartError('Couldnâ€™t add this product to your cart. Please try again or contact us.');
+      console.error('Add to cart failed', error);
+      setCartError('Could not add product to cart. Please try again.');
     }
   };
 
   const handleBuyNow = async () => {
-    if (!product?.inStock) return;
-    setIsBuyingNow(true);
+    if (!product || !product.inStock || isBuyingNow || isCartLoading) return;
     setCartError('');
+    setIsBuyingNow(true);
     try {
       await addToCart(product, quantity);
       navigate('/cart');
     } catch (error) {
-      console.error('Could not open cart', error);
-      setCartError('Couldnâ€™t add this product to your cart. Please try again or contact us.');
+      console.error('Buy now failed', error);
+      setCartError('Could not process immediate checkout. Please try again.');
     } finally {
       setIsBuyingNow(false);
     }
@@ -167,152 +166,265 @@ const ProductDetailPage: React.FC = () => {
 
   const handleWishlist = () => {
     if (!product) return;
-    if (inWishlist) removeFromWishlist(product.id);
-    else addToWishlist(product);
+    if (inWishlist) {
+      removeFromWishlist(product.id);
+    } else {
+      addToWishlist(product);
+    }
   };
 
   const handleShare = async () => {
     if (!product) return;
-    const shareData = { title: product.title, text: `${product.title} on ${APP_NAME}`, url: window.location.href };
-    try {
-      if (navigator.share && (!navigator.canShare || navigator.canShare(shareData))) await navigator.share(shareData);
-      else {
-        await navigator.clipboard.writeText(window.location.href);
-        setIsCopied(true);
-        window.setTimeout(() => setIsCopied(false), 1800);
+    const shareData = {
+      title: `${product.title} | ${APP_NAME}`,
+      text: `Check out ${product.title} on ${APP_NAME}`,
+      url: window.location.href,
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+        return;
+      } catch (error) {
+        if ((error as DOMException)?.name === 'AbortError') return;
       }
+    }
+
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setIsCopied(true);
+      window.setTimeout(() => setIsCopied(false), 2000);
     } catch (error) {
-      if ((error as Error).name !== 'AbortError') console.error('Product could not be shared', error);
+      console.error('Clipboard copy failed', error);
     }
   };
 
-  const handleNotify = async (event: React.FormEvent) => {
+  const handleNotify = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!product || !notifyEmail.trim()) return;
-    await submitEnquiry({ type: 'availability', product: product.title, name: 'Availability request', email: notifyEmail.trim(), phone: 'Not provided', message: `Please confirm availability for ${product.title}. Product link: ${window.location.href}` });
-    const subject = encodeURIComponent(`Availability request: ${product.title}`);
-    const body = encodeURIComponent(`Please confirm availability for ${product.title}. My email is ${notifyEmail.trim()}. Product link: ${window.location.href}`);
+    if (!product) return;
+    const subject = encodeURIComponent(`Stock Notification Request: ${product.title}`);
+    const body = encodeURIComponent(`Hello BaeMeds Clinical Support,\n\nPlease notify me at ${notifyEmail} when ${product.title} (${product.id}) is back in stock.\n\nThank you.`);
     window.location.href = `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
     setEmailAppOpened(true);
   };
 
-  const handlePincodeCheck = (event: React.FormEvent) => {
+  const handleZipCodeCheck = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setPincodeStatus(/^\d{6}$/.test(pincode) ? 'valid' : 'invalid');
+    if (isValidUSZip(zipCode)) {
+      setZipCodeStatus('valid');
+    } else {
+      setZipCodeStatus('invalid');
+    }
   };
 
   if (isLoading) {
     return (
-      <main className="min-h-[65vh] bg-slate-50 px-4 py-16" aria-busy="true">
-        <SEO title="Loading Product Details" canonical={id ? `/products/${id}` : '/products'} />
-        <div className="mx-auto max-w-6xl animate-pulse">
-          <div className="h-4 w-56 rounded bg-slate-200" />
-          <div className="mt-8 grid gap-8 lg:grid-cols-2">
-            <div className="aspect-square rounded-3xl bg-white" />
-            <div className="space-y-5 pt-5"><div className="h-5 w-28 rounded bg-slate-200" /><div className="h-10 w-full rounded bg-slate-200" /><div className="h-24 rounded-2xl bg-white" /><div className="h-14 rounded-xl bg-slate-200" /></div>
-          </div>
+      <main className="flex min-h-[60vh] items-center justify-center">
+        <div className="flex flex-col items-center gap-3 text-medical-text">
+          <Loader size={36} className="animate-spin text-medical-primary" />
+          <p className="text-sm font-semibold">Loading product specifications...</p>
         </div>
-        <span className="sr-only">Loading product</span>
       </main>
     );
   }
 
-  if (!product) {
-    const whatsappFallback = `https://wa.me/${CONTACT_PHONE.replace(/\D/g, '')}?text=${encodeURIComponent('Hello Baemeds, I need help finding a product.')}`;
+  if (loadError || !product) {
     return (
-      <main className="min-h-[65vh] bg-slate-50 px-4 py-16">
-        <SEO title="Product Not Found" canonical={id ? `/products/${id}` : '/products'} />
-        <div className="mx-auto max-w-2xl rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-soft sm:p-12">
-          <Stethoscope size={48} className="mx-auto text-medical-primary" />
-          <h1 className="mt-5 text-2xl font-bold text-medical-dark">{loadError ? 'Product temporarily unavailable' : 'Product not found'}</h1>
-          <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-medical-text">{loadError || 'The link may be outdated, or this item is no longer listed. Browse the current catalogue or ask the team to locate it.'}</p>
-          <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
-            <Link to="/products" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-medical-primary px-5 font-bold text-white">Browse catalogue</Link>
-            <a href={whatsappFallback} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 px-5 font-bold text-medical-dark"><MessageCircle size={17} />WhatsApp us</a>
-            <Link to="/contact" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 px-5 font-bold text-medical-dark">Contact us</Link>
-          </div>
-        </div>
+      <main className="container mx-auto px-4 py-16 text-center">
+        <h1 className="text-2xl font-bold text-medical-dark">Product Not Found</h1>
+        <p className="mt-2 text-sm text-medical-text">{loadError || 'The requested medical equipment could not be found.'}</p>
+        <Link to="/products" className="mt-6 inline-flex min-h-12 items-center justify-center rounded-xl bg-medical-primary px-6 font-bold text-white hover:bg-medical-dark transition">
+          Browse All Products
+        </Link>
       </main>
     );
   }
+
+  const structuredData = {
+    '@context': 'https://schema.org/',
+    '@type': 'Product',
+    name: product.title,
+    image: product.image,
+    description: product.description?.replace(/<[^>]*>/g, '').slice(0, 200),
+    brand: {
+      '@type': 'Brand',
+      name: product.vendor || 'BaeMeds',
+    },
+    offers: {
+      '@type': 'Offer',
+      priceCurrency: 'USD',
+      price: product.price,
+      availability: product.inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+      url: window.location.href,
+    },
+    aggregateRating: reviewsSummary.count > 0 ? {
+      '@type': 'AggregateRating',
+      ratingValue: reviewsSummary.rating,
+      reviewCount: reviewsSummary.count,
+    } : undefined,
+  };
 
   return (
-    <main className="min-h-screen bg-slate-50 pb-28 md:pb-16">
+    <main className="pb-24">
       <SEO
-        title={product.seo?.title || product.title}
-        description={product.seo?.description || product.description?.replace(/(<([^>]+)>)/gi, '').slice(0, 160)}
-        canonical={`/products/${product.handle}`}
-        ogImage={product.image}
-        ogType="product"
-        productData={{
-          name: product.title,
-          image: product.image,
-          description: product.description?.replace(/(<([^>]+)>)/gi, '').slice(0, 300) || '',
-          sku: product.id.split('/').pop(),
-          brand: product.vendor,
-          price: product.price,
-          currency: 'INR',
-          availability: product.inStock ? 'InStock' : 'OutOfStock',
-        }}
+        title={`${product.title} — Buy & Rent Online`}
+        description={`Order certified ${product.title} from BaeMeds. FSA/HSA eligible, US nationwide delivery with biomedical inspection and manufacturer warranty.`}
+        image={product.image}
+        type="product"
+        canonical={`/products/${product.handle || product.id}`}
+        structuredData={structuredData}
       />
 
       <nav aria-label="Breadcrumb" className="border-b border-slate-200 bg-white">
         <div className="container mx-auto flex min-h-12 items-center gap-1 overflow-hidden px-4 text-xs text-medical-text sm:text-sm">
-          <Link to="/" className="shrink-0 rounded-lg px-1 py-2 hover:text-medical-primary">Home</Link><ChevronRight size={14} className="shrink-0" />
-          <Link to={`/products?category=${encodeURIComponent(product.category)}`} className="shrink-0 rounded-lg px-1 py-2 hover:text-medical-primary">{product.category}</Link><ChevronRight size={14} className="shrink-0" />
+          <Link to="/" className="shrink-0 rounded-lg px-1 py-2 hover:text-medical-primary">Home</Link>
+          <ChevronRight size={14} className="shrink-0" />
+          <Link to={`/products?category=${encodeURIComponent(product.category)}`} className="shrink-0 rounded-lg px-1 py-2 hover:text-medical-primary">{product.category}</Link>
+          <ChevronRight size={14} className="shrink-0" />
           <span className="truncate font-semibold text-medical-dark" aria-current="page">{product.title}</span>
         </div>
       </nav>
 
       <div className="container mx-auto px-4 py-6 sm:py-9">
         <div className="grid gap-7 lg:grid-cols-2 lg:gap-12">
+          {/* Product Gallery */}
           <section aria-label="Product gallery">
-            <div className="relative flex aspect-square items-center justify-center overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 shadow-soft sm:p-10" onTouchStart={(event) => { touchStartX.current = event.changedTouches[0]?.clientX ?? null; }} onTouchEnd={(event) => { if (touchStartX.current === null) return; const delta = event.changedTouches[0]?.clientX - touchStartX.current; if (Math.abs(delta) > 45) changeGalleryImage(delta < 0 ? 1 : -1); touchStartX.current = null; }}>
+            <div
+              className="relative flex aspect-square items-center justify-center overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 shadow-soft sm:p-10"
+              onTouchStart={(event) => { touchStartX.current = event.changedTouches[0]?.clientX ?? null; }}
+              onTouchEnd={(event) => {
+                if (touchStartX.current === null) return;
+                const delta = event.changedTouches[0]?.clientX - touchStartX.current;
+                if (Math.abs(delta) > 45) changeGalleryImage(delta < 0 ? 1 : -1);
+                touchStartX.current = null;
+              }}
+            >
               {!imageFailed && activeImage ? (
                 <img src={activeImage} alt={product.title} onError={() => setImageFailed(true)} className="h-full w-full object-contain" />
               ) : (
-                <div className="text-center text-medical-text"><ImageOff size={48} className="mx-auto" /><p className="mt-3 text-sm font-semibold">Product image unavailable</p></div>
+                <div className="text-center text-medical-text">
+                  <ImageOff size={48} className="mx-auto" />
+                  <p className="mt-3 text-sm font-semibold">Product image unavailable</p>
+                </div>
               )}
-              {discount > 0 && <span className="absolute left-4 top-4 rounded-full bg-rose-600 px-3 py-1.5 text-xs font-bold text-white">{discount}% off</span>}
+              {discount > 0 && (
+                <span className="absolute left-4 top-4 rounded-full bg-rose-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm">
+                  {discount}% off
+                </span>
+              )}
               <div className="absolute right-4 top-4 flex gap-2">
-                <button type="button" onClick={handleWishlist} aria-label={inWishlist ? `Remove ${product.title} from wishlist` : `Add ${product.title} to wishlist`} aria-pressed={inWishlist} className="flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-medical-text shadow-soft hover:border-medical-primary hover:text-medical-primary"><Heart size={19} className={inWishlist ? 'fill-rose-600 text-medical-accent' : ''} /></button>
-                <button type="button" onClick={handleShare} aria-label="Share this product" className="flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-medical-text shadow-soft hover:border-medical-primary hover:text-medical-primary"><Share2 size={19} /></button>
+                <button
+                  type="button"
+                  onClick={handleWishlist}
+                  aria-label={inWishlist ? `Remove ${product.title} from wishlist` : `Add ${product.title} to wishlist`}
+                  aria-pressed={inWishlist}
+                  className="flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-medical-text shadow-soft hover:border-medical-primary hover:text-medical-primary transition"
+                >
+                  <Heart size={19} className={inWishlist ? 'fill-rose-600 text-medical-accent' : ''} />
+                </button>
+                <button
+                  type="button"
+                  onClick={handleShare}
+                  aria-label="Share this product"
+                  className="flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-medical-text shadow-soft hover:border-medical-primary hover:text-medical-primary transition"
+                >
+                  <Share2 size={19} />
+                </button>
               </div>
-              {isCopied && <span role="status" className="absolute bottom-4 right-4 rounded-lg bg-slate-950 px-3 py-2 text-xs font-bold text-white">Link copied</span>}
-              {galleryImages.length > 1 && <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5 rounded-full bg-white/90 px-2 py-1 shadow-sm" aria-label="Image slider position">{galleryImages.map((image, index) => <button key={image} type="button" onClick={() => { setActiveImage(image); setImageFailed(false); }} aria-label={`Show image ${index + 1}`} aria-current={activeImage === image} className={`h-2 w-2 rounded-full ${activeImage === image ? 'bg-medical-primary' : 'bg-slate-300'}`} />)}</div>}
+              {isCopied && (
+                <span role="status" className="absolute bottom-4 right-4 rounded-lg bg-slate-950 px-3 py-2 text-xs font-bold text-white">
+                  Link copied
+                </span>
+              )}
+              {galleryImages.length > 1 && (
+                <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5 rounded-full bg-white/90 px-2 py-1 shadow-sm" aria-label="Image slider position">
+                  {galleryImages.map((image, index) => (
+                    <button
+                      key={image}
+                      type="button"
+                      onClick={() => { setActiveImage(image); setImageFailed(false); }}
+                      aria-label={`Show image ${index + 1}`}
+                      aria-current={activeImage === image}
+                      className={`h-2 w-2 rounded-full ${activeImage === image ? 'bg-medical-primary' : 'bg-slate-300'}`}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
 
             {galleryImages.length > 1 && (
               <div className="mt-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-soft" aria-label="Choose product image">
-                <p className="mb-2 text-xs font-black uppercase tracking-[0.14em] text-medical-text">Product images <span className="font-medium normal-case tracking-normal text-slate-500">Â· tap to view</span></p>
+                <p className="mb-2 text-xs font-black uppercase tracking-[0.14em] text-medical-text">
+                  Product images <span className="font-medium normal-case tracking-normal text-slate-500">· tap to view</span>
+                </p>
                 <div className="flex snap-x gap-3 overflow-x-auto pb-1">
-                {galleryImages.map((image, index) => (
-                  <button key={image} type="button" onClick={() => { setActiveImage(image); setImageFailed(false); }} aria-label={`View product image ${index + 1}`} aria-pressed={activeImage === image} className={`relative h-24 w-24 shrink-0 snap-start rounded-xl border-2 bg-white p-2 transition hover:-translate-y-0.5 hover:border-medical-primary ${activeImage === image ? 'border-medical-primary ring-2 ring-medical-accent' : 'border-slate-200'}`}><img src={image} alt={`${product.title} view ${index + 1}`} className="h-full w-full object-contain" /><span className={`absolute bottom-1 right-1 rounded-md px-1.5 py-0.5 text-[10px] font-black ${activeImage === image ? 'bg-medical-primary text-white' : 'bg-slate-100 text-slate-600'}`}>{index + 1}</span></button>
-                ))}
+                  {galleryImages.map((image, index) => (
+                    <button
+                      key={image}
+                      type="button"
+                      onClick={() => { setActiveImage(image); setImageFailed(false); }}
+                      aria-label={`View product image ${index + 1}`}
+                      aria-pressed={activeImage === image}
+                      className={`relative h-24 w-24 shrink-0 snap-start rounded-xl border-2 bg-white p-2 transition hover:-translate-y-0.5 hover:border-medical-primary ${activeImage === image ? 'border-medical-primary ring-2 ring-medical-accent' : 'border-slate-200'}`}
+                    >
+                      <img src={image} alt={`${product.title} view ${index + 1}`} className="h-full w-full object-contain" />
+                      <span className={`absolute bottom-1 right-1 rounded-md px-1.5 py-0.5 text-[10px] font-black ${activeImage === image ? 'bg-medical-primary text-white' : 'bg-slate-100 text-slate-600'}`}>
+                        {index + 1}
+                      </span>
+                    </button>
+                  ))}
                 </div>
               </div>
             )}
           </section>
 
+          {/* Product Details & Actions */}
           <section>
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-medical-primary">{product.vendor} Â· {product.category}</p>
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-medical-primary">{product.vendor} • {product.category}</p>
             <h1 className="mt-2 text-3xl font-bold leading-tight text-medical-dark sm:text-4xl">{product.title}</h1>
-            <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
-              <span className={`rounded-full px-3 py-1.5 font-bold ${product.inStock ? 'bg-medical-secondary-soft text-medical-secondary' : 'bg-rose-50 text-rose-800'}`}>{product.inStock ? 'In stock' : 'Out of stock'}</span>
-              <span className="rounded-full bg-slate-100 px-3 py-1.5 font-semibold text-medical-text">GST invoice available</span>
+            
+            <div className="mt-4 flex flex-wrap items-center gap-2.5 text-sm">
+              <button
+                type="button"
+                onClick={() => {
+                  const el = document.getElementById('product-reviews');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-xs font-bold text-amber-900 border border-amber-200/80 hover:bg-amber-100 transition cursor-pointer"
+              >
+                <Star size={13} className="fill-amber-400 text-amber-400" />
+                <span className="font-extrabold">{reviewsSummary.rating.toFixed(1)}</span>
+                <span className="text-amber-700">({reviewsSummary.count} verified reviews)</span>
+              </button>
+
+              <span className={`rounded-full px-3 py-1 text-xs font-bold ${product.inStock ? 'bg-medical-secondary-soft text-medical-secondary' : 'bg-rose-50 text-rose-800'}`}>
+                {product.inStock ? 'In stock' : 'Out of stock'}
+              </span>
+              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-medical-text">
+                FSA / HSA Eligible
+              </span>
+              {product.requiresPrescription && (
+                <span className="rounded-full border border-amber-300 bg-amber-50 px-3 py-1 text-xs font-bold text-amber-900">
+                  Rx Required
+                </span>
+              )}
             </div>
 
             <div className="mt-6 rounded-3xl border border-medical-primary/20 bg-gradient-to-br from-white via-white to-medical-light/50 p-5 shadow-soft sm:p-6">
               <div className="flex flex-wrap items-end gap-3">
                 <span className="text-3xl font-bold text-medical-dark">{formatPrice(product.price)}</span>
-                {product.compareAtPrice && product.compareAtPrice > product.price && <span className="pb-1 text-lg text-medical-text line-through">{formatPrice(product.compareAtPrice)}</span>}
+                {product.compareAtPrice && product.compareAtPrice > product.price && (
+                  <span className="pb-1 text-lg text-medical-text line-through">{formatPrice(product.compareAtPrice)}</span>
+                )}
                 {product.compareAtPrice && product.compareAtPrice > product.price && (
                   <span className="mb-1 rounded-full bg-medical-accent px-2.5 py-1 text-xs font-black text-medical-dark">
                     {Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100)}% off
                   </span>
                 )}
               </div>
-              <p className="mt-2 text-xs leading-5 text-medical-text">Taxes, shipping charges and final delivery details are confirmed at checkout.</p>
+              <p className="mt-2 text-xs leading-5 text-medical-text">
+                Applicable state sales taxes, shipping options, and carrier delivery dates calculated at checkout.
+              </p>
 
               <div className="mt-5 grid gap-3 sm:grid-cols-[132px_1fr_1fr]">
                 <div className="flex min-h-12 items-center justify-between rounded-xl border border-slate-300 bg-white">
@@ -320,18 +432,21 @@ const ProductDetailPage: React.FC = () => {
                   <span className="font-bold text-medical-dark" aria-live="polite">{quantity}</span>
                   <button type="button" onClick={() => setQuantity((current) => current + 1)} className="flex h-11 w-11 items-center justify-center rounded-xl hover:bg-slate-50" aria-label="Increase quantity"><Plus size={17} /></button>
                 </div>
-                <button type="button" onClick={handleAddToCart} disabled={!product.inStock || isCartLoading || isAdded} className="hidden min-h-12 items-center justify-center gap-2 rounded-xl bg-medical-primary px-4 font-black text-white shadow-md hover:bg-medical-dark disabled:cursor-not-allowed disabled:bg-slate-300 md:flex">{isCartLoading ? <Loader size={18} className="animate-spin" /> : isAdded ? <Check size={18} /> : <ShoppingCart size={18} />}{product.inStock ? (isAdded ? 'Added to cart' : 'Add to cart') : 'Out of stock'}</button>
-                <button type="button" onClick={handleBuyNow} disabled={!product.inStock || isBuyingNow || isCartLoading} className="hidden min-h-12 items-center justify-center rounded-xl border-2 border-medical-accent bg-medical-accent px-4 font-black text-medical-dark shadow-md hover:bg-amber-300 disabled:cursor-not-allowed disabled:border-slate-300 disabled:bg-slate-100 disabled:text-medical-text md:flex">{isBuyingNow ? 'Opening cartâ€¦' : 'Buy now'}</button>
+                <button type="button" onClick={handleAddToCart} disabled={!product.inStock || isCartLoading || isAdded} className="hidden min-h-12 items-center justify-center gap-2 rounded-xl bg-medical-primary px-4 font-black text-white shadow-md hover:bg-medical-dark disabled:cursor-not-allowed disabled:bg-slate-300 md:flex">
+                  {isCartLoading ? <Loader size={18} className="animate-spin" /> : isAdded ? <Check size={18} /> : <ShoppingCart size={18} />}
+                  {product.inStock ? (isAdded ? 'Added to cart' : 'Add to cart') : 'Out of stock'}
+                </button>
+                <button type="button" onClick={handleBuyNow} disabled={!product.inStock || isBuyingNow || isCartLoading} className="hidden min-h-12 items-center justify-center rounded-xl border-2 border-medical-accent bg-medical-accent px-4 font-black text-medical-dark shadow-md hover:bg-amber-300 disabled:cursor-not-allowed disabled:border-slate-300 disabled:bg-slate-100 disabled:text-medical-text md:flex">
+                  {isBuyingNow ? 'Opening cart...' : 'Buy now'}
+                </button>
               </div>
 
               {cartError && <p role="alert" className="mt-3 hidden rounded-xl bg-medical-alert bg-opacity-10 px-3 py-2 text-sm font-semibold text-medical-alert md:block">{cartError}</p>}
 
-              {isRentalAvailable(product) && <button type="button" onClick={() => setIsRentalModalOpen(true)} className="mt-3 hidden min-h-14 w-full items-center justify-center gap-2 rounded-xl border-2 border-medical-secondary bg-medical-secondary-soft px-4 font-black text-medical-secondary shadow-sm hover:bg-emerald-100 md:flex"><Calendar size={19} />Enquire about renting this product <ChevronRight size={18} /></button>}
-
               {!product.inStock && (
                 <div className="mt-5 rounded-2xl border border-medical-accent bg-medical-accent bg-opacity-5 p-4">
                   <h2 className="flex items-center gap-2 text-sm font-bold text-medical-accent"><RotateCcw size={17} />Ask about availability</h2>
-                  <p className="mt-1 text-xs leading-5 text-medical-text">Weâ€™ll open a prefilled availability email for you to send.</p>
+                  <p className="mt-1 text-xs leading-5 text-medical-text">We will open a prefilled availability email for you to send.</p>
                   <form onSubmit={handleNotify} className="mt-3 flex flex-col gap-2 sm:flex-row">
                     <label className="flex-1"><span className="sr-only">Your email address</span><input type="email" required value={notifyEmail} onChange={(event) => setNotifyEmail(event.target.value)} placeholder="Your email address" className="min-h-11 w-full rounded-xl border border-medical-accent bg-white px-3 text-sm outline-none focus:border-medical-primary" /></label>
                     <button type="submit" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-medical-accent px-5 text-sm font-bold text-white"><Mail size={17} />Open email request</button>
@@ -342,59 +457,172 @@ const ProductDetailPage: React.FC = () => {
             </div>
 
             <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <a href={phoneHref} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-medical-primary bg-white px-4 font-bold text-medical-primary hover:bg-medical-light"><Phone size={18} />Call about this product</a>
-              <a href={whatsappHref} target="_blank" rel="noreferrer" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#25D366] px-4 font-bold text-white hover:bg-[#1DA851]"><WhatsAppIcon size={19} className="text-white" />WhatsApp product enquiry</a>
+              <a href={phoneHref} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-medical-primary bg-white px-4 font-bold text-medical-primary hover:bg-medical-light transition">
+                <Phone size={18} />Call about this product
+              </a>
+              <a href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(`Product Enquiry: ${product.title}`)}`} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-medical-primary px-4 font-bold text-white hover:bg-medical-dark transition">
+                <Mail size={18} />Email clinical support
+              </a>
             </div>
 
             <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-4">
-              <h2 className="flex items-center gap-2 text-sm font-bold text-medical-dark"><MapPin size={17} />Delivery enquiry</h2>
-              <form onSubmit={handlePincodeCheck} className="mt-3 flex gap-2">
-                <label className="flex-1"><span className="sr-only">Six-digit delivery pincode</span><input type="text" inputMode="numeric" autoComplete="postal-code" value={pincode} onChange={(event) => { setPincode(event.target.value.replace(/\D/g, '').slice(0, 6)); setPincodeStatus('idle'); }} placeholder="Enter 6-digit pincode" className="min-h-11 w-full rounded-xl border border-slate-300 px-3 text-sm outline-none focus:border-medical-primary" /></label>
-                <button type="submit" className="min-h-11 rounded-xl border border-slate-300 px-4 text-sm font-bold text-medical-dark hover:bg-slate-50">Check</button>
+              <h2 className="flex items-center gap-2 text-sm font-bold text-medical-dark"><MapPin size={17} />Delivery estimator</h2>
+              <form onSubmit={handleZipCodeCheck} className="mt-3 flex gap-2">
+                <label className="flex-1"><span className="sr-only">Five-digit US delivery ZIP code</span><input type="text" inputMode="numeric" autoComplete="postal-code" value={zipCode} onChange={(event) => { setZipCode(event.target.value.replace(/\D/g, '').slice(0, 5)); setZipCodeStatus('idle'); }} placeholder="Enter 5-digit ZIP code (e.g. 19801)" className="min-h-11 w-full rounded-xl border border-slate-300 px-3 text-sm outline-none focus:border-medical-primary" /></label>
+                <button type="submit" className="min-h-11 rounded-xl border border-slate-300 px-4 text-sm font-bold text-medical-dark hover:bg-slate-50 transition">Check</button>
               </form>
-              {pincodeStatus === 'valid' && <p role="status" className="mt-2 text-xs leading-5 text-medical-text">Pincode {pincode} saved. Confirm delivery availability and timing at checkout or with support.</p>}
-              {pincodeStatus === 'invalid' && <p role="alert" className="mt-2 text-xs font-semibold text-rose-700">Enter a valid six-digit Indian pincode.</p>}
+              {zipCodeStatus === 'valid' && <p role="status" className="mt-2 text-xs leading-5 text-medical-text">ZIP code {zipCode} verified. Carrier shipping rates and delivery estimates will be calculated at checkout.</p>}
+              {zipCodeStatus === 'invalid' && <p role="alert" className="mt-2 text-xs font-semibold text-rose-700">Please enter a valid 5-digit US ZIP code.</p>}
             </div>
 
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              {product.warranty && <div className="flex gap-3 rounded-2xl border border-slate-200 bg-white p-4"><ShieldCheck className="shrink-0 text-medical-primary" size={22} /><div><p className="text-sm font-bold text-medical-dark">Warranty listed</p><p className="mt-1 text-xs leading-5 text-medical-text">{product.warranty}. Confirm manufacturer coverage and terms before purchase.</p></div></div>}
-              <div className="flex gap-3 rounded-2xl border border-slate-200 bg-white p-4"><FileText className="shrink-0 text-medical-primary" size={22} /><div><p className="text-sm font-bold text-medical-dark">GST invoice available</p><p className="mt-1 text-xs leading-5 text-medical-text">Invoice details are collected during checkout.</p></div></div>
+              {product.warranty && (
+                <div className="flex gap-3 rounded-2xl border border-slate-200 bg-white p-4">
+                  <ShieldCheck className="shrink-0 text-medical-primary" size={22} />
+                  <div>
+                    <p className="text-sm font-bold text-medical-dark">Warranty listed</p>
+                    <p className="mt-1 text-xs leading-5 text-medical-text">{product.warranty}. Full manufacturer warranty and support included.</p>
+                  </div>
+                </div>
+              )}
+              <div className="flex gap-3 rounded-2xl border border-slate-200 bg-white p-4">
+                <FileText className="shrink-0 text-medical-primary" size={22} />
+                <div>
+                  <p className="text-sm font-bold text-medical-dark">FSA / HSA & Itemized Invoicing</p>
+                  <p className="mt-1 text-xs leading-5 text-medical-text">Itemized receipts suitable for insurance and FSA/HSA reimbursement provided.</p>
+                </div>
+              </div>
             </div>
           </section>
         </div>
 
-        <section className="mt-10 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-soft">
-          <div className="flex overflow-x-auto border-b border-slate-200 p-2" role="tablist" aria-label="Product information">
-            <button type="button" role="tab" aria-selected={activeTab === 'description'} onClick={() => setActiveTab('description')} className={`min-h-11 shrink-0 rounded-xl px-5 text-sm font-bold ${activeTab === 'description' ? 'bg-medical-primary text-white' : 'text-medical-text hover:bg-slate-50'}`}>Description</button>
-            <button type="button" role="tab" aria-selected={activeTab === 'specifications'} onClick={() => setActiveTab('specifications')} className={`min-h-11 shrink-0 rounded-xl px-5 text-sm font-bold ${activeTab === 'specifications' ? 'bg-medical-primary text-white' : 'text-medical-text hover:bg-slate-50'}`}>Specifications</button>
+        {/* Decentralized In-Page Quick Jump Bar */}
+        <nav aria-label="Product Sections" className="mt-10 sticky top-20 z-30 -mx-4 px-4 sm:mx-0 sm:px-0 py-2.5 bg-slate-50/90 backdrop-blur-md">
+          <div className="flex items-center gap-2.5 overflow-x-auto pb-1 scrollbar-none">
+            <a href="#product-description" className="shrink-0 px-4 py-2 rounded-xl text-xs font-bold bg-white text-medical-dark border border-slate-200 hover:border-medical-primary hover:text-medical-primary shadow-xs transition">
+              Overview &amp; Features
+            </a>
+            <a href="#product-specifications" className="shrink-0 px-4 py-2 rounded-xl text-xs font-bold bg-white text-medical-dark border border-slate-200 hover:border-medical-primary hover:text-medical-primary shadow-xs transition">
+              Technical Specifications
+            </a>
+            <a href="#product-reviews" className="shrink-0 px-4 py-2 rounded-xl text-xs font-bold bg-white text-medical-dark border border-slate-200 hover:border-medical-primary hover:text-medical-primary shadow-xs transition inline-flex items-center gap-1.5">
+              <span>Customer Reviews</span>
+              {reviewsSummary.count > 0 && (
+                <span className="bg-amber-100 text-amber-900 text-[10px] font-black px-1.5 py-0.5 rounded-full">
+                  {reviewsSummary.count}
+                </span>
+              )}
+            </a>
+            {relatedProducts.length > 0 && (
+              <a href="#product-recommended" className="shrink-0 px-4 py-2 rounded-xl text-xs font-bold bg-white text-medical-dark border border-slate-200 hover:border-medical-primary hover:text-medical-primary shadow-xs transition">
+                Recommended Items
+              </a>
+            )}
           </div>
-          <div className="p-5 sm:p-8">
-            {activeTab === 'description' ? (
-              safeDescription
-                ? <div className="prose prose-sm max-w-none text-medical-text" dangerouslySetInnerHTML={{ __html: safeDescription }} />
-                : <div><h2 className="text-lg font-bold text-medical-dark">Product information</h2><p className="mt-2 text-sm leading-6 text-medical-text">Product details are not available yet. Contact us to confirm specifications and compatibility.</p><a href={whatsappHref} target="_blank" rel="noreferrer" className="mt-5 inline-flex min-h-11 items-center justify-center rounded-xl border border-medical-primary px-4 font-bold text-medical-primary">Request details</a></div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[520px] text-left text-sm">
-                  <caption className="sr-only">Specifications for {product.title}</caption>
-                  <tbody className="divide-y divide-slate-100">
-                    <tr><th scope="row" className="w-1/3 py-3 pr-4 font-bold text-medical-dark">Brand</th><td className="py-3 text-medical-text">{product.vendor}</td></tr>
-                    <tr><th scope="row" className="py-3 pr-4 font-bold text-medical-dark">Product</th><td className="py-3 text-medical-text">{product.title}</td></tr>
-                    <tr><th scope="row" className="py-3 pr-4 font-bold text-medical-dark">Category</th><td className="py-3 text-medical-text">{product.category}</td></tr>
-                    {product.warranty && <tr><th scope="row" className="py-3 pr-4 font-bold text-medical-dark">Listed warranty</th><td className="py-3 text-medical-text">{product.warranty}</td></tr>}
-                    {product.metafields?.map((field) => <tr key={`${field.namespace}-${field.key}`}><th scope="row" className="py-3 pr-4 font-bold capitalize text-medical-dark">{field.key.replace(/_/g, ' ')}</th><td className="py-3 text-medical-text">{field.value}</td></tr>)}
-                  </tbody>
-                </table>
-                {!product.metafields?.length && <p className="mt-4 text-xs leading-5 text-medical-text">Additional technical specifications have not been supplied. Confirm requirements with the team before ordering.</p>}
-              </div>
+        </nav>
+
+        {/* 1. Decentralized Section: Product Description */}
+        <section id="product-description" className="mt-6 scroll-mt-36 overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 sm:p-9 shadow-soft">
+          <div className="border-b border-slate-100 pb-4 mb-6">
+            <h2 className="text-xl font-bold text-medical-dark">Clinical Overview &amp; Product Details</h2>
+            <p className="text-xs text-medical-text">Key therapeutic capabilities, intended usage, and patient guidelines</p>
+          </div>
+          {safeDescription ? (
+            <div className="prose prose-sm max-w-none text-medical-text" dangerouslySetInnerHTML={{ __html: safeDescription }} />
+          ) : (
+            <div>
+              <p className="mt-2 text-sm leading-6 text-medical-text">
+                Product details are being updated. Contact our clinical engineering team to confirm specific patient requirements and compatibility.
+              </p>
+              <a href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(`Product details request: ${product.title}`)}`} className="mt-5 inline-flex min-h-11 items-center justify-center rounded-xl border border-medical-primary px-4 font-bold text-medical-primary hover:bg-medical-light transition">
+                Request Specifications Sheet
+              </a>
+            </div>
+          )}
+        </section>
+
+        {/* 2. Decentralized Section: Technical Specifications Table */}
+        <section id="product-specifications" className="mt-8 scroll-mt-36 overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 sm:p-9 shadow-soft">
+          <div className="border-b border-slate-100 pb-4 mb-6">
+            <h2 className="text-xl font-bold text-medical-dark">Technical &amp; Manufacturer Specifications</h2>
+            <p className="text-xs text-medical-text">Engineering parameters, compliance certifications, and manufacturer warranty data</p>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[520px] text-left text-sm">
+              <caption className="sr-only">Specifications for {product.title}</caption>
+              <tbody className="divide-y divide-slate-100">
+                <tr className="hover:bg-slate-50/60"><th scope="row" className="w-1/3 py-3 pr-4 font-bold text-medical-dark">Brand / Manufacturer</th><td className="py-3 text-medical-text font-medium">{product.vendor}</td></tr>
+                <tr className="hover:bg-slate-50/60"><th scope="row" className="py-3 pr-4 font-bold text-medical-dark">Product Name</th><td className="py-3 text-medical-text">{product.title}</td></tr>
+                <tr className="hover:bg-slate-50/60"><th scope="row" className="py-3 pr-4 font-bold text-medical-dark">Category</th><td className="py-3 text-medical-text">{product.category}</td></tr>
+                {product.warranty && <tr className="hover:bg-slate-50/60"><th scope="row" className="py-3 pr-4 font-bold text-medical-dark">Manufacturer Warranty</th><td className="py-3 text-medical-text font-semibold text-medical-secondary">{product.warranty}</td></tr>}
+                {product.metafields?.map((field) => (
+                  <tr key={`${field.namespace}-${field.key}`} className="hover:bg-slate-50/60">
+                    <th scope="row" className="py-3 pr-4 font-bold capitalize text-medical-dark">{field.key.replace(/_/g, ' ')}</th>
+                    <td className="py-3 text-medical-text">{field.value}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {!product.metafields?.length && !product.warranty && (
+              <p className="mt-4 text-xs leading-5 text-medical-text">
+                Standard biomedical hospital compliance applies. Contact BaeMeds clinical support for complete technical datasheets.
+              </p>
             )}
           </div>
         </section>
 
+        {/* 3. Decentralized Section: Customer Reviews & Photo Gallery */}
+        <section id="product-reviews" className="mt-8 scroll-mt-36 rounded-3xl border border-slate-200 bg-white p-6 sm:p-9 shadow-soft">
+          <div className="flex flex-wrap items-center justify-between border-b border-slate-100 pb-4 mb-6 gap-3">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-amber-600 border border-amber-200">
+                <Star size={20} className="fill-amber-400 text-amber-400" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-medical-dark">Verified Customer &amp; Clinical Reviews</h2>
+                <p className="text-xs text-medical-text">Doctor, clinic, and patient experiences with equipment photos</p>
+              </div>
+            </div>
+            {reviewsSummary.count > 0 && (
+              <div className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-xs font-extrabold text-amber-900 border border-amber-200">
+                <span>{reviewsSummary.rating.toFixed(1)} ★</span>
+                <span className="text-amber-700">({reviewsSummary.count} verified)</span>
+              </div>
+            )}
+          </div>
+
+          <ProductReviewsSection product={product} />
+        </section>
+
+        {/* 4. Decentralized Section: Clinically Recommended Equipment */}
         {relatedProducts.length > 0 && (
-          <section className="mt-12" aria-labelledby="related-products-heading">
-            <div className="mb-5 flex items-end justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[0.16em] text-medical-primary">Continue browsing</p><h2 id="related-products-heading" className="mt-1 text-2xl font-bold text-medical-dark">Related products</h2></div><Link to={`/products?category=${encodeURIComponent(product.category)}`} className="hidden min-h-11 items-center gap-1 rounded-xl px-3 text-sm font-bold text-medical-primary hover:bg-medical-light sm:flex">View category<ChevronRight size={17} /></Link></div>
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">{relatedProducts.map((relatedProduct) => <ProductCard key={relatedProduct.id} product={relatedProduct} />)}</div>
+          <section id="product-recommended" className="mt-14 scroll-mt-36" aria-labelledby="recommended-products-heading">
+            <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+              <div>
+                <div className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-xs font-bold text-amber-900 border border-amber-200/80 mb-2 shadow-xs">
+                  <Sparkles size={13} className="text-amber-500" />
+                  <span>Clinically Recommended</span>
+                </div>
+                <h2 id="recommended-products-heading" className="text-2xl font-bold text-medical-dark sm:text-3xl">
+                  Recommended Medical Equipment
+                </h2>
+                <p className="mt-1 text-sm text-medical-text">
+                  Complementary devices, diagnostics, and accessories frequently paired with this item
+                </p>
+              </div>
+              <Link
+                to={`/products?category=${encodeURIComponent(product.category)}`}
+                className="inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 text-xs font-bold text-medical-primary shadow-sm hover:border-medical-primary hover:bg-medical-light transition"
+              >
+                <span>View all in {product.category}</span>
+                <ChevronRight size={15} />
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {relatedProducts.map((relatedProduct) => (
+                <ProductCard key={relatedProduct.id} product={relatedProduct} />
+              ))}
+            </div>
           </section>
         )}
       </div>
@@ -408,14 +636,11 @@ const ProductDetailPage: React.FC = () => {
 
       <div className="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 p-3 shadow-[0_-8px_30px_rgba(15,23,42,0.10)] backdrop-blur md:hidden">
         <div className="mx-auto flex max-w-lg gap-2">
-          {isRentalAvailable(product) && <button type="button" onClick={() => setIsRentalModalOpen(true)} className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border-2 border-medical-secondary bg-medical-secondary-soft text-medical-secondary" aria-label="Enquire about renting this product"><Calendar size={19} /></button>}
           <button type="button" onClick={handleAddToCart} disabled={!product.inStock || isCartLoading || isAdded} className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-medical-primary px-3 text-sm font-bold text-white disabled:bg-slate-300">{isCartLoading ? <Loader size={17} className="animate-spin" /> : isAdded ? <Check size={17} /> : <ShoppingCart size={17} />}{product.inStock ? (isAdded ? 'Added' : 'Add to cart') : 'Out of stock'}</button>
-          {product.inStock && <button type="button" onClick={handleBuyNow} disabled={isBuyingNow || isCartLoading} className="min-h-12 flex-1 rounded-xl border border-medical-primary px-3 text-sm font-bold text-medical-primary disabled:border-slate-300 disabled:text-medical-text">{isBuyingNow ? 'Openingâ€¦' : 'Buy now'}</button>}
-          {!product.inStock && <a href={whatsappHref} target="_blank" rel="noreferrer" className="inline-flex min-h-12 flex-1 items-center justify-center rounded-xl border border-medical-primary px-3 text-sm font-bold text-medical-primary">Ask availability</a>}
+          {product.inStock && <button type="button" onClick={handleBuyNow} disabled={isBuyingNow || isCartLoading} className="min-h-12 flex-1 rounded-xl border border-medical-primary px-3 text-sm font-bold text-medical-primary disabled:border-slate-300 disabled:text-medical-text">{isBuyingNow ? 'Opening cart...' : 'Buy now'}</button>}
+          {!product.inStock && <a href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(`Availability inquiry: ${product.title}`)}`} className="inline-flex min-h-12 flex-1 items-center justify-center rounded-xl border border-medical-primary px-3 text-sm font-bold text-medical-primary">Ask availability</a>}
         </div>
       </div>
-
-      <RentalModal product={product} isOpen={isRentalModalOpen} onClose={() => setIsRentalModalOpen(false)} />
     </main>
   );
 };

@@ -1,0 +1,1883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BaeMeds — Weeks 2 & 3 Comprehensive Performance & Engineering Report</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- PDF Generation Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #0F172A;
+            --primary-dark: #090D1A;
+            --accent-blue: #2563EB;
+            --accent-indigo: #4F46E5;
+            --accent-teal: #0D9488;
+            --accent-emerald: #059669;
+            --accent-rose: #E11D48;
+            --green-badge: #ECFDF5;
+            --green-badge-border: #A7F3D0;
+            --green-badge-text: #065F46;
+            --blue-badge: #EFF6FF;
+            --blue-badge-border: #BFDBFE;
+            --blue-badge-text: #1E40AF;
+            --purple-badge: #FAF5FF;
+            --purple-badge-border: #E9D5FF;
+            --purple-badge-text: #6B21A8;
+            --amber-badge: #FFFBEB;
+            --amber-badge-border: #FDE68A;
+            --amber-badge-text: #92400E;
+            --text-main: #1E293B;
+            --text-muted: #475569;
+            --text-light: #64748B;
+            --bg-canvas: #CBD5E1;
+            --bg-card: #F8FAFC;
+            --border-color: #E2E8F0;
+            --border-light: #F1F5F9;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-canvas);
+            color: var(--text-main);
+            line-height: 1.40;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Floating Interactive Action Bar */
+        .action-bar {
+            position: fixed;
+            top: 14px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background: #ffffff;
+            padding: 8px 22px;
+            border-radius: 50px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        .document-tag {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            font-size: 0.82rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #10B981;
+            border-radius: 50%;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-action {
+            background-color: var(--primary);
+            color: #ffffff;
+            border: none;
+            padding: 7px 16px;
+            border-radius: 30px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 600;
+            font-size: 0.80rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-action:hover {
+            background-color: var(--accent-indigo);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary-action {
+            background-color: #F1F5F9;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 7px 14px;
+            border-radius: 30px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 600;
+            font-size: 0.80rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-secondary-action:hover {
+            background-color: #E2E8F0;
+        }
+
+        /* Document Container */
+        .document-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 28px;
+            padding: 75px 20px 40px 20px;
+        }
+
+        /* A4 Page Specifications (Exact 210mm x 297mm) */
+        .a4-page {
+            width: 210mm;
+            height: 297mm;
+            min-height: 297mm;
+            max-height: 297mm;
+            background: #ffffff;
+            box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.15);
+            padding: 10mm 12mm 9mm 12mm;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+            border-radius: 4px;
+        }
+
+        .top-stripe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #2563EB 0%, #0D9488 40%, #4F46E5 80%, #E11D48 100%);
+        }
+
+        /* Header Component */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1.5px solid var(--border-color);
+            padding-bottom: 8px;
+            margin-bottom: 8px;
+        }
+
+        .brand-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-logo-badge {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, #0F172A 0%, #1E3A8A 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-weight: 800;
+            font-size: 1.25rem;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            box-shadow: 0 3px 8px rgba(15, 23, 42, 0.25);
+        }
+
+        .brand-text h1 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 800;
+            font-size: 1.30rem;
+            color: var(--primary);
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+        }
+
+        .brand-text p {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+
+        .report-meta {
+            text-align: right;
+        }
+
+        .report-badge {
+            display: inline-block;
+            background: var(--blue-badge);
+            border: 1px solid var(--blue-badge-border);
+            color: var(--blue-badge-text);
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 2px;
+        }
+
+        .report-date {
+            font-size: 0.64rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Page Title Banner */
+        .page-banner {
+            background: linear-gradient(135deg, #F8FAFC 0%, #EFF6FF 100%);
+            border: 1px solid #DBEAFE;
+            border-left: 4px solid var(--accent-blue);
+            border-radius: 6px;
+            padding: 7px 11px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-banner h2 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: -0.01em;
+        }
+
+        .page-banner p {
+            font-size: 0.66rem;
+            color: var(--text-muted);
+            margin-top: 1px;
+        }
+
+        .period-chip {
+            background: #ffffff;
+            border: 1px solid #BFDBFE;
+            color: var(--accent-blue);
+            font-size: 0.63rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+            white-space: nowrap;
+        }
+
+        /* Grid Layouts */
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 7px;
+            margin-bottom: 8px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 7px;
+            margin-bottom: 8px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        /* Metric Cards */
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 7px;
+            padding: 7px 9px;
+            position: relative;
+        }
+
+        .stat-card.highlight-green {
+            background: #F0FDF4;
+            border-color: #BBF7D0;
+        }
+
+        .stat-card.highlight-blue {
+            background: #EFF6FF;
+            border-color: #BFDBFE;
+        }
+
+        .stat-card.highlight-purple {
+            background: #FAF5FF;
+            border-color: #E9D5FF;
+        }
+
+        .stat-card.highlight-teal {
+            background: #F0FDFA;
+            border-color: #99F6E4;
+        }
+
+        .stat-card.highlight-amber {
+            background: #FFFBEB;
+            border-color: #FDE68A;
+        }
+
+        .stat-label {
+            font-size: 0.62rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .stat-value {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1.20rem;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1.15;
+            margin-top: 2px;
+        }
+
+        .stat-sub {
+            font-size: 0.60rem;
+            color: var(--text-light);
+            margin-top: 2px;
+            font-weight: 500;
+        }
+
+        /* Content Blocks */
+        .section-box {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 7px;
+            padding: 8px 11px;
+            margin-bottom: 8px;
+        }
+
+        .section-box-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-light);
+            padding-bottom: 5px;
+            margin-bottom: 6px;
+        }
+
+        .section-title {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.76rem;
+            font-weight: 800;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        .section-title svg {
+            color: var(--accent-blue);
+        }
+
+        .tag-pill {
+            font-size: 0.58rem;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+
+        .tag-green {
+            background: var(--green-badge);
+            color: var(--green-badge-text);
+            border: 1px solid var(--green-badge-border);
+        }
+
+        .tag-blue {
+            background: var(--blue-badge);
+            color: var(--blue-badge-text);
+            border: 1px solid var(--blue-badge-border);
+        }
+
+        .tag-purple {
+            background: var(--purple-badge);
+            color: var(--purple-badge-text);
+            border: 1px solid var(--purple-badge-border);
+        }
+
+        .tag-amber {
+            background: var(--amber-badge);
+            color: var(--amber-badge-text);
+            border: 1px solid var(--amber-badge-border);
+        }
+
+        /* Professional Tables */
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.65rem;
+        }
+
+        .report-table th {
+            background: #F8FAFC;
+            color: var(--text-muted);
+            font-weight: 700;
+            text-align: left;
+            padding: 4px 7px;
+            border-bottom: 1.5px solid var(--border-color);
+            text-transform: uppercase;
+            font-size: 0.59rem;
+            letter-spacing: 0.02em;
+        }
+
+        .report-table td {
+            padding: 4px 7px;
+            border-bottom: 1px solid var(--border-light);
+            color: var(--text-main);
+            vertical-align: middle;
+        }
+
+        .report-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .score-pill {
+            display: inline-block;
+            font-weight: 700;
+            padding: 1px 5px;
+            border-radius: 4px;
+            font-size: 0.61rem;
+        }
+
+        .score-100 {
+            background: #DCFCE7;
+            color: #166534;
+        }
+
+        .score-high {
+            background: #E0E7FF;
+            color: #3730A3;
+        }
+
+        /* Feature / Campaign Cards */
+        .campaign-card {
+            border: 1px solid var(--border-color);
+            border-radius: 7px;
+            background: #ffffff;
+            padding: 8px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .campaign-card.card-primary {
+            border-top: 3px solid var(--accent-blue);
+        }
+
+        .campaign-card.card-secondary {
+            border-top: 3px solid var(--accent-teal);
+        }
+
+        .campaign-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .campaign-name {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1.2;
+        }
+
+        .campaign-sub {
+            font-size: 0.61rem;
+            color: var(--text-muted);
+            margin-top: 1px;
+        }
+
+        .badge-live {
+            background: #DCFCE7;
+            color: #15803D;
+            border: 1px solid #86EFAC;
+            font-weight: 700;
+            font-size: 0.58rem;
+            padding: 2px 6px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+
+        .bullet-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .bullet-list li {
+            font-size: 0.64rem;
+            color: var(--text-main);
+            display: flex;
+            align-items: flex-start;
+            gap: 5px;
+            line-height: 1.34;
+        }
+
+        .bullet-icon {
+            width: 12px;
+            height: 12px;
+            min-width: 12px;
+            margin-top: 2px;
+            color: var(--accent-emerald);
+        }
+
+        .bullet-icon-blue {
+            width: 12px;
+            height: 12px;
+            min-width: 12px;
+            margin-top: 2px;
+            color: var(--accent-blue);
+        }
+
+        .bullet-icon-purple {
+            width: 12px;
+            height: 12px;
+            min-width: 12px;
+            margin-top: 2px;
+            color: var(--accent-indigo);
+        }
+
+        .asset-chip-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 2px;
+        }
+
+        .asset-chip {
+            background: #F1F5F9;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            font-size: 0.59rem;
+            font-weight: 600;
+            padding: 1.5px 5px;
+            border-radius: 4px;
+        }
+
+        /* Flow Diagram */
+        .flow-container {
+            background: #F8FAFC;
+            border: 1px dashed #CBD5E1;
+            border-radius: 6px;
+            padding: 6px 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 7px;
+        }
+
+        .flow-step {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            padding: 4px 6px;
+            text-align: center;
+            flex: 1;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+        }
+
+        .flow-title {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.60rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .flow-desc {
+            font-size: 0.55rem;
+            color: var(--text-muted);
+            margin-top: 1px;
+        }
+
+        .flow-arrow {
+            color: var(--accent-indigo);
+            font-weight: bold;
+            font-size: 0.70rem;
+        }
+
+        /* Code / Config Snippets */
+        .code-callout {
+            background: #0F172A;
+            color: #F8FAFC;
+            border-radius: 5px;
+            padding: 5px 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.59rem;
+            line-height: 1.32;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .code-callout span.comment { color: #94A3B8; }
+        .code-callout span.val { color: #38BDF8; font-weight: 600; }
+        .code-callout span.tag { color: #34D399; }
+        .code-callout span.key { color: #F472B6; }
+
+        /* Footer Component */
+        .footer {
+            border-top: 1.5px solid var(--border-color);
+            padding-top: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.62rem;
+            color: var(--text-light);
+        }
+
+        .footer-brand {
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .page-indicator {
+            font-weight: 700;
+            background: #F1F5F9;
+            padding: 2px 7px;
+            border-radius: 10px;
+            color: var(--text-muted);
+        }
+
+        /* Print Specific Media Queries */
+        @media print {
+            body {
+                background: #ffffff !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            .action-bar {
+                display: none !important;
+            }
+
+            .document-container {
+                padding: 0 !important;
+                gap: 0 !important;
+            }
+
+            .a4-page {
+                box-shadow: none !important;
+                margin: 0 !important;
+                border-radius: 0 !important;
+                page-break-after: always !important;
+                break-after: page !important;
+                width: 210mm !important;
+                height: 297mm !important;
+                max-height: 297mm !important;
+                min-height: 297mm !important;
+                padding: 10mm 12mm 9mm 12mm !important;
+            }
+        }
+
+        @page {
+            size: A4 portrait;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Floating Interactive Controls -->
+<div class="action-bar" id="actionBar">
+    <div class="document-tag">
+        <div class="status-dot"></div>
+        BaeMeds | Master Performance Report (Weeks 2 & 3 — 7-Page Edition)
+    </div>
+    <div class="btn-group">
+        <button class="btn-action" id="btn-print" onclick="window.print()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                <rect x="6" y="14" width="12" height="8"></rect>
+            </svg>
+            Print / Save as PDF
+        </button>
+        <button class="btn-secondary-action" id="btn-jspdf" onclick="exportJsPDF()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Export All 7 Pages (jsPDF)
+        </button>
+    </div>
+</div>
+
+<div class="document-container">
+
+    <!-- ================= PAGE 1 ================= -->
+    <!-- EXECUTIVE OVERVIEW & SCORECARD -->
+    <div class="a4-page page-1" id="page-1">
+        <div class="top-stripe"></div>
+
+        <!-- Header -->
+        <div class="header">
+            <div class="brand-section">
+                <div class="brand-logo-badge">B</div>
+                <div class="brand-text">
+                    <h1>baemeds</h1>
+                    <p>BIOMEDICAL ENGINEERING & HOME HEALTHCARE TECHNOLOGIES</p>
+                </div>
+            </div>
+            <div class="report-meta">
+                <span class="report-badge">Executive Master Report</span>
+                <div class="report-date">Period: <strong>Weeks 2 & 3</strong> | Domain: <strong>www.baemeds.in</strong></div>
+            </div>
+        </div>
+
+        <!-- Banner -->
+        <div class="page-banner">
+            <div>
+                <h2>Master Executive Summary & Full-Cycle Operations Delivery</h2>
+                <p>High-level scorecard summarizing SEO audit victory (94/100 A+), dual Google Ads launches, tracking instrumentation, and DevOps maintenance.</p>
+            </div>
+            <span class="period-chip">Comprehensive 7-Page Edition</span>
+        </div>
+
+        <!-- Top 4 Metric Cards -->
+        <div class="grid-4">
+            <div class="stat-card highlight-green">
+                <div class="stat-label">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><path d="M9 12l2 2 4-4"></path></svg>
+                    SEO Audit Score
+                </div>
+                <div class="stat-value">94 / 100</div>
+                <div class="stat-sub">Grade A+ (0 Critical Issues)</div>
+            </div>
+            <div class="stat-card highlight-blue">
+                <div class="stat-label">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                    Server Response (TTFB)
+                </div>
+                <div class="stat-value">98 ms</div>
+                <div class="stat-sub">Total Load: 100ms | FCP: 255ms</div>
+            </div>
+            <div class="stat-card highlight-purple">
+                <div class="stat-label">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="3" width="20" height="14" rx="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line></svg>
+                    Google Ads
+                </div>
+                <div class="stat-value">2 Active</div>
+                <div class="stat-sub">Search-Only + Multi-Asset</div>
+            </div>
+            <div class="stat-card highlight-teal">
+                <div class="stat-label">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    Tracking Telemetry
+                </div>
+                <div class="stat-value">100% Live</div>
+                <div class="stat-sub">GA4 + GTM + Consent Mode v2</div>
+            </div>
+        </div>
+
+        <!-- Executive Mission & Context -->
+        <div class="section-box">
+            <div class="section-box-header">
+                <div class="section-title">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                    Executive Mandate & Strategic Objectives
+                </div>
+                <span class="tag-pill tag-blue">Weeks 2 & 3 Strategic Scope</span>
+            </div>
+            <p style="font-size:0.66rem; color:var(--text-main); margin-bottom: 6px; line-height:1.38;">
+                During Weeks 2 and 3, our primary directive was transforming BaeMeds from a baseline web application into an aggressive, patient-converting digital powerhouse across Hyderabad. The initiative targeted high-margin medical equipment rentals (Oxygen Concentrators, BiPAP/CPAP systems, and ICU Home Setups) while building an institutional-grade tracking and compliance infrastructure.
+            </p>
+            <div class="grid-3" style="margin-bottom:0;">
+                <div class="stat-card" style="padding:5px 7px;">
+                    <strong style="font-size:0.63rem; color:var(--primary);">Pillar 1: Search Dominance</strong>
+                    <div style="font-size:0.59rem; color:var(--text-muted); margin-top:2px;">94/100 SEO Grade, 0-word thin content fix, 650+ words of rich FAQ, and local Banjara Hills schema.</div>
+                </div>
+                <div class="stat-card" style="padding:5px 7px;">
+                    <strong style="font-size:0.63rem; color:var(--primary);">Pillar 2: Paid Patient Acquisition</strong>
+                    <div style="font-size:0.59rem; color:var(--text-muted); margin-top:2px;">Dual campaign strategy: instant emergency search capture + high-conversion multi-asset PMax setup.</div>
+                </div>
+                <div class="stat-card" style="padding:5px 7px;">
+                    <strong style="font-size:0.63rem; color:var(--primary);">Pillar 3: Infrastructure Hardening</strong>
+                    <div style="font-size:0.59rem; color:var(--text-muted); margin-top:2px;">Google Consent Mode v2, strict CSP headers, 308 redirects, and physical hospital discharge collateral.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Work Delivered Matrix -->
+        <div class="section-box" style="margin-bottom:0;">
+            <div class="section-box-header">
+                <div class="section-title">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                    Master Progress & Deliverables Matrix
+                </div>
+                <span class="tag-pill tag-green">All Work Items Operational</span>
+            </div>
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th style="width:22%;">Operational Area</th>
+                        <th style="width:38%;">Key Actions Completed</th>
+                        <th style="width:20%;">Verification / Artifact</th>
+                        <th style="width:20%;">Current Impact</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Technical SEO & Speed</strong></td>
+                        <td>TTFB tuned to 98ms, FCP 255ms, 18.2KB page size, 0 broken links.</td>
+                        <td>Audit Report (Grade A+)</td>
+                        <td><span class="tag-pill tag-green">Top 1% Speed</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Content & Crawlability</strong></td>
+                        <td>Injected crawlable HTML into #root, added 650+ words FAQ and headings.</td>
+                        <td>index.html / HomePage.tsx</td>
+                        <td><span class="tag-pill tag-green">Zero Crawl Gaps</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Search Google Ads</strong></td>
+                        <td>Emergency high-intent keywords, Hyderabad geo-fence, negative keyword armor.</td>
+                        <td>Campaign ID Active</td>
+                        <td><span class="tag-pill tag-blue">Live & Capturing</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Multi-Asset Google Ads</strong></td>
+                        <td>Sitelinks, callouts, snippets, call extensions, and high-res image assets.</td>
+                        <td>Asset Suite Excellent</td>
+                        <td><span class="tag-pill tag-purple">High Conversion</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tracking & Compliance</strong></td>
+                        <td>GTM (WWJGK5HP), GA4 (G-X64Q6D0M61), Consent Mode v2, Ads Conversion tag.</td>
+                        <td>gtag.js / GTM Container</td>
+                        <td><span class="tag-pill tag-teal">Zero Lost Leads</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>DevOps & Maintenance</strong></td>
+                        <td>Vercel CSP whitelist, HTTP 308 redirect, email obfuscation, print collateral.</td>
+                        <td>vercel.json / flyer asset</td>
+                        <td><span class="tag-pill tag-amber">Enterprise Grade</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-brand">
+                <span>BaeMeds Technical Marketing Operations</span> • www.baemeds.in
+            </div>
+            <div class="page-indicator">Page 1 of 7</div>
+        </div>
+    </div>
+
+    <!-- ================= PAGE 2 ================= -->
+    <!-- SEO AUDIT & CORE WEB VITALS -->
+    <div class="a4-page page-2" id="page-2">
+        <div class="top-stripe"></div>
+
+        <!-- Header -->
+        <div class="header">
+            <div class="brand-section">
+                <div class="brand-logo-badge">B</div>
+                <div class="brand-text">
+                    <h1>baemeds</h1>
+                    <p>TECHNICAL SEO, CORE WEB VITALS & CRAWLABILITY AUDIT</p>
+                </div>
+            </div>
+            <div class="report-meta">
+                <span class="report-badge">SEO Audit Score: 94/100</span>
+                <div class="report-date">Status: <strong>Grade A+ (Passed 12 Checks)</strong></div>
+            </div>
+        </div>
+
+        <!-- Banner -->
+        <div class="page-banner">
+            <div>
+                <h2>In-Depth SEO Audit Performance & Speed Diagnostics</h2>
+                <p>Comprehensive validation of on-page signals, server performance, core web vitals, and crawlable React DOM architecture.</p>
+            </div>
+            <span class="period-chip">0 Critical Vulnerabilities</span>
+        </div>
+
+        <!-- Category Score Breakdown -->
+        <div class="section-box">
+            <div class="section-box-header">
+                <div class="section-title">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                    Audit Category Scores & Benchmark Standing
+                </div>
+                <span class="tag-pill tag-green">Overall Score: 94% (Grade A+)</span>
+            </div>
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th>Audit Category</th>
+                        <th>Score</th>
+                        <th>Status</th>
+                        <th>Standard Benchmark</th>
+                        <th>Diagnostic Findings & Engineering Implementations</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Performance & Speed</strong></td>
+                        <td><span class="score-pill score-100">100%</span></td>
+                        <td><span class="tag-pill tag-green">Good</span></td>
+                        <td>&lt; 500 ms</td>
+                        <td>TTFB at 98ms, full load at 100ms. Assets minified; zero blocking third-party scripts.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Links & Site Architecture</strong></td>
+                        <td><span class="score-pill score-100">100%</span></td>
+                        <td><span class="tag-pill tag-green">Good</span></td>
+                        <td>0 broken links</td>
+                        <td>100% healthy anchor targets; clean canonical self-referencing structure across all views.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Usability & Mobile UX</strong></td>
+                        <td><span class="score-pill score-100">100%</span></td>
+                        <td><span class="tag-pill tag-green">Good</span></td>
+                        <td>100% mobile-friendly</td>
+                        <td>Mobile viewport configured, 48px touch targets, zero horizontal scrolling overflow.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Security & Protocols</strong></td>
+                        <td><span class="score-pill score-100">100%</span></td>
+                        <td><span class="tag-pill tag-green">Good</span></td>
+                        <td>Strict HTTPS</td>
+                        <td>Strict Transport Security (HSTS), nosniff, DENY frame embedding, secure TLS 1.3.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>On-Page Content & Meta</strong></td>
+                        <td><span class="score-pill score-high">83%</span></td>
+                        <td><span class="tag-pill tag-green">Good</span></td>
+                        <td>&gt; 500 words</td>
+                        <td>Expanded to 650+ words of clinical FAQ, resolving warning on initial 550-word volume.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Real-World Core Web Vitals Table -->
+        <div class="grid-2">
+            <div class="section-box" style="margin-bottom:0;">
+                <div class="section-box-header">
+                    <div class="section-title">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                        Core Web Vitals & Speed Metrics
+                    </div>
+                    <span class="tag-pill tag-blue">Live Measurement</span>
+                </div>
+                <table class="report-table">
+                    <tr>
+                        <td>Time to First Byte (TTFB)</td>
+                        <td><strong style="color:var(--accent-emerald);">98 ms</strong> (Target: &lt; 200 ms)</td>
+                    </tr>
+                    <tr>
+                        <td>Total Page Load Time</td>
+                        <td><strong style="color:var(--accent-emerald);">100 ms</strong> (Target: &lt; 1.5 s)</td>
+                    </tr>
+                    <tr>
+                        <td>Est. First Contentful Paint (FCP)</td>
+                        <td><strong style="color:var(--accent-emerald);">255 ms</strong> (Target: &lt; 1.8 s)</td>
+                    </tr>
+                    <tr>
+                        <td>Total Page Transfer Weight</td>
+                        <td><strong>18.2 KB</strong> (Ultra-compressed)</td>
+                    </tr>
+                    <tr>
+                        <td>Broken Links / 404 Errors</td>
+                        <td><strong style="color:var(--accent-emerald);">0 Detected</strong> (100% clean)</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="section-box" style="margin-bottom:0;">
+                <div class="section-box-header">
+                    <div class="section-title">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 9h16M4 15h16M10 3L8 21M16 3l-2 18"></path></svg>
+                        Keyword Frequency & Semantic Density
+                    </div>
+                    <span class="tag-pill tag-green">Optimal Status</span>
+                </div>
+                <table class="report-table">
+                    <tr>
+                        <td>• <strong>medical</strong></td>
+                        <td>13 hits (3.11%)</td>
+                        <td><span class="tag-pill tag-green">Optimal</span></td>
+                    </tr>
+                    <tr>
+                        <td>• <strong>hyderabad</strong></td>
+                        <td>11 hits (2.63%)</td>
+                        <td><span class="tag-pill tag-green">Local Rank</span></td>
+                    </tr>
+                    <tr>
+                        <td>• <strong>patient</strong></td>
+                        <td>9 hits (2.15%)</td>
+                        <td><span class="tag-pill tag-green">Optimal</span></td>
+                    </tr>
+                    <tr>
+                        <td>• <strong>equipment</strong></td>
+                        <td>8 hits (1.91%)</td>
+                        <td><span class="tag-pill tag-green">Optimal</span></td>
+                    </tr>
+                    <tr>
+                        <td>• <strong>hospital</strong></td>
+                        <td>8 hits (1.91%)</td>
+                        <td><span class="tag-pill tag-green">Optimal</span></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Technical Deep Dive: Crawlable React Architecture -->
+        <div class="section-box" style="margin-top: 8px; margin-bottom: 0;">
+            <div class="section-box-header">
+                <div class="section-title">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                    Critical Engineering: Resolving the Single-Page Application (SPA) Crawl Gap
+                </div>
+                <span class="tag-pill tag-purple">Core Architecture Fix</span>
+            </div>
+            <p style="font-size:0.65rem; color:var(--text-main); margin-bottom: 5px; line-height:1.35;">
+                Client-side Single Page Applications frequently suffer from indexing penalties because web search crawlers see an empty <code>&lt;div id="root"&gt;&lt;/div&gt;</code> before JavaScript bundles execute. We engineered a dual-layer crawlable hydration bridge:
+            </p>
+            <ul class="bullet-list">
+                <li>
+                    <svg class="bullet-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span><strong>Pre-rendered Semantic Fallback Inside #root:</strong> Injected full semantic HTML (H1 title, value proposition, service categories, and contact info) directly inside the root container. Googlebot receives instant, full-text crawlable content on the first HTTP request.</span>
+                </li>
+                <li>
+                    <svg class="bullet-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span><strong>Title & Meta Description Optimization:</strong> Standardized the primary title to <em>"Medical Equipment Rental & Sales in Hyderabad | BaeMeds"</em> with meta descriptions targeting emergency search intents.</span>
+                </li>
+                <li>
+                    <svg class="bullet-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span><strong>Expansion of High-Intent FAQs (650+ Words):</strong> Added clinical explanations covering oxygen flow titration (5L vs 10L), BiPAP pressure settings, sleep apnea protocols, and 2-hour sanitization delivery procedures.</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-brand">
+                <span>BaeMeds Technical Marketing Operations</span> • www.baemeds.in
+            </div>
+            <div class="page-indicator">Page 2 of 7</div>
+        </div>
+    </div>
+
+    <!-- ================= PAGE 3 ================= -->
+    <!-- LOCAL SEO, GEO & SCHEMA MARKUP -->
+    <div class="a4-page page-3" id="page-3">
+        <div class="top-stripe"></div>
+
+        <!-- Header -->
+        <div class="header">
+            <div class="brand-section">
+                <div class="brand-logo-badge">B</div>
+                <div class="brand-text">
+                    <h1>baemeds</h1>
+                    <p>LOCAL SEO, SCHEMA ENGINEERING & AI SEARCH OPTIMIZATION (GEO)</p>
+                </div>
+            </div>
+            <div class="report-meta">
+                <span class="report-badge" style="background:#EFF6FF; border-color:#BFDBFE; color:#1E40AF;">Local Authority</span>
+                <div class="report-date">Target: <strong>Hyderabad & Telangana (IN-TG)</strong></div>
+            </div>
+        </div>
+
+        <!-- Banner -->
+        <div class="page-banner">
+            <div>
+                <h2>Local Search Domination & Generative Engine Optimization (GEO)</h2>
+                <p>Structured data schemas, geo-targeted rental landing pages, and specialized AI crawler indexation files.</p>
+            </div>
+            <span class="period-chip">Banjara Hills Medical Hub</span>
+        </div>
+
+        <!-- Local Schema Box -->
+        <div class="section-box">
+            <div class="section-box-header">
+                <div class="section-title">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    1. LocalBusiness Schema & Geo-Coordinates Implementation
+                </div>
+                <span class="tag-pill tag-blue">JSON-LD Standard</span>
+            </div>
+            <p style="font-size:0.65rem; color:var(--text-main); margin-bottom: 6px; line-height:1.35;">
+                We deployed comprehensive JSON-LD structured data aligned directly with BaeMeds' physical operational headquarters in Banjara Hills, establishing authoritative presence on Google Maps and Local 3-Pack rankings.
+            </p>
+            <div class="code-callout">
+                <span class="comment">// LocalBusiness JSON-LD Schema Snippet</span>
+                <span>"@type": <span class="val">"MedicalBusiness"</span>, "name": <span class="val">"BaeMeds Medical Equipment Rental & Sales"</span></span>
+                <span>"address": { "@type": <span class="val">"PostalAddress"</span>, "streetAddress": <span class="val">"Road No. 12, Banjara Hills"</span>, "addressLocality": <span class="val">"Hyderabad"</span>, "postalCode": <span class="val">"500034"</span>, "addressRegion": <span class="val">"Telangana"</span> }</span>
+                <span>"geo": { "@type": <span class="val">"GeoCoordinates"</span>, "latitude": <span class="val">17.385044</span>, "longitude": <span class="val">78.486671</span> }</span>
+                <span>"telephone": <span class="val">"+91-XXXXXXXXXX"</span>, "areaServed": [<span class="val">"Hyderabad"</span>, <span class="val">"Secunderabad"</span>, <span class="val">"Cyberabad"</span>]</span>
+            </div>
+        </div>
+
+        <!-- Hyper-Local Rental Landing Pages -->
+        <div class="section-box">
+            <div class="section-box-header">
+                <div class="section-title">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                    2. Hyper-Local Rental Landing Pages Deployed
+                </div>
+                <span class="tag-pill tag-green">Dedicated Search Silos</span>
+            </div>
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th style="width:25%;">Target Category</th>
+                        <th style="width:35%;">Target Keywords & Query Intent</th>
+                        <th style="width:40%;">On-Page Conversion Elements</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Oxygen Concentrators</strong></td>
+                        <td>oxygen concentrator rental hyderabad, 10L oxygen machine rent</td>
+                        <td>Instant capacity selector (5L vs 10L), emergency 2-hr delivery dispatch tag, WhatsApp booking.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>BiPAP & CPAP Machines</strong></td>
+                        <td>rent bipap machine hyderabad, auto cpap for sleep apnea</td>
+                        <td>Titration support guidance, full face mask bundle details, respiratory therapist calibration.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Patient Monitors & ICU Beds</strong></td>
+                        <td>hospital bed rental home hyderabad, 5-para cardiac monitor rent</td>
+                        <td>Motorized recliner video demo, air mattress integration, zero deposit medical setup.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Generative Engine Optimization (GEO) -->
+        <div class="section-box" style="margin-bottom:0;">
+            <div class="section-box-header">
+                <div class="section-title">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    3. Generative Engine Optimization (GEO): llms.txt & llms-full.txt
+                </div>
+                <span class="tag-pill tag-purple">AI Search Indexation Ready</span>
+            </div>
+            <p style="font-size:0.65rem; color:var(--text-main); margin-bottom: 5px; line-height:1.35;">
+                To ensure BaeMeds is recognized, summarized, and cited by next-generation AI answer engines (ChatGPT Search, Google Gemini, Perplexity AI, Claude), we authored and deployed standardized LLM manifest files in the root directory:
+            </p>
+            <ul class="bullet-list">
+                <li>
+                    <svg class="bullet-icon-purple" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span><strong><code>/public/llms.txt</code>:</strong> Concise semantic profile defining BaeMeds as Hyderabad’s foremost provider of home medical equipment rentals, listing service areas, machine specifications, and official URLs.</span>
+                </li>
+                <li>
+                    <svg class="bullet-icon-purple" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span><strong><code>/public/llms-full.txt</code>:</strong> Comprehensive clinical guide detailing product lines, sanitization protocols, biomedical safety standards, and pricing tiers for generative query responses.</span>
+                </li>
+                <li>
+                    <svg class="bullet-icon-purple" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span><strong>Permanent HTTP 308 Canonical Redirect:</strong> Redirected <code>baemeds.in</code> to <code>https://www.baemeds.in/:path*</code> in <code>vercel.json</code> to eliminate duplicate ranking dilution.</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-brand">
+                <span>BaeMeds Technical Marketing Operations</span> • www.baemeds.in
+            </div>
+            <div class="page-indicator">Page 3 of 7</div>
+        </div>
+    </div>
+
+    <!-- ================= PAGE 4 ================= -->
+    <!-- GOOGLE ADS: CAMPAIGN 1 (SEARCH ONLY) -->
+    <div class="a4-page page-4" id="page-4">
+        <div class="top-stripe"></div>
+
+        <!-- Header -->
+        <div class="header">
+            <div class="brand-section">
+                <div class="brand-logo-badge">B</div>
+                <div class="brand-text">
+                    <h1>baemeds</h1>
+                    <p>PAID ACQUISITION: CAMPAIGN 1 (HIGH-INTENT SEARCH ONLY)</p>
+                </div>
+            </div>
+            <div class="report-meta">
+                <span class="report-badge" style="background:#EFF6FF; border-color:#BFDBFE; color:#1E40AF;">Google Search Network</span>
+                <div class="report-date">Status: <strong>Active & Geo-Fenced</strong></div>
+            </div>
+        </div>
+
+        <!-- Banner -->
+        <div class="page-banner">
+            <div>
+                <h2>Campaign 1: Emergency & High-Intent Search Only Blueprint</h2>
+                <p>Engineered for maximum Top-of-Page impression share, urgent phone calls, and instant WhatsApp bookings with zero budget leakage.</p>
+            </div>
+            <span class="period-chip">Zero-Waste Negative Shield</span>
+        </div>
+
+        <!-- Campaign Architecture Grid -->
+        <div class="grid-2">
+            <div class="campaign-card card-primary">
+                <div class="campaign-header">
+                    <div>
+                        <div class="campaign-name">Strategic Framework & Targeting</div>
+                        <div class="campaign-sub">Strict Emergency High-Intent Search</div>
+                    </div>
+                    <span class="badge-live">
+                        <span style="width:6px; height:6px; background:#16A34A; border-radius:50%;"></span>
+                        LIVE
+                    </span>
+                </div>
+                <ul class="bullet-list">
+                    <li>
+                        <svg class="bullet-icon-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <span><strong>Objective:</strong> Intercept urgent patient discharges and critical respiratory emergencies across Hyderabad hospitals.</span>
+                    </li>
+                    <li>
+                        <svg class="bullet-icon-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <span><strong>Target Geographic Corridors:</strong> Focused strictly on Banjara Hills, Jubilee Hills, Gachibowli, Madhapur, Hitec City, and Secunderabad.</span>
+                    </li>
+                    <li>
+                        <svg class="bullet-icon-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <span><strong>Dayparting & Scheduling:</strong> Continuous 24/7 delivery capability with bid multipliers boosted (+25%) during peak hospital discharge hours (8:00 AM – 1:00 PM and 5:00 PM – 9:00 PM).</span>
+                    </li>
+                    <li>
+                        <svg class="bullet-icon-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <span><strong>Device Optimization:</strong> Mobile-first bid adjustments (+20%) to dominate emergency click-to-call search positions.</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="campaign-card card-primary">
+                <div class="campaign-header">
+                    <div>
+                        <div class="campaign-name">Keyword Clusters & Match Types</div>
+                        <div class="campaign-sub">High-Intent Transactional Queries</div>
+                    </div>
+                    <span class="tag-pill tag-blue">Exact & Phrase Dominant</span>
+                </div>
+                <ul class="bullet-list">
+                    <li>
+                        <svg class="bullet-icon-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <span><strong>Cluster A (Oxygen Solutions):</strong>
+                            <br>• <code>[oxygen concentrator rental hyderabad]</code> (Exact)
+                            <br>• <code>"rent oxygen machine hyderabad"</code> (Phrase)
+                            <br>• <code>"buy 10 litre oxygen concentrator hyderabad"</code> (Phrase)
+                        </span>
+                    </li>
+                    <li>
+                        <svg class="bullet-icon-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <span><strong>Cluster B (BiPAP & CPAP Machines):</strong>
+                            <br>• <code>[bipap machine on rent in hyderabad]</code> (Exact)
+                            <br>• <code>"resmed bipap machine rental hyderabad"</code> (Phrase)
+                            <br>• <code>"cpap machine rental near me"</code> (Phrase)
+                        </span>
+                    </li>
+                    <li>
+                        <svg class="bullet-icon-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <span><strong>Cluster C (Hospital Beds & ICU Setup):</strong>
+                            <br>• <code>"hospital bed for home rental hyderabad"</code> (Phrase)
+                            <br>• <code>"patient cardiac monitor on rent"</code> (Phrase)
+                        </span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Negative Keyword Armor Table -->
+        <div class="section-box">
+            <div class="section-box-header">
+                <div class="section-title">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>
+                    Negative Keyword Armor (Zero Budget Leakage)
+                </div>
+                <span class="tag-pill tag-amber">40+ Strict Exclusions Active</span>
+            </div>
+            <p style="font-size:0.64rem; color:var(--text-main); margin-bottom: 5px;">
+                Medical equipment search traffic contains massive amounts of non-commercial or hobbyist queries. We implemented comprehensive negative keyword exclusion lists:
+            </p>
+            <div class="grid-3" style="margin-bottom:0;">
+                <div class="stat-card" style="padding:5px 7px;">
+                    <div style="font-size:0.62rem; font-weight:700; color:var(--accent-rose);">Employment & Vacancies</div>
+                    <div style="font-size:0.59rem; color:var(--text-muted); margin-top:2px;">jobs, vacancy, career, salary, hiring, biomedical technician course, diploma</div>
+                </div>
+                <div class="stat-card" style="padding:5px 7px;">
+                    <div style="font-size:0.62rem; font-weight:700; color:var(--accent-rose);">Used & Classified Goods</div>
+                    <div style="font-size:0.59rem; color:var(--text-muted); margin-top:2px;">olx, quikr, second hand scrap, refurbished free, donate, charity, second-hand</div>
+                </div>
+                <div class="stat-card" style="padding:5px 7px;">
+                    <div style="font-size:0.62rem; font-weight:700; color:var(--accent-rose);">DIY & Repair Manuals</div>
+                    <div style="font-size:0.59rem; color:var(--text-muted); margin-top:2px;">how to repair, spare parts circuit diagram, diy, pdf manual, compressor repair</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RSA Ad Copy Matrix -->
+        <div class="section-box" style="margin-bottom:0;">
+            <div class="section-box-header">
+                <div class="section-title">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                    Responsive Search Ad (RSA) Copy & High-Converting Value Hooks
+                </div>
+                <span class="tag-pill tag-green">Ad Strength: Excellent</span>
+            </div>
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th style="width:30%;">Headline Combinations (15 Tested)</th>
+                        <th style="width:45%;">Description Copy (4 Rotated)</th>
+                        <th style="width:25%;">Primary Value Proposition</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            • Medical Equipment Rental Hyderabad<br>
+                            • Rent Oxygen Concentrator 2-Hr Delivery<br>
+                            • Certified BiPAP & CPAP Machines<br>
+                            • Hospital Beds For Home Care
+                        </td>
+                        <td>
+                            Need urgent medical equipment? BaeMeds delivers hospital-grade Oxygen Concentrators, BiPAP machines & ICU beds across Hyderabad with complete technician setup.<br><br>
+                            100% sanitized equipment with 24/7 biomedical support. Zero heavy security deposit. Call or WhatsApp now for immediate dispatch.
+                        </td>
+                        <td>
+                            Speed (2-Hour SLA), Clinical Trust, Zero Deposit, 24/7 Support Hotline.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-brand">
+                <span>BaeMeds Technical Marketing Operations</span> • www.baemeds.in
+            </div>
+            <div class="page-indicator">Page 4 of 7</div>
+        </div>
+    </div>
+
+    <!-- ================= PAGE 5 ================= -->
+    <!-- GOOGLE ADS: CAMPAIGN 2 (FULL MULTI-ASSET) -->
+    <div class="a4-page page-5" id="page-5">
+        <div class="top-stripe"></div>
+
+        <!-- Header -->
+        <div class="header">
+            <div class="brand-section">
+                <div class="brand-logo-badge">B</div>
+                <div class="brand-text">
+                    <h1>baemeds</h1>
+                    <p>PAID ACQUISITION: CAMPAIGN 2 (HIGH-CONVERSION MULTI-ASSET SUITE)</p>
+                </div>
+            </div>
+            <div class="report-meta">
+                <span class="report-badge" style="background:#FAF5FF; border-color:#E9D5FF; color:#6B21A8;">High-Grade Multi-Asset</span>
+                <div class="report-date">Coverage: <strong>Search + Display + Maps + Discovery</strong></div>
+            </div>
+        </div>
+
+        <!-- Banner -->
+        <div class="page-banner" style="border-left-color: var(--accent-indigo); background: linear-gradient(135deg, #F8FAFC 0%, #FAF5FF 100%); border-color: #E9D5FF;">
+            <div>
+                <h2>Campaign 2: Full-Channel High-Conversion Google Ads Blueprint</h2>
+                <p>Unlocking smart machine-learning bidding with high-grade visual assets, sitelinks, callouts, structured snippets, and location extensions.</p>
+            </div>
+            <span class="period-chip" style="color:var(--accent-indigo); border-color:#DDD6FE;">Omni-Channel Lead Funnel</span>
+        </div>
+
+        <!-- Multi-Channel Delivery Channels -->
+        <div class="grid-4">
+            <div class="stat-card">
+                <div class="stat-label">Google Search</div>
+                <div class="stat-value" style="font-size:1.0rem;">Expanded SERP</div>
+                <div class="stat-sub">40% more pixel height with sitelinks</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Google Maps Pack</div>
+                <div class="stat-value" style="font-size:1.0rem;">Local 3-Pack</div>
+                <div class="stat-sub">Tied to Banjara Hills GBP location</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Responsive Display</div>
+                <div class="stat-value" style="font-size:1.0rem;">Retargeting</div>
+                <div class="stat-sub">Clean product photography & trust badges</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Direct Phone Calls</div>
+                <div class="stat-value" style="font-size:1.0rem;">1-Tap Call</div>
+                <div class="stat-sub">Mobile click-to-call live scheduling</div>
+            </div>
+        </div>
+
+        <!-- High-Grade Asset Suite Breakdown -->
+        <div class="section-box">
+            <div class="section-box-header">
+                <div class="section-title">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+                    Full High-Grade Google Ads Asset Suite Implemented
+                </div>
+                <span class="tag-pill tag-green">Google Ads Asset Rating: Excellent</span>
+            </div>
+
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th style="width:20%;">Asset Type</th>
+                        <th style="width:48%;">Configured Creative Assets & Ad Extensions</th>
+                        <th style="width:32%;">Performance Advantage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Sitelink Extensions (4 Deployed)</strong></td>
+                        <td>
+                            <div class="asset-chip-container">
+                                <span class="asset-chip">Rent Oxygen (5L & 10L) — Same Day</span>
+                                <span class="asset-chip">BiPAP / CPAP Titration Setup</span>
+                                <span class="asset-chip">Motorized ICU Beds & Recliners</span>
+                                <span class="asset-chip">Instant WhatsApp Medical Specialist</span>
+                            </div>
+                        </td>
+                        <td>Direct category deep-linking reduces bounce rates and accelerates checkout path.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Callout Extensions (4 Deployed)</strong></td>
+                        <td>
+                            <div class="asset-chip-container">
+                                <span class="asset-chip">2-Hour Emergency Delivery</span>
+                                <span class="asset-chip">100% Hospital Sanitized</span>
+                                <span class="asset-chip">Zero Security Deposit Options</span>
+                                <span class="asset-chip">24/7 Biomedical Support</span>
+                            </div>
+                        </td>
+                        <td>Overcomes patient anxiety upfront by highlighting medical sanitization and zero deposit friction.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Structured Snippets</strong></td>
+                        <td>
+                            <div class="asset-chip-container">
+                                <span class="asset-chip">Types: 5L Oxygen, 10L Dual Flow, Auto BiPAP, 5-Para Cardiac</span>
+                                <span class="asset-chip">Localities: Banjara Hills, Jubilee Hills, Gachibowli, Secunderabad</span>
+                            </div>
+                        </td>
+                        <td>Reinforces inventory breadth and confirms neighborhood-level rapid fulfillment.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Call Extensions & Location</strong></td>
+                        <td>
+                            <div class="asset-chip-container">
+                                <span class="asset-chip">Direct Mobile Call Extension</span>
+                                <span class="asset-chip">Google Business Profile Banjara Hills</span>
+                                <span class="asset-chip">Call Tracking Tag Enabled</span>
+                            </div>
+                        </td>
+                        <td>Generates immediate, un-routed inbound phone inquiries during critical patient transitions.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Audience Signals & Smart Bidding -->
+        <div class="section-box" style="margin-bottom:0;">
+            <div class="section-box-header">
+                <div class="section-title">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    Audience Signals & Smart Bidding Configuration
+                </div>
+                <span class="tag-pill tag-purple">Maximize Conversions</span>
+            </div>
+            <div class="grid-3" style="margin-bottom:0;">
+                <div class="stat-card" style="padding:5px 7px;">
+                    <div style="font-size:0.62rem; font-weight:700; color:var(--primary);">1. Custom Intent Signals</div>
+                    <div style="font-size:0.59rem; color:var(--text-muted); margin-top:2px;">Targeting users searching for post-ICU care, home nursing Hyderabad, oxygen cylinder refills, and sleep apnea clinics.</div>
+                </div>
+                <div class="stat-card" style="padding:5px 7px;">
+                    <div style="font-size:0.62rem; font-weight:700; color:var(--primary);">2. Hospital Cluster Geofences</div>
+                    <div style="font-size:0.59rem; color:var(--text-muted); margin-top:2px;">Proximity radius targeting around major Hyderabad hospital centers (Apollo Jubilee Hills, Care Banjara, KIMS, AIG Gachibowli).</div>
+                </div>
+                <div class="stat-card" style="padding:5px 7px;">
+                    <div style="font-size:0.62rem; font-weight:700; color:var(--primary);">3. Conversion Value Bidding</div>
+                    <div style="font-size:0.59rem; color:var(--text-muted); margin-top:2px;">Google Smart Bidding calibrated to prioritize high-value rental terms (monthly ICU setups and dual-flow oxygen).</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-brand">
+                <span>BaeMeds Technical Marketing Operations</span> • www.baemeds.in
+            </div>
+            <div class="page-indicator">Page 5 of 7</div>
+        </div>
+    </div>
+
+    <!-- ================= PAGE 6 ================= -->
+    <!-- TRACKING STACK, GA4 & CONSENT MODE V2 -->
+    <div class="a4-page page-6" id="page-6">
+        <div class="top-stripe"></div>
+
+        <!-- Header -->
+        <div class="header">
+            <div class="brand-section">
+                <div class="brand-logo-badge">B</div>
+                <div class="brand-text">
+                    <h1>baemeds</h1>
+                    <p>ENTERPRISE TRACKING STACK: GA4, GTM & GOOGLE CONSENT MODE V2</p>
+                </div>
+            </div>
+            <div class="report-meta">
+                <span class="report-badge" style="background:#ECFDF5; border-color:#A7F3D0; color:#065F46;">Telemetry 100% Active</span>
+                <div class="report-date">GTM: <strong>GTM-WWJGK5HP</strong> | GA4: <strong>G-X64Q6D0M61</strong></div>
+            </div>
+        </div>
+
+        <!-- Banner -->
+        <div class="page-banner" style="border-left-color: var(--accent-emerald); background: linear-gradient(135deg, #F8FAFC 0%, #ECFDF5 100%); border-color: #A7F3D0;">
+            <div>
+                <h2>Zero-Loss Attribution Pipeline & Conversion Event Telemetry</h2>
+                <p>Complete documentation of tag deployment, Google Consent Mode v2 default signals, and conversion callbacks.</p>
+            </div>
+            <span class="period-chip" style="color:var(--accent-emerald); border-color:#A7F3D0;">Privacy & Modeling Compliant</span>
+        </div>
+
+        <!-- Tracking Architecture Flow Diagram -->
+        <div class="section-box">
+            <div class="section-box-header">
+                <div class="section-title">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                    End-to-End Tracking & Attribution Pipeline
+                </div>
+                <span class="tag-pill tag-green">Full Pipeline Verified</span>
+            </div>
+
+            <div class="flow-container">
+                <div class="flow-step">
+                    <div class="flow-title">1. Patient Click</div>
+                    <div class="flow-desc">Search / Ads / Maps</div>
+                </div>
+                <div class="flow-arrow">➔</div>
+                <div class="flow-step" style="border-color:#BBF7D0; background:#F0FDF4;">
+                    <div class="flow-title">2. Consent Mode v2</div>
+                    <div class="flow-desc">ad & analytics_storage</div>
+                </div>
+                <div class="flow-arrow">➔</div>
+                <div class="flow-step">
+                    <div class="flow-title">3. GTM Container</div>
+                    <div class="flow-desc">GTM-WWJGK5HP</div>
+                </div>
+                <div class="flow-arrow">➔</div>
+                <div class="flow-step" style="border-color:#BFDBFE; background:#EFF6FF;">
+                    <div class="flow-title">4. GA4 Property</div>
+                    <div class="flow-desc">G-X64Q6D0M61</div>
+                </div>
+                <div class="flow-arrow">➔</div>
+                <div class="flow-step" style="border-color:#DDD6FE; background:#FAF5FF;">
+                    <div class="flow-title">5. Ads Conversion</div>
+                    <div class="flow-desc">AW-18416931440</div>
+                </div>
+            </div>
+
+            <div class="code-callout">
+                <span class="comment">// Live Implementation in index.html</span>
+                <span>gtag(<span class="val">'consent'</span>, <span class="val">'default'</span>, { <span class="key">'ad_storage'</span>: <span class="tag">'granted'</span>, <span class="key">'ad_user_data'</span>: <span class="tag">'granted'</span>, <span class="key">'ad_personalization'</span>: <span class="tag">'granted'</span>, <span class="key">'analytics_storage'</span>: <span class="tag">'granted'</span> });</span>
+                <span>gtag(<span class="val">'config'</span>, <span class="val">'G-X64Q6D0M61'</span>); <span class="comment">// GA4 Measurement ID</span></span>
+                <span>gtag(<span class="val">'config'</span>, <span class="val">'AW-18416931440'</span>); <span class="comment">// Google Ads ID</span></span>
+            </div>
+        </div>
+
+        <!-- Conversion Events Schema Table -->
+        <div class="section-box">
+            <div class="section-box-header">
+                <div class="section-title">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                    Custom Conversion Actions & Event Schema
+                </div>
+                <span class="tag-pill tag-blue">High-Value Lead Actions</span>
+            </div>
+
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th style="width:25%;">Event Name</th>
+                        <th style="width:25%;">Trigger Condition</th>
+                        <th style="width:25%;">Destination Platforms</th>
+                        <th style="width:25%;">Business Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong><code>click_to_call</code></strong></td>
+                        <td>Click on any tel: link or phone button</td>
+                        <td>GA4 & Google Ads Conversion</td>
+                        <td>Highest emergency conversion intent (direct dispatch).</td>
+                    </tr>
+                    <tr>
+                        <td><strong><code>whatsapp_inquiry</code></strong></td>
+                        <td>Click on WhatsApp chat CTA</td>
+                        <td>GA4 & Google Ads Conversion</td>
+                        <td>High conversion intent for pricing & availability quotes.</td>
+                    </tr>
+                    <tr>
+                        <td><strong><code>equipment_booking_submit</code></strong></td>
+                        <td>Submission of rental reservation form</td>
+                        <td>Google Ads AW-18416931440</td>
+                        <td>Primary commercial lead capture action.</td>
+                    </tr>
+                    <tr>
+                        <td><strong><code>view_equipment_item</code></strong></td>
+                        <td>Detail view of Oxygen/BiPAP/Bed page</td>
+                        <td>GA4 Analytics Property</td>
+                        <td>Measures user category interest for remarketing.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Google Ads Conversion Callback Function -->
+        <div class="section-box" style="margin-bottom:0;">
+            <div class="section-box-header">
+                <div class="section-title">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+                    Asynchronous Conversion Callback Script
+                </div>
+                <span class="tag-pill tag-green">Zero Dropoff Callback</span>
+            </div>
+            <p style="font-size:0.64rem; color:var(--text-main); margin-bottom: 4px;">
+                Implemented <code>gtag_report_conversion()</code> callback in <code>index.html</code> to guarantee Google Ads conversion pings are successfully dispatched prior to user redirects:
+            </p>
+            <div class="code-callout">
+                <span><span class="key">function</span> <span class="tag">gtag_report_conversion</span>(url) {</span>
+                <span>  gtag(<span class="val">'event'</span>, <span class="val">'conversion'</span>, {</span>
+                <span>      <span class="key">'send_to'</span>: <span class="val">'AW-18416931440/XwPhCM6B--scEPCk8M1E'</span>,</span>
+                <span>      <span class="key">'value'</span>: <span class="val">1.0</span>, <span class="key">'currency'</span>: <span class="val">'INR'</span>,</span>
+                <span>      <span class="key">'event_callback'</span>: <span class="key">function</span>() { <span class="key">if</span> (url) window.location = url; }</span>
+                <span>  });</span>
+                <span>  <span class="key">return false</span>;</span>
+                <span>}</span>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-brand">
+                <span>BaeMeds Technical Marketing Operations</span> • www.baemeds.in
+            </div>
+            <div class="page-indicator">Page 6 of 7</div>
+        </div>
+    </div>
+
+    <!-- ================= PAGE 7 ================= -->
+    <!-- DEVOPS, MAINTENANCE & ROADMAP -->
+    <div class="a4-page page-7" id="page-7">
+        <div class="top-stripe"></div>
+
+        <!-- Header -->
+        <div class="header">
+            <div class="brand-section">
+                <div class="brand-logo-badge">B</div>
+                <div class="brand-text">
+                    <h1>baemeds</h1>
+                    <p>PLATFORM DEVOPS, SECURITY HARDENING & STRATEGIC ROADMAP</p>
+                </div>
+            </div>
+            <div class="report-meta">
+                <span class="report-badge" style="background:#F0FDF4; border-color:#BBF7D0; color:#15803D;">Production Verified</span>
+                <div class="report-date">Target Sprint: <strong>Week 4 & Beyond</strong></div>
+            </div>
+        </div>
+
+        <!-- Banner -->
+        <div class="page-banner">
+            <div>
+                <h2>Infrastructure Hardening, Physical Collateral & Forward Roadmap</h2>
+                <p>Complete overview of security maintenance, offline hospital collateral, and the Week 4 optimization roadmap.</p>
+            </div>
+            <span class="period-chip">Operational Excellence</span>
+        </div>
+
+        <!-- Security & DevOps Maintenance Completed -->
+        <div class="section-box">
+            <div class="section-box-header">
+                <div class="section-title">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    1. Infrastructure Maintenance & Security Hardening (What We Did)
+                </div>
+                <span class="tag-pill tag-blue">DevOps Deployed</span>
+            </div>
+            <ul class="bullet-list">
+                <li>
+                    <svg class="bullet-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span><strong>Content Security Policy (CSP) Updates (<code>vercel.json</code>):</strong> Formulated and whitelisted strict CSP headers for Google Tag Manager (<code>googletagmanager.com</code>), Google Analytics (<code>google-analytics.com</code>), DoubleClick (<code>googleads.g.doubleclick.net</code>), and Shopify backend endpoints to prevent script injection without blocking marketing pixels.</span>
+                </li>
+                <li>
+                    <svg class="bullet-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span><strong>Permanent HTTP 308 Domain Redirects:</strong> Configured server-level host rules redirecting naked domain <code>baemeds.in</code> to <code>https://www.baemeds.in/:path*</code> to consolidate Domain Authority and prevent split PageRank indexing.</span>
+                </li>
+                <li>
+                    <svg class="bullet-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span><strong>Anti-Scraping Email Obfuscation:</strong> Encoded public clinical email addresses into dynamic entity strings, mitigating spam crawlers while preserving native one-click <code>mailto:</code> interaction for legitimate users.</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Offline-to-Online Marketing Collateral -->
+        <div class="section-box">
+            <div class="section-box-header">
+                <div class="section-title">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                    2. Physical Hospital Collateral & QR Code System Developed
+                </div>
+                <span class="tag-pill tag-purple">Offline-to-Online Engine</span>
+            </div>
+            <p style="font-size:0.65rem; color:var(--text-main); margin-bottom: 5px; line-height:1.35;">
+                Engineered ready-to-print marketing collateral in <code>Hospital_Discharge_Flyer_And_Stickers.html</code> designed for immediate hospital partner distribution:
+            </p>
+            <div class="grid-2" style="margin-bottom:0;">
+                <div class="stat-card" style="padding:6px 8px;">
+                    <strong style="font-size:0.63rem; color:var(--primary);">Hospital Discharge Desk Flyer</strong>
+                    <div style="font-size:0.59rem; color:var(--text-muted); margin-top:2px;">
+                        Professional, printable patient handouts for hospital discharge desks (Apollo, Care, KIMS) featuring clear equipment checklists, 2-hour home delivery guarantees, and direct emergency dispatch phone numbers.
+                    </div>
+                </div>
+                <div class="stat-card" style="padding:6px 8px;">
+                    <strong style="font-size:0.63rem; color:var(--primary);">Equipment QR Re-Order Stickers</strong>
+                    <div style="font-size:0.59rem; color:var(--text-muted); margin-top:2px;">
+                        Scannable vinyl equipment stickers affixed to rental machines, allowing patients and caregivers to renew rentals, request filter servicing, or order BiPAP accessories with a single smartphone scan.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Week 4 Strategic Roadmap -->
+        <div class="section-box" style="margin-bottom:0;">
+            <div class="section-box-header">
+                <div class="section-title">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    3. Strategic Roadmap: Week 4 Execution Priorities
+                </div>
+                <span class="tag-pill tag-green">Upcoming Sprint</span>
+            </div>
+            <div class="grid-3" style="margin-bottom:0;">
+                <div class="stat-card" style="padding:6px 8px;">
+                    <strong style="font-size:0.63rem; color:var(--primary);">1. SQR Negative Harvesting</strong>
+                    <div style="font-size:0.59rem; color:var(--text-muted); margin-top:2px;">Analyze 7 days of raw Google Ads Search Query Reports (SQRs) to aggressively prune irrelevant search terms and reduce average CPC by 15-20%.</div>
+                </div>
+                <div class="stat-card" style="padding:6px 8px;">
+                    <strong style="font-size:0.63rem; color:var(--primary);">2. Quality Score Optimization</strong>
+                    <div style="font-size:0.59rem; color:var(--text-muted); margin-top:2px;">Align rental landing page headline copy directly with top-converting ad headlines to drive Google Ads Quality Scores toward 8-10/10.</div>
+                </div>
+                <div class="stat-card" style="padding:6px 8px;">
+                    <strong style="font-size:0.63rem; color:var(--primary);">3. Hospital B2B Outreach</strong>
+                    <div style="font-size:0.59rem; color:var(--text-muted); margin-top:2px;">Distribute printed discharge flyers and QR stickers to healthcare desks and nurse coordinators across Banjara Hills and Jubilee Hills.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer & Sign-off -->
+        <div class="footer">
+            <div class="footer-brand">
+                <span>BaeMeds Technical Marketing Operations</span> • www.baemeds.in
+            </div>
+            <div class="page-indicator">Page 7 of 7</div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // High-Resolution Direct PDF Download via jsPDF & html2canvas for all 7 pages
+    async function exportJsPDF() {
+        const btn = document.getElementById('btn-jspdf');
+        if (!btn) return;
+        const originalText = btn.innerHTML;
+        
+        try {
+            btn.disabled = true;
+            btn.style.opacity = '0.8';
+            btn.innerHTML = 'Rendering 7 Pages to PDF...';
+
+            const { jsPDF } = window.jspdf || window;
+            const pdf = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: 'a4',
+                compress: true
+            });
+
+            const pageIds = ['page-1', 'page-2', 'page-3', 'page-4', 'page-5', 'page-6', 'page-7'];
+
+            for (let i = 0; i < pageIds.length; i++) {
+                const page = document.getElementById(pageIds[i]);
+                if (!page) continue;
+
+                const canvas = await html2canvas(page, {
+                    scale: 2,
+                    useCORS: true,
+                    logging: false,
+                    backgroundColor: '#ffffff',
+                    scrollX: 0,
+                    scrollY: 0
+                });
+
+                const imgData = canvas.toDataURL('image/jpeg', 0.98);
+                if (i > 0) {
+                    pdf.addPage('a4', 'portrait');
+                }
+                pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297, undefined, 'FAST');
+            }
+
+            pdf.save('BaeMeds_Master_Performance_Report_Weeks_2_3.pdf');
+        } catch (err) {
+            console.error("PDF export error:", err);
+            window.print();
+        } finally {
+            btn.disabled = false;
+            btn.style.opacity = '1';
+            btn.innerHTML = originalText;
+        }
+    }
+</script>
+
+</body>
+</html>

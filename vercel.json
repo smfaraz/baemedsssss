@@ -7,6 +7,15 @@
       ]
     },
     {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Credentials", "value": "true" },
+        { "key": "Access-Control-Allow-Origin", "value": "https://baemeds.com" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET,OPTIONS,PATCH,DELETE,POST,PUT" },
+        { "key": "Access-Control-Allow-Headers", "value": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization, X-Admin-Role" }
+      ]
+    },
+    {
       "source": "/(.*)",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=0, s-maxage=86400, stale-while-revalidate=86400" },
@@ -14,9 +23,9 @@
         { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
         { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" },
         { "key": "X-Frame-Options", "value": "DENY" },
-        { "key": "X-DNS-Prefetch-Control", "value": "off" },
+        { "key": "X-DNS-Prefetch-Control", "value": "on" },
         { "key": "Origin-Agent-Cluster", "value": "?1" },
-        { "key": "Content-Security-Policy", "value": "default-src 'self' https://baemeds.in https://www.baemeds.in https://*.baemeds.in; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://baemeds.in https://www.baemeds.in https://*.baemeds.in https://www.googletagmanager.com https://*.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://googleads.g.doubleclick.net; script-src-elem 'self' 'unsafe-inline' https://baemeds.in https://www.baemeds.in https://*.baemeds.in https://www.googletagmanager.com https://*.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://googleads.g.doubleclick.net; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://baemeds.in https://www.baemeds.in https://*.baemeds.in https://fonts.googleapis.com; style-src-elem 'self' 'unsafe-inline' https://baemeds.in https://www.baemeds.in https://*.baemeds.in https://fonts.googleapis.com; img-src 'self' data: blob: https: https://www.google-analytics.com https://www.googletagmanager.com https://*.google.com https://*.google.co.in; font-src 'self' data: https://baemeds.in https://www.baemeds.in https://*.baemeds.in https://fonts.gstatic.com; connect-src 'self' https://baemeds.in https://www.baemeds.in https://*.baemeds.in https://ptya1n-k0.myshopify.com https://*.myshopify.com https://zyuvvqvbsojathbzcfzi.supabase.co https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.g.doubleclick.net https://googleads.g.doubleclick.net https://*.google.com https://*.google.co.in; frame-src https://www.google.com https://www.youtube.com https://www.googletagmanager.com; object-src 'none'; base-uri 'self' https://baemeds.in https://www.baemeds.in; form-action 'self' https://baemeds.in https://www.baemeds.in; frame-ancestors 'none'; upgrade-insecure-requests" },
+        { "key": "Content-Security-Policy", "value": "default-src 'self' https://baemeds.com https://www.baemeds.com https://*.baemeds.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://baemeds.com https://www.baemeds.com https://*.baemeds.com https://www.googletagmanager.com https://*.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://googleads.g.doubleclick.net https://*.doubleclick.net https://ad.doubleclick.net; script-src-elem 'self' 'unsafe-inline' https://baemeds.com https://www.baemeds.com https://*.baemeds.com https://www.googletagmanager.com https://*.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://googleads.g.doubleclick.net https://*.doubleclick.net https://ad.doubleclick.net; worker-src 'self' blob:; style-src 'self' 'unsafe-inline' https://baemeds.com https://www.baemeds.com https://*.baemeds.com https://fonts.googleapis.com; style-src-elem 'self' 'unsafe-inline' https://baemeds.com https://www.baemeds.com https://*.baemeds.com https://fonts.googleapis.com; img-src 'self' data: blob: https: https://www.google-analytics.com https://www.googletagmanager.com https://*.google.com; font-src 'self' data: https://baemeds.com https://www.baemeds.com https://*.baemeds.com https://fonts.gstatic.com; connect-src 'self' https://baemeds.com https://www.baemeds.com https://*.baemeds.com https://psyeixlohgkpvaymjyxh.supabase.co https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.g.doubleclick.net https://googleads.g.doubleclick.net https://*.doubleclick.net https://ad.doubleclick.net https://stats.g.doubleclick.net https://*.google.com; frame-src https://www.google.com https://www.youtube.com https://www.googletagmanager.com https://*.doubleclick.net; object-src 'none'; base-uri 'self' https://baemeds.com https://www.baemeds.com; form-action 'self' https://baemeds.com https://www.baemeds.com; frame-ancestors 'none'; upgrade-insecure-requests" },
         { "key": "Strict-Transport-Security", "value": "max-age=31536000; includeSubDomains" }
       ]
     }
@@ -24,7 +33,22 @@
   "redirects": [
     {
       "source": "/guides/oxygen-concentrator-rental-hyderabad",
-      "destination": "https://www.baemeds.in/oxygen-concentrator-rental-hyderabad",
+      "destination": "https://www.baemeds.com/guides/oxygen-concentrator-rental-guide",
+      "permanent": true
+    },
+    {
+      "source": "/oxygen-concentrator-rental-hyderabad",
+      "destination": "https://www.baemeds.com/guides/oxygen-concentrator-rental-guide",
+      "permanent": true
+    },
+    {
+      "source": "/bipap-machine-on-rent-hyderabad",
+      "destination": "https://www.baemeds.com/guides/bipap-machine-rental-guide",
+      "permanent": true
+    },
+    {
+      "source": "/patient-monitor-price-hyderabad",
+      "destination": "https://www.baemeds.com/guides/patient-monitor-guide",
       "permanent": true
     },
     {
@@ -32,10 +56,10 @@
       "has": [
         {
           "type": "host",
-          "value": "baemeds.in"
+          "value": "baemeds.com"
         }
       ],
-      "destination": "https://www.baemeds.in/:path*",
+      "destination": "https://www.baemeds.com/:path*",
       "permanent": true
     }
   ],

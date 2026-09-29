@@ -18,7 +18,7 @@ $types = @('rental', 'contact', 'bulk', 'availability')
 $created = @()
 
 foreach ($type in $types) {
-  $payload = @{ type = $type; product = "Smoke test $runId"; name = "Smoke test $type"; phone = '+91 90000 00099'; email = "smoke-$type-$runId@baemeds.in"; message = "Repeatable smoke test for $type"; status = 'new' }
+  $payload = @{ type = $type; product = "Smoke test $runId"; name = "Smoke test $type"; phone = '+18005550199'; email = "smoke-$type-$runId@baemeds.com"; message = "Repeatable smoke test for $type"; status = 'new' }
   $row = Invoke-RestMethod -Method Post -Uri "$ProjectUrl/rest/v1/enquiries" -Headers $sessionHeaders -Body ($payload | ConvertTo-Json)
   $created += $row.id
   Write-Host "$type: PASS ($($row.id))" -ForegroundColor Green

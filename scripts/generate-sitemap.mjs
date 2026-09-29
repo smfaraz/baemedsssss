@@ -5,66 +5,27 @@ import { fileURLToPath } from 'node:url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const SITEMAP_PATH = path.resolve(__dirname, '../public/sitemap.xml');
-const SITE_URL = 'https://www.baemeds.in';
+const SITE_URL = process.env.VITE_SITE_URL || 'https://baemeds.com';
 
 async function fetchAllShopifyProducts() {
-  const allProducts = [];
-  let hasNextPage = true;
-  let cursor = null;
-
-  while (hasNextPage) {
-    const query = `
-      query getProducts($cursor: String) {
-        products(first: 250, after: $cursor) {
-          pageInfo {
-            hasNextPage
-            endCursor
-          }
-          edges {
-            node {
-              id
-              title
-              handle
-              updatedAt
-              featuredImage {
-                url
-                altText
-              }
-              images(first: 5) {
-                edges {
-                  node {
-                    url
-                    altText
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    `;
-
-    const response = await fetch('https://ptya1n-k0.myshopify.com/api/2024-07/graphql.json', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Shopify-Storefront-Access-Token': 'c1fb47a74eaec2fbafa70becac08f52b',
+  const catalogPath = path.resolve(__dirname, '../data/catalog_seed.json');
+  if (fs.existsSync(catalogPath)) {
+    const raw = fs.readFileSync(catalogPath, 'utf8');
+    const items = JSON.parse(raw);
+    return items.map((p) => ({
+      id: p.id,
+      title: p.title,
+      handle: p.handle,
+      updatedAt: new Date().toISOString(),
+      featuredImage: { url: p.image, altText: p.title },
+      images: {
+        edges: (p.images || [p.image]).map((img) => ({
+          node: { url: img, altText: p.title },
+        })),
       },
-      body: JSON.stringify({ query, variables: { cursor } }),
-    });
-
-    const result = await response.json();
-    const edges = result?.data?.products?.edges || [];
-    
-    for (const edge of edges) {
-      allProducts.push(edge.node);
-    }
-
-    hasNextPage = result?.data?.products?.pageInfo?.hasNextPage || false;
-    cursor = result?.data?.products?.pageInfo?.endCursor || null;
+    }));
   }
-
-  return allProducts;
+  return [];
 }
 
 function escapeXml(unsafe) {
@@ -85,10 +46,9 @@ async function generateCompleteSitemap() {
   const staticRoutes = [
     { path: '/', priority: '1.0', changefreq: 'daily' },
     { path: '/products', priority: '0.9', changefreq: 'daily' },
-    { path: '/oxygen-concentrator-rental-hyderabad', priority: '0.95', changefreq: 'daily' },
-    { path: '/bipap-machine-on-rent-hyderabad', priority: '0.95', changefreq: 'daily' },
-    { path: '/patient-monitor-price-hyderabad', priority: '0.95', changefreq: 'daily' },
     { path: '/bulk-orders', priority: '0.8', changefreq: 'weekly' },
+
+
     { path: '/about', priority: '0.7', changefreq: 'monthly' },
     { path: '/contact', priority: '0.7', changefreq: 'monthly' },
     { path: '/policies/privacy', priority: '0.5', changefreq: 'yearly' },

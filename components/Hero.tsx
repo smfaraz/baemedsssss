@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight, MessageCircle, Search, Truck } from 'lucide-react';
+import { ArrowRight, MessageCircle, Phone, Search, Truck } from 'lucide-react';
 import { Link } from '../context/CartContext';
 import aboutImage from '../pages/about.png';
 
@@ -25,8 +25,8 @@ const Hero: React.FC = () => {
           </div>
           <ul className="mt-7 grid gap-3 text-sm text-slate-700 sm:grid-cols-3">
             <li className="flex items-center gap-2"><Search className="shrink-0 text-medical-primary" size={18} aria-hidden="true" /> Search the live list</li>
-            <li className="flex items-center gap-2"><MessageCircle className="shrink-0 text-medical-primary" size={18} aria-hidden="true" /> Call or WhatsApp</li>
-            <li className="flex items-center gap-2"><Truck className="shrink-0 text-medical-primary" size={18} aria-hidden="true" /> Shipping at checkout</li>
+            <li className="flex items-center gap-2"><Phone className="shrink-0 text-medical-primary" size={18} aria-hidden="true" /> Toll-Free Phone Support</li>
+            <li className="flex items-center gap-2"><Truck className="shrink-0 text-medical-primary" size={18} aria-hidden="true" /> Insured 50-State Shipping</li>
           </ul>
         </div>
 

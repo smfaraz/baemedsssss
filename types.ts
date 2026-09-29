@@ -29,6 +29,17 @@ export interface Product {
     value: string;
   }[];
   youtubeVideos?: string[];
+  requiresPrescription?: boolean;
+  prescriptionRequired?: boolean;
+  isRentalAvailable?: boolean;
+  fsaEligible?: boolean;
+  hcpcsCode?: string;
+  fdaClassification?: 'Class I' | 'Class II' | 'Class III';
+  ndcNumber?: string;
+  udi?: string;
+  eligibleFsaHsa?: boolean;
+  isRegulatoryVerified?: boolean;
+  weightLbs?: number;
 }
 
 export interface Category {
@@ -57,9 +68,9 @@ export interface Address {
   address1: string;
   address2?: string;
   city: string;
-  province?: string;
-  country: string;
-  zip: string;
+  province?: string; // US 2-letter state code (e.g. CA, NY, TX)
+  country: string; // "United States"
+  zip: string; // 5-digit ZIP or ZIP+4
   firstName: string;
   lastName: string;
   phone?: string;
@@ -92,3 +103,42 @@ export interface Order {
   }[];
   statusUrl: string;
 }
+
+export interface TaxCalculation {
+  subtotal: number;
+  taxableAmount: number;
+  estimatedTax: number;
+  taxRate: number;
+  state: string;
+  isExempt: boolean;
+  exemptionReason?: string;
+}
+
+export interface ShippingOption {
+  id: string;
+  name: string;
+  carrier: 'USPS' | 'UPS' | 'FedEx' | 'Medical Freight';
+  price: number;
+  estimatedDaysMin: number;
+  estimatedDaysMax: number;
+  guaranteed?: boolean;
+}
+
+export type StaffRole =
+  | 'SUPER_ADMIN'
+  | 'OPERATIONS_ADMIN'
+  | 'CUSTOMER_SUPPORT'
+  | 'FULFILLMENT'
+  | 'COMPLIANCE'
+  | 'READ_ONLY';
+
+export interface AuditLogEvent {
+  id: string;
+  timestamp: string;
+  actor: string;
+  action: string;
+  resource: string;
+  result: 'SUCCESS' | 'FAILURE' | 'DENIED';
+  metadata?: Record<string, unknown>;
+}
+

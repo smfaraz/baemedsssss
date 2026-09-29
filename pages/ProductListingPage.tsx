@@ -13,7 +13,7 @@ import ProductCardSkeleton from '../components/ProductCardSkeleton';
 import SEO from '../components/SEO';
 import { Link, useSearchParams } from '../context/CartContext';
 import { APP_NAME, CATEGORIES, CONTACT_PHONE } from '../constants';
-import { fetchAllProducts, searchProducts } from '../lib/shopify';
+import { fetchAllProducts, searchProducts } from '../lib/commerce';
 import { Product } from '../types';
 
 type SortOption = 'availability' | 'price-asc' | 'price-desc' | 'name-asc';
@@ -161,7 +161,6 @@ const ProductListingPage: React.FC = () => {
   };
 
   const phoneHref = `tel:${CONTACT_PHONE.replace(/[^+\d]/g, '')}`;
-  const whatsappHref = `https://wa.me/${CONTACT_PHONE.replace(/\D/g, '')}?text=${encodeURIComponent('Hello Baemeds, I need help finding medical equipment.')}`;
 
   const filters = (
     <div className="space-y-7">
@@ -214,7 +213,7 @@ const ProductListingPage: React.FC = () => {
         <div className="grid grid-cols-2 gap-3">
           <label className="text-xs font-semibold text-medical-text">
             Minimum
-            <input type="number" min="0" inputMode="numeric" value={priceRange.min} onChange={(event) => setPriceRange((current) => ({ ...current, min: event.target.value }))} placeholder="₹0" className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3 text-sm outline-none focus:border-medical-primary" />
+            <input type="number" min="0" inputMode="numeric" value={priceRange.min} onChange={(event) => setPriceRange((current) => ({ ...current, min: event.target.value }))} placeholder="$0" className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 px-3 text-sm outline-none focus:border-medical-primary" />
           </label>
           <label className="text-xs font-semibold text-medical-text">
             Maximum
@@ -249,14 +248,14 @@ const ProductListingPage: React.FC = () => {
               <p className="mt-3 max-w-2xl text-sm leading-6 text-medical-text sm:text-base">Filter by category, brand, price, or availability.</p>
               {searchParam && (
                 <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
-                  <span className="rounded-full bg-medical-light px-3 py-2 font-semibold text-teal-900">Results for â€œ{searchParam}â€</span>
+                  <span className="rounded-full bg-medical-light px-3 py-2 font-semibold text-teal-900">Results for “{searchParam}”</span>
                   <button type="button" onClick={clearSearch} className="min-h-11 rounded-xl px-3 font-bold text-medical-primary hover:bg-medical-light"><SearchX size={17} className="mr-2 inline" />Clear search</button>
                 </div>
               )}
             </div>
             <div className="flex flex-col gap-2 sm:flex-row">
-              <a href={phoneHref} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-medical-primary px-4 text-sm font-bold text-medical-primary hover:bg-medical-light"><Phone size={17} />Call for guidance</a>
-              <a href={whatsappHref} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-medical-primary px-4 text-sm font-bold text-white hover:bg-medical-dark"><MessageCircle size={17} />WhatsApp us</a>
+              <a href={phoneHref} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-medical-primary px-4 text-sm font-bold text-medical-primary hover:bg-medical-light"><Phone size={17} />Call Toll-Free</a>
+              <Link to="/contact" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-medical-primary px-4 text-sm font-bold text-white hover:bg-medical-dark">Contact Support</Link>
             </div>
           </div>
         </header>
@@ -264,7 +263,7 @@ const ProductListingPage: React.FC = () => {
         <section className="mb-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-soft" aria-label="Catalogue toolbar">
           <div className="flex flex-col gap-3 p-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center justify-between gap-3">
-              <p className="px-1 text-sm font-semibold text-medical-text" aria-live="polite">{isLoading ? 'Loading catalogueâ€¦' : `${filteredProducts.length} product${filteredProducts.length === 1 ? '' : 's'}`}</p>
+              <p className="px-1 text-sm font-semibold text-medical-text" aria-live="polite">{isLoading ? 'Loading catalogue…' : `${filteredProducts.length} product${filteredProducts.length === 1 ? '' : 's'}`}</p>
               <button type="button" onClick={() => setIsMobileFiltersOpen(true)} className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-slate-300 px-4 text-sm font-bold text-slate-800 hover:border-medical-primary hover:text-medical-primary lg:hidden"><SlidersHorizontal size={18} />Filters{activeFilterCount ? ` (${activeFilterCount})` : ''}</button>
             </div>
             <label className="flex min-h-11 items-center gap-2 rounded-xl bg-medical-light px-3 text-sm font-semibold text-medical-text">
@@ -367,7 +366,7 @@ const ProductListingPage: React.FC = () => {
                 <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-medical-text">Clear the filters to see the full catalogue, or ask the team to locate a specific model.</p>
                 <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
                   <button type="button" onClick={clearFilters} className="min-h-11 rounded-xl bg-medical-primary px-5 font-bold text-white">Clear filters</button>
-                  <a href={whatsappHref} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 px-5 font-bold text-slate-800">Ask on WhatsApp</a>
+                  <a href={phoneHref} className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 px-5 font-bold text-slate-800"><Phone size={17} className="mr-2 inline" />Call Toll-Free</a>
                 </div>
               </div>
             )}

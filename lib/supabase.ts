@@ -1,8 +1,23 @@
 import { createClient } from '@supabase/supabase-js';
 
+const SUPABASE_URL =
+  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_URL) ||
+  'https://psyeixlohgkpvaymjyxh.supabase.co';
+
+const SUPABASE_ANON_KEY =
+  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_ANON_KEY) ||
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzeWVpeGxvaGdrcHZheW1qeXhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0MjA3MjIsImV4cCI6MjEwNDk5NjcyMn0.dswCTpddP5tWk_RodrPiOewHbVZymtGYdUrQljfKjbE';
+
+// Polyfill minimal WebSocket constructor if running in older Node.js environments
+if (typeof globalThis.WebSocket === 'undefined') {
+  globalThis.WebSocket = class {} as any;
+}
+
 // These are public browser credentials. Database protection is enforced by RLS;
-// never place a Supabase secret/service-role key in this file.
-export const supabase = createClient(
-  'https://zyuvvqvbsojathbzcfzi.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp5dXZ2cXZic29qYXRoYnpjZnppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ4OTA3MjgsImV4cCI6MjEwMDQ2NjcyOH0.dud6yghnqeozK0Yap5uNEBhQiUrYXm6cQmjjeR7EnS0',
-);
+// never place a Supabase secret/service-role key in client-side code.
+export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: {
+    persistSession: typeof window !== 'undefined',
+  },
+});
+

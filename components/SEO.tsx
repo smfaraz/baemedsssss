@@ -77,7 +77,7 @@ const SEO: React.FC<SEOProps> = ({
     offers: {
       '@type': 'Offer',
       url: fullCanonical,
-      priceCurrency: productData.currency || 'INR',
+      priceCurrency: productData.currency || 'USD',
       price: productData.price,
       priceValidUntil: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       itemCondition: 'https://schema.org/NewCondition',
@@ -91,9 +91,9 @@ const SEO: React.FC<SEOProps> = ({
       },
       hasMerchantReturnPolicy: {
         '@type': 'MerchantReturnPolicy',
-        applicableCountry: 'IN',
+        applicableCountry: 'US',
         returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
-        merchantReturnDays: 7,
+        merchantReturnDays: 30,
         returnMethod: 'https://schema.org/ReturnByMail',
         returnFees: 'https://schema.org/FreeReturn',
       },
@@ -102,11 +102,11 @@ const SEO: React.FC<SEOProps> = ({
         shippingRate: {
           '@type': 'MonetaryAmount',
           value: '0',
-          currency: 'INR',
+          currency: 'USD',
         },
         shippingDestination: {
           '@type': 'DefinedRegion',
-          addressCountry: 'IN',
+          addressCountry: 'US',
         },
         deliveryTime: {
           '@type': 'ShippingDeliveryTime',
@@ -118,8 +118,8 @@ const SEO: React.FC<SEOProps> = ({
           },
           transitTime: {
             '@type': 'QuantitativeValue',
-            minValue: 1,
-            maxValue: 4,
+            minValue: 2,
+            maxValue: 5,
             unitCode: 'd',
           },
         },
@@ -142,24 +142,24 @@ const SEO: React.FC<SEOProps> = ({
     url: SITE_URL,
     logo: `${SITE_URL}/baemeds-social-preview.jpg`,
     image: `${SITE_URL}/baemeds-social-preview.jpg`,
-    description: 'BaeMeds is Hyderabad’s trusted medical equipment and surgical supplier (Since 1996). We provide doctor-recommended 5L/10L oxygen concentrators, BiPAP/CPAP machines, ICU patient monitors, hospital beds, and mobility aids on rent and sale with same-day 60-min delivery and Pan-India shipping.',
-    telephone: '+919390349389',
-    email: 'sales@baemeds.in',
-    priceRange: '₹₹',
-    paymentAccepted: 'Cash, Credit Card, Debit Card, UPI, Net Banking, GST Invoice',
-    currenciesAccepted: 'INR',
+    description: 'BaeMeds Healthcare USA is your trusted provider of clinical respiratory equipment (5L/10L oxygen concentrators, BiPAP/CPAP systems), ICU monitors, hospital beds, and mobility aids with nationwide US shipping and FSA/HSA eligibility.',
+    telephone: '+18005550199',
+    email: 'support@baemeds.com',
+    priceRange: '$$',
+    paymentAccepted: 'Credit Card, Debit Card, Apple Pay, Google Pay, FSA/HSA Card, Purchase Order',
+    currenciesAccepted: 'USD',
     address: {
       '@type': 'PostalAddress',
-      streetAddress: 'Hyderabad',
-      addressLocality: 'Hyderabad',
-      addressRegion: 'Telangana',
-      postalCode: '500001',
-      addressCountry: 'IN',
+      streetAddress: '1209 Orange Street',
+      addressLocality: 'Wilmington',
+      addressRegion: 'DE',
+      postalCode: '19801',
+      addressCountry: 'US',
     },
     geo: {
       '@type': 'GeoCoordinates',
-      latitude: 17.3850,
-      longitude: 78.4867,
+      latitude: 39.7459,
+      longitude: -75.5466,
     },
     openingHoursSpecification: [
       {
@@ -170,30 +170,25 @@ const SEO: React.FC<SEOProps> = ({
           'Wednesday',
           'Thursday',
           'Friday',
-          'Saturday',
-          'Sunday',
         ],
-        opens: '00:00',
-        closes: '23:59',
+        opens: '08:00',
+        closes: '20:00',
       },
     ],
     areaServed: [
       {
-        '@type': 'City',
-        name: 'Hyderabad',
-      },
-      {
         '@type': 'Country',
-        name: 'India',
+        name: 'United States',
       },
     ],
     hasOfferCatalog: {
       '@type': 'OfferCatalog',
-      name: 'Medical Equipment Sales & Rental Catalogue',
+      name: 'Medical Equipment Sales & Clinical Supply Catalogue',
       itemListElement: [
+
         {
           '@type': 'OfferCatalog',
-          name: 'Oxygen Concentrators (Sales & Rental)',
+          name: 'Oxygen Concentrators (5L & 10L DME)',
         },
         {
           '@type': 'OfferCatalog',
@@ -201,11 +196,11 @@ const SEO: React.FC<SEOProps> = ({
         },
         {
           '@type': 'OfferCatalog',
-          name: 'Multipara Patient Monitors & ICU Systems',
+          name: 'Multiparameter Patient Monitors & Clinical Telemetry',
         },
         {
           '@type': 'OfferCatalog',
-          name: 'Electric Wheelchairs & Mobility Aids',
+          name: 'Mobility Equipment & Daily Living Aids',
         },
       ],
     },

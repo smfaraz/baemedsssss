@@ -1,10 +1,10 @@
 import React from 'react';
-import { AlertCircle, Calendar, Clock3, Heart, ImageOff, ShoppingCart, Star } from 'lucide-react';
+import { AlertCircle, Clock3, Heart, ImageOff, ShoppingCart, Star } from 'lucide-react';
 import { APP_NAME } from '../constants';
 import { Link, useCart } from '../context/CartContext';
 import { useReviews } from '../context/ReviewsContext';
 import { flyToCart } from '../lib/flyToCart';
-import { isRentalAvailable } from '../lib/shopify';
+import { formatPrice } from '../lib/marketConfig';
 import { Product } from '../types';
 
 interface ProductCardProps {
@@ -77,7 +77,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         <Heart size={19} className={inWishlist ? 'fill-current text-medical-alert' : ''} />
       </button>
 
-      <Link to={productPath} className="relative flex h-52 items-center justify-center overflow-hidden bg-slate-50 p-5" aria-label={`View ${product.title}${discount > 0 ? `, ${discount}% off` : ''}${isRentalAvailable(product) ? ', Rental available' : ''}`}>
+      <Link to={productPath} className="relative flex h-52 items-center justify-center overflow-hidden bg-slate-50 p-5" aria-label={`View ${product.title}${discount > 0 ? `, ${discount}% off` : ''}`}>
         {product.image && !imageFailed ? (
           <img
             src={product.image}
@@ -103,15 +103,16 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               <span className="inline-flex items-center gap-1 rounded-full border border-rose-200 bg-rose-600 px-2.5 py-1 text-[10px] font-black text-white shadow-sm" title="Offer availability is item-specific">
                 <Clock3 size={11} /> Offer ends in {offerRemaining}
               </span>
-              {isRentalAvailable(product) && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-medical-primary px-2.5 py-1 text-[10px] font-black text-white">
-                  <Calendar size={11} /> Rental available
+              {product.requiresPrescription && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-blue-700 px-2.5 py-1 text-[10px] font-black text-white">
+                  Rx Required
                 </span>
               )}
             </>
           )}
         </span>
       </Link>
+
 
       <div className="flex flex-1 flex-col p-4">
         {vendorName && <p className="text-xs font-bold uppercase tracking-wide text-medical-text">{vendorName}</p>}
@@ -133,9 +134,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         <div className="mt-auto flex items-end justify-between gap-3 border-t border-slate-200 pt-4">
           <div>
             {product.compareAtPrice && product.compareAtPrice > product.price && (
-              <p className="text-xs text-medical-text line-through">₹{product.compareAtPrice.toLocaleString('en-IN')}</p>
+              <p className="text-xs text-medical-text line-through">{formatPrice(product.compareAtPrice)}</p>
             )}
-            <p className={`text-lg font-black ${product.inStock ? 'text-amber-900' : 'text-medical-text'}`}>₹{product.price.toLocaleString('en-IN')}</p>
+            <p className={`text-lg font-black ${product.inStock ? 'text-amber-900' : 'text-medical-text'}`}>{formatPrice(product.price)}</p>
           </div>
           <button
             type="button"

@@ -1,7 +1,7 @@
 import React from 'react';
 import { ArrowRight, Building2, CheckCircle2, Headphones, MapPin, PackageSearch, Phone } from 'lucide-react';
 import SEO from '../components/SEO';
-import { APP_NAME, CONTACT_PHONE } from '../constants';
+import { APP_NAME, CONTACT_PHONE, LEGAL_ENTITY_NAME, STORE_ADDRESS } from '../constants';
 import { Link } from '../context/CartContext';
 import { useReveal } from '../lib/useReveal';
 import aboutImg from '../public/assets/images/about.png';
@@ -10,17 +10,17 @@ const priorities = [
   {
     icon: PackageSearch,
     title: 'Easy product search',
-    description: 'Browse by product type, compare the available options, and read the full product page before deciding.',
+    description: 'Browse by clinical category, compare medical equipment specifications, and check FDA compliance and prescription requirements before ordering.',
   },
   {
     icon: Headphones,
-    title: 'Help from our team',
-    description: 'Call or message us when you need help checking compatibility, stock, delivery, or how to order.',
+    title: 'US Clinical & Order Support',
+    description: 'Call or email our specialists when you need assistance verifying equipment compatibility, DME codes, stock availability, or freight delivery.',
   },
   {
     icon: Building2,
-    title: 'Single and bulk orders',
-    description: 'Buy individual products online or send us a list for a clinic, hospital, or larger order.',
+    title: 'Consumer & Institutional Procurement',
+    description: 'Order individual supplies directly online with FSA/HSA cards or submit institutional purchase orders with tax-exempt processing.',
   },
 ];
 
@@ -32,8 +32,8 @@ const AboutPage: React.FC = () => {
   return (
     <main className="overflow-hidden" style={{ backgroundColor: '#f6f3ee' }}>
       <SEO
-        title="About Us — Trusted Medical Equipment Supplier Hyderabad"
-        description="BaeMeds by Mohsin Enterprises is Hyderabad's certified medical equipment and DME distributor for hospitals, clinics, and home healthcare."
+        title="About Us — Nationwide Medical Equipment & DME Supplies"
+        description="BaeMeds Healthcare USA is your trusted nationwide distributor of FDA-compliant clinical equipment, respiratory therapy, and DME supplies for hospitals, clinics, and home care."
         canonical="/about"
       />
       <section className="relative border-b border-slate-200 bg-medical-dark text-white">
@@ -41,10 +41,10 @@ const AboutPage: React.FC = () => {
           <div>
             <p className="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-medical-accent">About {APP_NAME}</p>
             <h1 className="max-w-2xl text-4xl font-bold leading-tight text-white sm:text-5xl">
-              Medical equipment, made easier to find and order.
+              Clinical medical equipment, made easier to source and deliver.
             </h1>
             <p className="mt-5 max-w-xl text-base leading-7 text-slate-200 sm:text-lg">
-              {APP_NAME} is an online medical equipment shop run by Mohsin Enterprises in Hyderabad. Browse products, contact us directly, or ask for a quote for a larger order.
+              {APP_NAME} is operated by {LEGAL_ENTITY_NAME}, providing certified medical equipment, home respiratory care, and clinical supplies nationwide across all 50 US states.
             </p>
             <div className="mt-7 flex flex-col gap-3 sm:flex-row">
               <Link
@@ -54,7 +54,7 @@ const AboutPage: React.FC = () => {
                 Explore products <ArrowRight size={18} aria-hidden="true" />
               </Link>
               <a
-                href={`tel:${CONTACT_PHONE}`}
+                href={`tel:${CONTACT_PHONE.replace(/\D/g, '')}`}
                 className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-white/30 bg-transparent px-5 py-3 font-bold text-white transition-colors hover:bg-white/10"
               >
                 <Phone size={18} aria-hidden="true" /> Call {CONTACT_PHONE}
@@ -100,8 +100,8 @@ const AboutPage: React.FC = () => {
         <div className="container mx-auto grid max-w-6xl gap-8 px-4 py-14 sm:px-6 lg:grid-cols-2 lg:items-center lg:py-16 reveal-on-scroll" ref={enterpriseRef}>
           <div>
             <div className="max-w-2xl rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
-              <p><strong className="font-semibold text-medical-dark">Business information</strong> — {APP_NAME} is operated by Mohsin Enterprises.</p>
-              <p className="mt-1 text-xs leading-5 text-slate-500">Corporate office: 8-2-326/a/2, Banjara Hills Road No. 3, Plot No. 209, Hyderabad, Telangana 500034</p>
+              <p><strong className="font-semibold text-medical-dark">Corporate Entity</strong> — {APP_NAME} is operated by {LEGAL_ENTITY_NAME}.</p>
+              <p className="mt-1 text-xs leading-5 text-slate-500">Headquarters: {STORE_ADDRESS}</p>
             </div>
           </div>
 

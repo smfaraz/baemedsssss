@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
-import { ArrowRight, Building2, CheckCircle2, Mail, MapPin, MessageCircle, Phone, Send } from 'lucide-react';
+import { ArrowRight, Building2, CheckCircle2, Mail, MapPin, Phone, Send } from 'lucide-react';
 import SEO from '../components/SEO';
-import { APP_NAME, CONTACT_EMAIL, CONTACT_PHONE } from '../constants';
+import { APP_NAME, CONTACT_EMAIL, CONTACT_PHONE, STORE_ADDRESS } from '../constants';
 import { Link } from '../context/CartContext';
 import { useReveal } from '../lib/useReveal';
 import { submitEnquiry } from '../lib/enquiries';
 
-const whatsappNumber = CONTACT_PHONE.replace(/\D/g, '');
-const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent('Hello Baemeds, I have a medical equipment question.')}`;
-const storeAddress = '8-2-326/a/2, Banjara Hills Road No. 3, Plot No. 209, Hyderabad, Telangana 500034';
+const storeAddress = STORE_ADDRESS;
 const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(storeAddress)}`;
 const mapsEmbedUrl = `https://www.google.com/maps?q=${encodeURIComponent(storeAddress)}&output=embed`;
 
@@ -28,7 +26,7 @@ const ContactPage: React.FC = () => {
     await submitEnquiry({ type: 'contact', name, email, phone: phone || 'Not provided', message: `${topic}: ${message}` });
     const subject = encodeURIComponent(`${topic} from ${name}`);
     const body = encodeURIComponent(
-      `Baemeds website message\n\nName: ${name}\nEmail: ${email}\nPhone: ${phone || 'Not provided'}\nTopic: ${topic}\n\nMessage:\n${message}`,
+      `BaeMeds US website message\n\nName: ${name}\nEmail: ${email}\nPhone: ${phone || 'Not provided'}\nTopic: ${topic}\n\nMessage:\n${message}`,
     );
 
     setEmailDraftOpened(true);
@@ -38,8 +36,8 @@ const ContactPage: React.FC = () => {
   return (
     <main className="min-h-screen" style={{ backgroundColor: '#f6f3ee' }}>
       <SEO
-        title="Contact Us & 24/7 Medical Equipment Support Hyderabad"
-        description="Get in touch with BaeMeds Hyderabad for emergency oxygen delivery, BiPAP machine rentals, wheelchair demos, and customer support. Call +91 93903 49389."
+        title="Contact Us — US Clinical Support & Customer Care"
+        description="Contact BaeMeds Healthcare USA for clinical respiratory equipment, CPAP/BiPAP rentals, patient monitors, and institutional orders. Call toll-free +1 (800) 555-0199."
         canonical="/contact"
       />
       <section className="bg-medical-dark text-white">
@@ -47,17 +45,17 @@ const ContactPage: React.FC = () => {
           <p className="text-sm font-bold uppercase tracking-[0.18em] text-medical-accent">Contact {APP_NAME}</p>
           <div className="mt-3 grid gap-6 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
             <div>
-              <h1 className="max-w-3xl text-4xl font-bold leading-tight sm:text-5xl">Product, order, and quote help</h1>
+              <h1 className="max-w-3xl text-4xl font-bold leading-tight sm:text-5xl">Clinical, order, and procurement support</h1>
               <p className="mt-4 max-w-2xl text-base leading-7 text-slate-200 sm:text-lg">
-                Tell us what you are looking for and include the product name, intended use, quantity, or order reference when available.
+                Reach our US customer care desk for device specifications, Rx submission assistance, order tracking, and institutional purchase orders.
               </p>
             </div>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-              <a href={`tel:${CONTACT_PHONE}`} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-medical-accent px-4 py-3 font-bold text-medical-dark hover:bg-white">
-                <Phone size={18} aria-hidden="true" /> Call now
+              <a href={`tel:${CONTACT_PHONE.replace(/\D/g, '')}`} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-medical-accent px-4 py-3 font-bold text-medical-dark hover:bg-white">
+                <Phone size={18} aria-hidden="true" /> Call toll-free
               </a>
-              <a href={whatsappUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-medical-accent px-4 py-3 font-bold text-medical-accent hover:bg-medical-accent/10">
-                <MessageCircle size={18} aria-hidden="true" /> WhatsApp
+              <a href={`mailto:${CONTACT_EMAIL}`} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-medical-accent px-4 py-3 font-bold text-medical-accent hover:bg-medical-accent/10">
+                <Mail size={18} aria-hidden="true" /> Email support
               </a>
             </div>
           </div>

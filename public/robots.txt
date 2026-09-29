@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://www.baemeds.in/sitemap.xml
+Sitemap: https://baemeds.com/sitemap.xml

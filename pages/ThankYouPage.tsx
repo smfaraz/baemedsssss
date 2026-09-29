@@ -1,11 +1,10 @@
 import React from 'react';
-import { ArrowRight, CheckCircle, Mail, MessageCircle, Phone, ShoppingBag } from 'lucide-react';
+import { ArrowRight, CheckCircle, Mail, MessageSquareText, Phone, ShoppingBag } from 'lucide-react';
 import { APP_NAME, CONTACT_EMAIL, CONTACT_PHONE } from '../constants';
 import { Link } from '../context/CartContext';
 import { useReveal } from '../lib/useReveal';
 
 const cleanPhone = CONTACT_PHONE.replace(/\D/g, '');
-const whatsappMessage = encodeURIComponent(`Hello ${APP_NAME}, I would like help with a medical equipment enquiry.`);
 
 const ThankYouPage: React.FC = () => {
   const sectionRef = useReveal<HTMLDivElement>();
@@ -21,13 +20,13 @@ const ThankYouPage: React.FC = () => {
           <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/15 motion-lift" aria-hidden="true"><CheckCircle size={30} /></span>
           <p className="mt-6 text-xs font-bold uppercase tracking-[0.18em] text-white/70">Contact options</p>
           <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">Continue your enquiry with {APP_NAME}.</h1>
-          <p className="mt-4 max-w-xl leading-7 text-white/80">Choose call, WhatsApp, or email to contact the team. A message is confirmed only after you send it from the selected app.</p>
+          <p className="mt-4 max-w-xl leading-7 text-white/80">Choose telephone, online contact form, or direct email to speak with our clinical care and equipment support team.</p>
         </div>
         <div className="p-6 sm:p-10">
           <div ref={contactCardsRef} className="grid gap-3 sm:grid-cols-3 stagger-grid">
-            <a href={`tel:+${cleanPhone}`} ref={firstCardRef} className="group rounded-2xl border border-medical-light p-4 hover:border-medical-primary hover:shadow-soft motion-lift transition"><Phone className="text-medical-primary" /><p className="mt-3 text-sm font-bold text-medical-dark">Call now</p><p className="mt-1 text-sm text-medical-text/60">{CONTACT_PHONE}</p></a>
-            <a href={`https://wa.me/${cleanPhone}?text=${whatsappMessage}`} target="_blank" rel="noreferrer" ref={secondCardRef} className="group rounded-2xl border border-medical-light p-4 hover:border-medical-primary hover:shadow-soft motion-lift transition"><MessageCircle className="text-medical-primary" /><p className="mt-3 text-sm font-bold text-medical-dark">WhatsApp</p><p className="mt-1 text-sm text-medical-text/60">Open prefilled message</p></a>
-            <a href={`mailto:${CONTACT_EMAIL}`} ref={thirdCardRef} className="group rounded-2xl border border-medical-light p-4 hover:border-medical-primary hover:shadow-soft motion-lift transition"><Mail className="text-medical-primary" /><p className="mt-3 text-sm font-bold text-medical-dark">Email</p><p className="mt-1 break-all text-sm text-medical-text/60">{CONTACT_EMAIL}</p></a>
+            <a href={`tel:+${cleanPhone}`} ref={firstCardRef} className="group rounded-2xl border border-medical-light p-4 hover:border-medical-primary hover:shadow-soft motion-lift transition"><Phone className="text-medical-primary" /><p className="mt-3 text-sm font-bold text-medical-dark">Toll-Free Call</p><p className="mt-1 text-sm text-medical-text/60">{CONTACT_PHONE}</p></a>
+            <Link to="/contact" ref={secondCardRef} className="group rounded-2xl border border-medical-light p-4 hover:border-medical-primary hover:shadow-soft motion-lift transition"><MessageSquareText className="text-medical-primary" /><p className="mt-3 text-sm font-bold text-medical-dark">Online Support</p><p className="mt-1 text-sm text-medical-text/60">Submit Support Request</p></Link>
+            <a href={`mailto:${CONTACT_EMAIL}`} ref={thirdCardRef} className="group rounded-2xl border border-medical-light p-4 hover:border-medical-primary hover:shadow-soft motion-lift transition"><Mail className="text-medical-primary" /><p className="mt-3 text-sm font-bold text-medical-dark">Email Support</p><p className="mt-1 break-all text-sm text-medical-text/60">{CONTACT_EMAIL}</p></a>
           </div>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Link to="/products" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-medical-primary px-6 py-3 font-bold text-white hover:bg-medical-dark transition"><ShoppingBag size={18} /> Browse products <ArrowRight size={18} /></Link>

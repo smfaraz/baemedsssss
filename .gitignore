@@ -1,6 +1,9 @@
 node_modules
 dist
 .env
+.env.local
+.env.*.local
+
 
 # Screenshot sweep — keep the shared baseline, ignore regeneratable output
 audit/mobile-shots/current
@@ -14,6 +17,19 @@ dev-server.stderr.log
 # Internal project notes stay local and are never committed.
 /*.md
 !/README.md
+!/US_MARKET_MIGRATION.md
+!/SECURITY.md
+!/COMPLIANCE.md
+!/PRODUCTION_READINESS_REPORT.md
+!/FINAL_PRODUCTION_SECURITY_AUDIT.md
+!/SHOPIFY_DEPENDENCY_AUDIT.md
+!/BAEMEDS_COMMERCE_ARCHITECTURE.md
+!/BAEMEDS_API_SPEC.md
+!/BAEMEDS_DATABASE_SCHEMA.md
+!/SHOPIFY_DATA_MIGRATION_PLAN.md
+!/BAEMEDS_SECURITY_MODEL.md
+!/BAEMEDS_COMMERCE_TEST_PLAN.md
+!/SHOPIFY_REMOVAL_FINAL_REPORT.md
 /audit/*.md
 
 .vercel
