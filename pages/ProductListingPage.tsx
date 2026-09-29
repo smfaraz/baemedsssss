@@ -1,30 +1,52 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   ArrowUpDown,
+  ChevronLeft,
+  ChevronRight,
   Filter,
-  MessageCircle,
   Phone,
   SearchX,
   SlidersHorizontal,
   X,
+  CheckCircle2,
 } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import ProductCardSkeleton from '../components/ProductCardSkeleton';
 import SEO from '../components/SEO';
 import { Link, useSearchParams } from '../context/CartContext';
 import { APP_NAME, CATEGORIES, CONTACT_PHONE } from '../constants';
-import { fetchAllProducts, searchProducts } from '../lib/commerce';
+import { fetchAllProducts, searchProducts, resolveCategoryName } from '../lib/commerce';
 import { Product } from '../types';
 
 type SortOption = 'availability' | 'price-asc' | 'price-desc' | 'name-asc';
 
+const ITEMS_PER_PAGE = 24;
+
 const normalise = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 
 const categoryMatches = (product: Product, category: string) => {
-  const productCategory = normalise(product.category || '');
-  const target = normalise(category);
-  if (!productCategory || !target) return false;
-  return productCategory === target || productCategory.includes(target) || target.includes(productCategory);
+  if (!product.category || !category) return false;
+  const productCanonical = resolveCategoryName(product.category);
+  const targetCanonical = resolveCategoryName(category);
+  if (productCanonical === targetCanonical) return true;
+  const pNorm = normalise(product.category);
+  const tNorm = normalise(category);
+  return pNorm === tNorm || pNorm.includes(tNorm) || tNorm.includes(pNorm);
+};
+
+const CATEGORY_DESCRIPTIONS: Record<string, string> = {
+  "Oxygen Concentrators": "Hospital-grade stationary 5L & 10L oxygen concentrators and lightweight portable travel POC units with pre-shipment calibration, manufacturer warranties, and insured US carrier delivery.",
+  "CPAP Machines": "Advanced auto-adjusting CPAP systems engineered for quiet, compliant obstructive sleep apnea management with heated humidification and companion accessories.",
+  "BiPAP Machines": "High-performance bi-level positive airway pressure units for non-invasive respiratory ventilation, COPD support, and complex sleep therapy.",
+  "Wheelchairs": "Lightweight transport chairs, standard folding wheelchairs, and heavy-duty bariatric mobility systems with certified weight capacities.",
+  "Patient Monitors": "Multiparameter clinical telemetry monitors, vital signs diagnostic stations, and OLED fingertip pulse oximeters.",
+  "Nebulizers": "Heavy-duty piston compressor nebulizers and portable ultrasonic mesh inhalers for effective aerosol respiratory therapy.",
+  "Blood Pressure Monitors": "Clinical digital upper arm blood pressure monitors and professional aneroid sphygmomanometer kits with calibrated cuffs.",
+  "Glucometers": "Fast, accurate blood glucose meters, multi-test memory systems, and comprehensive diabetic monitoring kits.",
+  "Suction Machines": "High-vacuum clinical suction units, surgical aspirators, and emergency phlegm clearance machines for hospital and home care.",
+  "Breast Pumps": "Hospital-grade electric breast pumps, closed-system double pumping kits, and maternity lactation accessories.",
+  "Incontinence & Care": "Premium absorbent briefs, protective underwear, and clinical disposable underpads for comprehensive patient hygiene.",
+  "Hospital Furniture": "Durable clinical beds, overbed tables, exam stretchers, and specialized healthcare facility furnishings."
 };
 
 const ProductListingPage: React.FC = () => {
@@ -41,9 +63,13 @@ const ProductListingPage: React.FC = () => {
   const [showOutOfStock, setShowOutOfStock] = useState(true);
   const [sortBy, setSortBy] = useState<SortOption>('availability');
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
   const [reloadKey, setReloadKey] = useState(0);
 
-  useEffect(() => setSelectedCategory(categoryParam), [categoryParam]);
+  useEffect(() => {
+    setSelectedCategory(categoryParam);
+    setCurrentPage(1);
+  }, [categoryParam]);
 
   useEffect(() => {
     let cancelled = false;
@@ -84,6 +110,11 @@ const ProductListingPage: React.FC = () => {
     };
   }, [isMobileFiltersOpen]);
 
+  // Reset page when filtering or sorting changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory, selectedBrands, priceRange, showOutOfStock, sortBy, searchParam]);
+
   const categoryOptions = useMemo(() => CATEGORIES.map((category) => {
     const value = category.slug || category.name;
     return {
@@ -122,8 +153,8 @@ const ProductListingPage: React.FC = () => {
         if (aHero !== bHero) return bHero - aHero;
 
         // Prioritize actual core equipment over small replacement parts & accessories
-        const aIsPart = /filter|tubing|connector|adapter|wrench|bracket|screw|clip|cuff/i.test(a.title) && a.price < 40;
-        const bIsPart = /filter|tubing|connector|adapter|wrench|bracket|screw|clip|cuff/i.test(b.title) && b.price < 40;
+        const aIsPart = /filter|tubing|connector|adapter|wrench|bracket|screw|clip|cuff|hose|bulb|valve|strap|strip|lancet/i.test(a.title) && a.price < 45;
+        const bIsPart = /filter|tubing|connector|adapter|wrench|bracket|screw|clip|cuff|hose|bulb|valve|strap|strip|lancet/i.test(b.title) && b.price < 45;
         if (aIsPart !== bIsPart) return aIsPart ? 1 : -1;
       }
       if (sortBy === 'price-asc') return a.price - b.price;
@@ -132,6 +163,18 @@ const ProductListingPage: React.FC = () => {
       return 0;
     });
   }, [priceRange, products, selectedBrands, selectedCategory, showOutOfStock, sortBy]);
+
+  // Pagination calculation
+  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+  const paginatedProducts = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredProducts.slice(start, start + ITEMS_PER_PAGE);
+  }, [filteredProducts, currentPage]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 220, behavior: 'smooth' });
+  };
 
   const activeFilterCount = (selectedCategory ? 1 : 0)
     + selectedBrands.length
@@ -172,10 +215,14 @@ const ProductListingPage: React.FC = () => {
 
   const phoneHref = `tel:${CONTACT_PHONE.replace(/[^+\d]/g, '')}`;
 
+  const currentCategoryDesc = selectedCategory
+    ? CATEGORY_DESCRIPTIONS[resolveCategoryName(selectedCategory)] || CATEGORY_DESCRIPTIONS[selectedCategory] || "Browse certified medical equipment and clinical supplies."
+    : "Browse our comprehensive 50-state certified medical equipment catalogue with official manufacturer warranties, FSA/HSA acceptance, and fast carrier shipping.";
+
   const filters = (
     <div className="space-y-7">
       <section aria-labelledby="category-filter-heading">
-        <h2 id="category-filter-heading" className="mb-3 text-sm font-bold text-medical-dark">Available categories</h2>
+        <h2 id="category-filter-heading" className="mb-3 text-sm font-bold text-medical-dark">Categories</h2>
         {categoryOptions.length ? (
           <div className="space-y-1">
             {categoryOptions.map((category) => (
@@ -183,11 +230,11 @@ const ProductListingPage: React.FC = () => {
                 <span className="flex items-center gap-3">
                   <input
                     type="checkbox"
-                    checked={selectedCategory === category.value}
+                    checked={selectedCategory === category.value || resolveCategoryName(selectedCategory) === resolveCategoryName(category.value)}
                     onChange={() => updateCategory(category.value)}
                     className="h-5 w-5 rounded border-slate-300 accent-medical-primary"
                   />
-                  <span className={selectedCategory === category.value ? 'font-bold text-medical-dark' : 'text-medical-text'}>{category.label}</span>
+                  <span className={(selectedCategory === category.value || resolveCategoryName(selectedCategory) === resolveCategoryName(category.value)) ? 'font-bold text-medical-dark' : 'text-medical-text'}>{category.label}</span>
                 </span>
                 <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-medical-text">{category.count}</span>
               </label>
@@ -246,43 +293,81 @@ const ProductListingPage: React.FC = () => {
   return (
     <main className="min-h-screen bg-medical-light pb-16 pt-6 sm:pt-9">
       <SEO
-        title={selectedCategory || (searchParam ? `Search: ${searchParam}` : 'Medical equipment')}
-        description={`Browse ${APP_NAME} medical equipment by category, brand, price, and availability.`}
+        title={selectedCategory ? `${selectedCategory} | ${APP_NAME} USA` : (searchParam ? `Search: ${searchParam} | ${APP_NAME}` : 'Medical Equipment Catalog | BaeMeds')}
+        description={currentCategoryDesc}
       />
       <div className="container mx-auto px-4">
-        <header className="mb-6 rounded-3xl border border-medical-light bg-white p-5 shadow-soft sm:p-8">
-          <p className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-medical-primary">Clinical equipment catalogue</p>
-          <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-              <h1 className="max-w-3xl text-3xl font-bold leading-tight text-slate-950 sm:text-4xl">Medical equipment catalogue</h1>
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-medical-text sm:text-base">Filter by category, brand, price, or availability.</p>
+        {/* Breadcrumb Navigation */}
+        <nav aria-label="Breadcrumb" className="mb-4 flex items-center gap-2 text-xs font-semibold text-slate-500">
+          <Link to="/" className="hover:text-medical-primary">Home</Link>
+          <span>/</span>
+          <Link to="/products" className={!selectedCategory ? "text-medical-dark font-bold" : "hover:text-medical-primary"}>Equipment</Link>
+          {selectedCategory && (
+            <>
+              <span>/</span>
+              <span className="text-medical-dark font-bold">{selectedCategory}</span>
+            </>
+          )}
+        </nav>
+
+        {/* Page Header */}
+        <header className="mb-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-soft sm:p-8">
+          <div className="flex flex-wrap items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-teal-700">
+            <span className="inline-flex items-center gap-1 rounded-full bg-teal-50 px-3 py-1 border border-teal-200">
+              <CheckCircle2 size={13} className="text-teal-600" /> 50-State Insured Delivery
+            </span>
+            <span className="inline-flex items-center gap-1 rounded-full bg-teal-50 px-3 py-1 border border-teal-200">
+              FSA / HSA Eligible
+            </span>
+          </div>
+
+          <div className="mt-3 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-3xl">
+              <h1 className="text-3xl font-black leading-tight text-slate-950 sm:text-4xl">
+                {selectedCategory || (searchParam ? `Search: “${searchParam}”` : 'Medical Equipment Catalogue')}
+              </h1>
+              <p className="mt-2 text-sm leading-relaxed text-slate-600 sm:text-base">
+                {currentCategoryDesc}
+              </p>
               {searchParam && (
-                <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
-                  <span className="rounded-full bg-medical-light px-3 py-2 font-semibold text-teal-900">Results for “{searchParam}”</span>
-                  <button type="button" onClick={clearSearch} className="min-h-11 rounded-xl px-3 font-bold text-medical-primary hover:bg-medical-light"><SearchX size={17} className="mr-2 inline" />Clear search</button>
+                <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
+                  <span className="rounded-full bg-slate-100 px-3 py-1 font-semibold text-slate-800">Showing matches for “{searchParam}”</span>
+                  <button type="button" onClick={clearSearch} className="rounded-lg px-2 py-1 font-bold text-medical-primary hover:bg-medical-light"><SearchX size={15} className="mr-1 inline" />Clear</button>
                 </div>
               )}
             </div>
-            <div className="flex flex-col gap-2 sm:flex-row">
-              <a href={phoneHref} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-medical-primary px-4 text-sm font-bold text-medical-primary hover:bg-medical-light"><Phone size={17} />Call Toll-Free</a>
-              <Link to="/contact" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-medical-primary px-4 text-sm font-bold text-white hover:bg-medical-dark">Contact Support</Link>
+            <div className="flex flex-col gap-2 shrink-0 sm:flex-row">
+              <a href={phoneHref} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-medical-primary px-4 text-sm font-bold text-medical-primary hover:bg-medical-light"><Phone size={17} />{CONTACT_PHONE}</a>
+              <Link to="/contact" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-medical-primary px-4 text-sm font-bold text-white hover:bg-medical-dark">Clinical Questions</Link>
             </div>
           </div>
         </header>
 
-        <section className="mb-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-soft" aria-label="Catalogue toolbar">
+        {/* Toolbar & Filter Bar */}
+        <section className="mb-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-soft" aria-label="Catalogue toolbar">
           <div className="flex flex-col gap-3 p-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center justify-between gap-3">
-              <p className="px-1 text-sm font-semibold text-medical-text" aria-live="polite">{isLoading ? 'Loading catalogue…' : `${filteredProducts.length} product${filteredProducts.length === 1 ? '' : 's'}`}</p>
+              <p className="px-1 text-sm font-bold text-slate-800" aria-live="polite">
+                {isLoading ? 'Loading products…' : (
+                  <>
+                    <span>{filteredProducts.length.toLocaleString()}</span> products found
+                    {totalPages > 1 && (
+                      <span className="ml-2 text-xs font-normal text-slate-500">
+                        (Page {currentPage} of {totalPages})
+                      </span>
+                    )}
+                  </>
+                )}
+              </p>
               <button type="button" onClick={() => setIsMobileFiltersOpen(true)} className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-slate-300 px-4 text-sm font-bold text-slate-800 hover:border-medical-primary hover:text-medical-primary lg:hidden"><SlidersHorizontal size={18} />Filters{activeFilterCount ? ` (${activeFilterCount})` : ''}</button>
             </div>
-            <label className="flex min-h-11 items-center gap-2 rounded-xl bg-medical-light px-3 text-sm font-semibold text-medical-text">
-              <ArrowUpDown size={17} aria-hidden="true" />
-              <span>Sort</span>
-              <select value={sortBy} onChange={(event) => setSortBy(event.target.value as SortOption)} aria-label="Sort products" className="min-h-11 min-w-0 flex-1 bg-transparent pr-2 font-bold outline-none sm:min-w-48">
-                <option value="availability">Availability</option>
-                <option value="price-asc">Price: low to high</option>
-                <option value="price-desc">Price: high to low</option>
+            <label className="flex min-h-11 items-center gap-2 rounded-xl bg-slate-50 border border-slate-200 px-3 text-sm font-semibold text-slate-700">
+              <ArrowUpDown size={16} aria-hidden="true" className="text-slate-500" />
+              <span>Sort by</span>
+              <select value={sortBy} onChange={(event) => setSortBy(event.target.value as SortOption)} aria-label="Sort products" className="min-h-11 min-w-0 flex-1 bg-transparent pr-2 font-bold outline-none sm:min-w-48 text-medical-dark">
+                <option value="availability">Featured Equipment First</option>
+                <option value="price-asc">Price: Low to High</option>
+                <option value="price-desc">Price: High to Low</option>
                 <option value="name-asc">Name: A to Z</option>
               </select>
             </label>
@@ -291,28 +376,28 @@ const ProductListingPage: React.FC = () => {
           <div className="border-t border-slate-200 px-3 pt-3">
             <div className="filter-toolbar-scroll flex items-center gap-2 overflow-x-auto pb-3" aria-label="Quick filters">
               <span className="inline-flex min-h-11 shrink-0 items-center gap-2 px-1 text-xs font-black uppercase tracking-[0.12em] text-slate-500">
-                <Filter size={16} aria-hidden="true" /> Quick filters
+                <Filter size={15} aria-hidden="true" /> Categories
               </span>
               <button
                 type="button"
                 onClick={() => selectedCategory && updateCategory(selectedCategory)}
                 aria-pressed={!selectedCategory}
-                className={`min-h-11 shrink-0 rounded-full border px-4 text-sm font-bold transition-colors ${!selectedCategory ? 'border-medical-dark bg-medical-dark text-white' : 'border-slate-300 bg-white text-medical-text hover:border-medical-primary hover:text-medical-primary'}`}
+                className={`min-h-10 shrink-0 rounded-full border px-4 text-xs font-bold transition-colors ${!selectedCategory ? 'border-medical-dark bg-medical-dark text-white' : 'border-slate-300 bg-white text-slate-700 hover:border-medical-primary hover:text-medical-primary'}`}
               >
-                All categories
+                All Products
               </button>
               {categoryOptions.map((category) => {
-                const active = selectedCategory === category.value;
+                const active = selectedCategory === category.value || resolveCategoryName(selectedCategory) === resolveCategoryName(category.value);
                 return (
                   <button
                     type="button"
                     key={category.value}
                     onClick={() => updateCategory(category.value)}
                     aria-pressed={active}
-                    className={`inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full border px-4 text-sm font-bold transition-colors ${active ? 'border-medical-dark bg-medical-dark text-white' : 'border-slate-300 bg-white text-medical-text hover:border-medical-primary hover:text-medical-primary'}`}
+                    className={`inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-full border px-3.5 text-xs font-bold transition-colors ${active ? 'border-medical-dark bg-medical-dark text-white' : 'border-slate-300 bg-white text-slate-700 hover:border-medical-primary hover:text-medical-primary'}`}
                   >
                     {category.label}
-                    <span className={`rounded-full px-2 py-0.5 text-xs ${active ? 'bg-white/15 text-white' : 'bg-slate-100 text-slate-600'}`}>{category.count}</span>
+                    <span className={`rounded-full px-1.5 py-0.2 text-[10px] ${active ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'}`}>{category.count}</span>
                   </button>
                 );
               })}
@@ -320,27 +405,28 @@ const ProductListingPage: React.FC = () => {
                 type="button"
                 onClick={() => setShowOutOfStock((current) => !current)}
                 aria-pressed={!showOutOfStock}
-                className={`min-h-11 shrink-0 rounded-full border px-4 text-sm font-bold transition-colors ${!showOutOfStock ? 'border-medical-primary bg-medical-light text-medical-primary' : 'border-slate-300 bg-white text-medical-text hover:border-medical-primary hover:text-medical-primary'}`}
+                className={`min-h-10 shrink-0 rounded-full border px-3.5 text-xs font-bold transition-colors ${!showOutOfStock ? 'border-teal-600 bg-teal-50 text-teal-800' : 'border-slate-300 bg-white text-slate-700 hover:border-medical-primary'}`}
               >
-                In stock only
+                In Stock Only
               </button>
               {selectedBrands.map((brand) => (
-                <button type="button" key={brand} onClick={() => toggleBrand(brand)} className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full border border-medical-primary bg-medical-light px-4 text-sm font-bold text-medical-primary">
-                  {brand}<X size={15} aria-hidden="true" />
+                <button type="button" key={brand} onClick={() => toggleBrand(brand)} className="inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-full border border-teal-600 bg-teal-50 px-3 text-xs font-bold text-teal-800">
+                  {brand}<X size={14} aria-hidden="true" />
                 </button>
               ))}
               {(priceRange.min || priceRange.max) && (
-                <button type="button" onClick={() => setPriceRange({ min: '', max: '' })} className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full border border-medical-primary bg-medical-light px-4 text-sm font-bold text-medical-primary">
-                  Price {priceRange.min || '0'}â€“{priceRange.max || 'âˆž'}<X size={15} aria-hidden="true" />
+                <button type="button" onClick={() => setPriceRange({ min: '', max: '' })} className="inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-full border border-teal-600 bg-teal-50 px-3 text-xs font-bold text-teal-800">
+                  Price ${priceRange.min || '0'}–${priceRange.max || '∞'}<X size={14} aria-hidden="true" />
                 </button>
               )}
               {activeFilterCount > 0 && (
-                <button type="button" onClick={clearFilters} className="min-h-11 shrink-0 rounded-full px-3 text-sm font-bold text-medical-primary hover:bg-medical-light">Reset filters</button>
+                <button type="button" onClick={clearFilters} className="min-h-10 shrink-0 rounded-full px-3 text-xs font-bold text-rose-600 hover:bg-rose-50">Reset Filters</button>
               )}
             </div>
           </div>
         </section>
 
+        {/* Main Products Grid + Filter Sidebar */}
         <div className="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
           <aside className="hidden max-h-[calc(100vh-9rem)] self-start overflow-y-auto rounded-2xl border border-slate-200 bg-white p-5 shadow-soft lg:sticky lg:top-32 lg:block">
             <div className="mb-5 flex items-center justify-between border-b border-slate-100 pb-4">
@@ -366,9 +452,62 @@ const ProductListingPage: React.FC = () => {
                 </div>
               </div>
             ) : filteredProducts.length ? (
-              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
-                {filteredProducts.map((product) => <ProductCard key={product.id} product={product} />)}
-              </div>
+              <>
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                  {paginatedProducts.map((product) => <ProductCard key={product.id} product={product} />)}
+                </div>
+
+                {/* Pagination Controls */}
+                {totalPages > 1 && (
+                  <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-slate-200 bg-white px-5 py-4 rounded-2xl shadow-soft sm:flex-row">
+                    <p className="text-xs font-semibold text-slate-600">
+                      Showing <span className="font-bold text-slate-900">{((currentPage - 1) * ITEMS_PER_PAGE) + 1}</span>–<span className="font-bold text-slate-900">{Math.min(currentPage * ITEMS_PER_PAGE, filteredProducts.length)}</span> of <span className="font-bold text-slate-900">{filteredProducts.length.toLocaleString()}</span> products
+                    </p>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                        className="inline-flex h-10 items-center justify-center gap-1 rounded-xl border border-slate-200 px-3 text-xs font-bold text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        <ChevronLeft size={16} /> Prev
+                      </button>
+
+                      {/* Display numbered pages with window */}
+                      {Array.from({ length: Math.min(5, totalPages) }).map((_, idx) => {
+                        let pageNum = idx + 1;
+                        if (totalPages > 5) {
+                          if (currentPage > 3 && currentPage < totalPages - 2) {
+                            pageNum = currentPage - 2 + idx;
+                          } else if (currentPage >= totalPages - 2) {
+                            pageNum = totalPages - 4 + idx;
+                          }
+                        }
+                        const active = pageNum === currentPage;
+                        return (
+                          <button
+                            key={pageNum}
+                            type="button"
+                            onClick={() => handlePageChange(pageNum)}
+                            className={`h-10 w-10 rounded-xl text-xs font-bold transition ${active ? 'bg-medical-dark text-white shadow-sm' : 'border border-slate-200 text-slate-700 hover:bg-slate-50'}`}
+                          >
+                            {pageNum}
+                          </button>
+                        );
+                      })}
+
+                      <button
+                        type="button"
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                        className="inline-flex h-10 items-center justify-center gap-1 rounded-xl border border-slate-200 px-3 text-xs font-bold text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        Next <ChevronRight size={16} />
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </>
             ) : (
               <div className="rounded-3xl border border-slate-200 bg-white p-7 text-center sm:p-12">
                 <SearchX size={44} className="mx-auto text-medical-text" />
