@@ -99,6 +99,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             </span>
           ) : (
             <>
+              {product.tags?.includes('Flagship Hero') && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-600 px-2.5 py-1 text-[10px] font-black text-white shadow-sm">
+                  ★ Best Seller
+                </span>
+              )}
               {discount > 0 && <span className="rounded-full bg-medical-accent px-2.5 py-1 text-[10px] font-black text-medical-dark">{discount}% off</span>}
               <span className="inline-flex items-center gap-1 rounded-full border border-rose-200 bg-rose-600 px-2.5 py-1 text-[10px] font-black text-white shadow-sm" title="Offer availability is item-specific">
                 <Clock3 size={11} /> Offer ends in {offerRemaining}

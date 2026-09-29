@@ -106,7 +106,7 @@ async function prerender() {
     '/policies/terms',
     '/policies/shipping',
     '/policies/returns',
-    ...productLinks
+    ...productLinks.slice(0, 15)
   ];
 
   console.log(`Prerendering ${routesToPrerender.length} routes in parallel across ${CONCURRENCY} workers...`);
@@ -123,7 +123,7 @@ async function prerender() {
       const url = `${BASE_URL}${route}`;
       try {
         await page.goto(url, { waitUntil: 'domcontentloaded' });
-        await page.waitForFunction(() => !document.querySelector('[aria-busy="true"]'), { timeout: 6000 }).catch(() => null);
+        await page.waitForFunction(() => !document.querySelector('[aria-busy="true"]'), { timeout: 2000 }).catch(() => null);
 
         let html = await page.content();
         

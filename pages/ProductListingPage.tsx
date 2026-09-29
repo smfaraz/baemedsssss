@@ -115,7 +115,17 @@ const ProductListingPage: React.FC = () => {
     });
 
     return result.sort((a, b) => {
-      if (sortBy === 'availability' && a.inStock !== b.inStock) return a.inStock ? -1 : 1;
+      if (sortBy === 'availability') {
+        if (a.inStock !== b.inStock) return a.inStock ? -1 : 1;
+        const aHero = a.tags?.includes('Flagship Hero') ? 1 : 0;
+        const bHero = b.tags?.includes('Flagship Hero') ? 1 : 0;
+        if (aHero !== bHero) return bHero - aHero;
+
+        // Prioritize actual core equipment over small replacement parts & accessories
+        const aIsPart = /filter|tubing|connector|adapter|wrench|bracket|screw|clip|cuff/i.test(a.title) && a.price < 40;
+        const bIsPart = /filter|tubing|connector|adapter|wrench|bracket|screw|clip|cuff/i.test(b.title) && b.price < 40;
+        if (aIsPart !== bIsPart) return aIsPart ? 1 : -1;
+      }
       if (sortBy === 'price-asc') return a.price - b.price;
       if (sortBy === 'price-desc') return b.price - a.price;
       if (sortBy === 'name-asc') return a.title.localeCompare(b.title);

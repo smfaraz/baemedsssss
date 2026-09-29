@@ -27,7 +27,9 @@ export const CATEGORY_KEYWORDS: Record<string, string[]> = {
   "Hospital Furniture": ["hospital bed", "medical bed", "fowler bed", "hospital mattress", "overbed table", "examination table", "hospital trolley", "stretcher"],
   "Wheelchair": ["wheelchair", "karma", "walker", "commode"],
   "Orthopedic": ["orthopedic", "orthopaedic", "knee support", "back support", "cervical collar", "brace", "splint"],
-  "Masks & Accessories": ["cpap mask", "bipap mask", "oxygen mask", "nasal mask", "full face mask", "oxygen cannula", "cpap tubing"]
+  "Masks & Accessories": ["cpap mask", "bipap mask", "oxygen mask", "nasal mask", "full face mask", "oxygen cannula", "cpap tubing"],
+  "Breast Pump": ["breast pump", "breastpump", "lactation", "maternity", "medela", "ameda", "spectra"],
+  "Incontinence": ["briefs", "underwear", "incontinence", "adult brief", "diaper", "underpad", "chux"]
 };
 
 export const normalizeCategoryKey = (value: string): string =>

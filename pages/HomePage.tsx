@@ -234,14 +234,26 @@ const HomePage: React.FC = () => {
         if (!isMounted) return;
         setCatalogueProducts(allProducts);
         const inStockProducts = allProducts.filter((product) => product.inStock);
-        const respiratoryMap = new Map<string, Product>();
-        [...oxygenProducts, ...bipapProducts]
-          .filter((product) => product.inStock)
-          .forEach((product) => respiratoryMap.set(product.id, product));
 
-        setPopularProducts(inStockProducts.slice(0, 4));
-        setNewArrivals(inStockProducts.slice(4, 8));
-        setRespiratoryProducts(Array.from(respiratoryMap.values()).slice(0, 4));
+        // Curate actual core equipment that customers purchase
+        const heroes = inStockProducts.filter((p) => p.tags?.includes('Flagship Hero'));
+        const coreEquipment = inStockProducts.filter((p) =>
+          !p.tags?.includes('Flagship Hero') &&
+          p.price >= 60 &&
+          !/filter|tubing|connector|adapter|wrench|bracket|screw|clip|cuff/i.test(p.title)
+        );
+        const topSellers = [...heroes, ...coreEquipment];
+
+        setPopularProducts(topSellers.slice(0, 4));
+        setNewArrivals(topSellers.slice(4, 8));
+
+        // Respiratory care shelf: actual concentrators, BiPAP, and CPAP systems
+        const coreRespiratory = inStockProducts.filter((p) =>
+          /concentrator|bipap|cpap|pulmoneb|nebulizer system/i.test(p.title) &&
+          p.price >= 40 &&
+          !/filter|tubing|connector|adapter|bracket/i.test(p.title)
+        );
+        setRespiratoryProducts(coreRespiratory.slice(0, 4));
       } catch (error) {
         console.error('Failed to load homepage products:', error);
       } finally {
@@ -274,15 +286,17 @@ const HomePage: React.FC = () => {
 
   const revealRef = useReveal<HTMLDivElement>();
 
-  // Shuffled in-stock products for the continuously scrolling hero reel.
+  // Showcase flagship products and core medical equipment in the continuous marquee reel
   const heroReel = useMemo(() => {
-    const inStock = catalogueProducts.filter((product) => product.inStock && product.image);
-    const shuffled = [...inStock];
-    for (let i = shuffled.length - 1; i > 0; i -= 1) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-    return shuffled.slice(0, 12);
+    const heroes = catalogueProducts.filter((product) => product.inStock && product.tags?.includes('Flagship Hero'));
+    const coreMachines = catalogueProducts.filter((product) =>
+      product.inStock &&
+      product.price >= 50 &&
+      !product.tags?.includes('Flagship Hero') &&
+      !/filter|tubing|connector|adapter|wrench|bracket|screw|clip|cuff/i.test(product.title)
+    );
+    const combined = [...heroes, ...coreMachines];
+    return combined.slice(0, 12);
   }, [catalogueProducts]);
 
   return (

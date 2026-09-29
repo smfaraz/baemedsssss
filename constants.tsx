@@ -17,7 +17,9 @@ import {
   ShieldCheck,
   Bone,
   Accessibility,
-  User
+  User,
+  Baby,
+  Sparkles
 } from 'lucide-react';
 
 export const APP_NAME = "BaeMeds";
@@ -149,4 +151,16 @@ export const CATEGORIES: Category[] = [
     slug: "Orthopedic",
     image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=600&auto=format&fit=crop"
   },
+  {
+    name: "Breast Pumps",
+    icon: <Baby size={28} />,
+    slug: "Breast Pump",
+    image: "https://images.unsplash.com/photo-1516627145497-ae6968895b74?q=80&w=600&auto=format&fit=crop"
+  },
+  {
+    name: "Incontinence & Care",
+    icon: <Sparkles size={28} />,
+    slug: "Incontinence",
+    image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?q=80&w=600&auto=format&fit=crop"
+  }
 ];
