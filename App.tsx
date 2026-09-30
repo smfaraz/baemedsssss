@@ -22,6 +22,7 @@ import ThankYouPage from './pages/ThankYouPage';
 import NotFoundPage from './pages/NotFoundPage';
 import AdminPage from './pages/AdminPage';
 import LaunchRoadmapPage from './pages/LaunchRoadmapPage';
+import ProductResearchPage from './pages/ProductResearchPage';
 
 
 import { CartProvider } from './context/CartContext';
@@ -67,12 +68,17 @@ const AppContent: React.FC = () => {
     return <LaunchRoadmapPage />;
   }
 
+  if (pathname === '/research' || pathname === '/product-research') {
+    return <ProductResearchPage />;
+  }
+
   if (isAdminRoute) {
     return (
       <AdminLayout>
         <Routes>
           <Route path="/admin" element={<AdminDashboardPage />} />
           <Route path="/admin/roadmap" element={<LaunchRoadmapPage />} />
+          <Route path="/admin/research" element={<ProductResearchPage />} />
           <Route path="/admin/orders" element={<AdminOrdersPage />} />
           <Route path="/admin/orders/:id" element={<AdminOrderDetailPage />} />
           <Route path="/admin/products" element={<AdminProductsPage />} />

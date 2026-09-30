@@ -88,6 +88,14 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
           permission: 'products:view',
         },
         {
+          label: 'Product Research & Margins',
+          href: '/admin/research',
+          icon: BarChart3,
+          permission: 'products:view',
+          badge: '549 SKUs',
+          badgeColor: 'bg-teal-500/20 text-teal-400 font-bold border border-teal-500/30',
+        },
+        {
           label: 'Inventory',
           href: '/admin/inventory',
           icon: Boxes,
