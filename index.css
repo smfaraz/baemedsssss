@@ -166,7 +166,7 @@ section[aria-label="Product gallery"] > div:nth-child(2) p span {
 .marquee {
   display: flex;
   width: max-content;
-  animation: marquee 32s linear infinite;
+  animation: marquee 48s linear infinite;
 }
 
 .marquee-track:hover .marquee {
