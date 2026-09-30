@@ -342,75 +342,54 @@ const HomePage: React.FC = () => {
       />
 
       {/* Hero Stage */}
-      <section className="hero-stage overflow-hidden bg-gradient-to-b from-slate-950 via-medical-dark to-slate-900 text-white">
-        <div className="container mx-auto px-4 pt-6 pb-3 text-center md:pt-8 md:pb-4">
-          <div className="inline-flex items-center gap-1.5 rounded-full border border-teal-400/30 bg-teal-500/10 px-3 py-0.5 text-[11px] font-bold uppercase tracking-[0.14em] text-teal-300">
-            <span className="h-1.5 w-1.5 rounded-full bg-teal-400 animate-pulse" />
-            Authorized US Medical Equipment Distributor
-          </div>
-          <h1 className="mx-auto mt-2 max-w-4xl text-2xl font-black leading-tight tracking-tight sm:text-3xl md:text-4xl sm:whitespace-nowrap">
-            Hospital-Grade Medical Equipment
+      <section className="hero-stage overflow-hidden bg-[#071d33] text-white">
+        <div className="container mx-auto px-4 pt-10 pb-6 text-center sm:pt-14 sm:pb-8">
+          <span className="inline-block rounded-full bg-amber-500 px-4 py-1 text-[11px] font-black uppercase tracking-wider text-slate-950 shadow-sm">
+            HOME CARE, CLINICAL &amp; HOSPITAL EQUIPMENT
+          </span>
+          <h1 className="mx-auto mt-4 max-w-4xl text-2xl font-black tracking-tight text-white sm:text-3xl lg:text-4xl">
+            Trusted medical equipment, delivered across the US.
           </h1>
-          <p className="mx-auto mt-1.5 max-w-lg text-xs leading-relaxed text-slate-300 sm:text-sm">
-            Certified durable medical devices delivered nationwide with full manufacturer warranty and FSA/HSA acceptance.
-          </p>
-          <div className="mt-3.5 flex flex-wrap justify-center gap-2.5">
-            <Link to="/products" className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-lg bg-teal-400 px-4 text-xs font-black text-slate-950 shadow-md shadow-teal-500/20 hover:bg-white transition duration-200">
-              Browse All Equipment <ArrowRight size={15} />
+          <div className="mt-6 flex flex-wrap justify-center gap-3">
+            <Link
+              to="/products"
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-white px-6 text-sm font-bold text-slate-900 shadow-sm hover:bg-slate-100 transition"
+            >
+              Shop all equipment <ArrowRight size={17} />
             </Link>
-            <Link to="/products?category=Oxygen%20Concentrators" className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-lg border border-white/20 bg-white/10 px-4 text-xs font-bold text-white hover:bg-white/20 transition duration-200">
-              Oxygen &amp; Respiratory
+            <Link
+              to="/contact"
+              className="inline-flex min-h-11 items-center justify-center rounded-xl border border-white/30 bg-transparent px-6 text-sm font-semibold text-white hover:bg-white/10 transition"
+            >
+              Talk to product support
             </Link>
           </div>
         </div>
 
         {heroReel.length > 0 && (
-          <div className="marquee-track relative overflow-hidden pb-6 md:pb-8" aria-label="Featured flagship equipment">
-            <div className="mb-2.5 flex items-center justify-center gap-2 text-[11px] font-black uppercase tracking-[0.16em] text-teal-300/80">
-              <span className="h-px w-5 bg-teal-400/40" />
-              <span>Core Medical Equipment Reel</span>
-              <span className="h-px w-5 bg-teal-400/40" />
-            </div>
-
+          <div className="marquee-track relative overflow-hidden pb-10 sm:pb-14" aria-label="Featured equipment">
             <div className="marquee">
               {[...heroReel, ...heroReel].map((product, index) => (
                 <Link
                   key={`${product.id}-${index}`}
                   to={`/products/${product.handle}`}
-                  className="group mx-2 flex w-40 sm:w-48 md:w-52 shrink-0 flex-col overflow-hidden rounded-xl border border-white/15 bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_28px_rgba(20,83,154,0.30)] hover:border-teal-400/70"
+                  className="mx-2 sm:mx-2.5 flex w-44 sm:w-48 md:w-52 shrink-0 flex-col overflow-hidden rounded-2xl bg-white p-3.5 shadow-lg transition duration-200 hover:-translate-y-1"
                 >
-                  <div className="relative h-28 sm:h-32 bg-white p-2.5 flex items-center justify-center overflow-hidden border-b border-slate-100">
+                  <div className="flex h-32 sm:h-36 w-full items-center justify-center overflow-hidden">
                     <img
                       src={product.image}
                       alt={product.title}
                       loading="lazy"
-                      className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
+                      className="h-full w-full object-contain"
                     />
-                    <span className="absolute left-2 top-2 max-w-[85px] truncate rounded bg-slate-900/90 px-1.5 py-0.5 text-[8px] font-black uppercase tracking-wider text-white shadow-xs backdrop-blur-xs">
-                      {product.vendor}
-                    </span>
-                    <span className="absolute right-2 top-2 rounded bg-emerald-50 border border-emerald-200/90 px-1.5 py-0.5 text-[8px] font-bold text-emerald-800 shadow-xs">
-                      In Stock
-                    </span>
                   </div>
-                  <div className="flex flex-1 flex-col justify-between bg-white p-2.5 sm:p-3">
-                    <div>
-                      <p className="text-[8px] font-black uppercase tracking-widest text-teal-600 truncate">
-                        {product.category}
-                      </p>
-                      <h3 className="mt-0.5 line-clamp-1 text-xs font-bold text-medical-dark group-hover:text-medical-primary transition-colors leading-snug">
-                        {product.title}
-                      </h3>
-                    </div>
-                    <div className="mt-2 flex items-center justify-between border-t border-slate-100 pt-1.5">
-                      <div>
-                        <p className="text-[8px] font-bold uppercase tracking-wider text-slate-400">Direct Price</p>
-                        <p className="text-xs sm:text-sm font-black text-medical-dark">{formatPrice(product.price)}</p>
-                      </div>
-                      <span className="inline-flex items-center gap-1 rounded bg-teal-50 px-1.5 py-0.5 text-[10px] font-black text-teal-800 group-hover:bg-teal-400 group-hover:text-slate-950 transition-colors">
-                        View <ArrowRight size={10} />
-                      </span>
-                    </div>
+                  <div className="mt-2.5">
+                    <p className="truncate text-xs font-bold text-slate-900" title={product.title}>
+                      {product.title}
+                    </p>
+                    <p className="mt-0.5 text-xs font-bold text-[#14539a]">
+                      {formatPrice(product.price)}
+                    </p>
                   </div>
                 </Link>
               ))}
@@ -419,17 +398,16 @@ const HomePage: React.FC = () => {
         )}
       </section>
 
-      {/* Category Grid: Browse by Clinical Need */}
+      {/* Category Grid: Browse by Need */}
       <section className="reveal-on-scroll border-b border-slate-200 bg-white py-10 md:py-14">
         <div className="container mx-auto px-4">
           <div className="mb-6 flex items-end justify-between gap-4">
             <div>
-              <p className="text-xs font-black uppercase tracking-[0.18em] text-medical-primary">Comprehensive Catalog</p>
-              <h2 className="mt-1 text-2xl font-black tracking-tight text-medical-text md:text-3xl">Shop by Category</h2>
-              <p className="mt-1 text-sm text-slate-600">Select certified home medical equipment and clinical care categories.</p>
+              <h2 className="text-2xl font-black tracking-tight text-medical-dark md:text-3xl">Shop by need</h2>
+              <p className="mt-1 text-sm text-slate-600">Browse equipment by category.</p>
             </div>
-            <Link to="/products" className="hidden text-sm font-bold text-medical-primary hover:text-medical-dark sm:block">
-              View Complete Catalog ({catalogueProducts.length.toLocaleString()} items) &rarr;
+            <Link to="/products" className="text-sm font-bold text-medical-primary hover:text-medical-dark">
+              Complete catalogue
             </Link>
           </div>
 
