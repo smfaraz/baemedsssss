@@ -343,33 +343,33 @@ const HomePage: React.FC = () => {
 
       {/* Hero Stage */}
       <section className="hero-stage overflow-hidden bg-gradient-to-b from-slate-950 via-medical-dark to-slate-900 text-white">
-        <div className="container mx-auto px-4 pt-10 pb-6 text-center md:pt-14 md:pb-8">
-          <div className="inline-flex items-center gap-2 rounded-full border border-teal-400/30 bg-teal-500/10 px-3.5 py-1 text-xs font-bold uppercase tracking-[0.14em] text-teal-300">
+        <div className="container mx-auto px-4 pt-6 pb-3 text-center md:pt-8 md:pb-4">
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-teal-400/30 bg-teal-500/10 px-3 py-0.5 text-[11px] font-bold uppercase tracking-[0.14em] text-teal-300">
             <span className="h-1.5 w-1.5 rounded-full bg-teal-400 animate-pulse" />
             Authorized US Medical Equipment Distributor
           </div>
-          <h1 className="mx-auto mt-3 max-w-3xl text-3xl font-black leading-tight tracking-tight sm:text-4xl md:text-5xl">
+          <h1 className="mx-auto mt-2 max-w-4xl text-2xl font-black leading-tight tracking-tight sm:text-3xl md:text-4xl sm:whitespace-nowrap">
             Hospital-Grade Medical Equipment
           </h1>
-          <p className="mx-auto mt-2.5 max-w-xl text-sm leading-relaxed text-slate-300 sm:text-base">
+          <p className="mx-auto mt-1.5 max-w-lg text-xs leading-relaxed text-slate-300 sm:text-sm">
             Certified durable medical devices delivered nationwide with full manufacturer warranty and FSA/HSA acceptance.
           </p>
-          <div className="mt-5 flex flex-wrap justify-center gap-3">
-            <Link to="/products" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-teal-400 px-6 text-sm font-black text-slate-950 shadow-lg shadow-teal-500/20 hover:bg-white transition duration-200">
-              Browse All Equipment <ArrowRight size={17} />
+          <div className="mt-3.5 flex flex-wrap justify-center gap-2.5">
+            <Link to="/products" className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-lg bg-teal-400 px-4 text-xs font-black text-slate-950 shadow-md shadow-teal-500/20 hover:bg-white transition duration-200">
+              Browse All Equipment <ArrowRight size={15} />
             </Link>
-            <Link to="/products?category=Oxygen%20Concentrators" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/10 px-5 text-sm font-bold text-white hover:bg-white/20 transition duration-200">
+            <Link to="/products?category=Oxygen%20Concentrators" className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-lg border border-white/20 bg-white/10 px-4 text-xs font-bold text-white hover:bg-white/20 transition duration-200">
               Oxygen &amp; Respiratory
             </Link>
           </div>
         </div>
 
         {heroReel.length > 0 && (
-          <div className="marquee-track relative overflow-hidden pb-10 md:pb-14" aria-label="Featured flagship equipment">
-            <div className="mb-4 flex items-center justify-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-teal-300/80">
-              <span className="h-px w-6 bg-teal-400/40" />
+          <div className="marquee-track relative overflow-hidden pb-6 md:pb-8" aria-label="Featured flagship equipment">
+            <div className="mb-2.5 flex items-center justify-center gap-2 text-[11px] font-black uppercase tracking-[0.16em] text-teal-300/80">
+              <span className="h-px w-5 bg-teal-400/40" />
               <span>Core Medical Equipment Reel</span>
-              <span className="h-px w-6 bg-teal-400/40" />
+              <span className="h-px w-5 bg-teal-400/40" />
             </div>
 
             <div className="marquee">
@@ -377,38 +377,38 @@ const HomePage: React.FC = () => {
                 <Link
                   key={`${product.id}-${index}`}
                   to={`/products/${product.handle}`}
-                  className="group mx-2.5 sm:mx-3.5 flex w-60 sm:w-68 md:w-72 shrink-0 flex-col overflow-hidden rounded-2xl sm:rounded-3xl border border-white/15 bg-white shadow-2xl transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_20px_45px_rgba(20,83,154,0.40)] hover:border-teal-400/70"
+                  className="group mx-2 flex w-40 sm:w-48 md:w-52 shrink-0 flex-col overflow-hidden rounded-xl border border-white/15 bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_28px_rgba(20,83,154,0.30)] hover:border-teal-400/70"
                 >
-                  <div className="relative h-44 sm:h-52 bg-white p-4 flex items-center justify-center overflow-hidden border-b border-slate-100">
+                  <div className="relative h-28 sm:h-32 bg-white p-2.5 flex items-center justify-center overflow-hidden border-b border-slate-100">
                     <img
                       src={product.image}
                       alt={product.title}
                       loading="lazy"
                       className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
                     />
-                    <span className="absolute left-3 top-3 max-w-[120px] truncate rounded-md bg-slate-900/90 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-white shadow-xs backdrop-blur-xs">
+                    <span className="absolute left-2 top-2 max-w-[85px] truncate rounded bg-slate-900/90 px-1.5 py-0.5 text-[8px] font-black uppercase tracking-wider text-white shadow-xs backdrop-blur-xs">
                       {product.vendor}
                     </span>
-                    <span className="absolute right-3 top-3 rounded-md bg-emerald-50 border border-emerald-200/90 px-2 py-0.5 text-[10px] font-bold text-emerald-800 shadow-xs">
+                    <span className="absolute right-2 top-2 rounded bg-emerald-50 border border-emerald-200/90 px-1.5 py-0.5 text-[8px] font-bold text-emerald-800 shadow-xs">
                       In Stock
                     </span>
                   </div>
-                  <div className="flex flex-1 flex-col justify-between bg-white p-4 sm:p-5">
+                  <div className="flex flex-1 flex-col justify-between bg-white p-2.5 sm:p-3">
                     <div>
-                      <p className="text-[10px] font-black uppercase tracking-widest text-teal-600 truncate">
+                      <p className="text-[8px] font-black uppercase tracking-widest text-teal-600 truncate">
                         {product.category}
                       </p>
-                      <h3 className="mt-1 line-clamp-2 text-sm sm:text-base font-bold text-medical-dark group-hover:text-medical-primary transition-colors leading-snug">
+                      <h3 className="mt-0.5 line-clamp-1 text-xs font-bold text-medical-dark group-hover:text-medical-primary transition-colors leading-snug">
                         {product.title}
                       </h3>
                     </div>
-                    <div className="mt-3.5 flex items-center justify-between border-t border-slate-100 pt-3">
+                    <div className="mt-2 flex items-center justify-between border-t border-slate-100 pt-1.5">
                       <div>
-                        <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Direct Price</p>
-                        <p className="text-base sm:text-lg font-black text-medical-dark">{formatPrice(product.price)}</p>
+                        <p className="text-[8px] font-bold uppercase tracking-wider text-slate-400">Direct Price</p>
+                        <p className="text-xs sm:text-sm font-black text-medical-dark">{formatPrice(product.price)}</p>
                       </div>
-                      <span className="inline-flex items-center gap-1 rounded-lg bg-teal-50 px-2.5 py-1.5 text-xs font-black text-teal-800 group-hover:bg-teal-400 group-hover:text-slate-950 transition-colors">
-                        View <ArrowRight size={13} />
+                      <span className="inline-flex items-center gap-1 rounded bg-teal-50 px-1.5 py-0.5 text-[10px] font-black text-teal-800 group-hover:bg-teal-400 group-hover:text-slate-950 transition-colors">
+                        View <ArrowRight size={10} />
                       </span>
                     </div>
                   </div>
