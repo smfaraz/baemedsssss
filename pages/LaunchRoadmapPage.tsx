@@ -18,8 +18,6 @@ import {
   ArrowRight,
   Play,
   RotateCcw,
-  Download,
-  Share2,
   Check,
   Building2,
   PhoneCall,
@@ -28,8 +26,6 @@ import {
   Layers,
   Activity,
   FileCheck,
-  BadgeAlert,
-  Sliders,
 } from 'lucide-react';
 import { Link } from '../context/CartContext';
 import { APP_NAME } from '../constants';
@@ -61,12 +57,12 @@ interface RoadmapDay {
 
 const PHASES = [
   { id: 0, label: 'All 15 Days', icon: Layers, range: 'Oct 01 – Oct 15' },
-  { id: 1, label: 'Phase 1: Edge & Merchant', icon: Server, range: 'Days 1–3 (Oct 01–03)' },
-  { id: 2, label: 'Phase 2: Logistics & Dropship', icon: Truck, range: 'Days 4–6 (Oct 04–06)' },
-  { id: 3, label: 'Phase 3: Regulatory & HIPAA', icon: ShieldCheck, range: 'Days 7–9 (Oct 07–09)' },
-  { id: 4, label: 'Phase 4: Pilot & Stress QA', icon: Activity, range: 'Days 10–12 (Oct 10–12)' },
-  { id: 5, label: 'Phase 5: Soft Launch & Care', icon: PhoneCall, range: 'Days 13–14 (Oct 13–14)' },
-  { id: 6, label: 'Phase 6: Public Go-Live', icon: Rocket, range: 'Day 15 (Oct 15)' },
+  { id: 1, label: 'Step 1: Website & Cards', icon: Server, range: 'Days 1–3 (Oct 01–03)' },
+  { id: 2, label: 'Step 2: Suppliers & Shipping', icon: Truck, range: 'Days 4–6 (Oct 04–06)' },
+  { id: 3, label: 'Step 3: Doctor Checks & Privacy', icon: ShieldCheck, range: 'Days 7–9 (Oct 07–09)' },
+  { id: 4, label: 'Step 4: Practice & Testing', icon: Activity, range: 'Days 10–12 (Oct 10–12)' },
+  { id: 5, label: 'Step 5: Clinic Preview & Phones', icon: PhoneCall, range: 'Days 13–14 (Oct 13–14)' },
+  { id: 6, label: 'Step 6: Big Launch Day!', icon: Rocket, range: 'Day 15 (Oct 15)' },
 ];
 
 const INITIAL_DAYS: RoadmapDay[] = [
@@ -74,366 +70,366 @@ const INITIAL_DAYS: RoadmapDay[] = [
     day: 1,
     date: 'Thu, Oct 01, 2026',
     phaseId: 1,
-    phaseTitle: 'Production Edge Infrastructure',
-    title: 'Domain, Edge Routing, SSL & Security Headers',
-    subtitle: 'Point apex domain, configure Cloudflare edge CDN, and enforce TLS 1.3/HSTS.',
+    phaseTitle: 'Step 1: Website & Cards',
+    title: 'Connect the Real Web Address (baemeds.com)',
+    subtitle: 'Make sure baemeds.com opens fast everywhere with the safe green lock icon.',
     owner: {
-      name: 'DevOps Lead',
-      role: 'Platform Engineering',
+      name: 'Tech Lead',
+      role: 'Website & Security',
       avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
     },
     criticality: 'CRITICAL',
     deliverables: [
-      'DNS A/CNAME records routed to edge host',
-      'HSTS max-age=31536000 & TLS 1.3 enforced',
-      'Content Security Policy (CSP) whitelisted for Stripe & AWS S3/CloudFront',
+      'baemeds.com opens fast on both phones and computers',
+      'The security lock shows safely with no warning screens',
+      'All pictures, prices, and text show up clean and quick',
     ],
-    riskMitigation: 'Have fallback apex redirect rules ready in Cloudflare if DNS propagation fluctuates.',
+    riskMitigation: 'If the web address takes a few hours to update on some internet providers, keep our backup link ready.',
     tasks: [
-      { id: 'd1-t1', title: 'Verify apex domain (baemeds.com) SSL cert issuance', detail: 'Zero downtime certificate handshake validation.', completed: true },
-      { id: 'd1-t2', title: 'Audit CSP policy against live third-party endpoints', detail: 'Ensure Supabase, CloudFront images, and fonts load with zero console warnings.', completed: true },
-      { id: 'd1-t3', title: 'Test multi-region latency benchmarks', detail: 'Sub-40ms response across US East (N. Virginia) and US West (Oregon).', completed: false },
+      { id: 'd1-t1', title: 'Open baemeds.com on phone and computer', detail: 'Check that the safe green lock shows with no browser warnings.', completed: true },
+      { id: 'd1-t2', title: 'Check all product pictures and text', detail: 'Make sure no images look broken or slow.', completed: true },
+      { id: 'd1-t3', title: 'Test loading speed across different US cities', detail: 'Make sure pages open in under 1 second from anywhere.', completed: false },
     ],
   },
   {
     day: 2,
     date: 'Fri, Oct 02, 2026',
     phaseId: 1,
-    phaseTitle: 'Production Edge Infrastructure',
-    title: 'Live Merchant Processing & FSA/HSA Gateway',
-    subtitle: 'Switch Stripe & merchant accounts from test sandbox to live 50-state payment processing.',
+    phaseTitle: 'Step 1: Website & Cards',
+    title: 'Turn on Real Cards & Health Savings Cards',
+    subtitle: 'Let customers pay with regular cards, health benefit cards (FSA/HSA), and easy monthly payments.',
     owner: {
-      name: 'Payment Ops',
-      role: 'Finance & Compliance',
+      name: 'Payments Lead',
+      role: 'Bank & Payments Setup',
       avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80',
     },
     criticality: 'CRITICAL',
     deliverables: [
-      'Stripe Production live API keys and webhook signing secrets',
-      'MCC/SIC Code 5912/5047 registered for FSA & HSA debit card acceptance',
-      'Affirm & Klarna medical equipment monthly financing active',
+      'Take real credit cards safely with Stripe',
+      'Accept FSA and HSA health benefit cards so patients can buy tax-free',
+      'Offer monthly payment plans (Affirm & Klarna) for bigger equipment',
     ],
-    riskMitigation: 'Confirm settlement accounts in Delaware commercial bank with automated payout schedules.',
+    riskMitigation: 'If a test payment goes through, refund the money back to the card right away with 1 click.',
     tasks: [
-      { id: 'd2-t1', title: 'Input production STRIPE_SECRET_KEY into server environment', detail: 'Test with $1 authorization hold and verify instant void.', completed: true },
-      { id: 'd2-t2', title: 'Verify SIGINT webhook handler for invoice.paid & payment_intent.succeeded', detail: 'Synchronous order state transition to PAID in AdminService.', completed: false },
-      { id: 'd2-t3', title: 'Conduct trial purchase with actual Flex/FSA card', detail: 'Ensure 90/10 inventory rule passes for medical equipment.', completed: false },
+      { id: 'd2-t1', title: 'Turn on live card payments and run a small $1 test', detail: 'Make sure the payment goes through and refund it right away.', completed: true },
+      { id: 'd2-t2', title: 'Check that orders show "Paid" instantly', detail: 'The admin dashboard should show the green Paid badge immediately.', completed: false },
+      { id: 'd2-t3', title: 'Test a purchase with an FSA/HSA health card', detail: 'Make sure the bank accepts the medical equipment classification.', completed: false },
     ],
   },
   {
     day: 3,
     date: 'Sat, Oct 03, 2026',
     phaseId: 1,
-    phaseTitle: 'Production Edge Infrastructure',
-    title: 'Branded Transactional Email & Patient SMS Alerts',
-    subtitle: 'Establish automated receipting, prescription receipt confirmations, and carrier tracking emails.',
+    phaseTitle: 'Step 1: Website & Cards',
+    title: 'Set up Email Receipts & Text Updates',
+    subtitle: 'Send buyers clear receipts and friendly text messages when their package ships.',
     owner: {
-      name: 'Communications Eng',
-      role: 'Patient Engagement',
+      name: 'Communications',
+      role: 'Customer Emails & Texts',
       avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=120&q=80',
     },
     criticality: 'HIGH',
     deliverables: [
-      'DKIM, SPF & DMARC 100% verified for mail.baemeds.com',
-      'Custom HTML templates for Order Confirmation with HCPCS insurance breakdown',
-      'Twilio SMS automated dispatch alerts',
+      'Clear email receipt with the medical codes patients need for insurance payback',
+      'Friendly email confirming: "We got your doctor prescription!"',
+      'Text message sent to customer phones with their tracking link',
     ],
-    riskMitigation: 'Include unguessable tracking links so patients can track shipments without typing login details.',
+    riskMitigation: 'Put a big 1-click tracking button in every email so nobody gets confused.',
     tasks: [
-      { id: 'd3-t1', title: 'Configure Resend/SendGrid transactional routing', detail: 'Test bounce handling and rate limits under 1,000/hr bursts.', completed: false },
-      { id: 'd3-t2', title: 'Preview email template on Gmail, Outlook, and Apple Mail', detail: 'Check responsive clinical invoice rendering.', completed: false },
+      { id: 'd3-t1', title: 'Connect the email system so receipts send out automatically', detail: 'Make sure emails land directly in the inbox, not spam.', completed: false },
+      { id: 'd3-t2', title: 'Check receipts on iPhone, Android, and Gmail', detail: 'Make sure receipts are super easy to read and print for insurance.', completed: false },
     ],
   },
   {
     day: 4,
     date: 'Sun, Oct 04, 2026',
     phaseId: 2,
-    phaseTitle: 'Logistics & Dropship Wholesale',
-    title: 'Distributor Dropship Order Routing (EDI / Webhook)',
-    subtitle: 'Automate order dispatch to Drive DeVilbiss, Inogen, ResMed, and wholesale depots.',
+    phaseTitle: 'Step 2: Suppliers & Shipping',
+    title: 'Connect with Equipment Warehouses',
+    subtitle: 'Send customer orders straight to our partner warehouses (Inogen, DeVilbiss, ResMed).',
     owner: {
       name: 'Supply Chain Lead',
-      role: 'Operations & Procurement',
+      role: 'Warehouses & Stock',
       avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80',
     },
     criticality: 'CRITICAL',
     deliverables: [
-      'Automated EDI 850 / REST webhook order dispatch on CLINICAL_APPROVED status',
-      'Wholesale pricing margin confirmation against MSRP rules',
-      'Real-time inventory decrement sync',
+      'Orders go straight to the warehouse once the doctor approves the prescription',
+      'Check our buying prices so every sale makes good profit',
+      'Stock numbers update automatically so we never sell something that is sold out',
     ],
-    riskMitigation: 'Maintain 3-unit safety buffer so items do not sell out before wholesale feed refreshes.',
+    riskMitigation: 'Hold a 3-item safety buffer so we never sell something that just ran out.',
     tasks: [
-      { id: 'd4-t1', title: 'Verify EDI 850 schema mapping for oxygen concentrators', detail: 'Map serial number tracking and lot code requirements.', completed: false },
-      { id: 'd4-t2', title: 'Test distributor staging endpoint responses', detail: 'Confirm purchase order number echo BM-XXXXXX-XXX.', completed: false },
+      { id: 'd4-t1', title: 'Check that oxygen orders include exact model and warranty info', detail: 'Make sure serial numbers and factory warranty codes are saved.', completed: false },
+      { id: 'd4-t2', title: 'Send 1 practice order to the warehouse', detail: 'Confirm the warehouse receives the order number cleanly.', completed: false },
     ],
   },
   {
     day: 5,
     date: 'Mon, Oct 05, 2026',
     phaseId: 2,
-    phaseTitle: 'Logistics & Dropship Wholesale',
-    title: 'FedEx Priority Health, UPS & White-Glove Courier Setup',
-    subtitle: 'Hook up carrier accounts and live tracking webhooks to auto-populate customer order views.',
+    phaseTitle: 'Step 2: Suppliers & Shipping',
+    title: 'Set up FedEx & UPS Shipping',
+    subtitle: 'Print shipping labels and give customers working delivery tracking links.',
     owner: {
-      name: 'Logistics Coordinator',
-      role: 'Fulfillment Specialist',
+      name: 'Shipping Manager',
+      role: 'Boxes & Shipping',
       avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=120&q=80',
     },
     criticality: 'HIGH',
     deliverables: [
-      'Commercial FedEx Priority Healthcare account credentials',
-      'UPS Ground automated label generation via /api/admin/orders',
-      'White-glove regional technician delivery booking calendar for hospital beds',
+      'FedEx fast medical shipping account ready',
+      'Print UPS shipping labels with one click',
+      'Special helper delivery ready for heavy motorized wheelchairs',
     ],
-    riskMitigation: 'Provide automatic 2-business-day delivery guarantees for critical respiratory equipment.',
+    riskMitigation: 'Offer 2-day fast delivery for urgent breathing equipment like oxygen machines.',
     tasks: [
-      { id: 'd5-t1', title: 'Test live tracking number webhook callback', detail: 'Verify SHIPPED status auto-transitions in memory & customer portal.', completed: true },
-      { id: 'd5-t2', title: 'Validate carrier rates table in Admin Shipping settings', detail: 'Standard ($12 / Free over $99), Priority ($25), White-Glove ($95).', completed: true },
+      { id: 'd5-t1', title: 'Add a test tracking number in the admin panel', detail: 'Check that the order updates to "Shipped" and the customer gets their tracking link.', completed: true },
+      { id: 'd5-t2', title: 'Check shipping rates on the checkout page', detail: 'Standard ($12 / Free over $99), Express ($25), In-Home Setup ($95).', completed: true },
     ],
   },
   {
     day: 6,
     date: 'Tue, Oct 06, 2026',
     phaseId: 2,
-    phaseTitle: 'Logistics & Dropship Wholesale',
-    title: 'Return Merchandise Authorization (RMA) & Hygiene Protocols',
-    subtitle: 'Standard Operating Procedures for unopened medical equipment returns and FDA seals.',
+    phaseTitle: 'Step 2: Suppliers & Shipping',
+    title: 'Write Clear Return & Warranty Rules',
+    subtitle: 'Explain how returns work and how the 3-year factory warranty protects buyers.',
     owner: {
-      name: 'QA & Operations',
-      role: 'Warehouse Operations',
+      name: 'Operations',
+      role: 'Returns & Quality',
       avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=120&q=80',
     },
     criticality: 'STANDARD',
     deliverables: [
-      'Published 30-Day Factory-Sealed Return Policy at /policies/returns',
-      'Biomedical hygiene inspection checklist for returned units',
-      'Automated RMA generation in Customer Account view',
+      'Simple 30-day return rule posted on the website',
+      'Cleanliness rule: breathing machines must be unopened in the box to return',
+      'Simple "Ask for Return" button inside the customer\'s account page',
     ],
-    riskMitigation: 'Strictly prohibit returns of opened sleep masks or oxygen tubing per FDA infection control rules.',
+    riskMitigation: 'To keep everyone healthy, unopened boxes can be returned, but opened breathing masks cannot.',
     tasks: [
-      { id: 'd6-t1', title: 'Review warranty disclaimer text on PDP pages', detail: 'Ensure 3-year manufacturer warranty terms are prominent.', completed: true },
-      { id: 'd6-t2', title: 'Establish quarantine bin protocol for returned parcels', detail: 'Prevent uninspected units from re-entering active inventory.', completed: false },
+      { id: 'd6-t1', title: 'Check warranty badges on every product page', detail: 'Make sure 3-year factory warranty badges show clearly on all machines.', completed: true },
+      { id: 'd6-t2', title: 'Set up a clean table in the warehouse to inspect returned boxes', detail: 'Never put an uninspected box back on the sales shelf.', completed: false },
     ],
   },
   {
     day: 7,
     date: 'Wed, Oct 07, 2026',
     phaseId: 3,
-    phaseTitle: 'Regulatory, HIPAA & State Tax',
-    title: 'Clinical Specialist Workflow & Telehealth Prescription Drill',
-    subtitle: 'Dry run prescription triage queue with Dr. Evelyn Reed, MD and respiratory care team.',
+    phaseTitle: 'Step 3: Doctor Checks & Privacy',
+    title: 'Practice Doctor Prescription Reviews',
+    subtitle: 'Our team doctor checks prescriptions fast so customer orders can ship right away.',
     owner: {
       name: 'Dr. Evelyn Reed, MD',
-      role: 'Clinical Specialist Lead',
+      role: 'Clinical Lead & Doctor',
       avatar: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=120&q=80',
     },
     criticality: 'CRITICAL',
     deliverables: [
-      '4-Hour Prescription Review SLA documented in clinical handbook',
-      'Prescription validation checklist against state medical board registries',
-      'Telehealth affiliate bridge for patients seeking immediate Rx consultation',
+      'Doctor reviews prescriptions within 4 hours during the day',
+      'Easy lookup to confirm the doctor\'s official medical license',
+      'Simple link to help patients get a prescription online if they don\'t have one',
     ],
-    riskMitigation: 'Automatic order hold enforcement: regulated DME cannot transition to SHIPPED without approval.',
+    riskMitigation: 'No oxygen machine leaves the warehouse until our doctor gives the green light.',
     tasks: [
-      { id: 'd7-t1', title: 'Conduct triage drill on /admin/prescriptions', detail: 'Approve test order BM-722730-720 and verify CLINICAL_APPROVED transition.', completed: true },
-      { id: 'd7-t2', title: 'Verify NPI (National Provider Identifier) lookup integration', detail: 'Check doctor active status in CMS database.', completed: false },
+      { id: 'd7-t1', title: 'Practice approving a prescription in the admin panel', detail: 'Click approve on order BM-722730-720 and make sure it turns green.', completed: true },
+      { id: 'd7-t2', title: 'Look up the doctor\'s official license number', detail: 'Check that the doctor name and clinic match official government records.', completed: false },
     ],
   },
   {
     day: 8,
     date: 'Thu, Oct 08, 2026',
     phaseId: 3,
-    phaseTitle: 'Regulatory, HIPAA & State Tax',
-    title: 'HIPAA Title II Security Audit & Business Associate Agreements',
-    subtitle: 'Sign BAAs with cloud infrastructure providers and verify immutable audit trail logging.',
+    phaseTitle: 'Step 3: Doctor Checks & Privacy',
+    title: 'Lock Down Patient Health Privacy (HIPAA)',
+    subtitle: 'Keep customer health records and prescriptions completely safe and private.',
     owner: {
-      name: 'Marcus Vance, CCO',
-      role: 'Compliance Officer',
+      name: 'Marcus Vance',
+      role: 'Privacy & Legal Lead',
       avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=120&q=80',
     },
     criticality: 'CRITICAL',
     deliverables: [
-      'Signed BAAs with Supabase, AWS CloudFront, and Resend',
-      'Verified AES-256 server-side encryption on all uploaded patient prescription files',
-      'Immutable cryptographic event log verified at /admin/audit-logs',
+      'Top-level security so only doctors can view customer prescriptions',
+      'Signed privacy promises with our software and hosting tools',
+      'A safe log that tracks whenever anyone views a prescription',
     ],
-    riskMitigation: 'Implement 15-minute expiring presigned URLs for all clinical document viewing.',
+    riskMitigation: 'Doctor links close automatically after 15 minutes to keep patient info safe.',
     tasks: [
-      { id: 'd8-t1', title: 'Run automated HIPAA audit log inspection', detail: 'Verify every staff login, role switch, and prescription view is logged.', completed: true },
-      { id: 'd8-t2', title: 'Confirm complete PHI redaction for support & fulfillment roles', detail: 'Non-clinical roles must not see physician notes or diagnoses.', completed: true },
+      { id: 'd8-t1', title: 'Check the staff history log on /admin/audit-logs', detail: 'Make sure every staff login and prescription view is safely recorded.', completed: true },
+      { id: 'd8-t2', title: 'Make sure warehouse packers only see the shipping box', detail: 'Packers see what box to ship, but never see personal medical diagnoses.', completed: true },
     ],
   },
   {
     day: 9,
     date: 'Fri, Oct 09, 2026',
     phaseId: 3,
-    phaseTitle: 'Regulatory, HIPAA & State Tax',
-    title: '50-State Sales Tax Nexus & DME Exemption Testing',
-    subtitle: 'Verify authoritative tax engine handles prescription exemptions and state reporting.',
+    phaseTitle: 'Step 3: Doctor Checks & Privacy',
+    title: 'Check State Sales Tax Rules',
+    subtitle: 'Make sure we charge the right sales tax (or 0% tax when prescriptions are tax-free).',
     owner: {
-      name: 'Tax Counsel',
-      role: 'Finance Operations',
+      name: 'Tax Specialist',
+      role: 'Accounting & Tax',
       avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=120&q=80',
     },
     criticality: 'HIGH',
     deliverables: [
-      'Verified state tax table across DE (0%), MT, NH, OR, AK, PA, NY, CA',
-      'DME exemption logic correctly applies 0% tax on prescription orders where legally mandated',
-      'Commercial invoice template meets insurance claim reimbursement standards',
+      'No sales tax ($0) in states where doctor-prescribed equipment is tax-free (like Delaware & Pennsylvania)',
+      'Charge normal state tax on regular accessories when needed',
+      'Clear receipts so patients can ask their health insurance for money back',
     ],
-    riskMitigation: 'Tax nexus rules must be logged per transaction with audit reference code.',
+    riskMitigation: 'Save every tax receipt automatically so end-of-year tax filing is easy and painless.',
     tasks: [
-      { id: 'd9-t1', title: 'Simulate checkout in non-exempt vs. exempt states', detail: 'Validate 0% tax for Delaware and medical exemption in Pennsylvania.', completed: true },
-      { id: 'd9-t2', title: 'Confirm separate tax line item in customer order receipt', detail: 'Fulfills Medicare Part B supplemental claim requirements.', completed: true },
+      { id: 'd9-t1', title: 'Test an order to Delaware and Pennsylvania', detail: 'Verify the tax shows $0.00 as legally required for prescriptions.', completed: true },
+      { id: 'd9-t2', title: 'Make sure the tax amount shows clearly on the receipt', detail: 'Needed for patients filing Medicare or private insurance payback claims.', completed: true },
     ],
   },
   {
     day: 10,
     date: 'Sat, Oct 10, 2026',
     phaseId: 4,
-    phaseTitle: 'Pilot & Stress Testing',
-    title: 'Order Zero Live Sandbox Drill (End-to-End Simulation)',
-    subtitle: 'Run complete commercial transactions with actual staff members acting in all roles.',
+    phaseTitle: 'Step 4: Practice & Testing',
+    title: 'Run 5 Practice Orders from Start to Finish',
+    subtitle: 'Buy real machines with real cards, check prescriptions, and track delivery.',
     owner: {
-      name: 'Super Admin',
-      role: 'General Operations',
+      name: 'Operations Boss',
+      role: 'General Manager',
       avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=120&q=80',
     },
     criticality: 'CRITICAL',
     deliverables: [
-      '5 distinct order types successfully processed end-to-end',
-      'Clinical Rx review completed within 15 minutes of upload',
-      'Fulfillment tracking generated and verified on mobile',
-      'Test funds successfully settled and voided',
+      'Place 5 test orders for different machines',
+      'Doctor approves the test prescriptions in under 15 minutes',
+      'Tracking text messages sent to test phones',
+      'Refund test money back to the cards right away',
     ],
-    riskMitigation: 'Conduct drill during simulated peak load with multiple concurrent sessions.',
+    riskMitigation: 'Have 3 people buy at the exact same second to make sure the site stays fast.',
     tasks: [
-      { id: 'd10-t1', title: 'Place regulated Oxygen Concentrator order on /checkout', detail: 'Attest prescription, upload PDF, verify CLINICAL_REVIEW status.', completed: true },
-      { id: 'd10-t2', title: 'Dr. Reed approves order on /admin/prescriptions', detail: 'Verify automatic status shift to CLINICAL_APPROVED.', completed: true },
-      { id: 'd10-t3', title: 'Fulfillment Lead assigns FedEx tracking on /admin/orders', detail: 'Verify customer receives live tracking badge in /account.', completed: true },
+      { id: 'd10-t1', title: 'Order an oxygen machine and upload a test doctor note', detail: 'Check that the order appears in the admin queue waiting for the doctor.', completed: true },
+      { id: 'd10-t2', title: 'Have Dr. Reed approve it in the admin panel', detail: 'Check that the status changes to approved and triggers the warehouse.', completed: true },
+      { id: 'd10-t3', title: 'Type in a test FedEx tracking number', detail: 'Check that the tracking link shows up on the customer account page.', completed: true },
     ],
   },
   {
     day: 11,
     date: 'Sun, Oct 11, 2026',
     phaseId: 4,
-    phaseTitle: 'Pilot & Stress Testing',
-    title: 'Cross-Device, Mobile Network & Accessibility Stress QA',
-    subtitle: 'Validate flawless touch targets, marquee animations, and sub-1s load on mobile cellular.',
+    phaseTitle: 'Step 4: Practice & Testing',
+    title: 'Test the Website on Phones & Tablets',
+    subtitle: 'Make sure buttons are big and easy to tap, text is easy to read, and pages load fast.',
     owner: {
-      name: 'Lead Frontend Eng',
-      role: 'Frontend & UI Excellence',
+      name: 'Frontend Designer',
+      role: 'Mobile & User Experience',
       avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80',
     },
     criticality: 'HIGH',
     deliverables: [
-      'Lighthouse Performance score > 92 on mobile',
-      'Sticky checkout button responsive on iPhone 13/14/15/16 and Samsung Galaxy',
-      'Zero layout shifts (CLS < 0.05) on product image marquee',
+      'Pages open in 1 second on cell phones',
+      'Big "Add to Cart" and "Buy Now" buttons that are easy to press',
+      'Large, clear text that older folks can read without squinting',
     ],
-    riskMitigation: 'Optimize all WebP images to under 45KB each with lazy-loading below fold.',
+    riskMitigation: 'Keep photos small in file size so pages open fast even on weak cell service.',
     tasks: [
-      { id: 'd11-t1', title: 'Run mobile throttling test on simulated 3G/4G', detail: 'Verify catalog grid loads smoothly without layout jump.', completed: true },
-      { id: 'd11-t2', title: 'Test screen reader & keyboard navigation (tabindex)', detail: 'Ensure accessibility compliance for senior patients.', completed: true },
+      { id: 'd11-t1', title: 'Test the checkout page on iPhone and Android phones', detail: 'Make sure the order button is always easy to see and press.', completed: true },
+      { id: 'd11-t2', title: 'Check font sizes and colors for seniors', detail: 'Ensure font sizes are large and text is clear and readable.', completed: true },
     ],
   },
   {
     day: 12,
     date: 'Mon, Oct 12, 2026',
     phaseId: 4,
-    phaseTitle: 'Pilot & Stress Testing',
-    title: 'Google Merchant Center Feed & Medical SEO Validation',
-    subtitle: 'Submit verified product feeds with GTIN, MPN, and HCPCS codes to search engines.',
+    phaseTitle: 'Step 4: Practice & Testing',
+    title: 'Connect Products to Google Search & Shopping',
+    subtitle: 'Help customers find our equipment when they search on Google.',
     owner: {
-      name: 'Growth & SEO Lead',
-      role: 'Digital Acquisition',
+      name: 'Google Specialist',
+      role: 'Search & Growth',
       avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=120&q=80',
     },
     criticality: 'STANDARD',
     deliverables: [
-      'Automated Google Merchant XML product feed published at /feeds/google-merchant.xml',
-      'MedicalDevice schema structured data active on all PDP URLs',
-      'XML sitemap with priority 1.0 submitted to Google Search Console',
+      'Send our product list to Google so our items show up in shopping searches',
+      'Show real prices, photos, and in-stock badges right on Google Shopping',
+      'Tell Google and Bing about all our web pages',
     ],
-    riskMitigation: 'Ensure medical device disclaimer tags are included in Google Shopping descriptions to avoid account suspension.',
+    riskMitigation: 'Include clear medical notes on every page so Google approves all ads smoothly.',
     tasks: [
-      { id: 'd12-t1', title: 'Inspect schema markup using Google Rich Results Test', detail: 'Confirm Product, Offer, and Brand snippets validate 100%.', completed: true },
-      { id: 'd12-t2', title: 'Submit sitemap to Google and Bing Webmaster tools', detail: 'Verify all cleaned catalog URLs are indexed.', completed: false },
+      { id: 'd12-t1', title: 'Test how products look when searched on Google', detail: 'Confirm that prices, photos, and star ratings show up correctly.', completed: true },
+      { id: 'd12-t2', title: 'Submit our website map to Google Search Console', detail: 'Make sure all category and product pages are ready for Google to find.', completed: false },
     ],
   },
   {
     day: 13,
     date: 'Tue, Oct 13, 2026',
     phaseId: 5,
-    phaseTitle: 'Soft Launch & Customer Care',
-    title: 'Soft Launch to Pilot Clinic Accounts & VIP Patients',
-    subtitle: 'Lift maintenance mode for select pulmonary sleep clinics and partner care coordinators.',
+    phaseTitle: 'Step 5: Clinic Preview & Phones',
+    title: 'Let Partner Clinics Order First',
+    subtitle: 'Invite 10 friendly sleep clinics and doctor offices to try ordering first.',
     owner: {
-      name: 'Commercial Lead',
-      role: 'B2B Medical Sales',
+      name: 'Clinic Liaison',
+      role: 'Doctor & Clinic Relations',
       avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
     },
     criticality: 'CRITICAL',
     deliverables: [
-      '10 Partner Sleep Clinics onboarded with commercial pricing tiers',
-      'Bulk PO order request form verified at /bulk-order',
-      'First 25 real commercial equipment orders placed and tracked',
+      'Invite 10 local doctor offices with friendly discounts',
+      'Bulk order page ready for clinics buying 5 or more machines',
+      'Deliver the first 25 real orders and collect happy reviews',
     ],
-    riskMitigation: 'Keep customer success manager assigned to live watch every soft-launch transaction.',
+    riskMitigation: 'Have our team watch every clinic order live to help immediately if anyone has questions.',
     tasks: [
-      { id: 'd13-t1', title: 'Send VIP access credentials to Delaware Sleep Clinic & Care Centers', detail: 'Track account logins and checkout completions.', completed: false },
-      { id: 'd13-t2', title: 'Monitor server response times under initial organic traffic', detail: 'Confirm 0% 500 error rate in serverless runtime logs.', completed: false },
+      { id: 'd13-t1', title: 'Email invitations to 10 partner clinics with their login code', detail: 'Help clinic managers log in and place trial orders.', completed: false },
+      { id: 'd13-t2', title: 'Watch the website live to ensure zero crashes and zero errors', detail: 'Make sure every clinic page loads instantly.', completed: false },
     ],
   },
   {
     day: 14,
     date: 'Wed, Oct 14, 2026',
     phaseId: 5,
-    phaseTitle: 'Soft Launch & Customer Care',
-    title: '1-800 Toll-Free Hotline & Clinical Live Chat Desk Drill',
-    subtitle: 'Verify call routing to licensed respiratory therapists and customer support reps.',
+    phaseTitle: 'Step 5: Clinic Preview & Phones',
+    title: 'Test the 1-800 Phone Line & Help Desk',
+    subtitle: 'Make sure customers can reach a friendly, helpful human within 3 rings.',
     owner: {
       name: 'Support Director',
-      role: 'Patient Care Operations',
+      role: 'Customer Care & Phones',
       avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80',
     },
     criticality: 'HIGH',
     deliverables: [
-      '+1 (800) 555-0199 toll-free line answered within 3 rings by certified reps',
-      'Live chat widget triage with automated medical bot and instant human escalation',
-      'Comprehensive FAQs published for FSA/HSA reimbursement and carrier insurance',
+      'Answer the 1-800 phone number in 3 rings with friendly, helpful staff',
+      'Helpful live chat on the website for quick questions',
+      'All 5 team leads give a green thumbs up for launch tomorrow',
     ],
-    riskMitigation: 'Maintain 24/7 on-call escalation rotation for patient emergency oxygen inquiries.',
+    riskMitigation: 'Keep a staff member on call 24/7 for urgent oxygen questions.',
     tasks: [
-      { id: 'd14-t1', title: 'Perform test inbound phone call from landline and mobile', detail: 'Verify IVR tree: 1 for Patient Orders, 2 for Clinical Rx, 3 for Wholesale.', completed: false },
-      { id: 'd14-t2', title: 'Final Executive Go/No-Go Decision Meeting (16:00 EST)', detail: 'All 5 operational persona leads sign off on 100% readiness.', completed: false },
+      { id: 'd14-t1', title: 'Call 1-800-555-0199 from both iPhones and Androids', detail: 'Make sure the sound is crystal clear and calls connect fast.', completed: false },
+      { id: 'd14-t2', title: 'Hold a 15-minute team check: All 5 leads say "Ready!"', detail: 'Everyone signs off that their department is 100% prepared.', completed: false },
     ],
   },
   {
     day: 15,
     date: 'Thu, Oct 15, 2026',
     phaseId: 6,
-    phaseTitle: 'Public Commercial Go-Live',
-    title: 'Commercial Launch Day & Nationwide Campaign Activation',
-    subtitle: 'Official public opening across all 50 US states with active search campaigns.',
+    phaseTitle: 'Step 6: Big Launch Day!',
+    title: 'Official Launch Day across all 50 States!',
+    subtitle: 'Open the store to the whole country and start welcoming customers!',
     owner: {
-      name: 'CEO & Super Admin',
+      name: 'CEO & Team',
       role: 'Executive Leadership',
       avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=120&q=80',
     },
     criticality: 'CRITICAL',
     deliverables: [
-      'Commercial switch flipped to Public Nationwide Availability',
-      'Google Ads campaign active for high-intent oxygen & CPAP searches',
-      'Press release distributed across medical equipment trade journals',
-      'Real-time war room active on /admin/dashboard with zero downtime',
+      'Website is 100% open to all 50 US states',
+      'Turn on Google ads for people looking to buy oxygen and sleep machines',
+      'Send announcement email to 12,000 doctor offices and clinics',
+      'Whole team stays on live chat and phone all day to help buyers',
     ],
-    riskMitigation: 'Engineering on continuous standby with instant rollback and hourly database snapshots.',
+    riskMitigation: 'Tech team watches servers closely all day to handle lots of visitors.',
     tasks: [
-      { id: 'd15-t1', title: '08:00 EST: Final System Health & Database Sanity Check', detail: 'Verify zero pending errors across all services.', completed: false },
-      { id: 'd15-t2', title: '09:00 EST: Official Nationwide Public Launch Announcement', detail: 'Newsletter dispatch to 12,000 pre-registered clinical leads.', completed: false },
-      { id: 'd15-t3', title: '12:00 – 20:00 EST: Real-Time War Room Monitoring', detail: 'Track first day revenue, order fulfillment, and Rx approval speed.', completed: false },
+      { id: 'd15-t1', title: '08:00 AM: Final 10-minute check of payments, website, and products', detail: 'Make sure card checkout, database, and products are working cleanly.', completed: false },
+      { id: 'd15-t2', title: '09:00 AM: Open the doors, send emails, and welcome our first shoppers', detail: 'Turn on Google ads and welcome our first nationwide customers.', completed: false },
+      { id: 'd15-t3', title: 'All Day: Pack orders fast, answer calls with a smile, and celebrate!', detail: 'Track first day sales, doctor approvals, and customer happiness.', completed: false },
     ],
   },
 ];
@@ -527,20 +523,20 @@ export const LaunchRoadmapPage: React.FC = () => {
     });
   }, [days, selectedPhase, searchQuery]);
 
-  // Simulated War Room Drill
+  // Quick System Test Drill
   const runSimulator = () => {
     setIsSimulatorOpen(true);
     setIsSimulating(true);
     setSimulatorStep(1);
-    setSimLogs(['[00:00:01] Initializing BaeMeds US 15-Day Readiness Automated Diagnostic...']);
+    setSimLogs(['[00:00:01] Starting quick system check...']);
 
     const steps = [
-      { step: 1, delay: 1000, log: '✓ [PASS] Edge CDN & SSL: Cloudflare edge active with TLS 1.3 and HSTS 31536000.' },
-      { step: 2, delay: 2200, log: '✓ [PASS] Merchant Rails: Stripe FSA/HSA MCC 5912 verified with test charge hold.' },
-      { step: 3, delay: 3400, log: '✓ [PASS] Catalog Integrity: 24,000+ items indexed with HCPCS E1390 codes and multi-angle imagery.' },
-      { step: 4, delay: 4600, log: '✓ [PASS] Clinical Triage: Prescription review queue verified with Dr. Evelyn Reed, MD.' },
-      { step: 5, delay: 5800, log: '✓ [PASS] HIPAA Title II: Immutable cryptographic audit trail verified on /admin/audit-logs.' },
-      { step: 6, delay: 7000, log: '🚀 [GO-LIVE CONFIRMED] All 15-day operational domains green. Readiness 100% verified!' },
+      { step: 1, delay: 1000, log: '✓ [READY] Website address is connected and safe with the green lock.' },
+      { step: 2, delay: 2200, log: '✓ [READY] Credit cards and health savings (FSA/HSA) cards work.' },
+      { step: 3, delay: 3400, log: '✓ [READY] All medical machines are listed with photos and prices.' },
+      { step: 4, delay: 4600, log: '✓ [READY] Doctor prescription review screen is ready for Dr. Reed.' },
+      { step: 5, delay: 5800, log: '✓ [READY] Patient health privacy is safely locked in.' },
+      { step: 6, delay: 7000, log: '🚀 [ALL READY] Everything is set for Opening Day!' },
     ];
 
     steps.forEach((s) => {
@@ -571,11 +567,11 @@ export const LaunchRoadmapPage: React.FC = () => {
               <div className="flex items-center gap-2">
                 <span className="text-sm font-black tracking-tight text-white">{APP_NAME} USA</span>
                 <span className="rounded-full border border-teal-500/40 bg-teal-500/10 px-2 py-0.5 text-[10px] font-bold text-teal-400">
-                  LAUNCH WAR ROOM
+                  15-DAY LAUNCH PLAN
                 </span>
               </div>
               <p className="text-[11px] font-medium text-slate-400">
-                15-Day Commercial Execution Roadmap • Target: Oct 15, 2026
+                15-Day Plan to Open the Store • Launch Day: Oct 15, 2026
               </p>
             </div>
           </div>
@@ -586,7 +582,7 @@ export const LaunchRoadmapPage: React.FC = () => {
               onClick={runSimulator}
               className="hidden sm:inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-teal-500 to-cyan-600 px-3.5 py-2 text-xs font-bold text-white shadow-md shadow-teal-500/25 hover:brightness-110 transition"
             >
-              <Play size={14} className="fill-white" /> Run Readiness Drill
+              <Play size={14} className="fill-white" /> Run Quick Check
             </button>
 
             <Link
@@ -594,7 +590,7 @@ export const LaunchRoadmapPage: React.FC = () => {
               className="flex items-center gap-1.5 rounded-xl border border-slate-800 bg-slate-900/80 px-3 py-2 text-xs font-semibold text-slate-300 hover:border-slate-700 hover:text-white transition"
             >
               <Stethoscope size={14} className="text-teal-400" />
-              <span>Admin Control Plane</span>
+              <span>Admin Panel</span>
             </Link>
 
             <Link
@@ -602,13 +598,13 @@ export const LaunchRoadmapPage: React.FC = () => {
               className="hidden md:flex items-center gap-1.5 rounded-xl border border-slate-800 bg-slate-900/80 px-3 py-2 text-xs font-semibold text-slate-300 hover:border-slate-700 hover:text-white transition"
             >
               <ExternalLink size={14} />
-              <span>Storefront</span>
+              <span>Visit Store</span>
             </Link>
           </div>
         </div>
       </header>
 
-      {/* Main War Room Body */}
+      {/* Main Roadmap Body */}
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-8 sm:py-12 space-y-10 relative">
         {/* Hero Banner with Countdown & Live Readiness */}
         <section className="relative overflow-hidden rounded-3xl border border-slate-800/90 bg-gradient-to-b from-slate-900 via-slate-900/90 to-slate-950 p-6 sm:p-10 shadow-2xl">
@@ -616,16 +612,15 @@ export const LaunchRoadmapPage: React.FC = () => {
             <div className="space-y-4">
               <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-bold text-amber-400">
                 <Sparkles size={14} />
-                <span>NATIONWIDE COMMERCIAL LAUNCH CAMPAIGN</span>
+                <span>15 DAYS UNTIL OPENING DAY</span>
               </div>
 
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight">
-                15 Days to Commercial Launch.
+                Our 15-Day Launch Plan
               </h1>
               <p className="text-sm sm:text-base leading-relaxed text-slate-300 max-w-2xl font-normal">
-                Everything we have built—from high-converting storefront and 24,000+ cleaned DME equipment catalog to
-                our 18-page administrative control plane, HIPAA prescription triage, and live state tax engine—converging
-                for public commercial opening on <strong className="text-white font-semibold">Thursday, October 15, 2026</strong>.
+                Our website is built and ready! We have the medical equipment, card checkout, doctor prescription reviews, and order tracking all in place. Here is our simple 15-day step-by-step plan to open the doors to customers across all 50 states on{' '}
+                <strong className="text-white font-semibold">Thursday, October 15, 2026</strong>.
               </p>
 
               {/* Live Readiness Bar */}
@@ -633,10 +628,10 @@ export const LaunchRoadmapPage: React.FC = () => {
                 <div className="flex items-center justify-between text-xs font-bold">
                   <span className="text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
                     <Activity size={14} className="text-teal-400" />
-                    Launch Checklist Progress
+                    Tasks Completed
                   </span>
                   <span className="text-teal-400 font-mono text-sm">
-                    {completedTasks} / {totalTasks} Tasks ({readinessPercent}%)
+                    {completedTasks} of {totalTasks} Tasks Done ({readinessPercent}%)
                   </span>
                 </div>
                 <div className="h-3 w-full rounded-full bg-slate-800 overflow-hidden p-0.5 border border-slate-700/60">
@@ -651,7 +646,7 @@ export const LaunchRoadmapPage: React.FC = () => {
             {/* Countdown Clock Display */}
             <div className="rounded-2xl border border-slate-800 bg-slate-950/80 p-6 shadow-xl backdrop-blur-xs">
               <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-400 mb-4 flex items-center justify-between">
-                <span>Target Go-Live T-Minus</span>
+                <span>Countdown to Opening Day</span>
                 <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-ping" />
               </p>
 
@@ -676,9 +671,9 @@ export const LaunchRoadmapPage: React.FC = () => {
 
               <div className="mt-4 pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
                 <span className="flex items-center gap-1.5">
-                  <Calendar size={13} className="text-teal-400" /> Oct 15, 09:00 EST
+                  <Calendar size={13} className="text-teal-400" /> Oct 15, 09:00 AM EST
                 </span>
-                <span className="text-emerald-400 font-bold">● Systems Nominal</span>
+                <span className="text-emerald-400 font-bold">● Everything on Track</span>
               </div>
             </div>
           </div>
@@ -688,8 +683,8 @@ export const LaunchRoadmapPage: React.FC = () => {
         <section className="space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h2 className="text-xl font-black text-white tracking-tight">15-Day Milestone Trajectory</h2>
-              <p className="text-xs text-slate-400">Click any phase to isolate sprint deliverables and risk mitigations.</p>
+              <h2 className="text-xl font-black text-white tracking-tight">Daily Steps & Checklist</h2>
+              <p className="text-xs text-slate-400">Click any step below to see what needs to be done each day.</p>
             </div>
 
             <div className="flex items-center gap-2">
@@ -699,7 +694,7 @@ export const LaunchRoadmapPage: React.FC = () => {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Filter deliverables, owners..."
+                  placeholder="Search tasks or team names..."
                   className="w-full rounded-xl border border-slate-800 bg-slate-900/90 py-1.5 pl-9 pr-3 text-xs text-white placeholder:text-slate-500 focus:border-teal-500 focus:outline-none"
                 />
               </div>
@@ -707,7 +702,7 @@ export const LaunchRoadmapPage: React.FC = () => {
               <button
                 type="button"
                 onClick={handleResetChecklist}
-                title="Reset checklist progress"
+                title="Start checklist over"
                 className="flex h-8 w-8 items-center justify-center rounded-xl border border-slate-800 bg-slate-900 text-slate-400 hover:text-white transition"
               >
                 <RotateCcw size={14} />
@@ -744,7 +739,7 @@ export const LaunchRoadmapPage: React.FC = () => {
           {filteredDays.length === 0 ? (
             <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-12 text-center text-slate-400">
               <Layers size={32} className="mx-auto mb-3 text-slate-600" />
-              <p className="text-sm font-semibold text-white">No roadmap items matched your filter.</p>
+              <p className="text-sm font-semibold text-white">No items found for this search.</p>
               <button
                 type="button"
                 onClick={() => {
@@ -753,13 +748,12 @@ export const LaunchRoadmapPage: React.FC = () => {
                 }}
                 className="mt-3 text-xs text-teal-400 underline font-semibold"
               >
-                Clear filters
+                Show all 15 days
               </button>
             </div>
           ) : (
             filteredDays.map((d) => {
               const dayCompleted = d.tasks.every((t) => t.completed);
-              const dayPending = d.tasks.filter((t) => !t.completed).length;
 
               return (
                 <article
@@ -789,11 +783,11 @@ export const LaunchRoadmapPage: React.FC = () => {
                               : 'bg-slate-700 text-slate-300'
                           }`}
                         >
-                          {d.criticality}
+                          {d.criticality === 'CRITICAL' ? 'Top Priority' : d.criticality === 'HIGH' ? 'Important' : 'Normal'}
                         </span>
                         {dayCompleted && (
                           <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/20 border border-emerald-500/40 px-2 py-0.5 text-[10px] font-bold text-emerald-300">
-                            <CheckCircle2 size={11} /> 100% DONE
+                            <CheckCircle2 size={11} /> Done ✓
                           </span>
                         )}
                       </div>
@@ -824,7 +818,7 @@ export const LaunchRoadmapPage: React.FC = () => {
                     <div className="space-y-2.5">
                       <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
                         <FileCheck size={13} className="text-teal-400" />
-                        Execution Checklist ({d.tasks.filter((t) => t.completed).length}/{d.tasks.length})
+                        Checklist ({d.tasks.filter((t) => t.completed).length} of {d.tasks.length} done)
                       </p>
 
                       <div className="space-y-2">
@@ -860,7 +854,7 @@ export const LaunchRoadmapPage: React.FC = () => {
                       <div className="rounded-xl border border-slate-800/80 bg-slate-950/60 p-3.5 space-y-2">
                         <p className="text-[11px] font-bold uppercase tracking-wider text-teal-400 flex items-center gap-1.5">
                           <Check size={13} />
-                          Required Launch Deliverables:
+                          What Needs to Be Done:
                         </p>
                         <ul className="space-y-1.5 text-xs text-slate-300">
                           {d.deliverables.map((del, i) => (
@@ -876,7 +870,7 @@ export const LaunchRoadmapPage: React.FC = () => {
                       <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-3 text-xs text-amber-200/90 flex items-start gap-2">
                         <AlertTriangle size={15} className="text-amber-400 shrink-0 mt-0.5" />
                         <div>
-                          <strong className="text-amber-300 font-bold block mb-0.5">Contingency Safeguard:</strong>
+                          <strong className="text-amber-300 font-bold block mb-0.5">Backup Plan:</strong>
                           <span className="text-[11px] leading-relaxed text-amber-200/80">{d.riskMitigation}</span>
                         </div>
                       </div>
@@ -892,68 +886,68 @@ export const LaunchRoadmapPage: React.FC = () => {
         <section className="rounded-3xl border border-slate-800 bg-slate-900/60 p-6 sm:p-8 space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <span className="text-xs font-bold text-teal-400 uppercase tracking-wider">COMMAND MATRIX</span>
-              <h2 className="text-2xl font-black text-white tracking-tight mt-1">Operational Persona Responsibilities</h2>
+              <span className="text-xs font-bold text-teal-400 uppercase tracking-wider">WHO DOES WHAT</span>
+              <h2 className="text-2xl font-black text-white tracking-tight mt-1">Our Team During the 15 Days</h2>
               <p className="text-xs text-slate-400">
-                Mapped directly to the RBAC authorization gates active inside our back-office.
+                Simple roles for each person on our team so everything runs smoothly.
               </p>
             </div>
             <Link
               to="/admin"
               className="inline-flex items-center gap-2 rounded-xl bg-slate-800 px-4 py-2 text-xs font-bold text-white hover:bg-slate-700 transition"
             >
-              <Users size={14} /> View Staff Registry ({INITIAL_DAYS.length} Days Mapped)
+              <Users size={14} /> Open Admin Panel
             </Link>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
             <div className="rounded-2xl border border-slate-800 bg-slate-950 p-4 space-y-2">
               <span className="inline-block rounded-lg bg-teal-500/20 px-2 py-0.5 text-[10px] font-bold text-teal-300">
-                SUPER ADMIN
+                OVERALL BOSS
               </span>
-              <h4 className="text-sm font-bold text-white">Platform Leadership</h4>
+              <h4 className="text-sm font-bold text-white">Super Admin</h4>
               <p className="text-xs text-slate-400">
-                Final Go/No-Go authorization, payment merchant rails, commercial clinic onboarding.
+                Makes final calls, oversees payments, and keeps everyone on track.
               </p>
             </div>
 
             <div className="rounded-2xl border border-slate-800 bg-slate-950 p-4 space-y-2">
               <span className="inline-block rounded-lg bg-amber-500/20 px-2 py-0.5 text-[10px] font-bold text-amber-300">
-                CLINICAL LEAD
+                DOCTOR
               </span>
               <h4 className="text-sm font-bold text-white">Dr. Evelyn Reed, MD</h4>
               <p className="text-xs text-slate-400">
-                4-hour prescription triage queue, physician NPI validation, telehealth affiliate link.
+                Reviews patient prescriptions fast so orders can ship right away.
               </p>
             </div>
 
             <div className="rounded-2xl border border-slate-800 bg-slate-950 p-4 space-y-2">
               <span className="inline-block rounded-lg bg-sky-500/20 px-2 py-0.5 text-[10px] font-bold text-sky-300">
-                COMPLIANCE
+                PRIVACY LEAD
               </span>
-              <h4 className="text-sm font-bold text-white">Marcus Vance, CCO</h4>
+              <h4 className="text-sm font-bold text-white">Marcus Vance</h4>
               <p className="text-xs text-slate-400">
-                HIPAA Title II audit logging, BAA sign-offs, 50-state medical sales tax nexus.
+                Keeps patient health info 100% private and makes sure we follow all health laws.
               </p>
             </div>
 
             <div className="rounded-2xl border border-slate-800 bg-slate-950 p-4 space-y-2">
               <span className="inline-block rounded-lg bg-purple-500/20 px-2 py-0.5 text-[10px] font-bold text-purple-300">
-                FULFILLMENT
+                SHIPPING LEAD
               </span>
-              <h4 className="text-sm font-bold text-white">Logistics Director</h4>
+              <h4 className="text-sm font-bold text-white">Warehouse Lead</h4>
               <p className="text-xs text-slate-400">
-                FedEx Priority tracking generation, wholesale dropship EDI order routing, RMA bins.
+                Packs boxes with care, prints FedEx & UPS labels, and sends tracking links.
               </p>
             </div>
 
             <div className="rounded-2xl border border-slate-800 bg-slate-950 p-4 space-y-2">
               <span className="inline-block rounded-lg bg-emerald-500/20 px-2 py-0.5 text-[10px] font-bold text-emerald-300">
-                SUPPORT DESK
+                CUSTOMER CARE
               </span>
-              <h4 className="text-sm font-bold text-white">Patient Care Team</h4>
+              <h4 className="text-sm font-bold text-white">Support Team</h4>
               <p className="text-xs text-slate-400">
-                +1 (800) 555-0199 toll-free line, live chat triage, FSA/HSA reimbursement claims.
+                Answers the phone with a smile, helps buyers on live chat, and sends receipts.
               </p>
             </div>
           </div>
@@ -966,34 +960,34 @@ export const LaunchRoadmapPage: React.FC = () => {
               <Rocket size={20} />
             </span>
             <div>
-              <h3 className="text-xl font-black text-white">Day 15 Go-Live Master Protocol (Oct 15, 2026)</h3>
-              <p className="text-xs text-teal-400">Hour-by-hour operational countdown on commercial launch day.</p>
+              <h3 className="text-xl font-black text-white">Launch Day Schedule (Thursday, October 15, 2026)</h3>
+              <p className="text-xs text-teal-400">What we do hour-by-hour on our big opening day.</p>
             </div>
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 text-xs">
             <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 space-y-1.5">
-              <span className="font-mono text-xs font-black text-teal-400">08:00 EST</span>
-              <p className="font-bold text-white">System Sanity Check</p>
-              <p className="text-slate-400">Verify Supabase DB, Stripe live mode, and catalog search latency under 50ms.</p>
+              <span className="font-mono text-xs font-black text-teal-400">08:00 AM EST</span>
+              <p className="font-bold text-white">Quick Final Check</p>
+              <p className="text-slate-400">Make sure card payments, website, and products are working fast.</p>
             </div>
 
             <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 space-y-1.5">
-              <span className="font-mono text-xs font-black text-teal-400">09:00 EST</span>
-              <p className="font-bold text-white">Public Switch & Announcement</p>
-              <p className="text-slate-400">Lift private staging gates and distribute nationwide PR across medical journals.</p>
+              <span className="font-mono text-xs font-black text-teal-400">09:00 AM EST</span>
+              <p className="font-bold text-white">Open the Doors!</p>
+              <p className="text-slate-400">Open the website to everyone across all 50 states and send the announcement email.</p>
             </div>
 
             <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 space-y-1.5">
-              <span className="font-mono text-xs font-black text-teal-400">09:30 EST</span>
-              <p className="font-bold text-white">Google Ads Activation</p>
-              <p className="text-slate-400">Turn on high-intent search campaigns for oxygen concentrators and CPAP therapy.</p>
+              <span className="font-mono text-xs font-black text-teal-400">09:30 AM EST</span>
+              <p className="font-bold text-white">Turn on Google Ads</p>
+              <p className="text-slate-400">Help people searching for oxygen and sleep machines find us easily.</p>
             </div>
 
             <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 space-y-1.5">
-              <span className="font-mono text-xs font-black text-teal-400">12:00 – 20:00 EST</span>
-              <p className="font-bold text-white">War Room Triage</p>
-              <p className="text-slate-400">Monitor live /admin/dashboard throughput, order dispatch, and 4-hr Rx turnaround.</p>
+              <span className="font-mono text-xs font-black text-teal-400">12:00 PM – Night</span>
+              <p className="font-bold text-white">Watch Orders & Help Buyers</p>
+              <p className="text-slate-400">Ship orders fast, review prescriptions, and answer calls with a smile.</p>
             </div>
           </div>
         </section>
@@ -1006,7 +1000,7 @@ export const LaunchRoadmapPage: React.FC = () => {
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <div className="flex items-center gap-2">
                 <Activity size={18} className="text-teal-400 animate-pulse" />
-                <h3 className="font-bold text-sm text-white">BaeMeds Automated Launch Readiness Diagnostic</h3>
+                <h3 className="font-bold text-sm text-white">BaeMeds Quick System Check</h3>
               </div>
               <button
                 type="button"
@@ -1020,7 +1014,7 @@ export const LaunchRoadmapPage: React.FC = () => {
             <div className="h-64 overflow-y-auto rounded-xl border border-slate-900 bg-black/60 p-4 font-mono text-[11px] space-y-2 text-slate-300">
               {simLogs.map((log, index) => (
                 <div key={index} className="leading-relaxed">
-                  {log.includes('[PASS]') || log.includes('[GO-LIVE') ? (
+                  {log.includes('[READY]') || log.includes('[ALL READY]') ? (
                     <span className="text-emerald-400 font-bold">{log}</span>
                   ) : (
                     <span>{log}</span>
@@ -1029,14 +1023,14 @@ export const LaunchRoadmapPage: React.FC = () => {
               ))}
               {isSimulating && (
                 <div className="flex items-center gap-2 text-teal-400 animate-pulse">
-                  <span>Executing step {simulatorStep}/6...</span>
+                  <span>Checking step {simulatorStep} of 6...</span>
                 </div>
               )}
             </div>
 
             <div className="flex items-center justify-between pt-2">
               <span className="text-xs text-slate-400">
-                {isSimulating ? 'Running simulated traffic drill...' : 'Diagnostic complete. 100% verified.'}
+                {isSimulating ? 'Checking systems now...' : 'Check finished! All systems look great and ready.'}
               </span>
               <button
                 type="button"
