@@ -44,11 +44,7 @@ interface RoadmapDay {
   phaseTitle: string;
   title: string;
   subtitle: string;
-  owner: {
-    name: string;
-    role: string;
-    avatar: string;
-  };
+  ownerType: 'Agency' | 'Client' | 'Client & Agency';
   criticality: 'CRITICAL' | 'HIGH' | 'STANDARD';
   deliverables: string[];
   riskMitigation: string;
@@ -73,11 +69,7 @@ const INITIAL_DAYS: RoadmapDay[] = [
     phaseTitle: 'Step 1: Website & Cards',
     title: 'Connect the Real Web Address (baemeds.com)',
     subtitle: 'Make sure baemeds.com opens fast everywhere with the safe green lock icon.',
-    owner: {
-      name: 'Tech Lead',
-      role: 'Website & Security',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
-    },
+    ownerType: 'Agency',
     criticality: 'CRITICAL',
     deliverables: [
       'baemeds.com opens fast on both phones and computers',
@@ -98,11 +90,7 @@ const INITIAL_DAYS: RoadmapDay[] = [
     phaseTitle: 'Step 1: Website & Cards',
     title: 'Turn on Real Cards & Health Savings Cards',
     subtitle: 'Let customers pay with regular cards, health benefit cards (FSA/HSA), and easy monthly payments.',
-    owner: {
-      name: 'Payments Lead',
-      role: 'Bank & Payments Setup',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80',
-    },
+    ownerType: 'Agency',
     criticality: 'CRITICAL',
     deliverables: [
       'Take real credit cards safely with Stripe',
@@ -123,11 +111,7 @@ const INITIAL_DAYS: RoadmapDay[] = [
     phaseTitle: 'Step 1: Website & Cards',
     title: 'Set up Email Receipts & Text Updates',
     subtitle: 'Send buyers clear receipts and friendly text messages when their package ships.',
-    owner: {
-      name: 'Communications',
-      role: 'Customer Emails & Texts',
-      avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=120&q=80',
-    },
+    ownerType: 'Agency',
     criticality: 'HIGH',
     deliverables: [
       'Clear email receipt with the medical codes patients need for insurance payback',
@@ -147,11 +131,7 @@ const INITIAL_DAYS: RoadmapDay[] = [
     phaseTitle: 'Step 2: Suppliers & Shipping',
     title: 'Connect with Equipment Warehouses',
     subtitle: 'Send customer orders straight to our partner warehouses (Inogen, DeVilbiss, ResMed).',
-    owner: {
-      name: 'Supply Chain Lead',
-      role: 'Warehouses & Stock',
-      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80',
-    },
+    ownerType: 'Client',
     criticality: 'CRITICAL',
     deliverables: [
       'Orders go straight to the warehouse once the doctor approves the prescription',
@@ -171,11 +151,7 @@ const INITIAL_DAYS: RoadmapDay[] = [
     phaseTitle: 'Step 2: Suppliers & Shipping',
     title: 'Set up FedEx & UPS Shipping',
     subtitle: 'Print shipping labels and give customers working delivery tracking links.',
-    owner: {
-      name: 'Shipping Manager',
-      role: 'Boxes & Shipping',
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=120&q=80',
-    },
+    ownerType: 'Client',
     criticality: 'HIGH',
     deliverables: [
       'FedEx fast medical shipping account ready',
@@ -195,11 +171,7 @@ const INITIAL_DAYS: RoadmapDay[] = [
     phaseTitle: 'Step 2: Suppliers & Shipping',
     title: 'Write Clear Return & Warranty Rules',
     subtitle: 'Explain how returns work and how the 3-year factory warranty protects buyers.',
-    owner: {
-      name: 'Operations',
-      role: 'Returns & Quality',
-      avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=120&q=80',
-    },
+    ownerType: 'Client',
     criticality: 'STANDARD',
     deliverables: [
       'Simple 30-day return rule posted on the website',
@@ -219,11 +191,7 @@ const INITIAL_DAYS: RoadmapDay[] = [
     phaseTitle: 'Step 3: Doctor Checks & Privacy',
     title: 'Practice Doctor Prescription Reviews',
     subtitle: 'Our team doctor checks prescriptions fast so customer orders can ship right away.',
-    owner: {
-      name: 'Dr. Evelyn Reed, MD',
-      role: 'Clinical Lead & Doctor',
-      avatar: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=120&q=80',
-    },
+    ownerType: 'Client',
     criticality: 'CRITICAL',
     deliverables: [
       'Doctor reviews prescriptions within 4 hours during the day',
@@ -243,11 +211,7 @@ const INITIAL_DAYS: RoadmapDay[] = [
     phaseTitle: 'Step 3: Doctor Checks & Privacy',
     title: 'Lock Down Patient Health Privacy (HIPAA)',
     subtitle: 'Keep customer health records and prescriptions completely safe and private.',
-    owner: {
-      name: 'Marcus Vance',
-      role: 'Privacy & Legal Lead',
-      avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=120&q=80',
-    },
+    ownerType: 'Agency',
     criticality: 'CRITICAL',
     deliverables: [
       'Top-level security so only doctors can view customer prescriptions',
@@ -267,11 +231,7 @@ const INITIAL_DAYS: RoadmapDay[] = [
     phaseTitle: 'Step 3: Doctor Checks & Privacy',
     title: 'Check State Sales Tax Rules',
     subtitle: 'Make sure we charge the right sales tax (or 0% tax when prescriptions are tax-free).',
-    owner: {
-      name: 'Tax Specialist',
-      role: 'Accounting & Tax',
-      avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=120&q=80',
-    },
+    ownerType: 'Client',
     criticality: 'HIGH',
     deliverables: [
       'No sales tax ($0) in states where doctor-prescribed equipment is tax-free (like Delaware & Pennsylvania)',
@@ -291,11 +251,7 @@ const INITIAL_DAYS: RoadmapDay[] = [
     phaseTitle: 'Step 4: Practice & Testing',
     title: 'Run 5 Practice Orders from Start to Finish',
     subtitle: 'Buy real machines with real cards, check prescriptions, and track delivery.',
-    owner: {
-      name: 'Operations Boss',
-      role: 'General Manager',
-      avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=120&q=80',
-    },
+    ownerType: 'Client & Agency',
     criticality: 'CRITICAL',
     deliverables: [
       'Place 5 test orders for different machines',
@@ -317,11 +273,7 @@ const INITIAL_DAYS: RoadmapDay[] = [
     phaseTitle: 'Step 4: Practice & Testing',
     title: 'Test the Website on Phones & Tablets',
     subtitle: 'Make sure buttons are big and easy to tap, text is easy to read, and pages load fast.',
-    owner: {
-      name: 'Frontend Designer',
-      role: 'Mobile & User Experience',
-      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80',
-    },
+    ownerType: 'Agency',
     criticality: 'HIGH',
     deliverables: [
       'Pages open in 1 second on cell phones',
@@ -341,11 +293,7 @@ const INITIAL_DAYS: RoadmapDay[] = [
     phaseTitle: 'Step 4: Practice & Testing',
     title: 'Connect Products to Google Search & Shopping',
     subtitle: 'Help customers find our equipment when they search on Google.',
-    owner: {
-      name: 'Google Specialist',
-      role: 'Search & Growth',
-      avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=120&q=80',
-    },
+    ownerType: 'Agency',
     criticality: 'STANDARD',
     deliverables: [
       'Send our product list to Google so our items show up in shopping searches',
@@ -365,11 +313,7 @@ const INITIAL_DAYS: RoadmapDay[] = [
     phaseTitle: 'Step 5: Clinic Preview & Phones',
     title: 'Let Partner Clinics Order First',
     subtitle: 'Invite 10 friendly sleep clinics and doctor offices to try ordering first.',
-    owner: {
-      name: 'Clinic Liaison',
-      role: 'Doctor & Clinic Relations',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
-    },
+    ownerType: 'Client',
     criticality: 'CRITICAL',
     deliverables: [
       'Invite 10 local doctor offices with friendly discounts',
@@ -389,11 +333,7 @@ const INITIAL_DAYS: RoadmapDay[] = [
     phaseTitle: 'Step 5: Clinic Preview & Phones',
     title: 'Test the 1-800 Phone Line & Help Desk',
     subtitle: 'Make sure customers can reach a friendly, helpful human within 3 rings.',
-    owner: {
-      name: 'Support Director',
-      role: 'Customer Care & Phones',
-      avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=120&q=80',
-    },
+    ownerType: 'Client',
     criticality: 'HIGH',
     deliverables: [
       'Answer the 1-800 phone number in 3 rings with friendly, helpful staff',
@@ -413,11 +353,7 @@ const INITIAL_DAYS: RoadmapDay[] = [
     phaseTitle: 'Step 6: Big Launch Day!',
     title: 'Official Launch Day across all 50 States!',
     subtitle: 'Open the store to the whole country and start welcoming customers!',
-    owner: {
-      name: 'CEO & Team',
-      role: 'Executive Leadership',
-      avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=120&q=80',
-    },
+    ownerType: 'Client & Agency',
     criticality: 'CRITICAL',
     deliverables: [
       'Website is 100% open to all 50 US states',
@@ -434,11 +370,17 @@ const INITIAL_DAYS: RoadmapDay[] = [
   },
 ];
 
+const STORAGE_KEY = 'baemeds_launch_roadmap_v4';
+
 export const LaunchRoadmapPage: React.FC = () => {
   const [selectedPhase, setSelectedPhase] = useState<number>(0);
   const [days, setDays] = useState<RoadmapDay[]>(() => {
     try {
-      const saved = localStorage.getItem('baemeds_launch_roadmap');
+      // Clear out legacy cached data that had DevOps Lead / Platform Engineering tags
+      localStorage.removeItem('baemeds_launch_roadmap');
+      localStorage.removeItem('baemeds_launch_roadmap_v2');
+      localStorage.removeItem('baemeds_launch_roadmap_v3');
+      const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) return JSON.parse(saved);
     } catch {}
     return INITIAL_DAYS;
@@ -485,14 +427,14 @@ export const LaunchRoadmapPage: React.FC = () => {
           tasks: d.tasks.map((t) => (t.id === taskId ? { ...t, completed: !t.completed } : t)),
         };
       });
-      localStorage.setItem('baemeds_launch_roadmap', JSON.stringify(updated));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
       return updated;
     });
   };
 
   const handleResetChecklist = () => {
     if (window.confirm('Reset all checklist progress back to default?')) {
-      localStorage.removeItem('baemeds_launch_roadmap');
+      localStorage.removeItem(STORAGE_KEY);
       setDays(INITIAL_DAYS);
     }
   };
@@ -517,7 +459,7 @@ export const LaunchRoadmapPage: React.FC = () => {
         d.title.toLowerCase().includes(q) ||
         d.subtitle.toLowerCase().includes(q) ||
         d.phaseTitle.toLowerCase().includes(q) ||
-        d.owner.name.toLowerCase().includes(q) ||
+        d.ownerType.toLowerCase().includes(q) ||
         d.deliverables.some((del) => del.toLowerCase().includes(q));
       return matchesPhase && matchesSearch;
     });
@@ -798,17 +740,23 @@ export const LaunchRoadmapPage: React.FC = () => {
                       <p className="text-xs text-slate-400 max-w-3xl">{d.subtitle}</p>
                     </div>
 
-                    {/* Owner Card */}
-                    <div className="flex items-center gap-2.5 rounded-xl border border-slate-800 bg-slate-950/70 px-3 py-2 shrink-0 self-start">
-                      <img
-                        src={d.owner.avatar}
-                        alt={d.owner.name}
-                        className="h-8 w-8 rounded-full object-cover border border-teal-500/30"
-                      />
-                      <div className="text-left">
-                        <p className="text-xs font-bold text-white">{d.owner.name}</p>
-                        <p className="text-[10px] text-slate-400">{d.owner.role}</p>
-                      </div>
+                    {/* Responsible: Client or Agency */}
+                    <div className="flex items-center gap-2 shrink-0 self-start">
+                      <span className="text-[11px] font-semibold text-slate-400 hidden sm:inline">Responsible:</span>
+                      <span
+                        className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-black tracking-wide border shadow-sm ${
+                          d.ownerType === 'Agency'
+                            ? 'border-cyan-500/40 bg-cyan-500/10 text-cyan-300'
+                            : d.ownerType === 'Client'
+                            ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-300'
+                            : 'border-purple-500/40 bg-purple-500/10 text-purple-300'
+                        }`}
+                      >
+                        {d.ownerType === 'Agency' && <Building2 size={13} className="text-cyan-400" />}
+                        {d.ownerType === 'Client' && <Users size={13} className="text-emerald-400" />}
+                        {d.ownerType === 'Client & Agency' && <Sparkles size={13} className="text-purple-400" />}
+                        <span>{d.ownerType}</span>
+                      </span>
                     </div>
                   </div>
 
@@ -882,14 +830,14 @@ export const LaunchRoadmapPage: React.FC = () => {
           )}
         </section>
 
-        {/* RACI Matrix & Team Readiness Grid */}
+        {/* Client vs Agency Responsibilities Grid */}
         <section className="rounded-3xl border border-slate-800 bg-slate-900/60 p-6 sm:p-8 space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <span className="text-xs font-bold text-teal-400 uppercase tracking-wider">WHO DOES WHAT</span>
-              <h2 className="text-2xl font-black text-white tracking-tight mt-1">Our Team During the 15 Days</h2>
+              <span className="text-xs font-bold text-teal-400 uppercase tracking-wider">RESPONSIBILITIES</span>
+              <h2 className="text-2xl font-black text-white tracking-tight mt-1">Client & Agency Breakdown</h2>
               <p className="text-xs text-slate-400">
-                Simple roles for each person on our team so everything runs smoothly.
+                Clear division of work between the Agency (Website & Tech) and the Client (BaeMeds Healthcare Operations).
               </p>
             </div>
             <Link
@@ -900,56 +848,112 @@ export const LaunchRoadmapPage: React.FC = () => {
             </Link>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-            <div className="rounded-2xl border border-slate-800 bg-slate-950 p-4 space-y-2">
-              <span className="inline-block rounded-lg bg-teal-500/20 px-2 py-0.5 text-[10px] font-bold text-teal-300">
-                OVERALL BOSS
-              </span>
-              <h4 className="text-sm font-bold text-white">Super Admin</h4>
-              <p className="text-xs text-slate-400">
-                Makes final calls, oversees payments, and keeps everyone on track.
-              </p>
+          <div className="grid gap-6 md:grid-cols-2">
+            {/* Agency Card */}
+            <div className="rounded-2xl border border-cyan-500/30 bg-slate-950 p-6 space-y-4 shadow-lg">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">
+                    <Building2 size={18} />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-white">Agency</h3>
+                    <p className="text-[11px] text-cyan-400 font-semibold">Website, Engineering & Digital Setup</p>
+                  </div>
+                </div>
+                <span className="rounded-full bg-cyan-500/10 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-cyan-300 border border-cyan-500/20">
+                  7 Key Deliverables
+                </span>
+              </div>
+
+              <ul className="space-y-2.5 text-xs text-slate-300">
+                <li className="flex items-start gap-2">
+                  <Check size={14} className="text-cyan-400 shrink-0 mt-0.5" />
+                  <span><strong>Domain & SSL:</strong> Connect baemeds.com with fast edge routing and green lock security.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check size={14} className="text-cyan-400 shrink-0 mt-0.5" />
+                  <span><strong>Card & Health Payments:</strong> Turn on Stripe live cards, FSA/HSA cards, and monthly plans.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check size={14} className="text-cyan-400 shrink-0 mt-0.5" />
+                  <span><strong>Email & SMS:</strong> Automated itemized receipts, prescription receipts, and tracking links.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check size={14} className="text-cyan-400 shrink-0 mt-0.5" />
+                  <span><strong>Data Privacy (HIPAA):</strong> Encrypted prescription files and secure staff audit logging.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check size={14} className="text-cyan-400 shrink-0 mt-0.5" />
+                  <span><strong>Mobile & Speed:</strong> Sub-second load times on cell phones and senior-friendly font sizes.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check size={14} className="text-cyan-400 shrink-0 mt-0.5" />
+                  <span><strong>Google Shopping:</strong> Connect product feeds, prices, and star ratings for Google searches.</span>
+                </li>
+              </ul>
             </div>
 
-            <div className="rounded-2xl border border-slate-800 bg-slate-950 p-4 space-y-2">
-              <span className="inline-block rounded-lg bg-amber-500/20 px-2 py-0.5 text-[10px] font-bold text-amber-300">
-                DOCTOR
-              </span>
-              <h4 className="text-sm font-bold text-white">Dr. Evelyn Reed, MD</h4>
-              <p className="text-xs text-slate-400">
-                Reviews patient prescriptions fast so orders can ship right away.
-              </p>
-            </div>
+            {/* Client Card */}
+            <div className="rounded-2xl border border-emerald-500/30 bg-slate-950 p-6 space-y-4 shadow-lg">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                    <Users size={18} />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-white">Client</h3>
+                    <p className="text-[11px] text-emerald-400 font-semibold">BaeMeds Healthcare Operations & Business</p>
+                  </div>
+                </div>
+                <span className="rounded-full bg-emerald-500/10 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-emerald-300 border border-emerald-500/20">
+                  8 Key Deliverables
+                </span>
+              </div>
 
-            <div className="rounded-2xl border border-slate-800 bg-slate-950 p-4 space-y-2">
-              <span className="inline-block rounded-lg bg-sky-500/20 px-2 py-0.5 text-[10px] font-bold text-sky-300">
-                PRIVACY LEAD
-              </span>
-              <h4 className="text-sm font-bold text-white">Marcus Vance</h4>
-              <p className="text-xs text-slate-400">
-                Keeps patient health info 100% private and makes sure we follow all health laws.
-              </p>
+              <ul className="space-y-2.5 text-xs text-slate-300">
+                <li className="flex items-start gap-2">
+                  <Check size={14} className="text-emerald-400 shrink-0 mt-0.5" />
+                  <span><strong>Equipment Warehouses:</strong> Finalize wholesale accounts with Inogen, DeVilbiss, and ResMed.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check size={14} className="text-emerald-400 shrink-0 mt-0.5" />
+                  <span><strong>Carrier Accounts:</strong> FedEx Healthcare and UPS Ground accounts for label printing.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check size={14} className="text-emerald-400 shrink-0 mt-0.5" />
+                  <span><strong>Returns & Warranties:</strong> 30-day return policy and clean return inspection table in warehouse.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check size={14} className="text-emerald-400 shrink-0 mt-0.5" />
+                  <span><strong>Doctor Reviews:</strong> Dr. Evelyn Reed checks prescriptions within 4 hours in the admin panel.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check size={14} className="text-emerald-400 shrink-0 mt-0.5" />
+                  <span><strong>State Taxes:</strong> 50-state sales tax setup and 0% tax rules for prescribed machines.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check size={14} className="text-emerald-400 shrink-0 mt-0.5" />
+                  <span><strong>Phone & Customer Care:</strong> Staff the 1-800 toll-free phone line (+1 800 555-0199) and live chat.</span>
+                </li>
+              </ul>
             </div>
+          </div>
 
-            <div className="rounded-2xl border border-slate-800 bg-slate-950 p-4 space-y-2">
-              <span className="inline-block rounded-lg bg-purple-500/20 px-2 py-0.5 text-[10px] font-bold text-purple-300">
-                SHIPPING LEAD
-              </span>
-              <h4 className="text-sm font-bold text-white">Warehouse Lead</h4>
-              <p className="text-xs text-slate-400">
-                Packs boxes with care, prints FedEx & UPS labels, and sends tracking links.
-              </p>
+          {/* Joint Box */}
+          <div className="rounded-2xl border border-purple-500/30 bg-purple-950/20 p-4 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5">
+              <Sparkles size={18} className="text-purple-400 shrink-0" />
+              <div>
+                <strong className="text-purple-300 font-bold block">Joint Collaboration (Client & Agency):</strong>
+                <span className="text-slate-300">
+                  5 Practice test orders (Day 10), Partner clinic preview (Day 13), and Launch Day 50-state monitoring (Day 15).
+                </span>
+              </div>
             </div>
-
-            <div className="rounded-2xl border border-slate-800 bg-slate-950 p-4 space-y-2">
-              <span className="inline-block rounded-lg bg-emerald-500/20 px-2 py-0.5 text-[10px] font-bold text-emerald-300">
-                CUSTOMER CARE
-              </span>
-              <h4 className="text-sm font-bold text-white">Support Team</h4>
-              <p className="text-xs text-slate-400">
-                Answers the phone with a smile, helps buyers on live chat, and sends receipts.
-              </p>
-            </div>
+            <span className="shrink-0 rounded-xl bg-purple-500/20 px-3 py-1 text-[11px] font-bold text-purple-300 border border-purple-500/40">
+              Shared Effort
+            </span>
           </div>
         </section>
 
