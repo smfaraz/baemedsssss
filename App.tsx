@@ -21,6 +21,7 @@ import OrderSuccessPage from './pages/OrderSuccessPage';
 import ThankYouPage from './pages/ThankYouPage';
 import NotFoundPage from './pages/NotFoundPage';
 import AdminPage from './pages/AdminPage';
+import LaunchRoadmapPage from './pages/LaunchRoadmapPage';
 
 
 import { CartProvider } from './context/CartContext';
@@ -62,11 +63,16 @@ const AppContent: React.FC = () => {
   const { pathname } = useLocation();
   const isAdminRoute = pathname.startsWith('/admin');
 
+  if (pathname === '/roadmap' || pathname === '/launch-roadmap') {
+    return <LaunchRoadmapPage />;
+  }
+
   if (isAdminRoute) {
     return (
       <AdminLayout>
         <Routes>
           <Route path="/admin" element={<AdminDashboardPage />} />
+          <Route path="/admin/roadmap" element={<LaunchRoadmapPage />} />
           <Route path="/admin/orders" element={<AdminOrdersPage />} />
           <Route path="/admin/orders/:id" element={<AdminOrderDetailPage />} />
           <Route path="/admin/products" element={<AdminProductsPage />} />

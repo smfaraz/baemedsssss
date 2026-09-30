@@ -15,6 +15,7 @@ import {
   ChevronRight,
   Stethoscope,
   ExternalLink,
+  Rocket,
 } from 'lucide-react';
 import { Link, useLocation } from '../../context/CartContext';
 import { AdminRole, ROLE_PERMISSIONS } from '../../server/adminService';
@@ -58,6 +59,14 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
           href: '/admin',
           icon: LayoutDashboard,
           permission: 'dashboard:view',
+        },
+        {
+          label: '15-Day Launch Roadmap',
+          href: '/admin/roadmap',
+          icon: Rocket,
+          permission: 'dashboard:view',
+          badge: 'Oct 15',
+          badgeColor: 'bg-teal-500/20 text-teal-400 font-bold border border-teal-500/30',
         },
       ],
     },
