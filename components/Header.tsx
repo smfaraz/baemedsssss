@@ -304,10 +304,19 @@ const Header: React.FC = () => {
         <nav className="ml-auto flex items-center gap-1 sm:gap-2" aria-label="Account shortcuts">
           <Link
             to={isAuthenticated ? '/account' : '/login'}
-            className="tap-target hidden items-center justify-center rounded-xl text-slate-700 hover:bg-medical-light hover:text-medical-primary sm:inline-flex"
+            className="tap-target hidden items-center gap-1.5 rounded-xl px-2.5 py-1.5 text-xs font-semibold text-slate-700 hover:bg-medical-light hover:text-medical-primary sm:inline-flex"
             aria-label={isAuthenticated ? 'Open account' : 'Sign in'}
           >
-            <User size={22} />
+            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-medical-light text-medical-primary">
+              <User size={16} />
+            </span>
+            {isAuthenticated && customer ? (
+              <span className="max-w-[110px] truncate font-bold text-medical-dark">
+                {customer.firstName || 'Account'}
+              </span>
+            ) : (
+              <span className="hidden xl:inline text-xs font-medium text-slate-600">Sign In</span>
+            )}
           </Link>
           <Link
             to="/wishlist"

@@ -29,7 +29,7 @@ const AccountPage: React.FC = () => {
   const updateAddress = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => setNewAddress((current) => ({ ...current, [event.target.name]: event.target.value }));
   const submitAddress = async (event: React.FormEvent) => {
     event.preventDefault(); setActionError(''); setActionMessage(''); setSavingAddress(true);
-    try { await addNewAddress(newAddress); setNewAddress(emptyAddress); setShowAddressForm(false); setActionMessage('Delivery address saved to your Shopify customer account.'); }
+    try { await addNewAddress(newAddress); setNewAddress(emptyAddress); setShowAddressForm(false); setActionMessage('Delivery address saved to your BaeMeds account.'); }
     catch (error) { setActionError(error instanceof Error ? error.message : 'The address could not be saved.'); }
     finally { setSavingAddress(false); }
   };
@@ -37,7 +37,7 @@ const AccountPage: React.FC = () => {
     if (!window.confirm(`Remove the address at ${address.address1}?`)) return;
     setActionError('');
     setActionMessage('');
-    try { await removeAddress(address.id); setActionMessage('Delivery address removed from your Shopify customer account.'); }
+    try { await removeAddress(address.id); setActionMessage('Delivery address removed from your BaeMeds account.'); }
     catch (error) { setActionError(error instanceof Error ? error.message : 'The address could not be removed.'); }
   };
   const refreshOrders = async () => {
@@ -46,7 +46,7 @@ const AccountPage: React.FC = () => {
     setRefreshingOrders(true);
     try {
       await refreshCustomer();
-      setActionMessage('Order, payment, fulfilment, and tracking details refreshed from Shopify.');
+      setActionMessage('Order, payment, fulfillment, and tracking details refreshed.');
     } catch (error) {
       setActionError(error instanceof Error ? error.message : 'Orders could not be refreshed.');
     } finally {
@@ -212,7 +212,7 @@ const AccountPage: React.FC = () => {
           </div>
 
           <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-soft sm:p-6">
-            <div className="flex flex-wrap items-center justify-between gap-3"><div className="flex items-center gap-3"><span className="flex h-11 w-11 items-center justify-center rounded-xl bg-medical-light text-medical-primary"><Package size={22} aria-hidden="true" /></span><div><h2 className="text-xl font-bold text-medical-dark">Order history</h2><p className="text-sm text-slate-500">Shopify payment, fulfilment, and courier tracking details.</p></div></div><button type="button" onClick={refreshOrders} disabled={refreshingOrders} className="inline-flex min-h-11 items-center gap-2 rounded-xl px-3 text-sm font-bold text-medical-primary hover:bg-medical-light disabled:opacity-60"><RefreshCw size={17} className={refreshingOrders ? 'animate-spin' : ''} aria-hidden="true" /> Refresh</button></div>
+            <div className="flex flex-wrap items-center justify-between gap-3"><div className="flex items-center gap-3"><span className="flex h-11 w-11 items-center justify-center rounded-xl bg-medical-light text-medical-primary"><Package size={22} aria-hidden="true" /></span><div><h2 className="text-xl font-bold text-medical-dark">Order history</h2><p className="text-sm text-slate-500">BaeMeds payment, fulfillment, and courier tracking details.</p></div></div><button type="button" onClick={refreshOrders} disabled={refreshingOrders} className="inline-flex min-h-11 items-center gap-2 rounded-xl px-3 text-sm font-bold text-medical-primary hover:bg-medical-light disabled:opacity-60"><RefreshCw size={17} className={refreshingOrders ? 'animate-spin' : ''} aria-hidden="true" /> Refresh</button></div>
             {customer.orders?.length ? <div className="mt-6 space-y-4">{customer.orders.map((order) => {
               const tracking = order.successfulFulfillments.flatMap((fulfillment) => fulfillment.trackingInfo.map((info) => ({ ...info, company: fulfillment.trackingCompany })));
               return <article key={order.id} className="rounded-xl border border-slate-200 p-4 sm:p-5">
@@ -220,7 +220,7 @@ const AccountPage: React.FC = () => {
                   <div><p className="text-xs font-bold uppercase tracking-wide text-slate-500">Order</p><p className="mt-1 font-bold text-medical-dark">#{order.orderNumber}</p></div>
                   <div><p className="text-xs font-bold uppercase tracking-wide text-slate-500">Date</p><p className="mt-1 text-sm text-slate-700">{new Date(order.processedAt).toLocaleDateString('en-US')}</p></div>
                   <div><p className="text-xs font-bold uppercase tracking-wide text-slate-500">Total</p><p className="mt-1 font-bold text-medical-dark">{formatMoney(order.totalPrice.amount, order.totalPrice.currencyCode)}</p></div>
-                  <div>{order.statusUrl ? <a href={order.statusUrl} className="inline-flex min-h-11 items-center font-bold text-medical-primary" target="_blank" rel="noreferrer">View Shopify status <ArrowRight size={16} aria-hidden="true" /></a> : <p className="text-sm text-slate-500">Status link unavailable</p>}</div>
+                  <div>{order.statusUrl ? <a href={order.statusUrl} className="inline-flex min-h-11 items-center font-bold text-medical-primary" target="_blank" rel="noreferrer">View order status <ArrowRight size={16} aria-hidden="true" /></a> : <p className="text-sm text-slate-500">Status link unavailable</p>}</div>
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2 text-xs font-bold">
                   <span className="rounded-full bg-medical-light px-3 py-1.5 text-medical-primary">Payment: {formatStatus(order.financialStatus)}</span>
@@ -232,7 +232,7 @@ const AccountPage: React.FC = () => {
                 </dl>
                 <div className="mt-4 rounded-xl bg-slate-50 p-4">
                   <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Courier tracking</p>
-                  {tracking.length ? <ul className="mt-2 space-y-2">{tracking.map((info, index) => <li key={`${info.number || 'tracking'}-${index}`} className="text-sm"><span className="text-slate-600">{info.company || 'Courier'}: </span>{info.url ? <a href={info.url} target="_blank" rel="noreferrer" className="font-bold text-medical-primary hover:underline">{info.number || 'Track shipment'}</a> : <strong className="text-medical-dark">{info.number || 'Tracking details pending'}</strong>}</li>)}</ul> : <p className="mt-2 text-sm text-slate-600">Tracking will appear after Shopify records the shipment.</p>}
+                  {tracking.length ? <ul className="mt-2 space-y-2">{tracking.map((info, index) => <li key={`${info.number || 'tracking'}-${index}`} className="text-sm"><span className="text-slate-600">{info.company || 'Courier'}: </span>{info.url ? <a href={info.url} target="_blank" rel="noreferrer" className="font-bold text-medical-primary hover:underline">{info.number || 'Track shipment'}</a> : <strong className="text-medical-dark">{info.number || 'Tracking details pending'}</strong>}</li>)}</ul> : <p className="mt-2 text-sm text-slate-600">Tracking will appear once shipment is dispatched by the courier.</p>}
                 </div>
                 <ul className="mt-4 space-y-2">{order.lineItems.map((item, index) => <li key={`${item.title}-${index}`} className="flex justify-between gap-4 text-sm"><span className="text-slate-700">{item.title}</span><span className="shrink-0 text-slate-500">Qty {item.quantity}</span></li>)}</ul>
               </article>;

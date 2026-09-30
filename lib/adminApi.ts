@@ -15,9 +15,11 @@ export interface AdminSessionState {
 
 const getHeaders = (role?: AdminRole): HeadersInit => {
   const activeRole = role || (localStorage.getItem('baemeds_admin_role') as AdminRole) || 'super_admin';
+  const email = (typeof localStorage !== 'undefined' && localStorage.getItem('baemeds_admin_email')) || 'admin@baemeds.com';
+  const b64 = typeof btoa !== 'undefined' ? btoa(email) : Buffer.from(email).toString('base64');
   return {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer bm_admin_${Buffer.from('admin@baemeds.com').toString('base64')}_token`,
+    'Authorization': `Bearer bm_admin_${b64}_token`,
     'X-Admin-Role': activeRole,
   };
 };

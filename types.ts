@@ -89,7 +89,7 @@ export interface Customer {
 
 export interface Order {
   id: string;
-  orderNumber: number;
+  orderNumber: number | string;
   processedAt: string;
   totalPrice: { amount: string; currencyCode: string };
   totalShippingPrice: { amount: string; currencyCode: string };

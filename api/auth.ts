@@ -9,6 +9,7 @@ import {
   fetchCustomer,
   getSessionToken,
   json,
+  memoryCustomerAccounts,
   readJson,
   sessionCookie,
 } from '../server/commerce.js';
@@ -36,7 +37,23 @@ const handleLogin = async (body: AuthBody) => {
   const password = cleanString(body.password, 'Password', 128);
   if (password.length < 6) throw new ApiError(400, 'Password must be at least 6 characters.');
 
-  const token = createSessionToken(email);
+  let account = memoryCustomerAccounts.get(email);
+  if (account) {
+    if (account.password && account.password !== password) {
+      throw new ApiError(401, 'Invalid password for this customer account.');
+    }
+  } else {
+    // Instant zero-friction account onboarding
+    account = {
+      email,
+      password,
+      firstName: email.split('@')[0],
+      lastName: 'Patient',
+    };
+    memoryCustomerAccounts.set(email, account);
+  }
+
+  const token = createSessionToken(email, account.firstName, account.lastName);
   return json({ ok: true }, 200, { 'Set-Cookie': sessionCookie(token) });
 };
 
@@ -47,7 +64,14 @@ const handleRegister = async (body: AuthBody) => {
   const firstName = cleanString(body.firstName, 'First name', 80);
   const lastName = cleanString(body.lastName, 'Last name', 80);
 
-  const token = createSessionToken(email);
+  memoryCustomerAccounts.set(email, {
+    email,
+    password,
+    firstName,
+    lastName,
+  });
+
+  const token = createSessionToken(email, firstName, lastName);
   return json({ ok: true }, 201, { 'Set-Cookie': sessionCookie(token) });
 };
 

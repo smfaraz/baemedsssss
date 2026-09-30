@@ -5,6 +5,7 @@
 
 import { Customer, Address, Order } from '../types';
 import { supabase } from '../lib/supabase.js';
+import { getCustomerOrders } from './adminService.js';
 
 const SESSION_COOKIE = '__Host-baemeds_session';
 const THIRTY_DAYS_SECONDS = 60 * 60 * 24 * 30;
@@ -90,84 +91,154 @@ export const clearSessionCookie =
 export const customerUserError = (payload: { customerUserErrors?: { message?: string }[] } | undefined) =>
   payload?.customerUserErrors?.find((error) => error.message)?.message;
 
-// Simple native in-memory/database session resolver
+export interface CustomerAccount {
+  email: string;
+  password?: string;
+  firstName: string;
+  lastName: string;
+}
+
+export const memoryCustomerAccounts = new Map<string, CustomerAccount>([
+  ['patient@example.com', { email: 'patient@example.com', password: 'password123', firstName: 'Jane', lastName: 'Doe' }],
+  ['sarah.miller@example.com', { email: 'sarah.miller@example.com', password: 'password123', firstName: 'Sarah', lastName: 'Miller' }],
+  ['david.chen@example.com', { email: 'david.chen@example.com', password: 'password123', firstName: 'David', lastName: 'Chen' }],
+]);
+
+export interface StoredAddress extends Address {
+  customerEmail: string;
+}
+
+export const memoryAddresses: StoredAddress[] = [
+  {
+    id: 'addr_demo_01',
+    customerEmail: 'patient@example.com',
+    firstName: 'Jane',
+    lastName: 'Doe',
+    address1: '1200 N Dupont Hwy',
+    address2: 'Suite 400',
+    city: 'Dover',
+    province: 'DE',
+    zip: '19901',
+    country: 'United States',
+    phone: '(302) 555-0199',
+  },
+  {
+    id: 'addr_demo_02',
+    customerEmail: 'sarah.miller@example.com',
+    firstName: 'Sarah',
+    lastName: 'Miller',
+    address1: '1420 Market St',
+    address2: '',
+    city: 'Wilmington',
+    province: 'DE',
+    zip: '19801',
+    country: 'United States',
+    phone: '(302) 555-0144',
+  },
+];
+
+export const addCustomerAddress = (email: string, address: Omit<Address, 'id'>): Address => {
+  const normEmail = email.toLowerCase().trim();
+  const id = `addr_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+  const stored: StoredAddress = {
+    ...address,
+    id,
+    customerEmail: normEmail,
+  };
+  memoryAddresses.unshift(stored);
+  return stored;
+};
+
+export const deleteCustomerAddress = (email: string, id: string): boolean => {
+  const normEmail = email.toLowerCase().trim();
+  const index = memoryAddresses.findIndex((a) => a.id === id && a.customerEmail === normEmail);
+  if (index !== -1) {
+    memoryAddresses.splice(index, 1);
+    return true;
+  }
+  return false;
+};
+
+export const getCustomerAddresses = (email: string): Address[] => {
+  const normEmail = email.toLowerCase().trim();
+  return memoryAddresses
+    .filter((a) => a.customerEmail === normEmail)
+    .map(({ customerEmail: _email, ...addr }) => addr);
+};
+
+export const createSessionToken = (email: string, firstName?: string, lastName?: string): string => {
+  const normEmail = email.toLowerCase().trim();
+  const acc = memoryCustomerAccounts.get(normEmail);
+  const fName = firstName || acc?.firstName || normEmail.split('@')[0];
+  const lName = lastName || acc?.lastName || 'Patient';
+
+  const payload = JSON.stringify({ email: normEmail, firstName: fName, lastName: lName });
+  const b64 = Buffer.from(payload).toString('base64url');
+  return `bm_usr_${b64}_${Date.now()}`;
+};
+
+export const extractCustomerProfile = (sessionToken: string): { email: string; firstName: string; lastName: string } | null => {
+  if (!sessionToken || !sessionToken.startsWith('bm_usr_')) return null;
+  const parts = sessionToken.split('_');
+  if (!parts[2]) return null;
+  try {
+    const raw = Buffer.from(parts[2], 'base64url').toString('utf-8');
+    if (raw.startsWith('{')) {
+      const parsed = JSON.parse(raw);
+      if (parsed.email) {
+        return {
+          email: parsed.email.toLowerCase().trim(),
+          firstName: parsed.firstName || parsed.email.split('@')[0],
+          lastName: parsed.lastName || 'Patient',
+        };
+      }
+    }
+    // Fallback: standard base64 string
+    const email = Buffer.from(parts[2], 'base64').toString('utf-8').toLowerCase().trim();
+    if (email.includes('@')) {
+      const acc = memoryCustomerAccounts.get(email);
+      return {
+        email,
+        firstName: acc?.firstName || email.split('@')[0],
+        lastName: acc?.lastName || 'Patient',
+      };
+    }
+  } catch {}
+  return null;
+};
+
+// Authoritative native customer session resolver
 export const fetchCustomer = async (sessionToken: string): Promise<Customer | null> => {
   if (!sessionToken) return null;
 
   try {
-    // Attempt decoding session token (format: bm_usr_<encodedEmail>_<timestamp>)
-    if (sessionToken.startsWith('bm_usr_')) {
-      const parts = sessionToken.split('_');
-      const emailBase64 = parts[2];
-      const email = Buffer.from(emailBase64, 'base64').toString('utf-8');
+    const profile = extractCustomerProfile(sessionToken);
+    if (!profile) return null;
 
-      // Fetch saved addresses from Supabase
-      const { data: addressRows } = await supabase
-        .from('addresses')
-        .select('*')
-        .order('created_at', { ascending: false });
+    const email = profile.email;
+    const acc = memoryCustomerAccounts.get(email);
+    const firstName = acc?.firstName || profile.firstName;
+    const lastName = acc?.lastName || profile.lastName;
 
-      const addresses: Address[] = (addressRows || []).map((row: any) => ({
-        id: row.id,
-        firstName: row.first_name || '',
-        lastName: row.last_name || '',
-        address1: row.address1 || '',
-        address2: row.address2 || '',
-        city: row.city || '',
-        province: row.province || 'DE',
-        zip: row.zip || '',
-        country: row.country || 'United States',
-        phone: row.phone || '',
-      }));
+    // Load addresses from native store
+    const addresses = getCustomerAddresses(email);
 
-      // Fetch orders for customer
-      const { data: orderRows } = await supabase
-        .from('orders')
-        .select('*, order_items(*)')
-        .eq('customer_email', email)
-        .order('created_at', { ascending: false });
+    // Load orders from native store
+    const orders = getCustomerOrders(email);
 
-      const orders: Order[] = (orderRows || []).map((row: any) => ({
-        id: row.id,
-        orderNumber: row.order_number,
-        processedAt: row.created_at,
-        totalPrice: { amount: String(row.total_amount), currencyCode: row.currency || 'USD' },
-        totalShippingPrice: { amount: String(row.shipping_amount), currencyCode: row.currency || 'USD' },
-        totalTax: { amount: String(row.tax_amount), currencyCode: row.currency || 'USD' },
-        financialStatus: row.status === 'PAID' ? 'PAID' : 'PENDING',
-        fulfillmentStatus: row.status === 'SHIPPED' ? 'FULFILLED' : 'UNFULFILLED',
-        successfulFulfillments: row.tracking_number ? [
-          {
-            trackingCompany: row.carrier || 'Courier',
-            trackingInfo: [{ number: row.tracking_number, url: row.tracking_url || '' }],
-          }
-        ] : [],
-        statusUrl: '',
-        lineItems: (row.order_items || []).map((item: any) => ({
-          title: item.product_title,
-          quantity: item.quantity,
-        })),
-      }));
-
-      return {
-        id: `usr_${Buffer.from(email).toString('hex').substring(0, 12)}`,
-        email,
-        firstName: email.split('@')[0],
-        lastName: 'Patient',
-        phone: '',
-        defaultAddress: addresses[0],
-        addresses,
-        orders,
-      };
-    }
+    return {
+      id: `usr_${Buffer.from(email).toString('hex').substring(0, 12)}`,
+      email,
+      firstName,
+      lastName,
+      phone: addresses[0]?.phone || '',
+      defaultAddress: addresses[0],
+      addresses,
+      orders,
+    };
   } catch (error) {
     console.error('Failed to resolve customer session:', error);
   }
 
   return null;
-};
-
-export const createSessionToken = (email: string): string => {
-  const emailBase64 = Buffer.from(email.toLowerCase()).toString('base64');
-  return `bm_usr_${emailBase64}_${Date.now()}`;
 };

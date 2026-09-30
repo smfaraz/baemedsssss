@@ -172,7 +172,7 @@ export default {
         const parts = subpath.split('/');
         const rxId = parts[1];
 
-        if (rxId && method === 'POST') {
+        if (rxId && (method === 'POST' || method === 'PATCH')) {
           const body = await readJson<any>(request);
           const reviewed = await AdminService.reviewPrescription(actor, rxId, body.decision, body.notes);
           return json({ prescription: reviewed });

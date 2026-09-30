@@ -1,8 +1,11 @@
 import {
   ApiError,
+  addCustomerAddress,
   assertSameOrigin,
   cleanString,
+  deleteCustomerAddress,
   errorResponse,
+  extractCustomerProfile,
   json,
   readJson,
   requireSessionToken,
@@ -60,26 +63,43 @@ const addAddress = async (request: Request, _token: string) => {
     province: normalizeStateCode(rawState),
     country: 'United States',
     zip: rawZip.trim(),
-    first_name: sanitizeInput(cleanString(body.firstName, 'First name', 80)),
-    last_name: sanitizeInput(cleanString(body.lastName, 'Last name', 80)),
+    firstName: sanitizeInput(cleanString(body.firstName, 'First name', 80)),
+    lastName: sanitizeInput(cleanString(body.lastName, 'Last name', 80)),
     phone: rawPhone ? toE164Phone(rawPhone) : undefined,
   };
 
+  const profile = extractCustomerProfile(_token);
+  const email = profile?.email || 'patient@example.com';
+  const saved = addCustomerAddress(email, address);
+
   try {
-    const { error } = await supabase.from('addresses').insert(address);
-    if (error) {
-      // Fallback if offline or table unmigrated in dev
-    }
+    await supabase.from('addresses').insert({
+      id: saved.id,
+      customer_email: email,
+      address1: address.address1,
+      address2: address.address2,
+      city: address.city,
+      province: address.province,
+      country: address.country,
+      zip: address.zip,
+      first_name: address.firstName,
+      last_name: address.lastName,
+      phone: address.phone,
+    });
   } catch {
     // Offline resilient
   }
 
-  return json({ ok: true });
+  return json({ ok: true, address: saved });
 };
 
 const removeAddress = async (request: Request, _token: string) => {
   const body = await readJson<AddressBody>(request);
   const id = cleanString(body.id, 'Address identifier', 300);
+
+  const profile = extractCustomerProfile(_token);
+  const email = profile?.email || 'patient@example.com';
+  deleteCustomerAddress(email, id);
 
   try {
     await supabase.from('addresses').delete().eq('id', id);

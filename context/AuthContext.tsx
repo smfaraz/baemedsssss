@@ -63,7 +63,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       await loginCustomerSession(email, pass);
       const customerData = await refreshCustomer();
-      if (!customerData) throw new Error('Shopify did not return a customer profile for this session.');
+      if (!customerData) throw new Error('Could not retrieve your BaeMeds customer profile.');
     } catch (loginError) {
       setCustomer(null);
       const message = errorMessage(loginError, 'Sign-in failed. Please check your details and try again.');

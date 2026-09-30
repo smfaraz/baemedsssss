@@ -6,7 +6,7 @@
 
 import { supabase } from '../lib/supabase';
 import catalogSeed from '../data/catalog_seed.json';
-import { Product } from '../types';
+import { Product, Order } from '../types';
 
 export type AdminRole =
   | 'super_admin'
@@ -290,6 +290,230 @@ let memoryTaxSettings = {
   lastUpdated: new Date().toISOString(),
 };
 
+export let memoryOrders: any[] = [
+  {
+    id: 'ord_demo_001',
+    order_number: 'BM-722730-720',
+    customer_email: 'sarah.miller@example.com',
+    status: 'CLINICAL_REVIEW',
+    currency: 'USD',
+    subtotal_amount: 1450.0,
+    tax_amount: 87.0,
+    shipping_amount: 0.0,
+    total_amount: 1537.0,
+    requires_prescription: true,
+    shipping_method: 'Standard Ground (3-5 Business Days)',
+    shipping_address: {
+      first_name: 'Sarah',
+      last_name: 'Miller',
+      address1: '1420 Market St',
+      city: 'Wilmington',
+      province: 'DE',
+      zip: '19801',
+      country: 'United States',
+      phone: '(302) 555-0144',
+    },
+    billing_address: {
+      first_name: 'Sarah',
+      last_name: 'Miller',
+      address1: '1420 Market St',
+      city: 'Wilmington',
+      province: 'DE',
+      zip: '19801',
+      country: 'United States',
+      phone: '(302) 555-0144',
+    },
+    order_items: [
+      {
+        id: 'item_1',
+        product_id: 'philips-everflo',
+        product_title: 'Philips EverFlo Oxygen Concentrator 5L',
+        sku: 'EVF-500',
+        unit_price: 1450.0,
+        quantity: 1,
+        total_price: 1450.0,
+      },
+    ],
+    created_at: new Date(Date.now() - 3600000 * 3).toISOString(),
+  },
+  {
+    id: 'ord_demo_002',
+    order_number: 'BM-722730-721',
+    customer_email: 'david.chen@example.com',
+    status: 'PAID',
+    currency: 'USD',
+    subtotal_amount: 890.0,
+    tax_amount: 53.4,
+    shipping_amount: 25.0,
+    total_amount: 968.4,
+    requires_prescription: false,
+    shipping_method: 'Priority Medical Courier (1-2 Business Days)',
+    shipping_address: {
+      first_name: 'David',
+      last_name: 'Chen',
+      address1: '802 Delaware Ave',
+      city: 'Wilmington',
+      province: 'DE',
+      zip: '19806',
+      country: 'United States',
+      phone: '(302) 555-0188',
+    },
+    billing_address: {
+      first_name: 'David',
+      last_name: 'Chen',
+      address1: '802 Delaware Ave',
+      city: 'Wilmington',
+      province: 'DE',
+      zip: '19806',
+      country: 'United States',
+      phone: '(302) 555-0188',
+    },
+    order_items: [
+      {
+        id: 'item_2',
+        product_id: 'resmed-airfit-f20',
+        product_title: 'ResMed AirFit F20 Full Face CPAP Mask System',
+        sku: 'RF-F20',
+        unit_price: 178.0,
+        quantity: 5,
+        total_price: 890.0,
+      },
+    ],
+    created_at: new Date(Date.now() - 3600000 * 8).toISOString(),
+  },
+  {
+    id: 'ord_demo_003',
+    order_number: 'BM-722730-722',
+    customer_email: 'patient@example.com',
+    status: 'SHIPPED',
+    currency: 'USD',
+    subtotal_amount: 540.0,
+    tax_amount: 32.4,
+    shipping_amount: 12.0,
+    total_amount: 584.4,
+    requires_prescription: false,
+    shipping_method: 'Standard Ground (3-5 Business Days)',
+    carrier: 'FedEx Ground',
+    tracking_number: '748902849102',
+    tracking_url: 'https://www.fedex.com/fedextrack/?trknbr=748902849102',
+    shipping_address: {
+      first_name: 'Jane',
+      last_name: 'Doe',
+      address1: '1200 N Dupont Hwy',
+      city: 'Dover',
+      province: 'DE',
+      zip: '19901',
+      country: 'United States',
+      phone: '(302) 555-0199',
+    },
+    billing_address: {
+      first_name: 'Jane',
+      last_name: 'Doe',
+      address1: '1200 N Dupont Hwy',
+      city: 'Dover',
+      province: 'DE',
+      zip: '19901',
+      country: 'United States',
+      phone: '(302) 555-0199',
+    },
+    order_items: [
+      {
+        id: 'item_3',
+        product_id: 'drive-medical-wheelchair',
+        product_title: 'Drive Medical Cruiser III Light Weight Wheelchair',
+        sku: 'DM-CR3',
+        unit_price: 270.0,
+        quantity: 2,
+        total_price: 540.0,
+      },
+    ],
+    created_at: new Date(Date.now() - 86400000 * 2).toISOString(),
+  },
+];
+
+export let memoryPrescriptions: any[] = [
+  {
+    id: 'rx_8849',
+    patientName: 'Sarah Miller',
+    orderNumber: 'BM-722730-720',
+    prescribedDevice: 'Philips EverFlo Oxygen Concentrator (5 LPM continuous)',
+    physicianName: 'Dr. Arthur Vance, MD (NPI: 1982840192)',
+    clinic: 'Wilmington Pulmonary & Sleep Medicine',
+    submittedAt: new Date(Date.now() - 3600000 * 2).toISOString(),
+    status: 'PENDING_REVIEW',
+    documentUrl: 'https://placehold.co/800x1100/f8fafc/0f172a?text=Official+Medical+Prescription+Rx_8849',
+    documentType: 'PDF Document',
+  },
+  {
+    id: 'rx_8842',
+    patientName: 'Harold Jenkins',
+    orderNumber: 'BM-722601-319',
+    prescribedDevice: 'ResMed AirSense 10 AutoSet CPAP (Pressure 10-14 cmH2O)',
+    physicianName: 'Dr. Evelyn Reed, MD (NPI: 1029384756)',
+    clinic: 'Christiana Care Respiratory Services',
+    submittedAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+    status: 'APPROVED',
+    documentUrl: 'https://placehold.co/800x1100/f8fafc/0f172a?text=Official+Medical+Prescription+Rx_8842',
+    documentType: 'PDF Document',
+    reviewedBy: 'Dr. Evelyn Reed, MD',
+    reviewedAt: new Date(Date.now() - 86400000).toISOString(),
+  },
+];
+
+export const recordFirstPartyOrder = (order: any) => {
+  memoryOrders.unshift(order);
+  if (memoryOrders.length > 500) memoryOrders.pop();
+
+  if (order.requires_prescription) {
+    const rxId = `rx_${Date.now().toString().slice(-4)}`;
+    memoryPrescriptions.unshift({
+      id: rxId,
+      patientName: `${order.shipping_address?.first_name || ''} ${order.shipping_address?.last_name || ''}`.trim() || 'Patient',
+      orderNumber: order.order_number,
+      prescribedDevice: order.order_items?.[0]?.product_title || 'Clinical DME Equipment',
+      physicianName: 'Attested Physician on File',
+      clinic: 'Customer DME Attestation',
+      submittedAt: new Date().toISOString(),
+      status: 'PENDING_REVIEW',
+      documentUrl: `https://placehold.co/800x1100/f8fafc/0f172a?text=Clinical+Rx+Documentation+${encodeURIComponent(order.order_number)}`,
+      documentType: 'Clinical Attestation / Rx Record',
+    });
+  }
+
+  logAdminAction('system', 'super_admin', 'ORDER_CREATED', 'order', order.id, 'SUCCESS', {
+    orderNumber: order.order_number,
+    total: order.total_amount,
+    customerEmail: order.customer_email,
+    requiresPrescription: order.requires_prescription,
+  });
+};
+
+export const getCustomerOrders = (email: string): Order[] => {
+  const normEmail = (email || '').toLowerCase().trim();
+  const matched = memoryOrders.filter((o) => (o.customer_email || '').toLowerCase().trim() === normEmail);
+  return matched.map((row: any) => ({
+    id: row.id,
+    orderNumber: row.order_number,
+    processedAt: row.created_at || new Date().toISOString(),
+    totalPrice: { amount: String(row.total_amount), currencyCode: row.currency || 'USD' },
+    totalShippingPrice: { amount: String(row.shipping_amount ?? 0), currencyCode: row.currency || 'USD' },
+    totalTax: { amount: String(row.tax_amount ?? 0), currencyCode: row.currency || 'USD' },
+    financialStatus: ['PAID', 'SHIPPED', 'DELIVERED', 'PROCESSING'].includes(row.status) ? 'PAID' : 'PENDING',
+    fulfillmentStatus: row.status === 'DELIVERED' || row.status === 'SHIPPED' ? 'FULFILLED' : 'UNFULFILLED',
+    successfulFulfillments: row.tracking_number ? [
+      {
+        trackingCompany: row.carrier || 'Courier',
+        trackingInfo: [{ number: row.tracking_number, url: row.tracking_url || '' }],
+      }
+    ] : [],
+    statusUrl: '',
+    lineItems: (row.order_items || []).map((item: any) => ({
+      title: item.product_title,
+      quantity: item.quantity,
+    })),
+  }));
+};
+
 // --------------------------------------------------------------------
 // 4. AUDIT LOGGER
 // --------------------------------------------------------------------
@@ -376,86 +600,21 @@ export const AdminService = {
   async getOrders(role: AdminRole, filters?: { status?: string; search?: string }) {
     if (!hasPermission(role, 'orders:view')) throw new Error('Unauthorized');
 
-    let orders: any[] = [];
-    try {
-      let query = supabase.from('orders').select('*, order_items(*)').order('created_at', { ascending: false });
-      if (filters?.status && filters.status !== 'all') {
-        query = query.eq('status', filters.status);
-      }
-      const { data, error } = await query;
-      if (!error && data) orders = data;
-    } catch {}
+    let orders = [...memoryOrders];
 
-    // Fallback seed orders if database is clean
-    if (!orders.length) {
-      orders = [
-        {
-          id: 'ord_demo_001',
-          order_number: 'BM-722730-720',
-          customer_email: 'sarah.miller@example.com',
-          status: 'CLINICAL_REVIEW',
-          currency: 'USD',
-          subtotal_amount: 1450.0,
-          tax_amount: 87.0,
-          shipping_amount: 0.0,
-          total_amount: 1537.0,
-          requires_prescription: true,
-          shipping_method: 'Standard Ground',
-          shipping_address: {
-            first_name: 'Sarah',
-            last_name: 'Miller',
-            address1: '1420 Market St',
-            city: 'Wilmington',
-            province: 'DE',
-            zip: '19801',
-            phone: '(302) 555-0144',
-          },
-          order_items: [
-            {
-              id: 'item_1',
-              product_title: 'Philips EverFlo Oxygen Concentrator 5L',
-              sku: 'EVF-500',
-              unit_price: 1450.0,
-              quantity: 1,
-              total_price: 1450.0,
-            },
-          ],
-          created_at: new Date(Date.now() - 3600000 * 3).toISOString(),
-        },
-        {
-          id: 'ord_demo_002',
-          order_number: 'BM-722730-721',
-          customer_email: 'david.chen@example.com',
-          status: 'PAID',
-          currency: 'USD',
-          subtotal_amount: 890.0,
-          tax_amount: 53.4,
-          shipping_amount: 25.0,
-          total_amount: 968.4,
-          requires_prescription: false,
-          shipping_method: 'Priority Medical Courier',
-          shipping_address: {
-            first_name: 'David',
-            last_name: 'Chen',
-            address1: '802 Delaware Ave',
-            city: 'Wilmington',
-            province: 'DE',
-            zip: '19806',
-            phone: '(302) 555-0188',
-          },
-          order_items: [
-            {
-              id: 'item_2',
-              product_title: 'ResMed AirFit F20 Full Face CPAP Mask System',
-              sku: 'RF-F20',
-              unit_price: 178.0,
-              quantity: 5,
-              total_price: 890.0,
-            },
-          ],
-          created_at: new Date(Date.now() - 3600000 * 8).toISOString(),
-        },
-      ];
+    if (filters?.status && filters.status !== 'all') {
+      orders = orders.filter((o) => o.status === filters.status);
+    }
+
+    if (filters?.search && filters.search.trim()) {
+      const q = filters.search.toLowerCase().trim();
+      orders = orders.filter((o) =>
+        (o.order_number || '').toLowerCase().includes(q) ||
+        (o.customer_email || '').toLowerCase().includes(q) ||
+        (o.shipping_address?.first_name || '').toLowerCase().includes(q) ||
+        (o.shipping_address?.last_name || '').toLowerCase().includes(q) ||
+        (o.order_items || []).some((item: any) => (item.product_title || '').toLowerCase().includes(q))
+      );
     }
 
     // Role-based redaction: support & fulfillment roles do not see clinical notes
@@ -471,8 +630,7 @@ export const AdminService = {
 
   async getOrderById(role: AdminRole, orderId: string) {
     if (!hasPermission(role, 'orders:view')) throw new Error('Unauthorized');
-    const all = await this.getOrders(role);
-    const order = all.find((o) => o.id === orderId || o.order_number === orderId);
+    const order = memoryOrders.find((o) => o.id === orderId || o.order_number === orderId);
     if (!order) throw new Error('Order not found');
     return order;
   },
@@ -793,35 +951,7 @@ export const AdminService = {
   // --- CLINICAL PRESCRIPTIONS ---
   async getPrescriptions(role: AdminRole) {
     if (!hasPermission(role, 'prescriptions:view')) throw new Error('Unauthorized');
-
-    return [
-      {
-        id: 'rx_8849',
-        patientName: 'Sarah Miller',
-        orderNumber: 'BM-722730-720',
-        prescribedDevice: 'Philips EverFlo Oxygen Concentrator (5 LPM continuous)',
-        physicianName: 'Dr. Arthur Vance, MD (NPI: 1982840192)',
-        clinic: 'Wilmington Pulmonary & Sleep Medicine',
-        submittedAt: new Date(Date.now() - 3600000 * 2).toISOString(),
-        status: 'PENDING_REVIEW',
-        documentUrl: 'https://placehold.co/800x1100/f8fafc/0f172a?text=Official+Medical+Prescription+Rx_8849',
-        documentType: 'PDF Document',
-      },
-      {
-        id: 'rx_8842',
-        patientName: 'Harold Jenkins',
-        orderNumber: 'BM-722601-319',
-        prescribedDevice: 'ResMed AirSense 10 AutoSet CPAP (Pressure 10-14 cmH2O)',
-        physicianName: 'Dr. Evelyn Reed, MD (NPI: 1029384756)',
-        clinic: 'Christiana Care Respiratory Services',
-        submittedAt: new Date(Date.now() - 86400000 * 2).toISOString(),
-        status: 'APPROVED',
-        documentUrl: 'https://placehold.co/800x1100/f8fafc/0f172a?text=Official+Medical+Prescription+Rx_8842',
-        documentType: 'PDF Document',
-        reviewedBy: 'Dr. Evelyn Reed, MD',
-        reviewedAt: new Date(Date.now() - 86400000).toISOString(),
-      },
-    ];
+    return [...memoryPrescriptions];
   },
 
   async reviewPrescription(
@@ -833,6 +963,22 @@ export const AdminService = {
     if (!hasPermission(actor.role, 'prescriptions:review')) {
       await logAdminAction(actor.id, actor.role, 'PRESCRIPTION_REVIEW_ATTEMPT', 'prescription', prescriptionId, 'DENIED');
       throw new Error('Forbidden: Only licensed clinical specialists may review prescriptions');
+    }
+
+    const rx = memoryPrescriptions.find((p) => p.id === prescriptionId);
+    if (rx) {
+      rx.status = decision;
+      rx.reviewedBy = actor.name;
+      rx.reviewedAt = new Date().toISOString();
+      rx.notes = notes;
+
+      // When prescription is approved, automatically progress the associated order to CLINICAL_APPROVED
+      if (decision === 'APPROVED' && rx.orderNumber) {
+        const order = memoryOrders.find((o) => o.order_number === rx.orderNumber);
+        if (order && order.status === 'CLINICAL_REVIEW') {
+          order.status = 'CLINICAL_APPROVED';
+        }
+      }
     }
 
     await logAdminAction(actor.id, actor.role, `PRESCRIPTION_${decision}`, 'prescription', prescriptionId, 'SUCCESS', {
