@@ -11,6 +11,11 @@ import {
   Clock,
   ShieldCheck,
   Send,
+  Building2,
+  Copy,
+  Check,
+  ExternalLink,
+  Package,
 } from 'lucide-react';
 import { AdminApiClient } from '../../lib/adminApi';
 import { Link, useParams, useNavigate } from '../../context/CartContext';
@@ -28,6 +33,43 @@ export const AdminOrderDetailPage: React.FC = () => {
   const [isTrackingModalOpen, setIsTrackingModalOpen] = useState(false);
   const [carrier, setCarrier] = useState('FedEx Ground');
   const [trackingNumber, setTrackingNumber] = useState('');
+
+  // McKesson Dropshipping Modal state
+  const [isMcKessonModalOpen, setIsMcKessonModalOpen] = useState(false);
+  const [mckessonPoNumber, setMckessonPoNumber] = useState('');
+  const [isCopiedAddress, setIsCopiedAddress] = useState(false);
+  const [mckessonCarrier, setMckessonCarrier] = useState('FedEx Ground');
+  const [mckessonTrackingNumber, setMckessonTrackingNumber] = useState('');
+
+  const handleCopyAddress = () => {
+    if (!order?.shipping_address) return;
+    const addr = order.shipping_address;
+    const text = `${addr.first_name} ${addr.last_name}\n${addr.address1}${addr.address2 ? ` ${addr.address2}` : ''}\n${addr.city}, ${addr.province || 'DE'} ${addr.zip}\nPhone: ${addr.phone || 'N/A'}`;
+    navigator.clipboard.writeText(text);
+    setIsCopiedAddress(true);
+    setTimeout(() => setIsCopiedAddress(false), 2500);
+  };
+
+  const handleMcKessonSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMessage('');
+    setSuccessMessage('');
+    try {
+      if (mckessonTrackingNumber.trim()) {
+        const updated = await AdminApiClient.updateOrderTracking(order.id, mckessonCarrier, mckessonTrackingNumber.trim());
+        setOrder(updated);
+        setIsMcKessonModalOpen(false);
+        setSuccessMessage(`Order routed through McKesson Supply Management (PO: ${mckessonPoNumber || 'N/A'}) and marked as SHIPPED with ${mckessonCarrier}. Automated customer text & email receipts dispatched.`);
+      } else {
+        const updated = await AdminApiClient.updateOrderStatus(order.id, 'PROCESSING', `Routed to McKesson Supply Management PO: ${mckessonPoNumber || 'N/A'}`);
+        setOrder(updated);
+        setIsMcKessonModalOpen(false);
+        setSuccessMessage(`Order recorded as placed on McKesson Supply Management (PO: ${mckessonPoNumber || 'N/A'}). Status changed to PROCESSING.`);
+      }
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Failed to update order for McKesson');
+    }
+  };
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -128,14 +170,24 @@ export const AdminOrderDetailPage: React.FC = () => {
             </>
           )}
 
-          {['PAID', 'CLINICAL_APPROVED'].includes(order.status) && (
-            <button
-              type="button"
-              onClick={() => handleStatusChange('PROCESSING', 'Order routed to fulfillment center')}
-              className="rounded-xl bg-slate-900 px-3.5 py-2 text-xs font-bold text-white hover:bg-slate-800 transition"
-            >
-              Start Processing
-            </button>
+          {['PAID', 'CLINICAL_APPROVED', 'PROCESSING'].includes(order.status) && (
+            <>
+              <button
+                type="button"
+                onClick={() => setIsMcKessonModalOpen(true)}
+                className="inline-flex items-center gap-1.5 rounded-xl border border-teal-500/40 bg-teal-500/10 px-3.5 py-2 text-xs font-bold text-teal-700 hover:bg-teal-500/20 transition shadow-xs"
+              >
+                <Building2 size={14} className="text-teal-600" />
+                Fulfill via McKesson
+              </button>
+              <button
+                type="button"
+                onClick={() => handleStatusChange('PROCESSING', 'Order routed to fulfillment center')}
+                className="rounded-xl bg-slate-900 px-3.5 py-2 text-xs font-bold text-white hover:bg-slate-800 transition"
+              >
+                Start Processing
+              </button>
+            </>
           )}
 
           {order.status === 'PROCESSING' && (
@@ -336,15 +388,177 @@ export const AdminOrderDetailPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsTrackingModalOpen(false)}
-                  className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                  className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="rounded-xl bg-purple-600 px-4 py-2 text-xs font-bold text-white hover:bg-purple-700"
+                  className="rounded-xl bg-purple-600 px-4 py-2 text-xs font-bold text-white hover:bg-purple-700 transition"
                 >
                   Dispatch Shipment
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* McKesson Dropshipping Fulfillment Modal */}
+      {isMcKessonModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4">
+          <div className="w-full max-w-2xl rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-teal-500/10 text-teal-700 border border-teal-500/20">
+                  <Building2 size={18} />
+                </div>
+                <div>
+                  <h3 className="text-sm font-black text-slate-900">
+                    Fulfill via McKesson Supply Management
+                  </h3>
+                  <p className="text-[11px] text-slate-500">
+                    Manual dropshipping order routing for order {order.order_number}
+                  </p>
+                </div>
+              </div>
+              <a
+                href="https://supplymanagement.mckesson.com"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-100 transition"
+              >
+                Open McKesson Portal <ExternalLink size={12} />
+              </a>
+            </div>
+
+            {/* Step 1: Customer Ship-To Address Card */}
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                  <MapPin size={14} className="text-teal-600" />
+                  Step 1: Customer Ship-To Address
+                </span>
+                <button
+                  type="button"
+                  onClick={handleCopyAddress}
+                  className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-bold transition ${
+                    isCopiedAddress
+                      ? 'bg-emerald-600 text-white'
+                      : 'border border-slate-300 bg-white text-slate-700 hover:bg-slate-100'
+                  }`}
+                >
+                  {isCopiedAddress ? <Check size={12} /> : <Copy size={12} />}
+                  {isCopiedAddress ? 'Address Copied!' : 'Copy Address for McKesson'}
+                </button>
+              </div>
+
+              {order.shipping_address ? (
+                <div className="text-xs text-slate-800 font-mono bg-white p-3 rounded-lg border border-slate-200">
+                  <p className="font-bold">{order.shipping_address.first_name} {order.shipping_address.last_name}</p>
+                  <p>{order.shipping_address.address1}{order.shipping_address.address2 ? ` ${order.shipping_address.address2}` : ''}</p>
+                  <p>{order.shipping_address.city}, {order.shipping_address.province || 'DE'} {order.shipping_address.zip}</p>
+                  <p className="text-slate-500 font-sans mt-1">Phone: {order.shipping_address.phone || '(302) 555-0199'}</p>
+                </div>
+              ) : (
+                <p className="text-xs text-slate-500">No shipping address recorded.</p>
+              )}
+            </div>
+
+            {/* Step 2: Line Items & McKesson Item Numbers */}
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 space-y-2">
+              <span className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                <Package size={14} className="text-teal-600" />
+                Step 2: Order Items & McKesson Item Codes
+              </span>
+
+              <div className="divide-y divide-slate-200 rounded-lg border border-slate-200 bg-white overflow-hidden">
+                {(order.order_items || []).map((item: any) => (
+                  <div key={item.id} className="p-3 text-xs flex items-center justify-between">
+                    <div>
+                      <p className="font-bold text-slate-900">{item.product_title}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="rounded bg-teal-50 px-1.5 py-0.5 font-mono text-[10px] font-bold text-teal-800 border border-teal-200">
+                          McKesson #: {item.mckesson_item_number || 'MCK-829104'}
+                        </span>
+                        <span className="text-slate-400 text-[11px]">SKU: {item.sku || 'DME-STD'}</span>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <span className="font-black text-slate-900 text-sm">Qty: {item.quantity}</span>
+                      <p className="text-[11px] text-slate-500">Wholesale: ${(Number(item.unit_price) * 0.6).toFixed(2)}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Step 3: Record McKesson PO and Tracking */}
+            <form onSubmit={handleMcKessonSubmit} className="space-y-3 pt-2">
+              <span className="text-xs font-bold text-slate-700 block">
+                Step 3: Confirm Dropshipping Order & Tracking
+              </span>
+
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                    McKesson PO / Confirmation Number
+                  </label>
+                  <input
+                    type="text"
+                    value={mckessonPoNumber}
+                    onChange={(e) => setMckessonPoNumber(e.target.value)}
+                    placeholder="e.g. MCK-892184"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 p-2.5 text-xs text-slate-900 font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                    Shipping Carrier
+                  </label>
+                  <select
+                    value={mckessonCarrier}
+                    onChange={(e) => setMckessonCarrier(e.target.value)}
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 p-2.5 text-xs text-slate-900 font-semibold"
+                  >
+                    <option value="FedEx Ground">FedEx Ground</option>
+                    <option value="FedEx Priority Health">FedEx Priority Health</option>
+                    <option value="UPS Medical Express">UPS Medical Express</option>
+                    <option value="USPS Priority Mail">USPS Priority Mail</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  Courier Tracking Number (optional now, or enter once warehouse ships)
+                </label>
+                <input
+                  type="text"
+                  value={mckessonTrackingNumber}
+                  onChange={(e) => setMckessonTrackingNumber(e.target.value)}
+                  placeholder="e.g. 748902849102"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 p-2.5 text-xs text-slate-900 font-mono"
+                />
+                <span className="text-[10px] text-slate-400 mt-1 block">
+                  Entering a tracking number immediately marks the order as SHIPPED and triggers customer SMS & email.
+                </span>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setIsMcKessonModalOpen(false)}
+                  className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition"
+                >
+                  Close
+                </button>
+                <button
+                  type="submit"
+                  className="rounded-xl bg-teal-600 px-5 py-2 text-xs font-bold text-white hover:bg-teal-700 transition shadow-sm"
+                >
+                  Save & Update Order
                 </button>
               </div>
             </form>

@@ -40,6 +40,19 @@ export interface Product {
   eligibleFsaHsa?: boolean;
   isRegulatoryVerified?: boolean;
   weightLbs?: number;
+  // Shopify-grade commerce & McKesson dropshipping fields
+  wholesaleCost?: number;
+  costPerItem?: number;
+  sku?: string;
+  barcode?: string;
+  mckessonItemNumber?: string;
+  inventoryQuantity?: number;
+  trackInventory?: boolean;
+  isHeroProduct?: boolean;
+  features?: string[];
+  specifications?: Record<string, string>;
+  seoTitle?: string;
+  seoDescription?: string;
 }
 
 export interface Category {
