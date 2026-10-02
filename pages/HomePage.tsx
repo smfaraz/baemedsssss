@@ -299,45 +299,57 @@ const HomePage: React.FC = () => {
 
   const revealRef = useReveal<HTMLDivElement>();
 
-  // Showcase flagship products and core medical equipment in the continuous marquee reel
+  // Showcase flagship products and core medical equipment across diverse categories in the continuous marquee reel
   const heroReel = useMemo(() => {
-    const heroMachineIds = [
-      'prd-hero-dv-525ds',
-      'prd-hero-dv-1025ds',
-      'prd-hero-dr-k3',
-      'prd-hero-dr-stdec',
-      'prd-hero-dr-cx4',
-      'prd-hero-ino-is-501-na8',
-      'prd-o2-ino-rove6',
-      'prd-hero-dv-3655ltr',
-      'prd-hero-dr-18081',
-      'prd-hero-mq-mq3000',
-      'prd-hero-dr-13002sv-6',
+    if (!catalogueProducts.length) return [];
+
+    const isPrimaryEquipment = (p: Product) => {
+      if (!p.inStock || !p.image || p.price < 35 || p.price > 2500) return false;
+      const nonMachineryPattern =
+        /measuring wheel|filter|tubing|connector|adapter|wrench|bracket|screw|clip|cuff|case|bag|cannula|mask|valve|cleanser|wipes|upholstery|sheet|strip|battery|wheel only|headgear|chamber|unfilled|bottle only|cup only|pad|cord only|holder|tray|stand only|armrest|replacement/i;
+      return !nonMachineryPattern.test(p.title);
+    };
+
+    const eligible = catalogueProducts.filter(isPrimaryEquipment);
+
+    const categories = [
+      'Oxygen Concentrators',
+      'Wheelchairs',
+      'Breast Pumps',
+      'Patient Monitors',
+      'Nebulizers',
+      'Blood Pressure Monitors',
+      'CPAP Machines',
+      'BiPAP Machines',
     ];
 
-    const topHeroMachines = heroMachineIds
-      .map((id) =>
-        catalogueProducts.find(
-          (p) =>
-            p.id === id ||
-            p.id.endsWith(id) ||
-            p.handle.includes(id.replace(/^prd-(hero-)?/, ''))
-        )
-      )
-      .filter(Boolean) as Product[];
+    const byCat: Record<string, Product[]> = {};
+    for (const p of eligible) {
+      const cat = p.category || 'Equipment';
+      if (!byCat[cat]) byCat[cat] = [];
+      byCat[cat].push(p);
+    }
 
-    // Deduplicate by ID
-    const uniqueHeroes = Array.from(new Map(topHeroMachines.map((p) => [p.id, p])).values());
+    for (const cat in byCat) {
+      byCat[cat].sort((a, b) => {
+        if (a.isHeroProduct && !b.isHeroProduct) return -1;
+        if (!a.isHeroProduct && b.isHeroProduct) return 1;
+        return (b.price || 0) - (a.price || 0);
+      });
+    }
 
-    const additionalMachines = catalogueProducts.filter(
-      (p) =>
-        p.inStock &&
-        p.price >= 80 &&
-        !uniqueHeroes.some((m) => m.id === p.id) &&
-        !/filter|tubing|connector|adapter|wrench|bracket|screw|clip|cuff|case|bag|cannula|mask|valve/i.test(p.title)
-    );
+    const selected: Product[] = [];
+    for (let round = 0; round < 3; round++) {
+      for (const cat of categories) {
+        if (selected.length >= 16) break;
+        if (byCat[cat] && byCat[cat][round]) {
+          selected.push(byCat[cat][round]);
+        }
+      }
+    }
 
-    return [...uniqueHeroes, ...additionalMachines].slice(0, 14);
+    if (selected.length >= 8) return selected;
+    return catalogueProducts.filter((p) => p.inStock && p.image).slice(0, 16);
   }, [catalogueProducts]);
 
   return (
