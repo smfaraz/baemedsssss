@@ -299,17 +299,53 @@ const HomePage: React.FC = () => {
 
   const revealRef = useReveal<HTMLDivElement>();
 
-  // Showcase flagship products and core medical equipment in the continuous marquee reel
+  // Showcase a balanced, diverse mix of flagship equipment across all medical categories in the continuous marquee reel
   const heroReel = useMemo(() => {
-    const heroes = catalogueProducts.filter((p) => p.isHeroProduct && p.inStock && p.price >= 80);
-    if (heroes.length >= 8) return heroes.slice(0, 16);
+    if (!catalogueProducts.length) return [];
 
-    const coreEquipment = catalogueProducts.filter((p) =>
-      p.inStock &&
-      p.price >= 80 &&
-      !/filter|tubing|connector|adapter|wrench|bracket|screw|clip|cuff|case|bag|cannula|mask|valve/i.test(p.title)
+    const candidates = catalogueProducts.filter(
+      (p) =>
+        p.inStock &&
+        p.price >= 40 &&
+        p.price <= 1500 &&
+        !/prewash|cleanser|urine analyzer|test strip|chux|lancet|wipe|sheet|glove|mask only|tubing|filter|bracket|screw|clip|cuff only|sensor only|battery|cable|case only|bag only/i.test(p.title)
     );
-    return coreEquipment.slice(0, 16);
+
+    // Group candidates by category
+    const byCategory: Record<string, Product[]> = {};
+    for (const product of candidates) {
+      const cat = product.category || 'Equipment';
+      if (!byCategory[cat]) byCategory[cat] = [];
+      byCategory[cat].push(product);
+    }
+
+    // Sort each category to prioritize flagship hero items, then well-priced equipment
+    for (const cat in byCategory) {
+      byCategory[cat].sort((a, b) => {
+        if (a.isHeroProduct && !b.isHeroProduct) return -1;
+        if (!a.isHeroProduct && b.isHeroProduct) return 1;
+        return (b.price || 0) - (a.price || 0);
+      });
+    }
+
+    // Round-robin selection across distinct categories to guarantee diverse showcase
+    const selected: Product[] = [];
+    const categories = Object.keys(byCategory);
+    let round = 0;
+    while (selected.length < 16 && round < 4) {
+      let addedInRound = false;
+      for (const cat of categories) {
+        if (selected.length >= 16) break;
+        if (byCategory[cat][round]) {
+          selected.push(byCategory[cat][round]);
+          addedInRound = true;
+        }
+      }
+      if (!addedInRound) break;
+      round++;
+    }
+
+    return selected.length >= 6 ? selected : catalogueProducts.slice(0, 16);
   }, [catalogueProducts]);
 
   return (
