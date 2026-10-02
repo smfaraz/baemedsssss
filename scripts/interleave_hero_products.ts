@@ -19,25 +19,34 @@ currentHeroes.forEach((p: any) => {
   byCategory[p.category].push(p);
 });
 
-// Sort each category internally so the most prominent/flagship equipment comes first
+// Sort each category internally so accessible consumer equipment comes first
 Object.values(byCategory).forEach((list) => {
   list.sort((a, b) => {
-    const aFamous = /medela|spectra|momcozy|resmed|respironics|devilbiss|broda|masimo|nonin|welch allyn|dexcom|hemocue|ambu/i.test(a.vendor || '');
-    const bFamous = /medela|spectra|momcozy|resmed|respironics|devilbiss|broda|masimo|nonin|welch allyn|dexcom|hemocue|ambu/i.test(b.vendor || '');
+    // 1. Consumer Sweet Spot: $35 to $450 items get priority
+    const aSweet = a.price >= 35 && a.price <= 450 ? 0 : (a.price < 35 ? 1 : 2);
+    const bSweet = b.price >= 35 && b.price <= 450 ? 0 : (b.price < 35 ? 1 : 2);
+    if (aSweet !== bSweet) return aSweet - bSweet;
+
+    // 2. High-demand famous brands
+    const aFamous = /medela|spectra|momcozy|resmed|respironics|devilbiss|inogen|omron|drive|broda|masimo|nonin|dexcom/i.test(a.vendor || '');
+    const bFamous = /medela|spectra|momcozy|resmed|respironics|devilbiss|inogen|omron|drive|broda|masimo|nonin|dexcom/i.test(b.vendor || '');
     if (aFamous !== bFamous) return aFamous ? -1 : 1;
-    return b.price - a.price;
+
+    // 3. Lowest price first within tier
+    return a.price - b.price;
   });
 });
 
 const CATEGORY_ORDER = [
-  'BiPAP Machines',
-  'Wheelchairs',
+  'Oxygen Concentrators',
   'CPAP Machines',
-  'Patient Monitors',
+  'Wheelchairs',
   'Blood Pressure Monitors',
   'Nebulizers',
   'Breast Pumps',
   'Glucometers',
+  'BiPAP Machines',
+  'Patient Monitors',
   'Suction Machines',
   'Incontinence & Care',
 ];

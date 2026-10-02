@@ -48,18 +48,19 @@ function calculatePricing(dealerCost) {
   let cost = Math.max(0.5, dealerCost);
   let sellPrice = 0;
   
+  // Razor-thin growth pricing: undercut standard retail by 25-35%
   if (cost > 500) {
-    sellPrice = cost / 0.72; // ~28-30% margin
-  } else if (cost > 100) {
-    sellPrice = cost / 0.65; // ~35% margin
-  } else if (cost > 30) {
-    sellPrice = cost / 0.60; // ~40% margin
+    sellPrice = cost * 1.08; // 8% markup on high-ticket equipment
+  } else if (cost > 150) {
+    sellPrice = cost * 1.12; // 12% markup on mid-range equipment
+  } else if (cost > 40) {
+    sellPrice = cost * 1.16; // 16% markup on standard homecare items
   } else {
-    sellPrice = cost / 0.55; // ~45% margin
+    sellPrice = cost * 1.20; // 20% markup on small accessories & disposables
   }
   
-  sellPrice = Math.ceil(sellPrice) - 0.01; // $XX.99
-  let msrp = Math.ceil(sellPrice * 1.28) - 0.01;
+  sellPrice = Math.ceil(sellPrice) - 0.01; // $XX.99 clean price
+  let msrp = Math.ceil(cost * 1.45) - 0.01; // Standard competitor retail MSRP
   let profit = sellPrice - cost;
   let marginPct = Math.round((profit / sellPrice) * 100);
   
@@ -111,6 +112,7 @@ for (const cfg of categoryMapping) {
   const imgIdx = header.indexOf('Image URL');
 
   let addedForThis = 0;
+  let heroesForThis = 0;
 
   for (let i = 1; i < rows.length; i++) {
     const r = rows[i];
@@ -143,7 +145,11 @@ for (const cfg of categoryMapping) {
 
     const pricing = calculatePricing(dealerP);
 
-    const isHero = addedForThis < 10; // Top 10 per category as Flagship Hero!
+    // Flagship Heroes: prioritize high-demand, accessible homecare products ($20 - $950)
+    // Never pick institutional multi-thousand dollar lab equipment as consumer heroes
+    const isHeroCandidate = pricing.price >= 20 && pricing.price <= 950;
+    const isHero = heroesForThis < 10 && isHeroCandidate;
+    if (isHero) heroesForThis++;
 
     const features = [];
     if (hcpcs) features.push(`HCPCS Code: ${hcpcs}`);
