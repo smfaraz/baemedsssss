@@ -11,16 +11,16 @@ import {
   json,
   readJson,
   assertSameOrigin,
-} from '../server/commerce.js';
+} from '../server/commerce.ts';
 import {
   AdminService,
   AdminUser,
   AdminRole,
   hasPermission,
   logAdminAction,
-} from '../server/adminService.js';
+} from '../server/adminService.ts';
 
-import { adminSupabase } from '../server/adminSupabase.js';
+import { adminSupabase } from '../server/adminSupabase.ts';
 
 // Resolve caller identity and role from server-authoritative session
 export const resolveAdminActor = async (request: Request): Promise<AdminUser> => {
@@ -110,7 +110,7 @@ export const resolveAdminActor = async (request: Request): Promise<AdminUser> =>
   throw new ApiError(403, 'Forbidden: Insufficient privileges for administrative back office.');
 };
 
-import { createVercelHandler } from '../server/serverlessAdapter.js';
+import { createVercelHandler } from '../server/serverlessAdapter.ts';
 
 export default createVercelHandler(async (request: Request) => {
     try {

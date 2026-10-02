@@ -6,11 +6,11 @@ import {
   json,
   readJson,
   requireSessionToken,
-} from '../server/commerce.js';
+} from '../server/commerce.ts';
 
 type CartBody = { cartId?: unknown };
 
-import { createVercelHandler } from '../server/serverlessAdapter.js';
+import { createVercelHandler } from '../server/serverlessAdapter.ts';
 
 export default createVercelHandler(async (request: Request) => {
   try {

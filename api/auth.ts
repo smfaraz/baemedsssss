@@ -12,7 +12,7 @@ import {
   memoryCustomerAccounts,
   readJson,
   sessionCookie,
-} from '../server/commerce.js';
+} from '../server/commerce.ts';
 
 type AuthBody = {
   action?: unknown;
@@ -85,7 +85,7 @@ const handleLogout = async (request: Request) => {
   return json({ ok: true }, 200, { 'Set-Cookie': clearSessionCookie });
 };
 
-import { createVercelHandler } from '../server/serverlessAdapter.js';
+import { createVercelHandler } from '../server/serverlessAdapter.ts';
 
 export default createVercelHandler(async (request: Request) => {
   try {

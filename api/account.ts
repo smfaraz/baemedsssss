@@ -9,15 +9,15 @@ import {
   json,
   readJson,
   requireSessionToken,
-} from '../server/commerce.js';
+} from '../server/commerce.ts';
 import {
   isValidUSState,
   isValidUSZip,
   isValidUSPhone,
   normalizeStateCode,
   toE164Phone,
-} from '../lib/marketConfig.js';
-import { supabase } from '../lib/supabase.js';
+} from '../lib/marketConfig.ts';
+import { supabase } from '../lib/supabase.ts';
 
 type AddressBody = {
   id?: unknown;
@@ -110,7 +110,7 @@ const removeAddress = async (request: Request, _token: string) => {
   return json({ ok: true });
 };
 
-import { createVercelHandler } from '../server/serverlessAdapter.js';
+import { createVercelHandler } from '../server/serverlessAdapter.ts';
 
 export default createVercelHandler(async (request: Request) => {
   try {
