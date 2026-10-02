@@ -515,7 +515,14 @@ export const formatCartResponse = (cartId: string): NativeCart => {
 
   let subtotal = 0;
   const edges = storedItems.map((item) => {
-    const product = catalogCache.find((p) => p.id === item.merchandiseId || p.variantId === item.merchandiseId);
+    const product = catalogCache.find((p) => {
+      if (p.id === item.merchandiseId || p.variantId === item.merchandiseId || p.handle === item.merchandiseId) return true;
+      if (item.merchandiseId?.startsWith('var-')) {
+        const stripped = item.merchandiseId.replace(/^var-/, '');
+        if (p.id === stripped || p.id === `prd-${stripped}` || p.variantId === item.merchandiseId) return true;
+      }
+      return false;
+    });
     const price = product ? product.price : 0;
     subtotal += price * item.quantity;
 

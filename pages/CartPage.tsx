@@ -155,11 +155,11 @@ const CartPage: React.FC = () => {
                     </div>
                     <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
                       <div className="inline-flex min-h-11 items-center rounded-xl border border-medical-light bg-white" aria-label={`Quantity for ${item.title}`}>
-                        <button type="button" onClick={() => changeQuantity(item.lineItemId, item.quantity - 1)} disabled={isLoading} className="flex h-11 w-11 items-center justify-center rounded-l-xl text-medical-text hover:bg-medical-light disabled:opacity-50 transition" aria-label={`Decrease ${item.title} quantity`}><Minus size={16} /></button>
+                        <button type="button" onClick={() => changeQuantity(item.lineItemId || item.id, item.quantity - 1)} disabled={isLoading} className="flex h-11 w-11 items-center justify-center rounded-l-xl text-medical-text hover:bg-medical-light disabled:opacity-50 transition" aria-label={`Decrease ${item.title} quantity`}><Minus size={16} /></button>
                         <span className="w-10 text-center text-sm font-bold text-medical-dark" aria-live="polite">{item.quantity}</span>
-                        <button type="button" onClick={() => changeQuantity(item.lineItemId, item.quantity + 1)} disabled={isLoading} className="flex h-11 w-11 items-center justify-center rounded-r-xl text-medical-text hover:bg-medical-light disabled:opacity-50 transition" aria-label={`Increase ${item.title} quantity`}><Plus size={16} /></button>
+                        <button type="button" onClick={() => changeQuantity(item.lineItemId || item.id, item.quantity + 1)} disabled={isLoading} className="flex h-11 w-11 items-center justify-center rounded-r-xl text-medical-text hover:bg-medical-light disabled:opacity-50 transition" aria-label={`Increase ${item.title} quantity`}><Plus size={16} /></button>
                       </div>
-                      <button type="button" onClick={() => removeItem(item.lineItemId)} disabled={isLoading} className="inline-flex min-h-11 items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-medical-alert hover:bg-medical-alert/10 disabled:opacity-50 transition" aria-label={`Remove ${item.title} from cart`}><Trash2 size={17} /> Remove</button>
+                      <button type="button" onClick={() => removeItem(item.lineItemId || item.id)} disabled={isLoading} className="inline-flex min-h-11 items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-medical-alert hover:bg-medical-alert/10 disabled:opacity-50 transition" aria-label={`Remove ${item.title} from cart`}><Trash2 size={17} /> Remove</button>
                     </div>
                   </div>
                 </li>

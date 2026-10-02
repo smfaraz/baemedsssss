@@ -69,9 +69,47 @@ export default {
           throw new ApiError(400, 'Invalid item in cart.');
         }
 
-        const product = (catalogSeed as any[]).find(
-          (p) => p.id === item.merchandiseId || p.variantId === item.merchandiseId || p.handle === item.merchandiseId
-        );
+        const targetId = String(item.merchandiseId || '').trim();
+        const altId = String(item.id || '').trim();
+
+        let product = (catalogSeed as any[]).find((p) => {
+          if (p.id === targetId || p.variantId === targetId || p.handle === targetId) return true;
+          if (altId && (p.id === altId || p.variantId === altId || p.handle === altId)) return true;
+          if (targetId.startsWith('var-')) {
+            const stripped = targetId.replace(/^var-/, '');
+            if (p.id === stripped || p.id === `prd-${stripped}` || p.variantId === targetId) return true;
+          }
+          if (targetId.startsWith('prd-')) {
+            const stripped = targetId.replace(/^prd-/, '');
+            if (p.variantId === `var-${stripped}` || p.variantId === `var-${targetId}`) return true;
+          }
+          return false;
+        });
+
+        if (!product) {
+          try {
+            const { data: dbProduct } = await adminSupabase
+              .from('products')
+              .select('*')
+              .or(`id.eq.${targetId},variant_id.eq.${targetId},handle.eq.${targetId}${altId ? `,id.eq.${altId}` : ''}`)
+              .limit(1)
+              .maybeSingle();
+
+            if (dbProduct) {
+              product = {
+                id: dbProduct.id,
+                title: dbProduct.title,
+                handle: dbProduct.handle,
+                price: Number(dbProduct.price),
+                variantId: dbProduct.variant_id || `var-${dbProduct.id}`,
+                category: dbProduct.category,
+                prescriptionRequired: Boolean(dbProduct.prescription_required),
+              };
+            }
+          } catch (dbLookupErr) {
+            console.warn('[Checkout Product Lookup Fallback Error]:', dbLookupErr);
+          }
+        }
 
         if (!product) {
           throw new ApiError(404, `Product not found: ${item.merchandiseId}`);

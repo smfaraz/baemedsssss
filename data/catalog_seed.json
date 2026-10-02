@@ -50,7 +50,8 @@
       "FSA/HSA Eligible",
       "Drive DeVilbiss"
     ],
-    "heroRank": 1
+    "heroRank": 1,
+    "variantId": "var-o2-dv-525ds"
   },
   {
     "id": "prd-575592",
@@ -582,7 +583,8 @@
       "FSA/HSA Eligible",
       "Inogen"
     ],
-    "heroRank": 12
+    "heroRank": 12,
+    "variantId": "var-o2-ino-rove6"
   },
   {
     "id": "prd-785680",
@@ -148869,7 +148871,8 @@
       "FSA/HSA Eligible",
       "Drive DeVilbiss"
     ],
-    "heroRank": 9999
+    "heroRank": 9999,
+    "variantId": "var-o2-dv-1025ds"
   },
   {
     "id": "prd-o2-ino-g5-16",
@@ -148920,7 +148923,8 @@
       "FSA/HSA Eligible",
       "Inogen"
     ],
-    "heroRank": 9999
+    "heroRank": 9999,
+    "variantId": "var-o2-ino-g5-16"
   },
   {
     "id": "prd-o2-ino-g4-8",
@@ -148969,7 +148973,8 @@
       "FSA/HSA Eligible",
       "Inogen"
     ],
-    "heroRank": 9999
+    "heroRank": 9999,
+    "variantId": "var-o2-ino-g4-8"
   },
   {
     "id": "prd-o2-dv-igo2",
@@ -149018,7 +149023,8 @@
       "FSA/HSA Eligible",
       "Drive DeVilbiss"
     ],
-    "heroRank": 9999
+    "heroRank": 9999,
+    "variantId": "var-o2-dv-igo2"
   },
   {
     "id": "prd-o2-rh-lm5ba",
@@ -149067,7 +149073,8 @@
       "FSA/HSA Eligible",
       "Rhythm Healthcare"
     ],
-    "heroRank": 9999
+    "heroRank": 9999,
+    "variantId": "var-o2-rh-lm5ba"
   },
   {
     "id": "prd-o2-rh-lsp2",
@@ -149116,7 +149123,8 @@
       "FSA/HSA Eligible",
       "Rhythm Healthcare"
     ],
-    "heroRank": 9999
+    "heroRank": 9999,
+    "variantId": "var-o2-rh-lsp2"
   },
   {
     "id": "prd-o2-rh-p2e6",
@@ -149165,7 +149173,8 @@
       "FSA/HSA Eligible",
       "Rhythm Healthcare"
     ],
-    "heroRank": 9999
+    "heroRank": 9999,
+    "variantId": "var-o2-rh-p2e6"
   },
   {
     "id": "prd-o2-o2c-oxlife",
@@ -149214,7 +149223,8 @@
       "FSA/HSA Eligible",
       "O2 Concepts"
     ],
-    "heroRank": 9999
+    "heroRank": 9999,
+    "variantId": "var-o2-o2c-oxlife"
   },
   {
     "id": "prd-o2-rh-lm10a",
@@ -149263,7 +149273,8 @@
       "FSA/HSA Eligible",
       "Rhythm Healthcare"
     ],
-    "heroRank": 9999
+    "heroRank": 9999,
+    "variantId": "var-o2-rh-lm10a"
   },
   {
     "id": "prd-o2-ino-athome",
@@ -149312,7 +149323,8 @@
       "FSA/HSA Eligible",
       "Inogen"
     ],
-    "heroRank": 9999
+    "heroRank": 9999,
+    "variantId": "var-o2-ino-athome"
   },
   {
     "id": "prd-o2-airsep-10",
@@ -149361,7 +149373,8 @@
       "FSA/HSA Eligible",
       "AirSep Corporation"
     ],
-    "heroRank": 9999
+    "heroRank": 9999,
+    "variantId": "var-o2-airsep-10"
   },
   {
     "id": "prd-o2-react-10",
@@ -149410,7 +149423,8 @@
       "FSA/HSA Eligible",
       "React Health"
     ],
-    "heroRank": 9999
+    "heroRank": 9999,
+    "variantId": "var-o2-react-10"
   },
   {
     "id": "prd-o2-sequal-5",
@@ -149460,6 +149474,7 @@
       "FSA/HSA Eligible",
       "Sequal"
     ],
-    "heroRank": 9999
+    "heroRank": 9999,
+    "variantId": "var-o2-sequal-5"
   }
 ]

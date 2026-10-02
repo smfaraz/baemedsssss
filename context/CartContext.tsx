@@ -357,6 +357,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
             lineItemId: lineItemId,
             variantId: targetVariantId,
             prescriptionRequired: Boolean(product.prescriptionRequired || product.requiresPrescription),
+            requiresPrescription: Boolean(product.prescriptionRequired || product.requiresPrescription),
           };
           nextCart = [...prevCart, newItem];
         }
@@ -441,10 +442,13 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const clearCart = () => {
     setCart([]);
     localStorage.removeItem('baemeds_native_cart');
-    const currentCartId = cartId || localStorage.getItem('shopify_cart_id');
+    const currentCartId = cartId || localStorage.getItem('shopify_cart_id') || localStorage.getItem('cartId');
     if (currentCartId) {
       localStorage.removeItem(`baemeds_cart_${currentCartId}`);
     }
+    localStorage.removeItem('shopify_cart_id');
+    localStorage.removeItem('cartId');
+    setCartId(null);
   };
 
   const toggleCart = () => setIsCartOpen(!isCartOpen);
