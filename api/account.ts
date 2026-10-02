@@ -18,6 +18,7 @@ import {
   toE164Phone,
 } from '../lib/marketConfig.ts';
 import { supabase } from '../lib/supabase.ts';
+import { createVercelHandler } from '../server/serverlessAdapter.ts';
 
 type AddressBody = {
   id?: unknown;
@@ -108,12 +109,6 @@ const removeAddress = async (request: Request, _token: string) => {
   }
 
   return json({ ok: true });
-};
-
-import { createVercelHandler } from '../server/serverlessAdapter.ts';
-
-export const config = {
-  runtime: 'edge',
 };
 
 export default createVercelHandler(async (request: Request) => {

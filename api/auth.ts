@@ -13,6 +13,7 @@ import {
   readJson,
   sessionCookie,
 } from '../server/commerce.ts';
+import { createVercelHandler } from '../server/serverlessAdapter.ts';
 
 type AuthBody = {
   action?: unknown;
@@ -83,12 +84,6 @@ const handleRecover = async (body: AuthBody) => {
 
 const handleLogout = async (request: Request) => {
   return json({ ok: true }, 200, { 'Set-Cookie': clearSessionCookie });
-};
-
-import { createVercelHandler } from '../server/serverlessAdapter.ts';
-
-export const config = {
-  runtime: 'edge',
 };
 
 export default createVercelHandler(async (request: Request) => {

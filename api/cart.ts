@@ -7,14 +7,9 @@ import {
   readJson,
   requireSessionToken,
 } from '../server/commerce.ts';
-
-type CartBody = { cartId?: unknown };
-
 import { createVercelHandler } from '../server/serverlessAdapter.ts';
 
-export const config = {
-  runtime: 'edge',
-};
+type CartBody = { cartId?: unknown };
 
 export default createVercelHandler(async (request: Request) => {
   try {
