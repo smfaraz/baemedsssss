@@ -110,19 +110,19 @@ const removeAddress = async (request: Request, _token: string) => {
   return json({ ok: true });
 };
 
-export default {
-  async fetch(request: Request) {
-    try {
-      if (request.method !== 'POST' && request.method !== 'DELETE') {
-        return json({ error: 'Method not allowed.' }, 405, { Allow: 'POST, DELETE' });
-      }
-      assertSameOrigin(request);
-      const token = requireSessionToken(request);
-      return request.method === 'POST'
-        ? await addAddress(request, token)
-        : await removeAddress(request, token);
-    } catch (error) {
-      return errorResponse(error);
+import { createVercelHandler } from '../server/serverlessAdapter.js';
+
+export default createVercelHandler(async (request: Request) => {
+  try {
+    if (request.method !== 'POST' && request.method !== 'DELETE') {
+      return json({ error: 'Method not allowed.' }, 405, { Allow: 'POST, DELETE' });
     }
-  },
-};
+    assertSameOrigin(request);
+    const token = requireSessionToken(request);
+    return request.method === 'POST'
+      ? await addAddress(request, token)
+      : await removeAddress(request, token);
+  } catch (error) {
+    return errorResponse(error);
+  }
+});

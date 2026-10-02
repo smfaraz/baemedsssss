@@ -71,8 +71,9 @@ async function getFeedProducts(heroesOnly = false) {
   return (rawCatalog as any[]).filter((p) => (heroesOnly ? p.isHeroProduct : true));
 }
 
-export default {
-  async fetch(request: Request) {
+import { createVercelHandler } from '../server/serverlessAdapter.js';
+
+export default createVercelHandler(async (request: Request) => {
     const url = new URL(request.url);
     const pathname = url.pathname;
     const heroesOnly = url.searchParams.get('heroes') === '1' || url.searchParams.get('heroes_only') === 'true';
@@ -201,5 +202,4 @@ export default {
     return new Response(JSON.stringify({ count: products.length, products }), {
       headers: { 'Content-Type': 'application/json' },
     });
-  },
-};
+});

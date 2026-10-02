@@ -85,23 +85,24 @@ const handleLogout = async (request: Request) => {
   return json({ ok: true }, 200, { 'Set-Cookie': clearSessionCookie });
 };
 
-export default {
-  async fetch(request: Request) {
-    try {
-      if (request.method === 'GET') return await handleSession(request);
-      if (request.method !== 'POST') return json({ error: 'Method not allowed.' }, 405, { Allow: 'GET, POST' });
+import { createVercelHandler } from '../server/serverlessAdapter.js';
 
-      assertSameOrigin(request);
-      const body = await readJson<AuthBody>(request);
-      const action = cleanString(body.action, 'Action', 20);
+export default createVercelHandler(async (request: Request) => {
+  try {
+    if (request.method === 'GET') return await handleSession(request);
+    if (request.method !== 'POST') return json({ error: 'Method not allowed.' }, 405, { Allow: 'GET, POST' });
 
-      if (action === 'login') return await handleLogin(body);
-      if (action === 'register') return await handleRegister(body);
-      if (action === 'recover') return await handleRecover(body);
-      if (action === 'logout') return await handleLogout(request);
-      throw new ApiError(400, 'The requested account action is invalid.');
-    } catch (error) {
-      return errorResponse(error);
-    }
-  },
-};
+    assertSameOrigin(request);
+    const body = await readJson<AuthBody>(request);
+    const action = cleanString(body.action, 'Action', 20);
+
+    if (action === 'login') return await handleLogin(body);
+    if (action === 'register') return await handleRegister(body);
+    if (action === 'recover') return await handleRecover(body);
+    if (action === 'logout') return await handleLogout(request);
+    throw new ApiError(400, 'The requested account action is invalid.');
+  } catch (error) {
+    return errorResponse(error);
+  }
+});
+

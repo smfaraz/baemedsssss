@@ -34,7 +34,22 @@ export const errorResponse = (error: unknown) => {
 
 export const assertSameOrigin = (request: Request) => {
   const origin = request.headers.get('origin');
-  if (!origin || new URL(origin).origin !== new URL(request.url).origin) {
+  if (!origin) return; // Non-browser / same-origin without origin header
+  try {
+    const originUrl = new URL(origin);
+    const requestUrl = new URL(request.url);
+    const isAllowed =
+      originUrl.origin === requestUrl.origin ||
+      originUrl.hostname === 'baemeds.com' ||
+      originUrl.hostname === 'www.baemeds.com' ||
+      originUrl.hostname.endsWith('.vercel.app') ||
+      originUrl.hostname === 'localhost' ||
+      originUrl.hostname === '127.0.0.1';
+    if (!isAllowed) {
+      throw new ApiError(403, 'The request origin was not accepted.');
+    }
+  } catch (e: any) {
+    if (e instanceof ApiError) throw e;
     throw new ApiError(403, 'The request origin was not accepted.');
   }
 };
@@ -68,7 +83,9 @@ export const getSessionToken = (request: Request) => {
   const cookieHeader = request.headers.get('cookie') || '';
   for (const part of cookieHeader.split(';')) {
     const [name, ...valueParts] = part.trim().split('=');
-    if (name === SESSION_COOKIE) return decodeURIComponent(valueParts.join('='));
+    if (name === SESSION_COOKIE || name === '__Host-baemeds_session' || name === 'baemeds_session') {
+      return decodeURIComponent(valueParts.join('='));
+    }
   }
   return '';
 };

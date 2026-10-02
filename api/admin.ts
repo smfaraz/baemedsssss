@@ -110,8 +110,9 @@ export const resolveAdminActor = async (request: Request): Promise<AdminUser> =>
   throw new ApiError(403, 'Forbidden: Insufficient privileges for administrative back office.');
 };
 
-export default {
-  async fetch(request: Request) {
+import { createVercelHandler } from '../server/serverlessAdapter.js';
+
+export default createVercelHandler(async (request: Request) => {
     try {
       const url = new URL(request.url);
       const subpath = url.pathname.replace(/^\/api\/admin\/?/, '');
@@ -297,5 +298,4 @@ export default {
       const status = msg.toLowerCase().includes('forbidden') || msg.toLowerCase().includes('unauthorized') ? 403 : 500;
       return json({ error: msg }, status);
     }
-  },
-};
+});

@@ -36,11 +36,12 @@ interface CheckoutBody {
   items: CheckoutItem[];
 }
 
-export default {
-  async fetch(request: Request) {
-    try {
-      if (request.method !== 'POST') return json({ error: 'Method not allowed.' }, 405, { Allow: 'POST' });
-      assertSameOrigin(request);
+import { createVercelHandler } from '../server/serverlessAdapter.js';
+
+export default createVercelHandler(async (request: Request) => {
+  try {
+    if (request.method !== 'POST') return json({ error: 'Method not allowed.' }, 405, { Allow: 'POST' });
+    assertSameOrigin(request);
 
       const body = await readJson<CheckoutBody>(request);
 
@@ -284,5 +285,4 @@ export default {
     } catch (error) {
       return errorResponse(error);
     }
-  },
-};
+});
