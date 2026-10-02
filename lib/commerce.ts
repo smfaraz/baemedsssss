@@ -50,6 +50,8 @@ export const mapDbProductToProduct = (d: any): Product => {
     vendor: d.vendor || vendorFromFeatures || 'BaeMeds USA',
     tags: Array.isArray(d.tags) ? d.tags : ['DME', 'Healthcare'],
     inStock: (d.inventory_quantity ?? 25) > 0,
+    variantId: d.variant_id || d.variantId || `var-${d.id}`,
+    requiresPrescription: Boolean(d.prescription_required),
   };
 };
 

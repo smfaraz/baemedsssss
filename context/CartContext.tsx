@@ -7,6 +7,7 @@ import {
   removeLineItemFromCart, 
   updateLineItemInCart,
   attachCustomerToCart,
+  formatCartResponse,
 } from '../lib/commerce';
 import { useAuth } from './AuthContext';
 
@@ -221,45 +222,52 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [customer, cartId, syncCartWithCustomer]);
 
-  // Initialize Cart and Wishlist
+  // Initialize Cart and Wishlist natively
   useEffect(() => {
-    const initCart = async () => {
+    const initCart = () => {
       setIsLoading(true);
-      const existingCartId = localStorage.getItem('shopify_cart_id') || localStorage.getItem('cartId');
+      let existingCartId = localStorage.getItem('shopify_cart_id') || localStorage.getItem('cartId');
+      if (!existingCartId) {
+        existingCartId = `cart_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+        localStorage.setItem('shopify_cart_id', existingCartId);
+        localStorage.setItem('cartId', existingCartId);
+      }
+      setCartId(existingCartId);
+      setCheckoutUrl('/checkout');
 
-      // Load Wishlist from LocalStorage
+      // 1. Load Wishlist from LocalStorage
       const savedWishlist = localStorage.getItem('mediequip_wishlist');
       if (savedWishlist) {
         try {
-            setWishlist(JSON.parse(savedWishlist));
-        } catch(e) { console.error("Error parsing wishlist", e); }
+          setWishlist(JSON.parse(savedWishlist));
+        } catch (e) {
+          console.error("Error parsing wishlist", e);
+        }
       }
 
+      // 2. Load Cart from LocalStorage
       try {
-        let cartData;
-        if (existingCartId) {
-          try {
-            cartData = await fetchShopifyCart(existingCartId);
-            if (!cartData) {
-               cartData = await createShopifyCart();
-            }
-          } catch {
-            cartData = await createShopifyCart();
+        const savedCart = localStorage.getItem('baemeds_native_cart');
+        if (savedCart) {
+          const parsed = JSON.parse(savedCart);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setCart(parsed);
+            setIsLoading(false);
+            return;
           }
-        } else {
-          cartData = await createShopifyCart();
         }
 
-        if(cartData) {
-            setCartId(cartData.id);
-            setCheckoutUrl(cartData.checkoutUrl);
-            localStorage.setItem('shopify_cart_id', cartData.id);
-            localStorage.setItem('cartId', cartData.id); // Sync legacy key
-            updateLocalCart(cartData.lines);
+        // Fallback: Check legacy cart format
+        const rawLegacy = localStorage.getItem(`baemeds_cart_${existingCartId}`);
+        if (rawLegacy) {
+          const parsedLegacy = JSON.parse(rawLegacy);
+          if (Array.isArray(parsedLegacy) && parsedLegacy.length > 0) {
+            const formatted = formatCartResponse(existingCartId);
+            updateLocalCart(formatted.lines);
+          }
         }
-        
       } catch (e) {
-        console.warn("Cart Initialization Error:", e);
+        console.warn("Cart initialization fallback:", e);
       } finally {
         setIsLoading(false);
       }
@@ -276,74 +284,121 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const updateLocalCart = (lines: any) => {
     if (!lines || !lines.edges) return;
     
-    const mappedItems: CartItem[] = lines.edges.map((edge: any) => {
-      const item = edge.node;
-      const merchandise = item.merchandise;
-      
-      return {
-        id: merchandise.product.id,
-        handle: merchandise.product.handle,
-        title: merchandise.product.title,
-        vendor: /mohsin/i.test(merchandise.product.vendor || '') ? 'BaeMeds' : merchandise.product.vendor,
-        category: "Product", 
-        price: parseFloat(merchandise.price.amount),
-        compareAtPrice: null,
-        image: merchandise.image?.url || '',
-        images: [merchandise.image?.url || ''],
-        tags: [],
-        specs: merchandise.title === 'Default Title' ? '' : merchandise.title,
-        inStock: true,
-        quantity: item.quantity,
-        lineItemId: item.id,
-        variantId: merchandise.id
-      };
-    });
+    const mappedItems: CartItem[] = lines.edges
+      .filter((edge: any) => edge && edge.node && edge.node.merchandise)
+      .map((edge: any) => {
+        const item = edge.node;
+        const merchandise = item.merchandise;
+        const productInfo = merchandise.product || {};
+        
+        return {
+          id: productInfo.id || merchandise.id || item.id,
+          handle: productInfo.handle || '',
+          title: productInfo.title || 'Medical Supply',
+          vendor: /mohsin/i.test(productInfo.vendor || '') ? 'BaeMeds' : (productInfo.vendor || 'BaeMeds'),
+          category: "Product", 
+          price: parseFloat(merchandise.price?.amount || '0'),
+          compareAtPrice: null,
+          image: merchandise.image?.url || '',
+          images: [merchandise.image?.url || ''],
+          tags: [],
+          specs: merchandise.title === 'Default Title' ? '' : (merchandise.title || ''),
+          inStock: true,
+          quantity: item.quantity || 1,
+          lineItemId: item.id,
+          variantId: merchandise.id || productInfo.id
+        };
+      });
     setCart(mappedItems);
+    localStorage.setItem('baemeds_native_cart', JSON.stringify(mappedItems));
   };
 
   const addToCart = async (product: Product, quantity: number = 1) => {
-    if (!cartId || !product.variantId) {
-        // Retry init if failed previously
-        const newCart = await createShopifyCart();
-        localStorage.setItem("cartId", newCart.id);
-        setCartId(newCart.id);
-        setCheckoutUrl(newCart.checkoutUrl);
-        localStorage.setItem('shopify_cart_id', newCart.id);
-        if(!newCart.id) return;
-        // Recursive retry with new ID if needed, but for simplicity we continue with newCart.id
-        // (Actually, if cartId state isn't updated instantly in this scope, use local variable)
-    }
-    
-    const currentCartId = cartId || localStorage.getItem('shopify_cart_id');
-    if (!currentCartId) return;
-
+    if (!product) return;
     setIsLoading(true);
-    const lineItemsToAdd = [
-      {
-        merchandiseId: product.variantId!,
-        quantity: quantity,
-      }
-    ];
 
     try {
-      const updatedCart = await addItemToCart(currentCartId, lineItemsToAdd);
-      updateLocalCart(updatedCart.lines);
-      setCheckoutUrl(updatedCart.checkoutUrl);
+      let currentCartId = cartId || localStorage.getItem('shopify_cart_id') || localStorage.getItem('cartId');
+      if (!currentCartId) {
+        currentCartId = `cart_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+        localStorage.setItem('shopify_cart_id', currentCartId);
+        localStorage.setItem('cartId', currentCartId);
+        setCartId(currentCartId);
+      }
+      setCheckoutUrl('/checkout');
+
+      const targetVariantId = product.variantId || `var-${product.id}`;
+      const lineItemId = `line_${product.id}_${Date.now()}`;
+
+      setCart((prevCart) => {
+        const existingIdx = prevCart.findIndex((i) => i.id === product.id || i.variantId === targetVariantId || i.handle === product.handle);
+        let nextCart: CartItem[];
+        if (existingIdx > -1) {
+          nextCart = [...prevCart];
+          nextCart[existingIdx] = {
+            ...nextCart[existingIdx],
+            quantity: nextCart[existingIdx].quantity + quantity,
+          };
+        } else {
+          const newItem: CartItem = {
+            id: product.id,
+            handle: product.handle,
+            title: product.title,
+            vendor: /mohsin/i.test(product.vendor || '') ? 'BaeMeds' : (product.vendor || 'BaeMeds'),
+            category: product.category || 'Product',
+            price: Number(product.price) || 0,
+            compareAtPrice: product.compareAtPrice || null,
+            image: product.image || (product.images && product.images[0]) || '',
+            images: Array.isArray(product.images) && product.images.length > 0 ? product.images : [product.image || ''],
+            tags: product.tags || [],
+            specs: product.specs || '',
+            inStock: true,
+            quantity: quantity,
+            lineItemId: lineItemId,
+            variantId: targetVariantId,
+            prescriptionRequired: Boolean(product.prescriptionRequired || product.requiresPrescription),
+          };
+          nextCart = [...prevCart, newItem];
+        }
+        localStorage.setItem('baemeds_native_cart', JSON.stringify(nextCart));
+        return nextCart;
+      });
+
+      // Keep backend legacy format in sync for /api/checkout compatibility
+      try {
+        const lineItemsToAdd = [
+          {
+            merchandiseId: targetVariantId,
+            quantity: quantity,
+          }
+        ];
+        await addItemToCart(currentCartId, lineItemsToAdd);
+      } catch (backendSyncErr) {
+        // Native cart state is already updated; non-blocking sync
+      }
     } catch (e) {
       console.error("Error adding to cart:", e);
-      alert("Could not add to cart. Please try again.");
+      throw e;
     } finally {
       setIsLoading(false);
     }
   };
 
   const removeFromCart = async (lineItemId: string) => {
-    if (!cartId) return;
-
     setIsLoading(true);
     try {
-      const updatedCart = await removeLineItemFromCart(cartId, [lineItemId]);
-      updateLocalCart(updatedCart.lines);
+      setCart((prevCart) => {
+        const nextCart = prevCart.filter((item) => item.lineItemId !== lineItemId && item.id !== lineItemId);
+        localStorage.setItem('baemeds_native_cart', JSON.stringify(nextCart));
+        return nextCart;
+      });
+
+      const currentCartId = cartId || localStorage.getItem('shopify_cart_id');
+      if (currentCartId) {
+        try {
+          await removeLineItemFromCart(currentCartId, [lineItemId]);
+        } catch {}
+      }
     } catch (e) {
       console.error("Error removing item:", e);
     } finally {
@@ -353,23 +408,29 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const updateQuantity = async (lineItemId: string, quantity: number) => {
     if (quantity < 1) {
-      removeFromCart(lineItemId);
+      await removeFromCart(lineItemId);
       return;
     }
     
-    if(!cartId) return;
-
     setIsLoading(true);
-    const lineItemsToUpdate = [
-      {
-        id: lineItemId,
-        quantity: quantity
-      }
-    ];
-
     try {
-      const updatedCart = await updateLineItemInCart(cartId, lineItemsToUpdate);
-      updateLocalCart(updatedCart.lines);
+      setCart((prevCart) => {
+        const nextCart = prevCart.map((item) => {
+          if (item.lineItemId === lineItemId || item.id === lineItemId) {
+            return { ...item, quantity };
+          }
+          return item;
+        });
+        localStorage.setItem('baemeds_native_cart', JSON.stringify(nextCart));
+        return nextCart;
+      });
+
+      const currentCartId = cartId || localStorage.getItem('shopify_cart_id');
+      if (currentCartId) {
+        try {
+          await updateLineItemInCart(currentCartId, [{ id: lineItemId, quantity }]);
+        } catch {}
+      }
     } catch (e) {
       console.error("Error updating quantity:", e);
     } finally {
@@ -379,14 +440,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const clearCart = () => {
     setCart([]);
-    localStorage.removeItem('shopify_cart_id');
-    localStorage.removeItem('cartId');
-    createShopifyCart().then(cartData => {
-        setCartId(cartData.id);
-        setCheckoutUrl(cartData.checkoutUrl);
-        localStorage.setItem('shopify_cart_id', cartData.id);
-        localStorage.setItem('cartId', cartData.id);
-    });
+    localStorage.removeItem('baemeds_native_cart');
+    const currentCartId = cartId || localStorage.getItem('shopify_cart_id');
+    if (currentCartId) {
+      localStorage.removeItem(`baemeds_cart_${currentCartId}`);
+    }
   };
 
   const toggleCart = () => setIsCartOpen(!isCartOpen);
