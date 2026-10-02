@@ -75,13 +75,16 @@ export default {
         let product = (catalogSeed as any[]).find((p) => {
           if (p.id === targetId || p.variantId === targetId || p.handle === targetId) return true;
           if (altId && (p.id === altId || p.variantId === altId || p.handle === altId)) return true;
+          if (p.variants?.some((v: any) => v.id === targetId || v.originalProductId === targetId || v.sku === targetId)) return true;
           if (targetId.startsWith('var-')) {
             const stripped = targetId.replace(/^var-/, '');
             if (p.id === stripped || p.id === `prd-${stripped}` || p.variantId === targetId) return true;
+            if (p.variants?.some((v: any) => v.id === targetId || v.originalProductId === `prd-${stripped}`)) return true;
           }
           if (targetId.startsWith('prd-')) {
             const stripped = targetId.replace(/^prd-/, '');
             if (p.variantId === `var-${stripped}` || p.variantId === `var-${targetId}`) return true;
+            if (p.variants?.some((v: any) => v.originalProductId === targetId)) return true;
           }
           return false;
         });
@@ -115,7 +118,23 @@ export default {
           throw new ApiError(404, `Product not found: ${item.merchandiseId}`);
         }
 
-        const price = Number(product.price) || 0;
+        let price = Number(product.price) || 0;
+        let variantTitle = 'Standard';
+        let variantId = product.variantId || product.id;
+
+        const matchedVariant = product.variants?.find((v: any) =>
+          v.id === targetId ||
+          v.originalProductId === targetId ||
+          (targetId.startsWith('var-') && v.originalProductId === `prd-${targetId.replace(/^var-/, '')}`) ||
+          (altId && (v.id === altId || v.originalProductId === altId))
+        );
+
+        if (matchedVariant) {
+          price = Number(matchedVariant.price) || price;
+          variantTitle = matchedVariant.title || variantTitle;
+          variantId = matchedVariant.id || variantId;
+        }
+
         const lineTotal = price * item.quantity;
         calculatedSubtotal += lineTotal;
 
@@ -133,15 +152,17 @@ export default {
         orderItems.push({
           product_id: product.id,
           product_title: product.title,
-          variant_id: product.variantId || product.id,
-          variant_title: 'Standard',
-          sku: product.id,
+          variant_id: variantId,
+          variant_title: variantTitle,
+          sku: matchedVariant?.sku || product.sku || product.id,
           unit_price: price,
           quantity: item.quantity,
           total_price: lineTotal,
           metadata: {
             handle: product.handle,
             requires_prescription: isDmeRegulated,
+            size: matchedVariant?.size,
+            package_quantity: matchedVariant?.packageQuantity,
           },
         });
       }

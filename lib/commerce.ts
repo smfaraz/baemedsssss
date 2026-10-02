@@ -17,6 +17,12 @@ export const mapDbProductToProduct = (d: any): Product => {
   const vendorFromFeatures = Array.isArray(d.features)
     ? d.features.find((f: any) => typeof f === 'string' && f.startsWith('Manufacturer: '))?.replace('Manufacturer: ', '')
     : undefined;
+  const seedItem = (rawCatalog as any[]).find((p) => p.id === d.id);
+  const resolvedVariants = (Array.isArray(d.variants) && d.variants.length > 0)
+    ? d.variants
+    : (seedItem && Array.isArray(seedItem.variants) && seedItem.variants.length > 0)
+    ? seedItem.variants
+    : undefined;
 
   return {
     id: d.id,
@@ -52,6 +58,7 @@ export const mapDbProductToProduct = (d: any): Product => {
     inStock: (d.inventory_quantity ?? 25) > 0,
     variantId: d.variant_id || d.variantId || `var-${d.id}`,
     requiresPrescription: Boolean(d.prescription_required),
+    variants: resolvedVariants,
   };
 };
 
@@ -178,19 +185,66 @@ export const fetchHeroProducts = async (): Promise<Product[]> => {
 
 export const fetchProductById = async (id: string): Promise<Product | undefined> => {
   await hydrateCatalogFromSupabase();
-  return catalogCache.find((p) => p.id === id || p.variantId === id);
+  return catalogCache.find(
+    (p) =>
+      p.id === id ||
+      p.variantId === id ||
+      p.variants?.some((v: any) => v.id === id || v.originalProductId === id)
+  );
 };
 
 export const fetchProductByHandle = async (handle: string): Promise<Product | undefined> => {
   await hydrateCatalogFromSupabase();
   const cleanHandle = cleanCatalogueText(handle).toLowerCase().trim();
-  return catalogCache.find(
+  
+  // 1. Direct match on handle or ID
+  let product = catalogCache.find(
     (p) =>
       p.handle.toLowerCase() === cleanHandle ||
       p.id === handle ||
       p.id.endsWith(`/${handle}`) ||
       p.handle.toLowerCase().replace(/[^a-z0-9]/g, '') === cleanHandle.replace(/[^a-z0-9]/g, '')
   );
+
+  // 2. Fallback: Check if handle corresponds to a specific child variant
+  if (!product) {
+    product = catalogCache.find((p) =>
+      p.variants?.some(
+        (v: any) =>
+          v.id === handle ||
+          v.originalProductId === handle ||
+          v.handle?.toLowerCase() === cleanHandle
+      )
+    );
+    if (product) {
+      const targetVariant = product.variants?.find(
+        (v: any) =>
+          v.id === handle ||
+          v.originalProductId === handle ||
+          v.handle?.toLowerCase() === cleanHandle
+      );
+      if (targetVariant) {
+        return {
+          ...product,
+          selectedVariantId: targetVariant.id,
+        };
+      }
+    }
+  }
+
+  // 3. Database fallback
+  if (!product) {
+    try {
+      const { data } = await supabase
+        .from('products')
+        .select('*')
+        .or(`handle.eq.${cleanHandle},id.eq.${handle}`)
+        .limit(1);
+      if (data && data[0]) product = mapDbProductToProduct(data[0]);
+    } catch {}
+  }
+
+  return product;
 };
 
 export const fetchProductsByCategory = async (category: string): Promise<Product[]> => {

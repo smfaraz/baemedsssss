@@ -54,6 +54,21 @@ export interface Product {
   specifications?: Record<string, string>;
   seoTitle?: string;
   seoDescription?: string;
+  variants?: ProductVariant[];
+  selectedVariantId?: string;
+}
+
+export interface ProductVariant {
+  id: string; // e.g. 'var-1184218'
+  title: string; // e.g. 'Large' or 'Medium - Pack of 14'
+  size?: string; // e.g. 'Large', 'Medium', 'X-Large', '2X-Large'
+  packageQuantity?: string; // e.g. 'Standard Bag', 'Case of 72'
+  price: number;
+  compareAtPrice?: number | null;
+  sku?: string;
+  inStock?: boolean;
+  inventoryQuantity?: number;
+  image?: string;
 }
 
 export interface Category {

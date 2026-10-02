@@ -32,7 +32,7 @@ import { rememberRecentlyViewedProduct } from '../lib/recentlyViewed';
 import { fetchProductByHandle, fetchRecommendedProducts } from '../lib/commerce';
 import { formatPrice, isValidUSZip } from '../lib/marketConfig';
 import { Analytics } from '../lib/analytics';
-import { Product } from '../types';
+import { Product, ProductVariant } from '../types';
 
 const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -41,6 +41,9 @@ const ProductDetailPage: React.FC = () => {
   const { getReviewsSummary } = useReviews();
 
   const [product, setProduct] = useState<Product>();
+  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
+  const [selectedSize, setSelectedSize] = useState<string>('');
+  const [selectedPack, setSelectedPack] = useState<string>('');
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
@@ -108,6 +111,69 @@ const ProductDetailPage: React.FC = () => {
     };
   }, [id]);
 
+  useEffect(() => {
+    if (!product) {
+      setSelectedVariant(null);
+      setSelectedSize('');
+      setSelectedPack('');
+      return;
+    }
+
+    if (product.variants && product.variants.length > 0) {
+      let initial = product.variants.find((v) => v.id === product.selectedVariantId);
+      if (!initial) {
+        initial = product.variants.find((v) => v.inStock !== false) || product.variants[0];
+      }
+      setSelectedVariant(initial);
+      setSelectedSize(initial.size || '');
+      setSelectedPack(initial.packageQuantity || '');
+      if (initial.image) setActiveImage(initial.image);
+    } else {
+      setSelectedVariant(null);
+      setSelectedSize('');
+      setSelectedPack('');
+    }
+  }, [product]);
+
+  const availableSizes = useMemo(() => {
+    if (!product?.variants) return [];
+    return [...new Set(product.variants.map((v) => v.size).filter(Boolean))] as string[];
+  }, [product?.variants]);
+
+  const availablePacks = useMemo(() => {
+    if (!product?.variants || !selectedSize) return [];
+    const forSize = product.variants.filter((v) => v.size === selectedSize);
+    return [...new Set(forSize.map((v) => v.packageQuantity).filter(Boolean))] as string[];
+  }, [product?.variants, selectedSize]);
+
+  const handleSelectSize = (size: string) => {
+    setSelectedSize(size);
+    if (!product?.variants) return;
+    const matchingVariants = product.variants.filter((v) => v.size === size);
+    const samePack = matchingVariants.find((v) => v.packageQuantity === selectedPack);
+    const target = samePack || matchingVariants[0];
+    if (target) {
+      setSelectedVariant(target);
+      setSelectedPack(target.packageQuantity || '');
+      if (target.image) setActiveImage(target.image);
+    }
+  };
+
+  const handleSelectPack = (pack: string) => {
+    setSelectedPack(pack);
+    if (!product?.variants) return;
+    const target = product.variants.find((v) => v.size === selectedSize && v.packageQuantity === pack)
+      || product.variants.find((v) => v.packageQuantity === pack);
+    if (target) {
+      setSelectedVariant(target);
+      if (target.image) setActiveImage(target.image);
+    }
+  };
+
+  const currentPrice = selectedVariant ? selectedVariant.price : (product?.price || 0);
+  const currentCompareAtPrice = selectedVariant ? (selectedVariant.compareAtPrice ?? product?.compareAtPrice) : product?.compareAtPrice;
+  const isCurrentlyInStock = selectedVariant ? (selectedVariant.inStock !== false) : (product?.inStock ?? false);
+
   const galleryImages = useMemo(() => {
     if (!product) return [];
     return [...new Set([product.image, ...(product.images || [])].filter(Boolean))];
@@ -131,21 +197,36 @@ const ProductDetailPage: React.FC = () => {
     return getReviewsSummary(product.id, product.rating, product.reviewCount);
   }, [product, getReviewsSummary]);
 
-  const discount = product?.compareAtPrice && product.compareAtPrice > product.price
-    ? Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100)
+  const discount = currentCompareAtPrice && currentCompareAtPrice > currentPrice
+    ? Math.round(((currentCompareAtPrice - currentPrice) / currentCompareAtPrice) * 100)
     : 0;
   const inWishlist = product ? isInWishlist(product.id) : false;
   const phoneHref = `tel:${CONTACT_PHONE.replace(/\D/g, '')}`;
 
   const handleAddToCart = async (event?: React.MouseEvent<HTMLButtonElement>) => {
-    if (!product || !product.inStock || isCartLoading) return;
+    if (!product || !isCurrentlyInStock || isCartLoading) return;
     setCartError('');
     try {
       if (event) {
         flyToCart(event.currentTarget, activeImage || product.image);
       }
-      await addToCart(product, quantity);
-      Analytics.trackAddToCart(product, quantity);
+      const productToAdd: Product = selectedVariant
+        ? {
+            ...product,
+            variantId: selectedVariant.id,
+            price: selectedVariant.price,
+            compareAtPrice: selectedVariant.compareAtPrice ?? product.compareAtPrice,
+            sku: selectedVariant.sku || product.sku,
+            title: `${product.title} - ${selectedVariant.title}`,
+            specs: selectedVariant.size
+              ? `Size: ${selectedVariant.size}${selectedVariant.packageQuantity ? ` · ${selectedVariant.packageQuantity}` : ''}`
+              : product.specs,
+            image: selectedVariant.image || product.image,
+          }
+        : product;
+
+      await addToCart(productToAdd, quantity);
+      Analytics.trackAddToCart(productToAdd, quantity);
       setIsAdded(true);
       window.setTimeout(() => setIsAdded(false), 2200);
     } catch (error) {
@@ -155,12 +236,27 @@ const ProductDetailPage: React.FC = () => {
   };
 
   const handleBuyNow = async () => {
-    if (!product || !product.inStock || isBuyingNow || isCartLoading) return;
+    if (!product || !isCurrentlyInStock || isBuyingNow || isCartLoading) return;
     setCartError('');
     setIsBuyingNow(true);
     try {
-      await addToCart(product, quantity);
-      Analytics.trackAddToCart(product, quantity);
+      const productToAdd: Product = selectedVariant
+        ? {
+            ...product,
+            variantId: selectedVariant.id,
+            price: selectedVariant.price,
+            compareAtPrice: selectedVariant.compareAtPrice ?? product.compareAtPrice,
+            sku: selectedVariant.sku || product.sku,
+            title: `${product.title} - ${selectedVariant.title}`,
+            specs: selectedVariant.size
+              ? `Size: ${selectedVariant.size}${selectedVariant.packageQuantity ? ` · ${selectedVariant.packageQuantity}` : ''}`
+              : product.specs,
+            image: selectedVariant.image || product.image,
+          }
+        : product;
+
+      await addToCart(productToAdd, quantity);
+      Analytics.trackAddToCart(productToAdd, quantity);
       navigate('/checkout');
     } catch (error) {
       console.error('Buy now failed', error);
@@ -416,15 +512,94 @@ const ProductDetailPage: React.FC = () => {
               )}
             </div>
 
-            <div className="mt-6 rounded-3xl border border-medical-primary/20 bg-gradient-to-br from-white via-white to-medical-light/50 p-5 shadow-soft sm:p-6">
-              <div className="flex flex-wrap items-end gap-3">
-                <span className="text-3xl font-bold text-medical-dark">{formatPrice(product.price)}</span>
-                {product.compareAtPrice && product.compareAtPrice > product.price && (
-                  <span className="pb-1 text-lg text-medical-text line-through">{formatPrice(product.compareAtPrice)}</span>
+            {/* Multi-Variant Size & Quantity Selector */}
+            {product.variants && product.variants.length > 1 && (
+              <div className="mt-5 rounded-2xl border border-medical-primary/20 bg-white p-4 shadow-sm space-y-4">
+                {availableSizes.length > 0 && (
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-bold uppercase tracking-wider text-medical-text">
+                        Select Size: <strong className="text-medical-dark font-extrabold">{selectedSize}</strong>
+                      </span>
+                      {selectedVariant?.size && (
+                        <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full border ${
+                          isCurrentlyInStock
+                            ? 'text-emerald-700 bg-emerald-50 border-emerald-200'
+                            : 'text-amber-800 bg-amber-50 border-amber-200'
+                        }`}>
+                          {isCurrentlyInStock ? 'In Stock' : 'Limited Supply'}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {availableSizes.map((sz) => {
+                        const isSelected = sz === selectedSize;
+                        const matching = product.variants?.filter((v) => v.size === sz);
+                        const hasStock = matching?.some((v) => v.inStock !== false);
+                        const lowestSizePrice = matching?.length ? Math.min(...matching.map((v) => v.price)) : 0;
+                        return (
+                          <button
+                            key={sz}
+                            type="button"
+                            onClick={() => handleSelectSize(sz)}
+                            className={`min-h-12 px-4 py-2 rounded-xl text-xs font-bold border transition flex flex-col items-center justify-center cursor-pointer ${
+                              isSelected
+                                ? 'border-medical-primary bg-medical-primary text-white shadow-sm ring-2 ring-medical-primary/20 scale-[1.02]'
+                                : hasStock
+                                ? 'border-slate-200 bg-slate-50 text-slate-800 hover:border-medical-primary hover:bg-white'
+                                : 'border-slate-100 bg-slate-100/60 text-slate-400 line-through'
+                            }`}
+                          >
+                            <span className="text-xs">{sz}</span>
+                            <span className={`text-[10px] font-medium ${isSelected ? 'text-teal-100' : 'text-slate-500'}`}>
+                              {lowestSizePrice > 0 ? formatPrice(lowestSizePrice) : ''}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
                 )}
-                {product.compareAtPrice && product.compareAtPrice > product.price && (
+
+                {availablePacks.length > 1 && (
+                  <div>
+                    <span className="block text-xs font-bold uppercase tracking-wider text-medical-text mb-2">
+                      Select Package / Quantity: <strong className="text-medical-dark font-extrabold">{selectedPack}</strong>
+                    </span>
+                    <div className="flex flex-wrap gap-2">
+                      {availablePacks.map((pack) => {
+                        const isSelected = pack === selectedPack;
+                        const vForPack = product.variants?.find((v) => v.size === selectedSize && v.packageQuantity === pack);
+                        return (
+                          <button
+                            key={pack}
+                            type="button"
+                            onClick={() => handleSelectPack(pack)}
+                            className={`min-h-10 px-3.5 py-1.5 rounded-xl text-xs font-bold border transition cursor-pointer ${
+                              isSelected
+                                ? 'border-medical-dark bg-medical-dark text-white shadow-sm ring-2 ring-medical-dark/20'
+                                : 'border-slate-200 bg-white text-slate-700 hover:border-slate-400 hover:bg-slate-50'
+                            }`}
+                          >
+                            {pack} {vForPack ? `· ${formatPrice(vForPack.price)}` : ''}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="mt-5 rounded-3xl border border-medical-primary/20 bg-gradient-to-br from-white via-white to-medical-light/50 p-5 shadow-soft sm:p-6">
+              <div className="flex flex-wrap items-end gap-3">
+                <span className="text-3xl font-bold text-medical-dark">{formatPrice(currentPrice)}</span>
+                {currentCompareAtPrice && currentCompareAtPrice > currentPrice && (
+                  <span className="pb-1 text-lg text-medical-text line-through">{formatPrice(currentCompareAtPrice)}</span>
+                )}
+                {discount > 0 && (
                   <span className="mb-1 rounded-full bg-medical-accent px-2.5 py-1 text-xs font-black text-medical-dark">
-                    {Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100)}% off
+                    {discount}% off
                   </span>
                 )}
               </div>
@@ -438,11 +613,11 @@ const ProductDetailPage: React.FC = () => {
                   <span className="font-bold text-medical-dark" aria-live="polite">{quantity}</span>
                   <button type="button" onClick={() => setQuantity((current) => current + 1)} className="flex h-11 w-11 items-center justify-center rounded-xl hover:bg-slate-50" aria-label="Increase quantity"><Plus size={17} /></button>
                 </div>
-                <button type="button" onClick={handleAddToCart} disabled={!product.inStock || isCartLoading || isAdded} className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-medical-primary px-4 font-black text-white shadow-md hover:bg-medical-dark disabled:cursor-not-allowed disabled:bg-slate-300 transition">
+                <button type="button" onClick={handleAddToCart} disabled={!isCurrentlyInStock || isCartLoading || isAdded} className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-medical-primary px-4 font-black text-white shadow-md hover:bg-medical-dark disabled:cursor-not-allowed disabled:bg-slate-300 transition">
                   {isCartLoading ? <Loader size={18} className="animate-spin" /> : isAdded ? <Check size={18} /> : <ShoppingCart size={18} />}
-                  {product.inStock ? (isAdded ? 'Added to cart' : 'Add to cart') : 'Out of stock'}
+                  {isCurrentlyInStock ? (isAdded ? 'Added to cart' : 'Add to cart') : 'Out of stock'}
                 </button>
-                <button type="button" onClick={handleBuyNow} disabled={!product.inStock || isBuyingNow || isCartLoading} className="flex min-h-12 items-center justify-center rounded-xl border-2 border-medical-accent bg-medical-accent px-4 font-black text-medical-dark shadow-md hover:bg-amber-300 disabled:cursor-not-allowed disabled:border-slate-300 disabled:bg-slate-100 disabled:text-medical-text transition">
+                <button type="button" onClick={handleBuyNow} disabled={!isCurrentlyInStock || isBuyingNow || isCartLoading} className="flex min-h-12 items-center justify-center rounded-xl border-2 border-medical-accent bg-medical-accent px-4 font-black text-medical-dark shadow-md hover:bg-amber-300 disabled:cursor-not-allowed disabled:border-slate-300 disabled:bg-slate-100 disabled:text-medical-text transition">
                   {isBuyingNow ? 'Proceeding to checkout...' : 'Buy now'}
                 </button>
               </div>

@@ -113,6 +113,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                   Rx Required
                 </span>
               )}
+              {product.variants && product.variants.length > 1 && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-teal-800 px-2.5 py-1 text-[10px] font-black text-white shadow-sm">
+                  {product.variants.length} Sizes Available
+                </span>
+              )}
             </>
           )}
         </span>
@@ -141,18 +146,30 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             {product.compareAtPrice && product.compareAtPrice > product.price && (
               <p className="text-xs text-medical-text line-through">{formatPrice(product.compareAtPrice)}</p>
             )}
-            <p className={`text-lg font-black ${product.inStock ? 'text-amber-900' : 'text-medical-text'}`}>{formatPrice(product.price)}</p>
+            <p className={`text-lg font-black ${product.inStock ? 'text-amber-900' : 'text-medical-text'}`}>
+              {product.variants && product.variants.length > 1 ? `From ${formatPrice(product.price)}` : formatPrice(product.price)}
+            </p>
           </div>
-          <button
-            type="button"
-            onClick={handleAddToCart}
-            disabled={!product.inStock || cartState === 'adding'}
-            className="tap-target inline-flex items-center justify-center gap-2 rounded-xl bg-medical-primary px-3 text-sm font-bold text-white hover:bg-medical-dark disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500"
-            aria-label={product.inStock ? `${cartState === 'adding' ? 'Adding' : 'Add'} ${product.title} to cart` : `${product.title} is out of stock`}
-          >
-            <ShoppingCart size={18} />
-            <span className="hidden xl:inline">{cartState === 'adding' ? 'Adding...' : cartState === 'added' ? 'Added' : 'Add'}</span>
-          </button>
+          {product.variants && product.variants.length > 1 ? (
+            <Link
+              to={productPath}
+              className="tap-target inline-flex items-center justify-center gap-1 rounded-xl bg-medical-primary px-3 text-xs font-bold text-white hover:bg-medical-dark transition"
+              aria-label={`Select size and quantity for ${product.title}`}
+            >
+              Choose Size
+            </Link>
+          ) : (
+            <button
+              type="button"
+              onClick={handleAddToCart}
+              disabled={!product.inStock || cartState === 'adding'}
+              className="tap-target inline-flex items-center justify-center gap-2 rounded-xl bg-medical-primary px-3 text-sm font-bold text-white hover:bg-medical-dark disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500"
+              aria-label={product.inStock ? `${cartState === 'adding' ? 'Adding' : 'Add'} ${product.title} to cart` : `${product.title} is out of stock`}
+            >
+              <ShoppingCart size={18} />
+              <span className="hidden xl:inline">{cartState === 'adding' ? 'Adding...' : cartState === 'added' ? 'Added' : 'Add'}</span>
+            </button>
+          )}
         </div>
         <p className={`mt-2 min-h-4 text-xs font-semibold ${cartState === 'error' ? 'text-medical-alert' : 'text-medical-secondary'}`} aria-live="polite">
           {cartState === 'error' ? 'Could not add this item. Try again.' : cartState === 'added' ? 'Added to cart.' : ''}
