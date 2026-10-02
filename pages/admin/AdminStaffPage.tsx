@@ -10,7 +10,7 @@ import {
   Lock,
 } from 'lucide-react';
 import { AdminApiClient } from '../../lib/adminApi';
-import { AdminRole, AdminUser } from '../../server/adminService';
+import { AdminRole, AdminUser } from '../../types';
 
 export const AdminStaffPage: React.FC = () => {
   const [staff, setStaff] = useState<AdminUser[]>([]);
@@ -54,7 +54,17 @@ export const AdminStaffPage: React.FC = () => {
     e.preventDefault();
     if (!newEmail.trim() || !newName.trim()) return;
 
-    setSuccessMessage(`Invitation dispatched to ${newEmail} for role: ${newRole}.`);
+    const newStaffMember: AdminUser = {
+      id: `usr_${Date.now()}`,
+      email: newEmail.trim().toLowerCase(),
+      name: newName.trim(),
+      role: newRole,
+      isActive: true,
+      createdAt: new Date().toISOString(),
+    };
+
+    setStaff((prev) => [...prev, newStaffMember]);
+    setSuccessMessage(`Invitation dispatched to ${newEmail} for role: ${newRole}. Member active.`);
     setIsInviteModalOpen(false);
     setNewEmail('');
     setNewName('');

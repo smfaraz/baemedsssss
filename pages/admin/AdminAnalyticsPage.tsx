@@ -27,7 +27,7 @@ export const AdminAnalyticsPage: React.FC = () => {
           AdminApiClient.getProducts(),
         ]);
         setMetrics(dashData);
-        setProducts(prods);
+        setProducts(prods.products || []);
       } finally {
         setIsLoading(false);
       }

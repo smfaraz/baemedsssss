@@ -225,56 +225,49 @@ const HomePage: React.FC = () => {
         if (!isMounted) return;
         setCatalogueProducts(allProducts);
 
-        // 1. Popular Products: Flagship hero equipment with multi-angle galleries
-        const bestSellerIds = [
-          'gid://shopify/Product/hero-dv-525ds',
-          'gid://shopify/Product/hero-ino-is-501-na8',
-          'gid://shopify/Product/hero-dr-k3',
-          'gid://shopify/Product/hero-dv-1025ds',
-        ];
-        const bestSellers = bestSellerIds
-          .map((id) => allProducts.find((p) => p.id === id))
-          .filter(Boolean) as Product[];
-        setPopularProducts(bestSellers);
+        // 1. Popular Products: Flagship verified equipment across categories
+        const heroes = allProducts.filter((p) => p.isHeroProduct && p.inStock);
+        const bestSellers = heroes.slice(0, 4);
+        setPopularProducts(bestSellers.length > 0 ? bestSellers : allProducts.slice(0, 4));
 
-        // 2. Respiratory care shelf: DeVilbiss 5L, Inogen Rove 6, PulmoNeb LT, Drive Power Neb
-        const respiratoryIds = [
-          'gid://shopify/Product/hero-dv-525ds',
-          'gid://shopify/Product/hero-ino-is-501-na8',
-          'gid://shopify/Product/hero-dv-3655ltr',
-          'gid://shopify/Product/hero-dr-18081',
-        ];
-        const respiratory = respiratoryIds
-          .map((id) => allProducts.find((p) => p.id === id))
-          .filter(Boolean) as Product[];
-        setRespiratoryProducts(respiratory);
-
-        // 3. Mobility shelf: Cruiser III, Sentra EC Bariatric, Cruiser X4, Cylinder Cart
-        const mobilityIds = [
-          'gid://shopify/Product/hero-dr-k3',
-          'gid://shopify/Product/hero-dr-stdec',
-          'gid://shopify/Product/hero-dr-cx4',
-          'gid://shopify/Product/hero-dr-13002sv-6',
-        ];
-        const mobility = mobilityIds
-          .map((id) => allProducts.find((p) => p.id === id))
-          .filter(Boolean) as Product[];
-        setMobilityProducts(mobility);
-
-        // 4. Clinical diagnostics & monitoring shelf
-        const diagnosticIds = ['gid://shopify/Product/hero-mq-mq3000'];
-        const diagBase = diagnosticIds
-          .map((id) => allProducts.find((p) => p.id === id))
-          .filter(Boolean) as Product[];
-        const additionalDiag = allProducts.filter(
+        // 2. Respiratory care shelf: Oxygen Concentrators, CPAP, BiPAP, Nebulizers
+        const respiratory = allProducts.filter(
           (p) =>
             p.inStock &&
-            !diagBase.some((d) => d.id === p.id) &&
-            /monitor|oximeter|glucometer|sphygmomanometer/i.test(p.title) &&
-            !/connector|hose|tubing|bulb|bracket|adapter|wrench|strip|lancet/i.test(p.title) &&
-            p.price >= 15
+            (/oxygen|concentrator|cpap|bipap|nebulizer/i.test(p.category) || /concentrator|oxygen|cpap|bipap|nebulizer/i.test(p.title)) &&
+            !/tubing|filter|connector|adapter|clip|hose/i.test(p.title) &&
+            p.price >= 45
         );
-        setDiagnosticProducts([...diagBase, ...additionalDiag].slice(0, 4));
+        const respiratoryHeroes = respiratory.filter((p) => p.isHeroProduct);
+        setRespiratoryProducts(
+          (respiratoryHeroes.length >= 4 ? respiratoryHeroes : respiratory).slice(0, 4)
+        );
+
+        // 3. Mobility shelf: Wheelchairs & clinical furnishings
+        const mobility = allProducts.filter(
+          (p) =>
+            p.inStock &&
+            /wheelchair|furniture/i.test(p.category) &&
+            !/scale|stretcher|commode|anti-tipper|armrest pad/i.test(p.title) &&
+            p.price >= 120
+        );
+        const mobilityHeroes = mobility.filter((p) => p.isHeroProduct);
+        setMobilityProducts(
+          (mobilityHeroes.length >= 4 ? mobilityHeroes : mobility).slice(0, 4)
+        );
+
+        // 4. Clinical diagnostics & monitoring shelf
+        const diagnostics = allProducts.filter(
+          (p) =>
+            p.inStock &&
+            (/monitor|glucometer|blood pressure/i.test(p.category) || /monitor|oximeter|sphygmomanometer|glucometer/i.test(p.title)) &&
+            !/cuff only|sensor only|cable|strip|lancet|bracket/i.test(p.title) &&
+            p.price >= 40
+        );
+        const diagHeroes = diagnostics.filter((p) => p.isHeroProduct);
+        setDiagnosticProducts(
+          (diagHeroes.length >= 4 ? diagHeroes : diagnostics).slice(0, 4)
+        );
       } catch (error) {
         console.error('Failed to load homepage products:', error);
       } finally {
@@ -308,30 +301,15 @@ const HomePage: React.FC = () => {
 
   // Showcase flagship products and core medical equipment in the continuous marquee reel
   const heroReel = useMemo(() => {
-    const heroMachineIds = [
-      'gid://shopify/Product/hero-dv-525ds',
-      'gid://shopify/Product/hero-dv-1025ds',
-      'gid://shopify/Product/hero-dr-k3',
-      'gid://shopify/Product/hero-dr-stdec',
-      'gid://shopify/Product/hero-dr-cx4',
-      'gid://shopify/Product/hero-ino-is-501-na8',
-      'gid://shopify/Product/hero-dv-3655ltr',
-      'gid://shopify/Product/hero-dr-18081',
-      'gid://shopify/Product/hero-mq-mq3000',
-      'gid://shopify/Product/hero-dr-13002sv-6',
-    ];
-    const topHeroMachines = heroMachineIds
-      .map((id) => catalogueProducts.find((p) => p.id === id))
-      .filter(Boolean) as Product[];
+    const heroes = catalogueProducts.filter((p) => p.isHeroProduct && p.inStock && p.price >= 80);
+    if (heroes.length >= 8) return heroes.slice(0, 16);
 
-    const additionalMachines = catalogueProducts.filter((p) =>
+    const coreEquipment = catalogueProducts.filter((p) =>
       p.inStock &&
       p.price >= 80 &&
-      !topHeroMachines.some((m) => m.id === p.id) &&
       !/filter|tubing|connector|adapter|wrench|bracket|screw|clip|cuff|case|bag|cannula|mask|valve/i.test(p.title)
     );
-
-    return [...topHeroMachines, ...additionalMachines].slice(0, 14);
+    return coreEquipment.slice(0, 16);
   }, [catalogueProducts]);
 
   return (

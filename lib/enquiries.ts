@@ -1,6 +1,5 @@
 import { supabase } from './supabase';
 import { isValidUSPhone, toE164Phone } from './marketConfig';
-import { AuditLogger } from '../server/auditLogger';
 
 export type EnquiryInput = {
   type: 'rental' | 'contact' | 'bulk' | 'availability';
@@ -53,21 +52,6 @@ export const submitEnquiry = async (input: EnquiryInput) => {
   });
 
   if (error) {
-    AuditLogger.logEvent({
-      actor: cleanEmail,
-      action: 'CUSTOMER_ENQUIRY_FAILED',
-      resource: `enquiry:${input.type}`,
-      result: 'FAILURE',
-      metadata: { error: error.message },
-    });
     throw error;
   }
-
-  AuditLogger.logEvent({
-    actor: cleanEmail,
-    action: 'CUSTOMER_ENQUIRY_SUBMITTED',
-    resource: `enquiry:${input.type}`,
-    result: 'SUCCESS',
-    metadata: { type: input.type },
-  });
 };

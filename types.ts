@@ -49,6 +49,7 @@ export interface Product {
   inventoryQuantity?: number;
   trackInventory?: boolean;
   isHeroProduct?: boolean;
+  heroRank?: number;
   features?: string[];
   specifications?: Record<string, string>;
   seoTitle?: string;
@@ -135,6 +136,24 @@ export interface ShippingOption {
   estimatedDaysMin: number;
   estimatedDaysMax: number;
   guaranteed?: boolean;
+}
+
+export type AdminRole =
+  | 'super_admin'
+  | 'compliance_officer'
+  | 'clinical_specialist'
+  | 'support_agent'
+  | 'fulfillment_specialist'
+  | 'customer';
+
+export interface AdminUser {
+  id: string;
+  email: string;
+  name: string;
+  role: AdminRole;
+  isActive: boolean;
+  lastLoginAt?: string;
+  createdAt: string;
 }
 
 export type StaffRole =

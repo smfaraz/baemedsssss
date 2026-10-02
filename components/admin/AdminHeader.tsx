@@ -9,7 +9,7 @@ import {
   ChevronDown,
   ExternalLink,
 } from 'lucide-react';
-import { AdminRole } from '../../server/adminService';
+import { AdminRole } from '../../types';
 import { useNavigate } from '../../context/CartContext';
 
 interface AdminHeaderProps {

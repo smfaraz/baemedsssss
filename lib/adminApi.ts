@@ -1,11 +1,11 @@
 /**
- * BaeMeds Native Admin API Client
- * Used by admin back-office components to communicate with /api/admin endpoints
- * with fallback to local mock data when offline or in standalone preview.
+ * BaeMeds Native Admin API Client (Frontend Edge)
+ * Strictly untrusted client boundary. Communicates exclusively via HTTP
+ * with /api/admin/* endpoints using Bearer credentials.
+ * NEVER imports server secrets or service-role database clients.
  */
 
-import { AdminRole, AdminUser } from '../server/adminService';
-import { Product } from '../types';
+import { AdminRole, AdminUser, Product } from '../types';
 
 export interface AdminSessionState {
   user: AdminUser | null;
@@ -13,14 +13,12 @@ export interface AdminSessionState {
   isAuthenticated: boolean;
 }
 
-const getHeaders = (role?: AdminRole): HeadersInit => {
-  const activeRole = role || (localStorage.getItem('baemeds_admin_role') as AdminRole) || 'super_admin';
+const getHeaders = (): HeadersInit => {
   const email = (typeof localStorage !== 'undefined' && localStorage.getItem('baemeds_admin_email')) || 'admin@baemeds.com';
   const b64 = typeof btoa !== 'undefined' ? btoa(email) : Buffer.from(email).toString('base64');
   return {
     'Content-Type': 'application/json',
     'Authorization': `Bearer bm_admin_${b64}_token`,
-    'X-Admin-Role': activeRole,
   };
 };
 
@@ -34,53 +32,37 @@ export const AdminApiClient = {
   },
 
   async getDashboardMetrics(role?: AdminRole) {
-    try {
-      const res = await fetch('/api/admin/dashboard', { headers: getHeaders(role) });
-      if (res.ok) {
-        const data = await res.json();
-        return data.metrics;
-      }
-    } catch {}
-
-    // Fallback baseline
-    return {
-      revenueToday: 5480.00,
-      ordersToday: 18,
-      pendingOrders: 6,
-      pendingPrescriptions: 2,
-      lowStockProducts: 4,
-      averageOrderValue: 304.44,
-      conversionRate: '3.6%',
-      recentOrders: [],
-      recentActivity: [],
-    };
+    const res = await fetch('/api/admin/dashboard', { headers: getHeaders() });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.error || `HTTP ${res.status}: Failed to load metrics`);
+    }
+    const data = await res.json();
+    return data.metrics;
   },
 
   async getOrders(status?: string, search?: string) {
     const params = new URLSearchParams();
-    if (status) params.set('status', status);
+    if (status && status !== 'all') params.set('status', status);
     if (search) params.set('search', search);
 
-    try {
-      const res = await fetch(`/api/admin/orders?${params.toString()}`, { headers: getHeaders() });
-      if (res.ok) {
-        const data = await res.json();
-        return data.orders || [];
-      }
-    } catch {}
-
-    return [];
+    const res = await fetch(`/api/admin/orders?${params.toString()}`, { headers: getHeaders() });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.error || `HTTP ${res.status}: Failed to fetch orders`);
+    }
+    const data = await res.json();
+    return data.orders || [];
   },
 
   async getOrder(id: string) {
-    try {
-      const res = await fetch(`/api/admin/orders/${id}`, { headers: getHeaders() });
-      if (res.ok) {
-        const data = await res.json();
-        return data.order;
-      }
-    } catch {}
-    return null;
+    const res = await fetch(`/api/admin/orders/${id}`, { headers: getHeaders() });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.error || `HTTP ${res.status}: Failed to load order`);
+    }
+    const data = await res.json();
+    return data.order;
   },
 
   async updateOrderStatus(id: string, status: string, reason?: string) {
@@ -105,29 +87,76 @@ export const AdminApiClient = {
     return data.order;
   },
 
-  async getProducts(query?: string) {
-    const params = new URLSearchParams();
-    if (query) params.set('q', query);
+  async fulfillViaMcKesson(id: string, mckessonPoNumber: string, carrier: string, trackingNumber?: string) {
+    const res = await fetch(`/api/admin/orders/${id}`, {
+      method: 'PATCH',
+      headers: getHeaders(),
+      body: JSON.stringify({ action: 'mckesson', mckessonPoNumber, carrier, trackingNumber }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to update McKesson fulfillment');
+    return data.order;
+  },
 
-    try {
-      const res = await fetch(`/api/admin/products?${params.toString()}`, { headers: getHeaders() });
-      if (res.ok) {
-        const data = await res.json();
-        return data.products || [];
-      }
-    } catch {}
-    return [];
+  async getProducts(
+    optionsOrQuery?:
+      | string
+      | {
+          page?: number;
+          pageSize?: number;
+          query?: string;
+          category?: string;
+          rx?: string;
+          hero?: string;
+        }
+  ): Promise<{
+    products: Product[];
+    total: number;
+    page: number;
+    pageSize: number;
+    totalPages: number;
+  }> {
+    const params = new URLSearchParams();
+
+    if (typeof optionsOrQuery === 'string') {
+      if (optionsOrQuery) params.set('q', optionsOrQuery);
+      params.set('page', '1');
+      params.set('pageSize', '50');
+    } else if (optionsOrQuery) {
+      if (optionsOrQuery.query) params.set('q', optionsOrQuery.query);
+      if (optionsOrQuery.page) params.set('page', String(optionsOrQuery.page));
+      if (optionsOrQuery.pageSize) params.set('pageSize', String(optionsOrQuery.pageSize));
+      if (optionsOrQuery.category && optionsOrQuery.category !== 'all') params.set('category', optionsOrQuery.category);
+      if (optionsOrQuery.rx && optionsOrQuery.rx !== 'all') params.set('rx', optionsOrQuery.rx);
+      if (optionsOrQuery.hero && optionsOrQuery.hero !== 'all') params.set('hero', optionsOrQuery.hero);
+    } else {
+      params.set('page', '1');
+      params.set('pageSize', '50');
+    }
+
+    const res = await fetch(`/api/admin/products?${params.toString()}`, { headers: getHeaders() });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.error || `HTTP ${res.status}: Failed to load products`);
+    }
+    const data = await res.json();
+    return {
+      products: data.products || [],
+      total: data.total !== undefined ? data.total : (data.products?.length || 0),
+      page: data.page || 1,
+      pageSize: data.pageSize || 50,
+      totalPages: data.totalPages || 1,
+    };
   },
 
   async getProduct(id: string) {
-    try {
-      const res = await fetch(`/api/admin/products/${id}`, { headers: getHeaders() });
-      if (res.ok) {
-        const data = await res.json();
-        return data.product;
-      }
-    } catch {}
-    return null;
+    const res = await fetch(`/api/admin/products/${id}`, { headers: getHeaders() });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.error || `HTTP ${res.status}: Failed to load product`);
+    }
+    const data = await res.json();
+    return data.product;
   },
 
   async saveProduct(product: Partial<Product>) {
@@ -152,14 +181,13 @@ export const AdminApiClient = {
   },
 
   async getInventory() {
-    try {
-      const res = await fetch('/api/admin/inventory', { headers: getHeaders() });
-      if (res.ok) {
-        const data = await res.json();
-        return data.inventory || [];
-      }
-    } catch {}
-    return [];
+    const res = await fetch('/api/admin/inventory', { headers: getHeaders() });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.error || `HTTP ${res.status}: Failed to load inventory`);
+    }
+    const data = await res.json();
+    return data.inventory || [];
   },
 
   async adjustInventory(productId: string, delta: number, reason: string, notes?: string) {
@@ -174,25 +202,23 @@ export const AdminApiClient = {
   },
 
   async getCustomers() {
-    try {
-      const res = await fetch('/api/admin/customers', { headers: getHeaders() });
-      if (res.ok) {
-        const data = await res.json();
-        return data.customers || [];
-      }
-    } catch {}
-    return [];
+    const res = await fetch('/api/admin/customers', { headers: getHeaders() });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.error || `HTTP ${res.status}: Failed to load customers`);
+    }
+    const data = await res.json();
+    return data.customers || [];
   },
 
   async getPrescriptions() {
-    try {
-      const res = await fetch('/api/admin/prescriptions', { headers: getHeaders() });
-      if (res.ok) {
-        const data = await res.json();
-        return data.prescriptions || [];
-      }
-    } catch {}
-    return [];
+    const res = await fetch('/api/admin/prescriptions', { headers: getHeaders() });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.error || `HTTP ${res.status}: Failed to load prescriptions`);
+    }
+    const data = await res.json();
+    return data.prescriptions || [];
   },
 
   async reviewPrescription(id: string, decision: 'APPROVED' | 'REJECTED', notes: string) {
@@ -207,14 +233,13 @@ export const AdminApiClient = {
   },
 
   async getDiscounts() {
-    try {
-      const res = await fetch('/api/admin/discounts', { headers: getHeaders() });
-      if (res.ok) {
-        const data = await res.json();
-        return data.discounts || [];
-      }
-    } catch {}
-    return [];
+    const res = await fetch('/api/admin/discounts', { headers: getHeaders() });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.error || `HTTP ${res.status}: Failed to load discounts`);
+    }
+    const data = await res.json();
+    return data.discounts || [];
   },
 
   async saveDiscount(discount: any) {
@@ -229,47 +254,43 @@ export const AdminApiClient = {
   },
 
   async getShippingSettings() {
-    try {
-      const res = await fetch('/api/admin/shipping', { headers: getHeaders() });
-      if (res.ok) {
-        const data = await res.json();
-        return data.shipping;
-      }
-    } catch {}
-    return null;
+    const res = await fetch('/api/admin/shipping', { headers: getHeaders() });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.error || `HTTP ${res.status}: Failed to load shipping`);
+    }
+    const data = await res.json();
+    return data.shipping;
   },
 
   async getTaxSettings() {
-    try {
-      const res = await fetch('/api/admin/tax', { headers: getHeaders() });
-      if (res.ok) {
-        const data = await res.json();
-        return data.tax;
-      }
-    } catch {}
-    return null;
+    const res = await fetch('/api/admin/tax', { headers: getHeaders() });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.error || `HTTP ${res.status}: Failed to load tax settings`);
+    }
+    const data = await res.json();
+    return data.tax;
   },
 
   async getAuditLogs() {
-    try {
-      const res = await fetch('/api/admin/audit-logs', { headers: getHeaders() });
-      if (res.ok) {
-        const data = await res.json();
-        return data.logs || [];
-      }
-    } catch {}
-    return [];
+    const res = await fetch('/api/admin/audit-logs', { headers: getHeaders() });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.error || `HTTP ${res.status}: Failed to load audit logs`);
+    }
+    const data = await res.json();
+    return data.logs || [];
   },
 
   async getStaff() {
-    try {
-      const res = await fetch('/api/admin/staff', { headers: getHeaders() });
-      if (res.ok) {
-        const data = await res.json();
-        return data.staff || [];
-      }
-    } catch {}
-    return [];
+    const res = await fetch('/api/admin/staff', { headers: getHeaders() });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.error || `HTTP ${res.status}: Failed to load staff roster`);
+    }
+    const data = await res.json();
+    return data.staff || [];
   },
 
   async updateStaffRole(staffId: string, role: AdminRole) {

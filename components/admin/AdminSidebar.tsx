@@ -18,7 +18,8 @@ import {
   Rocket,
 } from 'lucide-react';
 import { Link, useLocation } from '../../context/CartContext';
-import { AdminRole, ROLE_PERMISSIONS } from '../../server/adminService';
+import { AdminRole } from '../../types';
+import { ROLE_PERMISSIONS } from '../../lib/rbacConfig';
 import { APP_NAME } from '../../constants';
 
 interface AdminSidebarProps {

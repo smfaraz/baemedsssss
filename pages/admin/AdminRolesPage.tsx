@@ -7,7 +7,8 @@ import {
   FileText,
   AlertTriangle,
 } from 'lucide-react';
-import { ROLE_PERMISSIONS, AdminRole } from '../../server/adminService';
+import { AdminRole } from '../../types';
+import { ROLE_PERMISSIONS } from '../../lib/rbacConfig';
 
 interface PermissionDefinition {
   key: string;

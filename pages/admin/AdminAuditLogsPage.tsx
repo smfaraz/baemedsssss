@@ -57,6 +57,32 @@ export const AdminAuditLogsPage: React.FC = () => {
     );
   });
 
+  const handleExportAuditCsv = () => {
+    if (!logs.length) {
+      alert('No audit logs to export.');
+      return;
+    }
+    const headers = ['Log ID', 'Timestamp', 'Actor ID', 'Actor Role', 'Action', 'Resource Type', 'Resource ID', 'Status'];
+    const rows = filteredLogs.map((l) => [
+      `"${l.id}"`,
+      `"${l.timestamp}"`,
+      `"${l.actorId}"`,
+      `"${l.actorRole}"`,
+      `"${l.action}"`,
+      `"${l.resourceType}"`,
+      `"${l.resourceId || ''}"`,
+      `"${l.status}"`,
+    ]);
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `baemeds_hipaa_audit_trail_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="space-y-6 max-w-6xl pb-16">
       {/* Header Bar */}
@@ -74,7 +100,8 @@ export const AdminAuditLogsPage: React.FC = () => {
         </div>
 
         <button
-          onClick={() => alert('Exporting signed audit ledger to encrypted CSV...')}
+          type="button"
+          onClick={handleExportAuditCsv}
           className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 shadow-xs transition"
         >
           <FileSpreadsheet size={15} /> Export Audit Log

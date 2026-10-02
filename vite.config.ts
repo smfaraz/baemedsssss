@@ -17,15 +17,17 @@ function apiDevMiddleware() {
 
           let handler: any = null;
           if (pathname.startsWith('/api/admin')) {
-            handler = (await import('./api/admin.js')).default;
+            handler = (await server.ssrLoadModule('./api/admin.ts')).default;
           } else if (pathname.startsWith('/api/checkout')) {
-            handler = (await import('./api/checkout.js')).default;
+            handler = (await server.ssrLoadModule('./api/checkout.ts')).default;
           } else if (pathname.startsWith('/api/auth')) {
-            handler = (await import('./api/auth.js')).default;
+            handler = (await server.ssrLoadModule('./api/auth.ts')).default;
           } else if (pathname.startsWith('/api/cart')) {
-            handler = (await import('./api/cart.js')).default;
+            handler = (await server.ssrLoadModule('./api/cart.ts')).default;
           } else if (pathname.startsWith('/api/account')) {
-            handler = (await import('./api/account.js')).default;
+            handler = (await server.ssrLoadModule('./api/account.ts')).default;
+          } else if (pathname.startsWith('/api/feeds')) {
+            handler = (await server.ssrLoadModule('./api/feeds.ts')).default;
           }
 
           if (!handler || typeof handler.fetch !== 'function') {

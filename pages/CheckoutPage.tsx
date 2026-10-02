@@ -12,11 +12,19 @@ import {
 import { APP_NAME } from '../constants';
 import { Link, useCart, useNavigate } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import { Analytics } from '../lib/analytics';
 
 export const CheckoutPage: React.FC = () => {
   const { cart, cartTotal, clearCart } = useCart();
   const { customer, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+
+  // Track begin_checkout in GA4 & Meta Pixel
+  useEffect(() => {
+    if (cart && cart.length > 0) {
+      Analytics.trackBeginCheckout(cart, cartTotal);
+    }
+  }, []);
 
   // Form State
   const [email, setEmail] = useState('');
@@ -162,6 +170,20 @@ export const CheckoutPage: React.FC = () => {
       };
       sessionStorage.setItem('baemeds_last_order', JSON.stringify(orderRecord));
       sessionStorage.setItem('last_placed_order', JSON.stringify(data));
+
+      // Trigger GA4 & Meta Pixel Purchase event with Google Ads conversion
+      Analytics.trackPurchase({
+        orderNumber: data.orderNumber || data.orderId,
+        totalAmount: orderRecord.total,
+        currency: 'USD',
+        items: cart.map((item) => ({
+          id: item.id,
+          title: item.title,
+          price: item.price,
+          quantity: item.quantity,
+        })),
+      });
+
       clearCart();
       navigate(`/order-success?order_number=${encodeURIComponent(data.orderNumber || data.orderId)}`);
     } catch (err: any) {

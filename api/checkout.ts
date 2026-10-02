@@ -8,7 +8,7 @@ import {
   json,
   readJson,
 } from '../server/commerce.js';
-import { supabase } from '../lib/supabase.js';
+import { adminSupabase } from '../server/adminSupabase.js';
 import catalogSeed from '../data/catalog_seed.json';
 import { recordFirstPartyOrder } from '../server/adminService.js';
 
@@ -183,7 +183,7 @@ export default {
 
       // Async write to Supabase if database available
       try {
-        const { error: orderInsertError } = await supabase.from('orders').insert({
+        const { error: orderInsertError } = await adminSupabase.from('orders').insert({
           id: orderId,
           order_number: orderNumber,
           customer_email: email,
@@ -205,7 +205,7 @@ export default {
             ...item,
             order_id: orderId,
           }));
-          await supabase.from('order_items').insert(formattedItems);
+          await adminSupabase.from('order_items').insert(formattedItems);
         }
       } catch (dbErr) {
         // Resilient fallback: order is securely retained in server store

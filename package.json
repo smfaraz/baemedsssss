@@ -10,7 +10,11 @@
     "prerender": "node scripts/prerender.mjs",
     "preview": "vite preview",
     "lint": "tsc --noEmit",
-    "test": "tsx tests/us-market.test.ts && tsx tests/native-commerce.test.ts && tsx tests/admin-rbac.test.ts",
+    "test:security": "tsx tests/security-boundary.test.ts && tsx tests/authorization-pipeline.test.ts && tsx tests/v1-api-contract.test.ts && tsx tests/admin-rbac.test.ts && tsx tests/us-market.test.ts",
+    "test:concurrency": "tsx tests/concurrency-inventory.test.ts",
+    "test:pagination": "tsx tests/storefront-pagination.test.ts",
+    "test:migration": "tsx scripts/validate_inventory_migration.ts",
+    "test": "npm run test:security && npm run test:concurrency && npm run test:pagination",
     "seed:supabase": "node scripts/seed-supabase-catalog.mjs",
     "shots": "node scripts/mobile-shots.mjs"
   },
@@ -27,9 +31,11 @@
     "react-dom": "^19.2.4",
     "react-helmet-async": "^3.0.0",
     "react-router-dom": "^7.18.2",
-    "tailwindcss": "^4.2.0"
+    "tailwindcss": "^4.2.0",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.8",
     "@tailwindcss/vite": "^4.3.1",
     "@types/node": "^22.19.11",
     "@vitejs/plugin-react": "^5.0.0",

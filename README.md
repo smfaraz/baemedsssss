@@ -1,71 +1,98 @@
-# BaeMeds USA Storefront
+# BaeMeds USA — Production E-Commerce Platform
 
-Production-grade medical equipment, Durable Medical Equipment (DME), and healthcare supplies e-commerce platform for [baemeds.com](https://www.baemeds.com/).
+Enterprise-grade Durable Medical Equipment (DME) and healthcare supplies e-commerce platform for **[baemeds.com](https://www.baemeds.com/)**.
 
-## Overview
+---
 
-BaeMeds USA operates a nationwide US healthcare commerce platform tailored to consumer and commercial medical equipment needs, featuring:
-- **US Regional Architecture**: Full 50-state + DC shipping, US ZIP/ZIP+4 address validation, +1 E.164 phone formatting, and USD pricing.
-- **US Sales Tax Layer**: Automated state baseline and local tax calculations with medical/DME/Rx statutory exemptions.
-- **Carrier Shipping Abstraction**: Real-time integration hooks for USPS, UPS, FedEx, and White Glove Medical Freight.
-- **Healthcare & DME Cataloging**: HCPCS coding, FDA device classification, prescription badges, and FSA/HSA eligibility tags.
-- **HIPAA-Conscious Safeguards**: Least-privilege RBAC architecture, audit logging with automatic PHI sanitization, and strict zero-PHI analytics protections.
+## 🗂️ Clean Project Directory Structure
 
-## Tech Stack
+```
+baemeds-main/
+│
+├── 📁 products/           # 📦 Primary DME Catalogs (Extracted from McKesson by Category)
+│   ├── catalog_bipap_extracted_2026-09-29.csv
+│   ├── catalog_cpap_extracted_2026-09-29.csv
+│   ├── catalog_wheel_extracted_2026-09-29.csv
+│   ├── catalog_blood_pressure_monitor_extracted_2026-09-29.csv
+│   ├── catalog_blood_glucose_extracted_2026-09-29.csv
+│   ├── catalog_nebulizer_extracted_2026-09-29.csv
+│   ├── catalog_suction_ma_extracted_2026-09-29.csv
+│   ├── catalog_pulse_oximeter_extracted_2026-09-29.csv
+│   ├── catalog_breast_pump_extracted_2026-09-29.csv
+│   └── catalog_adult_br_extracted_2026-09-29.csv
+│
+├── 📁 pages/              # 🖥️ Customer Storefront & Admin Back-Office Pages
+│   ├── HomePage.tsx, ProductDetailPage.tsx, CheckoutPage.tsx
+│   ├── ProductResearchPage.tsx (Wholesale costs, margins, profit simulator)
+│   └── 📁 admin/          # Admin Dashboard, Products, Orders, McKesson Dropshipping
+│
+├── 📁 components/         # 🧩 Reusable React UI Components (Cards, Nav, Footers, Modals)
+│
+├── 📁 api/                # ⚡ Serverless API Endpoints (Vercel & Vite Dev Gateway)
+│   ├── admin.ts           # Admin RBAC & backend services
+│   ├── checkout.ts        # Order creation, payments, address verification
+│   └── feeds.ts           # Google Merchant Center XML & Meta Catalog CSV generator
+│
+├── 📁 server/             # 🛠️ Backend Business Logic, Taxes, Audit Logging, Dropshipping
+│
+├── 📁 lib/                # 📚 Core Utilities, Supabase Client & Omnichannel Tracking
+│   ├── supabase.ts        # Supabase PostgreSQL client
+│   ├── commerce.ts        # Catalog hydrator & search queries
+│   └── analytics.ts       # Unified GA4 e-commerce & Meta Pixel tracking
+│
+├── 📁 data/               # 💾 Authoritative Seed & Research Datasets
+│   ├── catalog_seed.json  # 3,099 Clean compiled products from products/
+│   ├── product_research.json
+│   └── 📁 archive_csvs/   # Historical research sheets and scratch backups
+│
+├── 📁 supabase/           # 🗄️ Database Schemas & Migrations (PostgreSQL)
+│   └── MASTER_COMPLETE_SETUP.sql
+│
+├── 📁 scripts/            # 🚀 Database Seeding & Pipeline Automation
+│   ├── compile_products_folder.mjs   # Compiles products/ into catalog_seed.json
+│   ├── seed_live_supabase_database.mjs # Seeds Supabase products table
+│   └── generate_static_feeds.mjs     # Generates Google & Meta feeds
+│
+├── 📁 public/             # 🌐 Static Assets & Marketing Feeds
+│   └── 📁 feeds/          # google-merchant.xml & meta-catalog.csv
+│
+├── 📁 docs/               # 📖 Technical Architecture & Compliance Documentation
+│   ├── 📁 architecture/   # System blueprints & schema docs
+│   ├── 📁 security/       # HIPAA, RBAC, and security audit reports
+│   ├── 📁 api/            # API specifications
+│   ├── 📁 migration/      # Shopify migration & launch guides
+│   └── 📁 testing/        # Test plans & readiness reports
+│
+└── 📁 reports/            # 📊 Client Deliverables, Presentations & HTML Roadmaps
+```
 
-- **Frontend**: React 18, TypeScript, Vite, Tailwind CSS, Lucide Icons
-- **Commerce Backend**: Shopify Storefront GraphQL API (Catalogue, Cart, Customer Accounts, Checkout, Orders)
-- **Services & Storage**: Supabase (reviews, inquiries, RBAC, audit logging), Vercel Serverless Functions
-- **Hosting**: Vercel (`https://www.baemeds.com/`)
+---
 
-## Local Development
-
-Requires Node.js (v18+).
+## 🚀 Key Commands
 
 ```powershell
-npm install
+# 1. Start Local Development Server
 npm run dev
+
+# 2. Type-Check the Codebase
+npx tsc --noEmit
+
+# 3. Re-compile products/ into catalog_seed.json
+node scripts/compile_products_folder.mjs
+
+# 4. Re-seed Live Supabase Database
+node scripts/seed_live_supabase_database.mjs
+
+# 5. Re-generate Google Shopping & Meta Feeds
+node scripts/generate_static_feeds.mjs
 ```
 
-### Environment Configuration
+---
 
-Copy `.env.example` to `.env.local` to override default store configuration:
+## 🔒 Environment Variables (`.env.local`)
 
-```dotenv
-# Market & Storefront Configuration
-VITE_MARKET=US
-VITE_COUNTRY=US
-VITE_CURRENCY=USD
-VITE_LOCALE=en-US
-VITE_PUBLIC_DOMAIN=https://www.baemeds.com
-
-# Shopify Storefront API
-VITE_SHOPIFY_STORE_DOMAIN=your-store.myshopify.com
-VITE_SHOPIFY_STOREFRONT_ACCESS_TOKEN=your-public-storefront-token
-
-# Supabase Integration
-VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key
+```ini
+VITE_SUPABASE_URL=https://ifadlrhqsgdxeeebjblo.supabase.co
+VITE_SUPABASE_ANON_KEY=your_public_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_secret
 ```
-
-*Security Note*: Never expose Shopify Admin API secrets or service-role keys in `VITE_` prefixed variables.
-
-## Testing & Validation
-
-```powershell
-# Type checking
-npm run lint
-
-# Architecture & US Market unit tests
-npm test
-
-# Production build validation
-npm run build
-```
-
-## Compliance & Documentation
-
-- [US Market Migration Guide](./US_MARKET_MIGRATION.md)
-- [Security Architecture](./SECURITY.md)
-- [Healthcare Compliance & Technical Safeguards](./COMPLIANCE.md)
-

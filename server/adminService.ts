@@ -5,6 +5,7 @@
  */
 
 import { supabase } from '../lib/supabase';
+import { adminSupabase } from './adminSupabase';
 import catalogSeed from '../data/catalog_seed.json';
 import { Product, Order } from '../types';
 
@@ -543,7 +544,7 @@ export const logAdminAction = async (
 
   // Also record to Supabase if table is reachable
   try {
-    await supabase.from('audit_logs').insert({
+    await adminSupabase.from('audit_logs').insert({
       actor_id: actorId,
       actor_role: actorRole,
       action,
@@ -569,19 +570,29 @@ export const AdminService = {
     // Fetch live orders count & revenue from Supabase or fallback
     let ordersList: any[] = [];
     try {
-      const { data } = await supabase.from('orders').select('*').limit(100);
+      const { data } = await adminSupabase.from('orders').select('*').limit(100);
       if (data && data.length) ordersList = data;
     } catch {}
+
+    if (ordersList.length === 0) {
+      ordersList = [...memoryOrders];
+    }
 
     const totalRevenue = ordersList.reduce((sum, o) => sum + (Number(o.total_amount) || 0), 0);
     const totalOrders = ordersList.length;
     const pendingPrescriptions = ordersList.filter((o) => o.status === 'CLINICAL_REVIEW').length;
-    const awaitingFulfillment = ordersList.filter((o) => ['PAID', 'PROCESSING'].includes(o.status)).length;
+    const awaitingFulfillment = ordersList.filter((o) => ['PAID', 'PROCESSING', 'CLINICAL_APPROVED'].includes(o.status)).length;
     const aov = totalOrders > 0 ? totalRevenue / totalOrders : 0;
 
-    const lowStockCount = (catalogSeed as any[]).filter(
-      (p) => (p.availableQuantity !== undefined ? p.availableQuantity : 10) < 5
-    ).length;
+    let lowStockCount = 0;
+    try {
+      const { data: lowStock } = await adminSupabase
+        .from('products')
+        .select('id')
+        .lt('inventory_quantity', 5)
+        .limit(20);
+      if (lowStock) lowStockCount = lowStock.length;
+    } catch {}
 
     return {
       revenueToday: totalRevenue > 0 ? totalRevenue : 4820.50,
@@ -600,10 +611,30 @@ export const AdminService = {
   async getOrders(role: AdminRole, filters?: { status?: string; search?: string }) {
     if (!hasPermission(role, 'orders:view')) throw new Error('Unauthorized');
 
-    let orders = [...memoryOrders];
+    let orders: any[] = [];
+    try {
+      let query = adminSupabase
+        .from('orders')
+        .select('*, order_items(*)')
+        .order('created_at', { ascending: false });
 
-    if (filters?.status && filters.status !== 'all') {
-      orders = orders.filter((o) => o.status === filters.status);
+      if (filters?.status && filters.status !== 'all') {
+        query = query.eq('status', filters.status);
+      }
+
+      const { data, error } = await query;
+      if (!error && data && data.length > 0) {
+        orders = data;
+      }
+    } catch (e) {
+      console.warn('Orders query fallback to memory:', e);
+    }
+
+    if (orders.length === 0) {
+      orders = [...memoryOrders];
+      if (filters?.status && filters.status !== 'all') {
+        orders = orders.filter((o) => o.status === filters.status);
+      }
     }
 
     if (filters?.search && filters.search.trim()) {
@@ -630,6 +661,19 @@ export const AdminService = {
 
   async getOrderById(role: AdminRole, orderId: string) {
     if (!hasPermission(role, 'orders:view')) throw new Error('Unauthorized');
+
+    try {
+      const { data, error } = await adminSupabase
+        .from('orders')
+        .select('*, order_items(*)')
+        .or(`id.eq.${orderId},order_number.eq.${orderId}`)
+        .maybeSingle();
+
+      if (!error && data) {
+        return data;
+      }
+    } catch {}
+
     const order = memoryOrders.find((o) => o.id === orderId || o.order_number === orderId);
     if (!order) throw new Error('Order not found');
     return order;
@@ -667,7 +711,7 @@ export const AdminService = {
     }
 
     try {
-      await supabase.from('orders').update({ status: nextStatus }).eq('id', order.id);
+      await adminSupabase.from('orders').update({ status: nextStatus, updated_at: new Date().toISOString() }).eq('id', order.id);
     } catch {}
 
     order.status = nextStatus;
@@ -693,13 +737,14 @@ export const AdminService = {
     const trackingUrl = `https://track.baemeds.com/?carrier=${encodeURIComponent(carrier)}&num=${encodeURIComponent(trackingNumber)}`;
 
     try {
-      await supabase
+      await adminSupabase
         .from('orders')
         .update({
           carrier,
           tracking_number: trackingNumber,
           tracking_url: trackingUrl,
           status: 'SHIPPED',
+          updated_at: new Date().toISOString(),
         })
         .eq('id', order.id);
     } catch {}
@@ -717,31 +762,121 @@ export const AdminService = {
     return order;
   },
 
+  async fulfillViaMcKesson(
+    actor: AdminUser,
+    orderId: string,
+    mckessonPoNumber: string,
+    carrier: string,
+    trackingNumber?: string
+  ) {
+    if (!hasPermission(actor.role, 'orders:manage')) throw new Error('Forbidden');
+
+    const order = await this.getOrderById(actor.role, orderId);
+    const trackingUrl = trackingNumber ? `https://track.baemeds.com/?carrier=${encodeURIComponent(carrier)}&num=${encodeURIComponent(trackingNumber)}` : null;
+
+    try {
+      await adminSupabase
+        .from('orders')
+        .update({
+          mckesson_po_number: mckessonPoNumber,
+          carrier,
+          tracking_number: trackingNumber || null,
+          tracking_url: trackingUrl,
+          status: trackingNumber ? 'SHIPPED' : 'PROCESSING',
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', order.id);
+    } catch {}
+
+    order.mckesson_po_number = mckessonPoNumber;
+    order.carrier = carrier;
+    if (trackingNumber) {
+      order.tracking_number = trackingNumber;
+      order.tracking_url = trackingUrl;
+      order.status = 'SHIPPED';
+    } else {
+      order.status = 'PROCESSING';
+    }
+
+    await logAdminAction(actor.id, actor.role, 'ORDER_MCKESSON_FULFILLMENT', 'order', order.id, 'SUCCESS', {
+      mckessonPoNumber,
+      carrier,
+      trackingNumber,
+    });
+
+    return order;
+  },
+
   // --- PRODUCTS ---
-  async getProducts(role: AdminRole, query?: string) {
+  async getProductsPaginated(
+    role: AdminRole,
+    options: {
+      page?: number;
+      pageSize?: number;
+      query?: string;
+      category?: string;
+      prescriptionRequired?: boolean;
+      heroOnly?: boolean;
+    } = {}
+  ): Promise<{
+    products: Product[];
+    total: number;
+    page: number;
+    pageSize: number;
+    totalPages: number;
+  }> {
     if (!hasPermission(role, 'products:view')) throw new Error('Unauthorized');
 
-    let list: Product[] = [];
+    const page = Math.max(1, options.page || 1);
+    const pageSize = Math.min(100, Math.max(1, options.pageSize || 50));
+    const from = (page - 1) * pageSize;
+    const to = from + pageSize - 1;
+
+    let products: Product[] = [];
+    let total = 0;
+
     try {
-      const { data, error } = await supabase.from('products').select('*').order('title');
-      if (!error && data && data.length) {
-        list = data.map((d: any) => ({
+      let req = adminSupabase
+        .from('products')
+        .select('*', { count: 'exact' });
+
+      if (options.category && options.category !== 'all') {
+        req = req.eq('category', options.category);
+      }
+      if (options.prescriptionRequired !== undefined) {
+        req = req.eq('prescription_required', options.prescriptionRequired);
+      }
+      if (options.heroOnly) {
+        req = req.eq('is_hero_product', true);
+      }
+      if (options.query) {
+        const q = options.query.trim();
+        req = req.or(`title.ilike.%${q}%,sku.ilike.%${q}%,hcpcs_code.ilike.%${q}%,category.ilike.%${q}%`);
+      }
+
+      const { data, count, error } = await req
+        .order('title', { ascending: true })
+        .range(from, to);
+
+      if (!error && data && count !== null) {
+        total = count;
+        products = data.map((d: any) => ({
           id: d.id,
           title: d.title,
           handle: d.handle,
-          description: d.description,
+          description: d.description || '',
           category: d.category,
           price: Number(d.price),
           compareAtPrice: d.compare_at_price ? Number(d.compare_at_price) : undefined,
           image: d.featured_image,
-          images: d.images,
-          specs: d.specs,
+          images: d.images || (d.featured_image ? [d.featured_image] : []),
+          specs: d.specs || {},
           warranty: d.warranty,
-          isRentalAvailable: d.is_rental_available,
-          prescriptionRequired: d.prescription_required,
+          isRentalAvailable: Boolean(d.is_rental_available),
+          prescriptionRequired: Boolean(d.prescription_required),
           hcpcsCode: d.hcpcs_code,
           fdaClassification: d.fda_classification,
-          isRegulatoryVerified: d.is_regulatory_verified,
+          isRegulatoryVerified: Boolean(d.is_regulatory_verified),
           wholesaleCost: d.wholesale_cost ? Number(d.wholesale_cost) : undefined,
           costPerItem: d.wholesale_cost ? Number(d.wholesale_cost) : undefined,
           sku: d.sku || undefined,
@@ -758,24 +893,48 @@ export const AdminService = {
           inStock: (d.inventory_quantity ?? 25) > 0,
         }));
       }
-    } catch {}
-
-    if (!list.length) {
-      list = [...(catalogSeed as unknown as Product[])];
+    } catch (e) {
+      console.warn('Database pagination fetch fallback:', e);
     }
 
-    if (query) {
-      const q = query.toLowerCase().trim();
-      list = list.filter(
-        (p) =>
-          p.title.toLowerCase().includes(q) ||
-          p.category.toLowerCase().includes(q) ||
-          p.handle.toLowerCase().includes(q) ||
-          (p.hcpcsCode && p.hcpcsCode.toLowerCase().includes(q))
-      );
+    // Fallback to local catalog seed if database is unreachable or empty
+    if (!products.length && total === 0) {
+      let seedList = [...(catalogSeed as unknown as Product[])];
+      if (options.category && options.category !== 'all') {
+        seedList = seedList.filter((p) => p.category === options.category);
+      }
+      if (options.prescriptionRequired !== undefined) {
+        seedList = seedList.filter((p) => Boolean(p.prescriptionRequired) === options.prescriptionRequired);
+      }
+      if (options.heroOnly) {
+        seedList = seedList.filter((p) => Boolean(p.isHeroProduct));
+      }
+      if (options.query) {
+        const q = options.query.toLowerCase().trim();
+        seedList = seedList.filter(
+          (p) =>
+            p.title.toLowerCase().includes(q) ||
+            p.category.toLowerCase().includes(q) ||
+            p.handle.toLowerCase().includes(q) ||
+            (p.hcpcsCode && p.hcpcsCode.toLowerCase().includes(q))
+        );
+      }
+      total = seedList.length;
+      products = seedList.slice(from, to + 1);
     }
 
-    return list;
+    return {
+      products,
+      total,
+      page,
+      pageSize,
+      totalPages: Math.max(1, Math.ceil(total / pageSize)),
+    };
+  },
+
+  async getProducts(role: AdminRole, query?: string) {
+    const result = await this.getProductsPaginated(role, { query, pageSize: 50, page: 1 });
+    return result.products;
   },
 
   async getProductById(role: AdminRole, id: string) {
@@ -837,8 +996,10 @@ export const AdminService = {
     };
 
     try {
-      await supabase.from('products').upsert(dbPayload, { onConflict: 'id' });
-    } catch {}
+      await adminSupabase.from('products').upsert(dbPayload, { onConflict: 'id' });
+    } catch (e) {
+      console.warn('Admin Supabase product upsert fallback:', e);
+    }
 
     await logAdminAction(actor.id, actor.role, 'PRODUCT_MUTATION_SAVED', 'product', id, 'SUCCESS', {
       title: payload.title,
@@ -853,8 +1014,10 @@ export const AdminService = {
     if (!hasPermission(actor.role, 'products:delete')) throw new Error('Forbidden');
 
     try {
-      await supabase.from('products').delete().eq('id', id);
-    } catch {}
+      await adminSupabase.from('products').delete().eq('id', id);
+    } catch (e) {
+      console.warn('Admin Supabase product delete fallback:', e);
+    }
 
     await logAdminAction(actor.id, actor.role, 'PRODUCT_DELETED', 'product', id, 'SUCCESS');
     return { success: true, id };
@@ -866,16 +1029,16 @@ export const AdminService = {
     const products = await this.getProducts(role);
 
     return products.map((p) => {
-      // Find adjustments
+      // Find adjustments if any in memory
       const adjs = memoryInventoryAdjustments.filter((a) => a.productId === p.id);
       const totalAdjusted = adjs.reduce((sum, a) => sum + a.delta, 0);
-      const baseStock = 25;
+      const baseStock = p.inventoryQuantity !== undefined ? p.inventoryQuantity : 25;
       const available = Math.max(0, baseStock + totalAdjusted);
 
       return {
         productId: p.id,
         title: p.title,
-        sku: p.id.substring(0, 10).toUpperCase(),
+        sku: p.sku || p.id.substring(0, 10).toUpperCase(),
         category: p.category,
         available,
         reserved: Math.floor(available * 0.1),
@@ -918,6 +1081,16 @@ export const AdminService = {
 
     memoryInventoryAdjustments.unshift(adjustment);
 
+    // Persist real inventory quantity update to Supabase
+    try {
+      await adminSupabase
+        .from('products')
+        .update({ inventory_quantity: newQuantity, updated_at: new Date().toISOString() })
+        .eq('id', productId);
+    } catch (e) {
+      console.warn('Inventory quantity Supabase update fallback:', e);
+    }
+
     await logAdminAction(actor.id, actor.role, 'INVENTORY_ADJUSTMENT', 'inventory', productId, 'SUCCESS', {
       delta,
       newQuantity,
@@ -928,11 +1101,19 @@ export const AdminService = {
     return adjustment;
   },
 
+  async getInventoryAdjustments(role: AdminRole) {
+    if (!hasPermission(role, 'inventory:view')) throw new Error('Unauthorized');
+    return [...memoryInventoryAdjustments];
+  },
+
   // --- CUSTOMERS ---
   async getCustomers(role: AdminRole) {
     if (!hasPermission(role, 'customers:view')) throw new Error('Unauthorized');
 
-    return [
+    const emailMap = new Map<string, any>();
+
+    // 1. Seed standard recognized verified clinical accounts
+    const initialCustomers = [
       {
         id: 'cust_001',
         name: 'Sarah Miller',
@@ -967,38 +1148,159 @@ export const AdminService = {
         createdAt: '2025-11-20T11:00:00Z',
       },
     ];
+
+    for (const c of initialCustomers) {
+      emailMap.set(c.email.toLowerCase(), c);
+    }
+
+    // 2. Aggregate dynamic customer spend & order metrics from live Supabase orders
+    try {
+      const { data: dbOrders } = await adminSupabase
+        .from('orders')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (dbOrders && dbOrders.length) {
+        for (const order of dbOrders) {
+          const email = (order.customer_email || '').toLowerCase().trim();
+          if (!email) continue;
+
+          const orderSpend = Number(order.total_amount) || 0;
+          const address = order.shipping_address || {};
+          const customerName =
+            address.first_name || address.last_name
+              ? `${address.first_name || ''} ${address.last_name || ''}`.trim()
+              : email.split('@')[0];
+          const phone = address.phone || '(302) 555-0199';
+          const state = address.province || 'DE';
+
+          if (emailMap.has(email)) {
+            const existing = emailMap.get(email);
+            existing.ordersCount += 1;
+            existing.lifetimeSpend += orderSpend;
+            if (customerName && customerName !== email.split('@')[0]) {
+              existing.name = customerName;
+            }
+          } else {
+            emailMap.set(email, {
+              id: `cust_${order.id.slice(0, 8)}`,
+              name: customerName,
+              email,
+              phone,
+              ordersCount: 1,
+              lifetimeSpend: orderSpend,
+              state,
+              status: order.requires_prescription ? 'Rx Patient' : 'Active Customer',
+              createdAt: order.created_at,
+            });
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('Customer live aggregation fallback:', e);
+    }
+
+    return Array.from(emailMap.values());
   },
 
   // --- CLINICAL PRESCRIPTIONS ---
   async getPrescriptions(role: AdminRole) {
     if (!hasPermission(role, 'prescriptions:view')) throw new Error('Unauthorized');
+
+    try {
+      const { data, error } = await adminSupabase
+        .from('prescriptions')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (!error && data && data.length > 0) {
+        return data.map((rx: any) => ({
+          id: rx.id,
+          patientName: rx.patient_name || 'Verified Patient',
+          orderNumber: rx.order_id || 'BM-ONLINE',
+          prescribedDevice: rx.prescribed_device || 'Clinical DME Equipment',
+          physicianName: rx.physician_name || 'Attending Physician',
+          clinic: rx.clinic || 'Verified Health Provider',
+          submittedAt: rx.created_at,
+          status: rx.status || 'PENDING_REVIEW',
+          documentUrl: rx.file_path || 'https://placehold.co/800x1100/f8fafc/0f172a?text=Official+Medical+Prescription',
+          documentType: rx.mime_type || 'PDF Document',
+          reviewedBy: rx.reviewed_by,
+          reviewedAt: rx.reviewed_at,
+          notes: rx.clinical_notes,
+        }));
+      }
+    } catch (e) {
+      console.warn('Prescriptions Supabase fetch fallback:', e);
+    }
+
     return [...memoryPrescriptions];
   },
 
   async reviewPrescription(
     actor: AdminUser,
     prescriptionId: string,
-    decision: 'APPROVED' | 'REJECTED',
-    notes: string
+    decision: 'APPROVED' | 'REJECTED' | 'NEEDS_INFORMATION',
+    notes?: string
   ) {
     if (!hasPermission(actor.role, 'prescriptions:review')) {
       await logAdminAction(actor.id, actor.role, 'PRESCRIPTION_REVIEW_ATTEMPT', 'prescription', prescriptionId, 'DENIED');
       throw new Error('Forbidden: Only licensed clinical specialists may review prescriptions');
     }
 
+    const reviewedAt = new Date().toISOString();
+
+    // 1. Update in memoryPrescriptions
     const rx = memoryPrescriptions.find((p) => p.id === prescriptionId);
+    let orderNum = rx?.orderNumber;
     if (rx) {
       rx.status = decision;
       rx.reviewedBy = actor.name;
-      rx.reviewedAt = new Date().toISOString();
+      rx.reviewedAt = reviewedAt;
       rx.notes = notes;
 
-      // When prescription is approved, automatically progress the associated order to CLINICAL_APPROVED
       if (decision === 'APPROVED' && rx.orderNumber) {
         const order = memoryOrders.find((o) => o.order_number === rx.orderNumber);
         if (order && order.status === 'CLINICAL_REVIEW') {
           order.status = 'CLINICAL_APPROVED';
         }
+      }
+    }
+
+    // 2. Persist to Supabase prescriptions table
+    try {
+      const { data: updatedRx } = await adminSupabase
+        .from('prescriptions')
+        .update({
+          status: decision,
+          reviewed_at: reviewedAt,
+          clinical_notes: notes,
+          updated_at: reviewedAt,
+        })
+        .eq('id', prescriptionId)
+        .select()
+        .maybeSingle();
+
+      if (updatedRx && updatedRx.order_id) {
+        orderNum = updatedRx.order_id;
+      }
+    } catch (e) {
+      console.warn('Prescription Supabase update fallback:', e);
+    }
+
+    // 3. Cascade update associated order in Supabase
+    if (decision === 'APPROVED' && orderNum) {
+      try {
+        await adminSupabase
+          .from('orders')
+          .update({
+            status: 'CLINICAL_APPROVED',
+            updated_at: reviewedAt,
+          })
+          .or(`id.eq.${orderNum},order_number.eq.${orderNum}`)
+          .eq('status', 'CLINICAL_REVIEW');
+      } catch (e) {
+        console.warn('Order status cascade update fallback:', e);
       }
     }
 
@@ -1011,7 +1313,7 @@ export const AdminService = {
       id: prescriptionId,
       status: decision,
       reviewedBy: actor.name,
-      reviewedAt: new Date().toISOString(),
+      reviewedAt,
       notes,
     };
   },
@@ -1019,6 +1321,29 @@ export const AdminService = {
   // --- DISCOUNTS ---
   async getDiscounts(role: AdminRole) {
     if (!hasPermission(role, 'discounts:view')) throw new Error('Unauthorized');
+
+    try {
+      const { data, error } = await adminSupabase
+        .from('discounts')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (!error && data && data.length > 0) {
+        return data.map((d: any) => ({
+          id: d.id,
+          code: d.code,
+          type: d.type,
+          value: Number(d.value),
+          minOrderAmount: d.min_order_amount ? Number(d.min_order_amount) : undefined,
+          usageLimit: d.usage_limit ? Number(d.usage_limit) : undefined,
+          timesUsed: Number(d.times_used || 0),
+          isActive: Boolean(d.is_active),
+          expiresAt: d.expires_at,
+          createdAt: d.created_at,
+        }));
+      }
+    } catch {}
+
     return [...memoryDiscounts];
   },
 
@@ -1035,6 +1360,21 @@ export const AdminService = {
 
     memoryDiscounts = memoryDiscounts.filter((d) => d.id !== id);
     memoryDiscounts.unshift(entry);
+
+    try {
+      await adminSupabase.from('discounts').upsert({
+        id: entry.id,
+        code: entry.code,
+        type: entry.type,
+        value: entry.value,
+        min_order_amount: entry.minOrderAmount || null,
+        usage_limit: entry.usageLimit || null,
+        times_used: entry.timesUsed,
+        is_active: entry.isActive ?? true,
+        expires_at: entry.expiresAt || null,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: 'id' });
+    } catch {}
 
     await logAdminAction(actor.id, actor.role, 'DISCOUNT_MUTATION', 'discount', id, 'SUCCESS', {
       code: entry.code,
@@ -1058,6 +1398,31 @@ export const AdminService = {
   // --- AUDIT LOGS ---
   async getAuditLogs(role: AdminRole) {
     if (!hasPermission(role, 'audit_logs:view')) throw new Error('Unauthorized');
+
+    try {
+      const { data, error } = await adminSupabase
+        .from('audit_logs')
+        .select('*')
+        .order('timestamp', { ascending: false })
+        .limit(200);
+
+      if (!error && data && data.length > 0) {
+        return data.map((d: any) => ({
+          id: d.id,
+          timestamp: d.timestamp,
+          actorId: d.actor_id,
+          actorRole: d.actor_role,
+          action: d.action,
+          resourceType: d.resource_type,
+          resourceId: d.resource_id,
+          status: d.status,
+          metadata: d.sanitized_metadata || {},
+        }));
+      }
+    } catch (e) {
+      console.warn('Audit logs Supabase fetch fallback:', e);
+    }
+
     return [...memoryAuditLogs];
   },
 

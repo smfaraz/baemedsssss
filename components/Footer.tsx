@@ -102,6 +102,15 @@ const Footer: React.FC = () => {
         </div>
       </div>
 
+      <div className="border-t border-white/10 bg-black/20">
+        <div className="container mx-auto px-4 py-4 text-[11px] leading-5 text-slate-400">
+          <p className="font-semibold text-slate-300">FDA &amp; Clinical Compliance Notice:</p>
+          <p className="mt-1">
+            Information provided on baemeds.com is for informational and educational purposes only and does not substitute for professional medical advice, diagnosis, or treatment. Certain Durable Medical Equipment (DME), including oxygen concentrators, BiPAP, and CPAP systems, require a valid prescription from a licensed US healthcare practitioner prior to fulfillment in accordance with federal and state regulations.
+          </p>
+        </div>
+      </div>
+
       <div className="border-t border-white/10">
         <div className="container mx-auto flex flex-col gap-3 px-4 py-4 text-xs text-slate-400 md:flex-row md:items-center md:justify-between">
           <div>

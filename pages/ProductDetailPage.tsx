@@ -31,6 +31,7 @@ import { flyToCart } from '../lib/flyToCart';
 import { rememberRecentlyViewedProduct } from '../lib/recentlyViewed';
 import { fetchProductByHandle, fetchRecommendedProducts } from '../lib/commerce';
 import { formatPrice, isValidUSZip } from '../lib/marketConfig';
+import { Analytics } from '../lib/analytics';
 import { Product } from '../types';
 
 const ProductDetailPage: React.FC = () => {
@@ -71,7 +72,10 @@ const ProductDetailPage: React.FC = () => {
         const loadedProduct = await fetchProductByHandle(id);
         if (cancelled) return;
         setProduct(loadedProduct);
-        if (loadedProduct) rememberRecentlyViewedProduct(loadedProduct);
+        if (loadedProduct) {
+          rememberRecentlyViewedProduct(loadedProduct);
+          Analytics.trackViewItem(loadedProduct);
+        }
         setActiveImage(loadedProduct?.image || '');
         setImageFailed(false);
         setQuantity(1);
@@ -141,6 +145,7 @@ const ProductDetailPage: React.FC = () => {
         flyToCart(event.currentTarget, activeImage || product.image);
       }
       await addToCart(product, quantity);
+      Analytics.trackAddToCart(product, quantity);
       setIsAdded(true);
       window.setTimeout(() => setIsAdded(false), 2200);
     } catch (error) {
@@ -155,6 +160,7 @@ const ProductDetailPage: React.FC = () => {
     setIsBuyingNow(true);
     try {
       await addToCart(product, quantity);
+      Analytics.trackAddToCart(product, quantity);
       navigate('/checkout');
     } catch (error) {
       console.error('Buy now failed', error);

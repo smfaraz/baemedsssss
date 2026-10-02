@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { AdminSidebar } from './AdminSidebar';
 import { AdminHeader } from './AdminHeader';
 import { AdminBreadcrumbs } from './AdminBreadcrumbs';
-import { AdminRole } from '../../server/adminService';
+import { AdminRole } from '../../types';
 import { AdminApiClient } from '../../lib/adminApi';
 import { LogIn, Stethoscope, Lock, ShieldCheck, AlertCircle } from 'lucide-react';
 import { APP_NAME } from '../../constants';

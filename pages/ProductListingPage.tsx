@@ -15,24 +15,18 @@ import ProductCardSkeleton from '../components/ProductCardSkeleton';
 import SEO from '../components/SEO';
 import { Link, useSearchParams } from '../context/CartContext';
 import { APP_NAME, CATEGORIES, CONTACT_PHONE } from '../constants';
-import { fetchAllProducts, searchProducts, resolveCategoryName } from '../lib/commerce';
+import {
+  resolveCategoryName,
+  fetchStorefrontProducts,
+  getCatalogCategoryCounts,
+  getCatalogBrandCounts,
+} from '../lib/commerce';
 import { Product } from '../types';
 
 type SortOption = 'availability' | 'price-asc' | 'price-desc' | 'name-asc';
 
-const ITEMS_PER_PAGE = 24;
-
-const normalise = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
-
-const categoryMatches = (product: Product, category: string) => {
-  if (!product.category || !category) return false;
-  const productCanonical = resolveCategoryName(product.category);
-  const targetCanonical = resolveCategoryName(category);
-  if (productCanonical === targetCanonical) return true;
-  const pNorm = normalise(product.category);
-  const tNorm = normalise(category);
-  return pNorm === tNorm || pNorm.includes(tNorm) || tNorm.includes(pNorm);
-};
+// Storefront chunking: 50 products per page
+const ITEMS_PER_PAGE = 50;
 
 const CATEGORY_DESCRIPTIONS: Record<string, string> = {
   "Oxygen Concentrators": "Hospital-grade stationary 5L & 10L oxygen concentrators and lightweight portable travel POC units with pre-shipment calibration, manufacturer warranties, and insured US carrier delivery.",
@@ -49,12 +43,65 @@ const CATEGORY_DESCRIPTIONS: Record<string, string> = {
   "Hospital Furniture": "Durable clinical beds, overbed tables, exam stretchers, and specialized healthcare facility furnishings."
 };
 
+const renderPaginationPages = (
+  currentPage: number,
+  totalPages: number,
+  onPageChange: (page: number) => void
+) => {
+  const pages: (number | string)[] = [];
+
+  if (totalPages <= 7) {
+    for (let i = 1; i <= totalPages; i++) pages.push(i);
+  } else {
+    pages.push(1);
+    if (currentPage > 3) pages.push('ellipsis-start');
+
+    const start = Math.max(2, currentPage - 1);
+    const end = Math.min(totalPages - 1, currentPage + 1);
+
+    for (let i = start; i <= end; i++) {
+      if (!pages.includes(i)) pages.push(i);
+    }
+
+    if (currentPage < totalPages - 2) pages.push('ellipsis-end');
+    if (!pages.includes(totalPages)) pages.push(totalPages);
+  }
+
+  return pages.map((item, idx) => {
+    if (typeof item === 'string') {
+      return (
+        <span key={`ellipsis-${idx}`} className="px-1 text-xs font-bold text-slate-400 select-none">
+          …
+        </span>
+      );
+    }
+    const active = item === currentPage;
+    return (
+      <button
+        key={item}
+        type="button"
+        onClick={() => onPageChange(item)}
+        aria-label={`Go to page ${item}`}
+        aria-current={active ? 'page' : undefined}
+        className={`h-10 min-w-10 rounded-xl px-2.5 text-xs font-bold transition ${
+          active
+            ? 'bg-medical-dark text-white shadow-sm'
+            : 'border border-slate-200 text-slate-700 hover:bg-slate-50'
+        }`}
+      >
+        {item}
+      </button>
+    );
+  });
+};
+
 const ProductListingPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const categoryParam = searchParams.get('category') || '';
   const searchParam = searchParams.get('search') || searchParams.get('q') || '';
 
   const [products, setProducts] = useState<Product[]>([]);
+  const [totalCount, setTotalCount] = useState<number>(3099);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(categoryParam);
@@ -66,11 +113,13 @@ const ProductListingPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [reloadKey, setReloadKey] = useState(0);
 
+  // Sync category param from URL
   useEffect(() => {
     setSelectedCategory(categoryParam);
     setCurrentPage(1);
   }, [categoryParam]);
 
+  // Load products in 50-by-50 chunks on demand along with total count
   useEffect(() => {
     let cancelled = false;
 
@@ -78,12 +127,24 @@ const ProductListingPage: React.FC = () => {
       setIsLoading(true);
       setLoadError('');
       try {
-        const results = searchParam
-          ? await searchProducts(searchParam.trim())
-          : await fetchAllProducts();
-        if (!cancelled) setProducts(results);
+        const result = await fetchStorefrontProducts({
+          page: currentPage,
+          pageSize: ITEMS_PER_PAGE,
+          category: selectedCategory,
+          brands: selectedBrands,
+          search: searchParam,
+          minPrice: priceRange.min !== '' ? Number(priceRange.min) : undefined,
+          maxPrice: priceRange.max !== '' ? Number(priceRange.max) : undefined,
+          showOutOfStock,
+          sortBy,
+        });
+
+        if (!cancelled) {
+          setProducts(result.products);
+          setTotalCount(result.total);
+        }
       } catch (error) {
-        console.error('Unable to load products', error);
+        console.error('Unable to load storefront products', error);
         if (!cancelled) {
           setProducts([]);
           setLoadError('The catalogue could not be loaded right now.');
@@ -94,9 +155,22 @@ const ProductListingPage: React.FC = () => {
     };
 
     loadProducts();
-    return () => { cancelled = true; };
-  }, [searchParam, reloadKey]);
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    currentPage,
+    selectedCategory,
+    selectedBrands,
+    priceRange.min,
+    priceRange.max,
+    showOutOfStock,
+    sortBy,
+    searchParam,
+    reloadKey,
+  ]);
 
+  // Mobile filters drawer keyboard trap
   useEffect(() => {
     if (!isMobileFiltersOpen) return;
     const onKeyDown = (event: KeyboardEvent) => {
@@ -113,65 +187,30 @@ const ProductListingPage: React.FC = () => {
   // Reset page when filtering or sorting changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedCategory, selectedBrands, priceRange, showOutOfStock, sortBy, searchParam]);
+  }, [selectedCategory, selectedBrands, priceRange.min, priceRange.max, showOutOfStock, sortBy, searchParam]);
+
+  // Authoritative category counts across the full catalog
+  const catalogCategoryCounts = useMemo(() => getCatalogCategoryCounts(), []);
+  const allBrandCounts = useMemo(() => getCatalogBrandCounts(), []);
 
   const categoryOptions = useMemo(() => CATEGORIES.map((category) => {
     const value = category.slug || category.name;
+    const canonical = resolveCategoryName(value);
+    const count = catalogCategoryCounts[canonical] || catalogCategoryCounts[value] || 0;
     return {
       label: category.name,
       value,
-      count: products.filter((product) => categoryMatches(product, value)).length,
+      count,
     };
-  }).filter((category) => category.count > 0), [products]);
+  }).filter((category) => category.count > 0), [catalogCategoryCounts]);
 
-  const brandOptions = useMemo(() => {
-    const counts = new Map<string, number>();
-    products.forEach((product) => {
-      if (product.vendor) counts.set(product.vendor, (counts.get(product.vendor) || 0) + 1);
-    });
-    return [...counts.entries()].sort(([a], [b]) => a.localeCompare(b));
-  }, [products]);
-
-  const filteredProducts = useMemo(() => {
-    const minPrice = priceRange.min === '' ? 0 : Number(priceRange.min);
-    const maxPrice = priceRange.max === '' ? Number.POSITIVE_INFINITY : Number(priceRange.max);
-    const validMin = Number.isFinite(minPrice) ? minPrice : 0;
-    const validMax = Number.isFinite(maxPrice) ? maxPrice : Number.POSITIVE_INFINITY;
-
-    const result = products.filter((product) => {
-      if (selectedCategory && !categoryMatches(product, selectedCategory)) return false;
-      if (selectedBrands.length && !selectedBrands.includes(product.vendor)) return false;
-      if (!showOutOfStock && !product.inStock) return false;
-      return product.price >= validMin && product.price <= validMax;
-    });
-
-    return result.sort((a, b) => {
-      if (sortBy === 'availability') {
-        if (a.inStock !== b.inStock) return a.inStock ? -1 : 1;
-        const aHero = a.tags?.includes('Flagship Hero') ? 1 : 0;
-        const bHero = b.tags?.includes('Flagship Hero') ? 1 : 0;
-        if (aHero !== bHero) return bHero - aHero;
-
-        // Prioritize actual core equipment over small replacement parts & accessories
-        const aIsPart = /filter|tubing|connector|adapter|wrench|bracket|screw|clip|cuff|hose|bulb|valve|strap|strip|lancet/i.test(a.title) && a.price < 45;
-        const bIsPart = /filter|tubing|connector|adapter|wrench|bracket|screw|clip|cuff|hose|bulb|valve|strap|strip|lancet/i.test(b.title) && b.price < 45;
-        if (aIsPart !== bIsPart) return aIsPart ? 1 : -1;
-      }
-      if (sortBy === 'price-asc') return a.price - b.price;
-      if (sortBy === 'price-desc') return b.price - a.price;
-      if (sortBy === 'name-asc') return a.title.localeCompare(b.title);
-      return 0;
-    });
-  }, [priceRange, products, selectedBrands, selectedCategory, showOutOfStock, sortBy]);
+  const brandOptions = useMemo(() => allBrandCounts, [allBrandCounts]);
 
   // Pagination calculation
-  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
-  const paginatedProducts = useMemo(() => {
-    const start = (currentPage - 1) * ITEMS_PER_PAGE;
-    return filteredProducts.slice(start, start + ITEMS_PER_PAGE);
-  }, [filteredProducts, currentPage]);
+  const totalPages = Math.max(1, Math.ceil(totalCount / ITEMS_PER_PAGE));
 
   const handlePageChange = (page: number) => {
+    if (page < 1 || page > totalPages || page === currentPage) return;
     setCurrentPage(page);
     window.scrollTo({ top: 220, behavior: 'smooth' });
   };
@@ -225,20 +264,23 @@ const ProductListingPage: React.FC = () => {
         <h2 id="category-filter-heading" className="mb-3 text-sm font-bold text-medical-dark">Categories</h2>
         {categoryOptions.length ? (
           <div className="space-y-1">
-            {categoryOptions.map((category) => (
-              <label key={category.value} className="flex min-h-11 cursor-pointer items-center justify-between gap-3 rounded-xl px-2 py-2 text-sm transition-colors hover:bg-medical-light">
-                <span className="flex items-center gap-3">
-                  <input
-                    type="checkbox"
-                    checked={selectedCategory === category.value || resolveCategoryName(selectedCategory) === resolveCategoryName(category.value)}
-                    onChange={() => updateCategory(category.value)}
-                    className="h-5 w-5 rounded border-slate-300 accent-medical-primary"
-                  />
-                  <span className={(selectedCategory === category.value || resolveCategoryName(selectedCategory) === resolveCategoryName(category.value)) ? 'font-bold text-medical-dark' : 'text-medical-text'}>{category.label}</span>
-                </span>
-                <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-medical-text">{category.count}</span>
-              </label>
-            ))}
+            {categoryOptions.map((category) => {
+              const isChecked = selectedCategory === category.value || resolveCategoryName(selectedCategory) === resolveCategoryName(category.value);
+              return (
+                <label key={category.value} className="flex min-h-11 cursor-pointer items-center justify-between gap-3 rounded-xl px-2 py-2 text-sm transition-colors hover:bg-medical-light">
+                  <span className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      checked={isChecked}
+                      onChange={() => updateCategory(category.value)}
+                      className="h-5 w-5 rounded border-slate-300 accent-medical-primary"
+                    />
+                    <span className={isChecked ? 'font-bold text-medical-dark' : 'text-medical-text'}>{category.label}</span>
+                  </span>
+                  <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-medical-text">{category.count.toLocaleString()}</span>
+                </label>
+              );
+            })}
           </div>
         ) : <p className="text-sm text-medical-text">No product categories are available.</p>}
       </section>
@@ -258,7 +300,7 @@ const ProductListingPage: React.FC = () => {
                   />
                   <span className="text-medical-text">{brand}</span>
                 </span>
-                <span className="text-xs font-semibold text-medical-text">{count}</span>
+                <span className="text-xs font-semibold text-medical-text">{count.toLocaleString()}</span>
               </label>
             ))}
           </div>
@@ -319,6 +361,9 @@ const ProductListingPage: React.FC = () => {
             <span className="inline-flex items-center gap-1 rounded-full bg-teal-50 px-3 py-1 border border-teal-200">
               FSA / HSA Eligible
             </span>
+            <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1 border border-slate-200 text-slate-700">
+              50 Products Per Page
+            </span>
           </div>
 
           <div className="mt-3 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
@@ -350,7 +395,7 @@ const ProductListingPage: React.FC = () => {
               <p className="px-1 text-sm font-bold text-slate-800" aria-live="polite">
                 {isLoading ? 'Loading products…' : (
                   <>
-                    <span>{filteredProducts.length.toLocaleString()}</span> products found
+                    <span>{totalCount.toLocaleString()}</span> products found
                     {totalPages > 1 && (
                       <span className="ml-2 text-xs font-normal text-slate-500">
                         (Page {currentPage} of {totalPages})
@@ -385,6 +430,7 @@ const ProductListingPage: React.FC = () => {
                 className={`min-h-10 shrink-0 rounded-full border px-4 text-xs font-bold transition-colors ${!selectedCategory ? 'border-medical-dark bg-medical-dark text-white' : 'border-slate-300 bg-white text-slate-700 hover:border-medical-primary hover:text-medical-primary'}`}
               >
                 All Products
+                <span className={`ml-1.5 rounded-full px-1.5 py-0.2 text-[10px] ${!selectedCategory ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'}`}>3,099</span>
               </button>
               {categoryOptions.map((category) => {
                 const active = selectedCategory === category.value || resolveCategoryName(selectedCategory) === resolveCategoryName(category.value);
@@ -397,7 +443,7 @@ const ProductListingPage: React.FC = () => {
                     className={`inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-full border px-3.5 text-xs font-bold transition-colors ${active ? 'border-medical-dark bg-medical-dark text-white' : 'border-slate-300 bg-white text-slate-700 hover:border-medical-primary hover:text-medical-primary'}`}
                   >
                     {category.label}
-                    <span className={`rounded-full px-1.5 py-0.2 text-[10px] ${active ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'}`}>{category.count}</span>
+                    <span className={`rounded-full px-1.5 py-0.2 text-[10px] ${active ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'}`}>{category.count.toLocaleString()}</span>
                   </button>
                 );
               })}
@@ -451,19 +497,28 @@ const ProductListingPage: React.FC = () => {
                   <Link to="/contact" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 px-5 font-bold text-slate-800">Contact us</Link>
                 </div>
               </div>
-            ) : filteredProducts.length ? (
+            ) : products.length ? (
               <>
                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
-                  {paginatedProducts.map((product) => <ProductCard key={product.id} product={product} />)}
+                  {products.map((product) => <ProductCard key={product.id} product={product} />)}
                 </div>
 
                 {/* Pagination Controls */}
                 {totalPages > 1 && (
-                  <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-slate-200 bg-white px-5 py-4 rounded-2xl shadow-soft sm:flex-row">
+                  <nav aria-label="Catalog pagination" className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-slate-200 bg-white px-5 py-4 rounded-2xl shadow-soft sm:flex-row">
                     <p className="text-xs font-semibold text-slate-600">
-                      Showing <span className="font-bold text-slate-900">{((currentPage - 1) * ITEMS_PER_PAGE) + 1}</span>–<span className="font-bold text-slate-900">{Math.min(currentPage * ITEMS_PER_PAGE, filteredProducts.length)}</span> of <span className="font-bold text-slate-900">{filteredProducts.length.toLocaleString()}</span> products
+                      Showing <span className="font-bold text-slate-900">{((currentPage - 1) * ITEMS_PER_PAGE) + 1}</span>–<span className="font-bold text-slate-900">{Math.min(currentPage * ITEMS_PER_PAGE, totalCount)}</span> of <span className="font-bold text-slate-900">{totalCount.toLocaleString()}</span> certified products
                     </p>
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => handlePageChange(1)}
+                        disabled={currentPage === 1}
+                        className="inline-flex h-10 items-center justify-center rounded-xl border border-slate-200 px-3 text-xs font-bold text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                        title="First page"
+                      >
+                        &laquo; First
+                      </button>
                       <button
                         type="button"
                         onClick={() => handlePageChange(currentPage - 1)}
@@ -474,27 +529,7 @@ const ProductListingPage: React.FC = () => {
                       </button>
 
                       {/* Display numbered pages with window */}
-                      {Array.from({ length: Math.min(5, totalPages) }).map((_, idx) => {
-                        let pageNum = idx + 1;
-                        if (totalPages > 5) {
-                          if (currentPage > 3 && currentPage < totalPages - 2) {
-                            pageNum = currentPage - 2 + idx;
-                          } else if (currentPage >= totalPages - 2) {
-                            pageNum = totalPages - 4 + idx;
-                          }
-                        }
-                        const active = pageNum === currentPage;
-                        return (
-                          <button
-                            key={pageNum}
-                            type="button"
-                            onClick={() => handlePageChange(pageNum)}
-                            className={`h-10 w-10 rounded-xl text-xs font-bold transition ${active ? 'bg-medical-dark text-white shadow-sm' : 'border border-slate-200 text-slate-700 hover:bg-slate-50'}`}
-                          >
-                            {pageNum}
-                          </button>
-                        );
-                      })}
+                      {renderPaginationPages(currentPage, totalPages, handlePageChange)}
 
                       <button
                         type="button"
@@ -504,8 +539,17 @@ const ProductListingPage: React.FC = () => {
                       >
                         Next <ChevronRight size={16} />
                       </button>
+                      <button
+                        type="button"
+                        onClick={() => handlePageChange(totalPages)}
+                        disabled={currentPage === totalPages}
+                        className="inline-flex h-10 items-center justify-center rounded-xl border border-slate-200 px-3 text-xs font-bold text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                        title="Last page"
+                      >
+                        Last &raquo;
+                      </button>
                     </div>
-                  </div>
+                  </nav>
                 )}
               </>
             ) : (
@@ -530,12 +574,12 @@ const ProductListingPage: React.FC = () => {
             <div className="sticky top-0 z-10 mb-5 flex items-center justify-between border-b border-slate-200 bg-white pb-4">
               <div>
                 <h2 id="mobile-filter-heading" className="text-lg font-bold text-slate-950">Filter products</h2>
-                <p className="text-xs text-medical-text">{filteredProducts.length} results currently shown</p>
+                <p className="text-xs text-medical-text">{totalCount.toLocaleString()} results currently found</p>
               </div>
               <button type="button" onClick={() => setIsMobileFiltersOpen(false)} className="flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200" aria-label="Close filters"><X size={21} /></button>
             </div>
             {filters}
-            <button type="button" onClick={() => setIsMobileFiltersOpen(false)} className="mt-6 min-h-12 w-full rounded-xl bg-medical-primary px-5 font-bold text-white">Show {filteredProducts.length} products</button>
+            <button type="button" onClick={() => setIsMobileFiltersOpen(false)} className="mt-6 min-h-12 w-full rounded-xl bg-medical-primary px-5 font-bold text-white">Show {totalCount.toLocaleString()} products</button>
           </aside>
         </div>
       )}

@@ -4,7 +4,6 @@ import { useAuth } from '../context/AuthContext';
 import { Link, useNavigate } from '../context/CartContext';
 import { US_STATES, DEFAULT_COUNTRY, DEFAULT_LOCALE } from '../lib/marketConfig';
 import { Address } from '../types';
-import { AuditLogger } from '../server/auditLogger';
 
 const emptyAddress: Omit<Address, 'id'> = { firstName: '', lastName: '', address1: '', city: '', province: 'DE', zip: '', country: DEFAULT_COUNTRY, phone: '' };
 const fieldClass = 'min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-medical-text outline-none focus:border-medical-primary focus:ring-2 focus:ring-medical-primary/15';
@@ -159,18 +158,6 @@ const AccountPage: React.FC = () => {
                             setShowRxUpload(false);
                             setRxOrderInput('');
                             setActionMessage(`Prescription "${newRx.fileName}" submitted and queued for clinical specialist review.`);
-                            AuditLogger.logEvent({
-                              actor: customer.email || 'customer',
-                              action: 'PRESCRIPTION_UPLOAD',
-                              resource: newRx.id,
-                              result: 'SUCCESS',
-                              metadata: {
-                                fileName: newRx.fileName,
-                                fileSizeBytes: file.size,
-                                mimeType: file.type,
-                                orderId: newRx.orderId,
-                              },
-                            });
                           } catch {
                             setActionError('Failed to record prescription document.');
                           } finally {

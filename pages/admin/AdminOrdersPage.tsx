@@ -56,6 +56,53 @@ export const AdminOrdersPage: React.FC = () => {
     }
   };
 
+  const handleExportCsv = () => {
+    if (!orders.length) {
+      alert('No orders to export.');
+      return;
+    }
+    const headers = [
+      'Order Number',
+      'Date Placed',
+      'Customer Email',
+      'Customer Name',
+      'Status',
+      'Total ($)',
+      'Subtotal ($)',
+      'Tax ($)',
+      'Shipping ($)',
+      'Prescription Required',
+      'Shipping Method',
+      'Carrier',
+      'Tracking Number',
+      'McKesson PO',
+    ];
+    const rows = orders.map((o) => [
+      `"${o.order_number || o.id}"`,
+      `"${o.created_at || ''}"`,
+      `"${o.customer_email || ''}"`,
+      `"${o.shipping_address?.first_name ? `${o.shipping_address.first_name} ${o.shipping_address.last_name || ''}`.trim() : ''}"`,
+      `"${o.status}"`,
+      `"${Number(o.total_amount || 0).toFixed(2)}"`,
+      `"${Number(o.subtotal_amount || 0).toFixed(2)}"`,
+      `"${Number(o.tax_amount || 0).toFixed(2)}"`,
+      `"${Number(o.shipping_amount || 0).toFixed(2)}"`,
+      `"${o.requires_prescription ? 'Yes' : 'No'}"`,
+      `"${o.shipping_method || 'Standard Ground'}"`,
+      `"${o.carrier || ''}"`,
+      `"${o.tracking_number || ''}"`,
+      `"${o.mckesson_po_number || ''}"`,
+    ]);
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `baemeds_orders_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -68,7 +115,7 @@ export const AdminOrdersPage: React.FC = () => {
 
         <button
           type="button"
-          onClick={() => alert('Exporting orders CSV...')}
+          onClick={handleExportCsv}
           className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 transition"
         >
           <Download size={15} /> Export CSV

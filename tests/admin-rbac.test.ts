@@ -129,7 +129,22 @@ async function testRbacRoleBoundaries() {
     throw new Error('Compliance officer must NOT have inventory mutation permissions');
   }
 
-  console.log('✔ RBAC least-privilege role boundaries verified.');
+  // 5. Anti-Spoofing Security: Attacker sends X-Admin-Role: super_admin on Support Token
+  const spoofReq = new Request('https://baemeds.com/api/admin/products/prod_exploit', {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer bm_admin_${Buffer.from('support@baemeds.com').toString('base64')}_token`,
+      'X-Admin-Role': 'super_admin', // MALICIOUS SPOOF HEADER
+    },
+  });
+  const spoofRes = await adminHandler.fetch(spoofReq);
+  const spoofData = await spoofRes.json();
+  if (spoofRes.status === 200 || !spoofData.error || !spoofData.error.toLowerCase().includes('forbidden')) {
+    throw new Error('SECURITY VIOLATION: Server trusted client-supplied X-Admin-Role header!');
+  }
+
+  console.log('✔ RBAC least-privilege role boundaries and Anti-Spoofing verified.');
 }
 
 // -------------------------------------------------------------

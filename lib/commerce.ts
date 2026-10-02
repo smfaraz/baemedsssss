@@ -6,9 +6,95 @@
 
 import { Product, CartItem } from '../types';
 import rawCatalog from '../data/catalog_seed.json';
+import { supabase } from './supabase';
 
-// Local memory cache for instant sub-millisecond retrieval
+// Local memory cache for instant sub-millisecond retrieval with fallback
 let catalogCache: Product[] = (rawCatalog as unknown as Product[]) || [];
+let isHydratedFromSupabase = false;
+let hydrationPromise: Promise<Product[]> | null = null;
+
+export const mapDbProductToProduct = (d: any): Product => {
+  const vendorFromFeatures = Array.isArray(d.features)
+    ? d.features.find((f: any) => typeof f === 'string' && f.startsWith('Manufacturer: '))?.replace('Manufacturer: ', '')
+    : undefined;
+
+  return {
+    id: d.id,
+    title: d.title,
+    handle: d.handle,
+    description: d.description || '',
+    category: d.category,
+    price: Number(d.price),
+    compareAtPrice: d.compare_at_price ? Number(d.compare_at_price) : undefined,
+    image: d.featured_image || 'https://placehold.co/600x600?text=DME',
+    images: Array.isArray(d.images) && d.images.length > 0 ? d.images : [d.featured_image || 'https://placehold.co/600x600?text=DME'],
+    specs: d.specs || '',
+    warranty: d.warranty || '1 Year Standard Manufacturer Warranty',
+    isRentalAvailable: Boolean(d.is_rental_available),
+    prescriptionRequired: Boolean(d.prescription_required),
+    hcpcsCode: d.hcpcs_code || undefined,
+    fdaClassification: d.fda_classification || undefined,
+    isRegulatoryVerified: Boolean(d.is_regulatory_verified),
+    wholesaleCost: d.wholesale_cost ? Number(d.wholesale_cost) : undefined,
+    costPerItem: d.wholesale_cost ? Number(d.wholesale_cost) : undefined,
+    sku: d.sku || undefined,
+    barcode: d.barcode || undefined,
+    mckessonItemNumber: d.mckesson_item_number || undefined,
+    inventoryQuantity: d.inventory_quantity !== undefined ? Number(d.inventory_quantity) : 25,
+    trackInventory: Boolean(d.track_inventory ?? true),
+    isHeroProduct: Boolean(d.is_hero_product),
+    heroRank: d.hero_rank ? Number(d.hero_rank) : (d.heroRank ? Number(d.heroRank) : undefined),
+    features: Array.isArray(d.features) ? d.features : [],
+    seoTitle: d.seo_title || undefined,
+    seoDescription: d.seo_description || undefined,
+    vendor: d.vendor || vendorFromFeatures || 'BaeMeds USA',
+    tags: Array.isArray(d.tags) ? d.tags : ['DME', 'Healthcare'],
+    inStock: (d.inventory_quantity ?? 25) > 0,
+  };
+};
+
+export const hydrateCatalogFromSupabase = async (): Promise<Product[]> => {
+  if (isHydratedFromSupabase && catalogCache.length >= 3000) return catalogCache;
+  if (hydrationPromise) return hydrationPromise;
+
+  hydrationPromise = (async () => {
+    try {
+      let allRows: any[] = [];
+      let from = 0;
+      const step = 1000;
+
+      while (true) {
+        const { data, error } = await supabase
+          .from('products')
+          .select('*')
+          .eq('is_active', true)
+          .order('is_hero_product', { ascending: false })
+          .order('updated_at', { ascending: false })
+          .range(from, from + step - 1);
+
+        if (error || !data || data.length === 0) break;
+        allRows.push(...data);
+        if (data.length < step) break;
+        from += step;
+      }
+
+      if (allRows.length > 0) {
+        catalogCache = allRows.map(mapDbProductToProduct);
+        isHydratedFromSupabase = true;
+      }
+    } catch (e) {
+      console.warn('Catalog hydration fallback to local catalog_seed:', e);
+    }
+    return catalogCache;
+  })();
+
+  return hydrationPromise;
+};
+
+// Trigger background hydration immediately on module load
+if (typeof window !== 'undefined') {
+  hydrateCatalogFromSupabase().catch(() => {});
+}
 
 export const CATEGORY_KEYWORDS: Record<string, string[]> = {
   "Oxygen Concentrators": ["oxygen concentrator", "oxygen concentrators", "concentrator", "concentrators", "oxygen generator", "portable oxygen concentrator", "portable concentrator", "5 liter concentrators", "10 liter concentrators", "respiratory therapy", "oxygen therapy"],
@@ -79,14 +165,22 @@ export const stripHtml = (value: unknown): string => cleanCatalogueText(
 // ==========================================
 
 export const fetchAllProducts = async (): Promise<Product[]> => {
+  await hydrateCatalogFromSupabase();
   return [...catalogCache];
 };
 
+export const fetchHeroProducts = async (): Promise<Product[]> => {
+  await hydrateCatalogFromSupabase();
+  return catalogCache.filter((p) => p.isHeroProduct);
+};
+
 export const fetchProductById = async (id: string): Promise<Product | undefined> => {
+  await hydrateCatalogFromSupabase();
   return catalogCache.find((p) => p.id === id || p.variantId === id);
 };
 
 export const fetchProductByHandle = async (handle: string): Promise<Product | undefined> => {
+  await hydrateCatalogFromSupabase();
   const cleanHandle = cleanCatalogueText(handle).toLowerCase().trim();
   return catalogCache.find(
     (p) =>
@@ -98,6 +192,7 @@ export const fetchProductByHandle = async (handle: string): Promise<Product | un
 };
 
 export const fetchProductsByCategory = async (category: string): Promise<Product[]> => {
+  await hydrateCatalogFromSupabase();
   if (!category || category.toLowerCase() === 'all') return fetchAllProducts();
   const canonicalCategory = resolveCategoryName(category);
   const normalizedRequest = normalizeCategoryKey(canonicalCategory || category);
@@ -119,6 +214,7 @@ const normalizeSearchValue = (value: unknown): string => stripHtml(value)
   .trim();
 
 export const searchProducts = async (query: string): Promise<Product[]> => {
+  await hydrateCatalogFromSupabase();
   const normalizedQuery = normalizeSearchValue(query);
   if (!normalizedQuery) return [];
 
@@ -149,6 +245,222 @@ export const searchProducts = async (query: string): Promise<Product[]> => {
     .filter((item) => item.score > 0)
     .sort((a, b) => b.score - a.score)
     .map((item) => item.product);
+};
+
+// ==========================================
+// STOREFRONT 50-BY-50 PAGINATED CATALOG API
+// ==========================================
+
+export interface FetchStorefrontProductsParams {
+  page?: number;
+  pageSize?: number;
+  category?: string;
+  brands?: string[];
+  search?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  showOutOfStock?: boolean;
+  sortBy?: 'availability' | 'price-asc' | 'price-desc' | 'name-asc';
+}
+
+export interface StorefrontProductsResult {
+  products: Product[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
+
+export const fetchTotalProductCount = async (): Promise<number> => {
+  try {
+    const { count, error } = await supabase
+      .from('products')
+      .select('*', { count: 'exact', head: true })
+      .eq('is_active', true);
+    if (!error && typeof count === 'number') {
+      return count;
+    }
+  } catch (err) {
+    console.warn('Unable to get exact product count from Supabase:', err);
+  }
+  return (rawCatalog as unknown as Product[]).length;
+};
+
+export const getCatalogCategoryCounts = (): Record<string, number> => {
+  const counts: Record<string, number> = {};
+  for (const p of rawCatalog as unknown as Product[]) {
+    if (p.category) {
+      const canonical = resolveCategoryName(p.category);
+      counts[canonical] = (counts[canonical] || 0) + 1;
+      if (canonical !== p.category) {
+        counts[p.category] = (counts[canonical] || 0);
+      }
+    }
+  }
+  return counts;
+};
+
+export const getCatalogBrandCounts = (): Array<[string, number]> => {
+  const counts = new Map<string, number>();
+  for (const p of rawCatalog as unknown as Product[]) {
+    if (p.vendor) {
+      counts.set(p.vendor, (counts.get(p.vendor) || 0) + 1);
+    }
+  }
+  return [...counts.entries()].sort(([a], [b]) => a.localeCompare(b));
+};
+
+const filterRawCatalogFallback = (params: FetchStorefrontProductsParams): StorefrontProductsResult => {
+  let list = [...(rawCatalog as unknown as Product[])];
+
+  if (params.category) {
+    const canonical = resolveCategoryName(params.category);
+    list = list.filter((p) => {
+      const pCanon = resolveCategoryName(p.category);
+      return pCanon === canonical || p.category.toLowerCase().includes(params.category!.toLowerCase());
+    });
+  }
+
+  if (params.brands && params.brands.length > 0) {
+    list = list.filter((p) => params.brands!.includes(p.vendor));
+  }
+
+  if (params.search && params.search.trim()) {
+    const q = params.search.trim().toLowerCase();
+    list = list.filter((p) =>
+      p.title.toLowerCase().includes(q) ||
+      (p.description && p.description.toLowerCase().includes(q)) ||
+      (p.category && p.category.toLowerCase().includes(q))
+    );
+  }
+
+  const minPrice = params.minPrice !== undefined && params.minPrice > 0 ? params.minPrice : 0;
+  const maxPrice = params.maxPrice !== undefined && params.maxPrice < Infinity ? params.maxPrice : Infinity;
+  list = list.filter((p) => p.price >= minPrice && p.price <= maxPrice);
+
+  if (params.showOutOfStock === false) {
+    list = list.filter((p) => p.inStock);
+  }
+
+  const sortBy = params.sortBy || 'availability';
+  list.sort((a, b) => {
+    if (sortBy === 'availability') {
+      if (a.inStock !== b.inStock) return a.inStock ? -1 : 1;
+      const aHero = a.isHeroProduct ? 1 : 0;
+      const bHero = b.isHeroProduct ? 1 : 0;
+      if (aHero !== bHero) return bHero - aHero;
+      if (a.isHeroProduct && b.isHeroProduct) {
+        const aRank = a.heroRank || 9999;
+        const bRank = b.heroRank || 9999;
+        if (aRank !== bRank) return aRank - bRank;
+      }
+      const aIsPart = /filter|tubing|connector|adapter|wrench|bracket|screw|clip|cuff|hose|bulb|valve|strap|strip|lancet/i.test(a.title) && a.price < 45;
+      const bIsPart = /filter|tubing|connector|adapter|wrench|bracket|screw|clip|cuff|hose|bulb|valve|strap|strip|lancet/i.test(b.title) && b.price < 45;
+      if (aIsPart !== bIsPart) return aIsPart ? 1 : -1;
+    }
+    if (sortBy === 'price-asc') return a.price - b.price;
+    if (sortBy === 'price-desc') return b.price - a.price;
+    if (sortBy === 'name-asc') return a.title.localeCompare(b.title);
+    return 0;
+  });
+
+  const total = list.length;
+  const page = Math.max(1, params.page || 1);
+  const pageSize = params.pageSize || 50;
+  const start = (page - 1) * pageSize;
+  const products = list.slice(start, start + pageSize);
+
+  return {
+    products,
+    total,
+    page,
+    pageSize,
+    totalPages: Math.ceil(total / pageSize),
+  };
+};
+
+export const fetchStorefrontProducts = async (
+  params: FetchStorefrontProductsParams = {}
+): Promise<StorefrontProductsResult> => {
+  const page = Math.max(1, params.page || 1);
+  const pageSize = params.pageSize || 50;
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
+  try {
+    let query = supabase
+      .from('products')
+      .select('*', { count: 'exact' })
+      .eq('is_active', true);
+
+    if (params.category) {
+      const canonicalCategory = resolveCategoryName(params.category);
+      query = query.eq('category', canonicalCategory);
+    }
+
+    if (params.brands && params.brands.length > 0) {
+      if (params.brands.length === 1) {
+        query = query.contains('features', [`Manufacturer: ${params.brands[0]}`]);
+      } else {
+        const brandClauses = params.brands.map((b) => `features.cs.{"Manufacturer: ${b}"}`).join(',');
+        query = query.or(brandClauses);
+      }
+    }
+
+    if (params.search && params.search.trim()) {
+      const cleanSearch = params.search.trim().replace(/[%_]/g, '');
+      if (cleanSearch) {
+        query = query.or(`title.ilike.%${cleanSearch}%,description.ilike.%${cleanSearch}%`);
+      }
+    }
+
+    if (params.minPrice !== undefined && params.minPrice > 0) {
+      query = query.gte('price', params.minPrice);
+    }
+    if (params.maxPrice !== undefined && params.maxPrice < Infinity) {
+      query = query.lte('price', params.maxPrice);
+    }
+
+    if (params.showOutOfStock === false) {
+      query = query.gt('inventory_quantity', 0);
+    }
+
+    const sortBy = params.sortBy || 'availability';
+    if (sortBy === 'price-asc') {
+      query = query.order('price', { ascending: true });
+    } else if (sortBy === 'price-desc') {
+      query = query.order('price', { ascending: false });
+    } else if (sortBy === 'name-asc') {
+      query = query.order('title', { ascending: true });
+    } else {
+      query = query
+        .order('is_hero_product', { ascending: false })
+        .order('updated_at', { ascending: false })
+        .order('inventory_quantity', { ascending: false });
+    }
+
+    query = query.range(from, to);
+
+    const { data, count, error } = await query;
+
+    if (!error && data) {
+      const products = data.map(mapDbProductToProduct);
+      const total = typeof count === 'number' ? count : products.length;
+      return {
+        products,
+        total,
+        page,
+        pageSize,
+        totalPages: Math.ceil(total / pageSize),
+      };
+    } else if (error) {
+      console.warn('Supabase storefront range query failed, falling back to local catalog:', error);
+    }
+  } catch (err) {
+    console.warn('Error during storefront products retrieval:', err);
+  }
+
+  return filterRawCatalogFallback(params);
 };
 
 // ==========================================
