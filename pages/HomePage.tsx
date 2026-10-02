@@ -299,53 +299,45 @@ const HomePage: React.FC = () => {
 
   const revealRef = useReveal<HTMLDivElement>();
 
-  // Showcase a balanced, diverse mix of flagship equipment across all medical categories in the continuous marquee reel
+  // Showcase flagship products and core medical equipment in the continuous marquee reel
   const heroReel = useMemo(() => {
-    if (!catalogueProducts.length) return [];
+    const heroMachineIds = [
+      'prd-hero-dv-525ds',
+      'prd-hero-dv-1025ds',
+      'prd-hero-dr-k3',
+      'prd-hero-dr-stdec',
+      'prd-hero-dr-cx4',
+      'prd-hero-ino-is-501-na8',
+      'prd-o2-ino-rove6',
+      'prd-hero-dv-3655ltr',
+      'prd-hero-dr-18081',
+      'prd-hero-mq-mq3000',
+      'prd-hero-dr-13002sv-6',
+    ];
 
-    const candidates = catalogueProducts.filter(
+    const topHeroMachines = heroMachineIds
+      .map((id) =>
+        catalogueProducts.find(
+          (p) =>
+            p.id === id ||
+            p.id.endsWith(id) ||
+            p.handle.includes(id.replace(/^prd-(hero-)?/, ''))
+        )
+      )
+      .filter(Boolean) as Product[];
+
+    // Deduplicate by ID
+    const uniqueHeroes = Array.from(new Map(topHeroMachines.map((p) => [p.id, p])).values());
+
+    const additionalMachines = catalogueProducts.filter(
       (p) =>
         p.inStock &&
-        p.price >= 40 &&
-        p.price <= 1500 &&
-        !/prewash|cleanser|urine analyzer|test strip|chux|lancet|wipe|sheet|glove|mask only|tubing|filter|bracket|screw|clip|cuff only|sensor only|battery|cable|case only|bag only/i.test(p.title)
+        p.price >= 80 &&
+        !uniqueHeroes.some((m) => m.id === p.id) &&
+        !/filter|tubing|connector|adapter|wrench|bracket|screw|clip|cuff|case|bag|cannula|mask|valve/i.test(p.title)
     );
 
-    // Group candidates by category
-    const byCategory: Record<string, Product[]> = {};
-    for (const product of candidates) {
-      const cat = product.category || 'Equipment';
-      if (!byCategory[cat]) byCategory[cat] = [];
-      byCategory[cat].push(product);
-    }
-
-    // Sort each category to prioritize flagship hero items, then well-priced equipment
-    for (const cat in byCategory) {
-      byCategory[cat].sort((a, b) => {
-        if (a.isHeroProduct && !b.isHeroProduct) return -1;
-        if (!a.isHeroProduct && b.isHeroProduct) return 1;
-        return (b.price || 0) - (a.price || 0);
-      });
-    }
-
-    // Round-robin selection across distinct categories to guarantee diverse showcase
-    const selected: Product[] = [];
-    const categories = Object.keys(byCategory);
-    let round = 0;
-    while (selected.length < 16 && round < 4) {
-      let addedInRound = false;
-      for (const cat of categories) {
-        if (selected.length >= 16) break;
-        if (byCategory[cat][round]) {
-          selected.push(byCategory[cat][round]);
-          addedInRound = true;
-        }
-      }
-      if (!addedInRound) break;
-      round++;
-    }
-
-    return selected.length >= 6 ? selected : catalogueProducts.slice(0, 16);
+    return [...uniqueHeroes, ...additionalMachines].slice(0, 14);
   }, [catalogueProducts]);
 
   return (
