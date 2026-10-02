@@ -12,6 +12,10 @@ type CartBody = { cartId?: unknown };
 
 import { createVercelHandler } from '../server/serverlessAdapter.ts';
 
+export const config = {
+  runtime: 'edge',
+};
+
 export default createVercelHandler(async (request: Request) => {
   try {
     if (request.method !== 'POST') return json({ error: 'Method not allowed.' }, 405, { Allow: 'POST' });

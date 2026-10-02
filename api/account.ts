@@ -112,6 +112,10 @@ const removeAddress = async (request: Request, _token: string) => {
 
 import { createVercelHandler } from '../server/serverlessAdapter.ts';
 
+export const config = {
+  runtime: 'edge',
+};
+
 export default createVercelHandler(async (request: Request) => {
   try {
     if (request.method !== 'POST' && request.method !== 'DELETE') {

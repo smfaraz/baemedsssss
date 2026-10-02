@@ -87,6 +87,10 @@ const handleLogout = async (request: Request) => {
 
 import { createVercelHandler } from '../server/serverlessAdapter.ts';
 
+export const config = {
+  runtime: 'edge',
+};
+
 export default createVercelHandler(async (request: Request) => {
   try {
     if (request.method === 'GET') return await handleSession(request);

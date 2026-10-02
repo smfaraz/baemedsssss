@@ -73,6 +73,10 @@ async function getFeedProducts(heroesOnly = false) {
 
 import { createVercelHandler } from '../server/serverlessAdapter.ts';
 
+export const config = {
+  runtime: 'edge',
+};
+
 export default createVercelHandler(async (request: Request) => {
     const url = new URL(request.url);
     const pathname = url.pathname;
