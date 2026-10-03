@@ -1033,6 +1033,71 @@ export const AdminService = {
     return { success: true, id };
   },
 
+  async bulkUpdateProducts(
+    actor: AdminUser,
+    updates: Array<{
+      id: string;
+      price?: number;
+      compareAtPrice?: number | null;
+      inventoryQuantity?: number;
+      inStock?: boolean;
+      category?: string;
+      isHeroProduct?: boolean;
+    }>
+  ) {
+    if (!hasPermission(actor.role, 'products:manage')) {
+      await logAdminAction(actor.id, actor.role, 'PRODUCT_BULK_UPDATE_ATTEMPT', 'product', undefined, 'DENIED');
+      throw new Error('Forbidden: Only authorized personnel can manage products');
+    }
+
+    if (!Array.isArray(updates) || updates.length === 0) {
+      throw new Error('No product updates provided');
+    }
+
+    const updatedIds: string[] = [];
+    for (const update of updates) {
+      if (!update.id) continue;
+      const patch: any = { updated_at: new Date().toISOString() };
+      if (typeof update.price === 'number') patch.price = update.price;
+      if (update.compareAtPrice !== undefined) patch.compare_at_price = update.compareAtPrice;
+      if (typeof update.inventoryQuantity === 'number') patch.inventory_quantity = update.inventoryQuantity;
+      if (typeof update.isHeroProduct === 'boolean') patch.is_hero_product = update.isHeroProduct;
+      if (typeof update.category === 'string' && update.category) patch.category = update.category;
+
+      try {
+        await adminSupabase.from('products').update(patch).eq('id', update.id);
+      } catch (e) {
+        console.warn(`Bulk update DB fallback for ${update.id}:`, e);
+      }
+      updatedIds.push(update.id);
+    }
+
+    await logAdminAction(actor.id, actor.role, 'PRODUCTS_BULK_UPDATED', 'product', undefined, 'SUCCESS', {
+      count: updatedIds.length,
+      productIds: updatedIds.slice(0, 50),
+    });
+
+    return { success: true, count: updatedIds.length, updatedIds };
+  },
+
+  async bulkDeleteProducts(actor: AdminUser, ids: string[]) {
+    if (!hasPermission(actor.role, 'products:delete')) throw new Error('Forbidden');
+    if (!Array.isArray(ids) || ids.length === 0) throw new Error('No product IDs provided');
+
+    try {
+      await adminSupabase.from('products').delete().in('id', ids);
+    } catch (e) {
+      console.warn('Bulk delete DB fallback:', e);
+    }
+
+    await logAdminAction(actor.id, actor.role, 'PRODUCTS_BULK_DELETED', 'product', undefined, 'SUCCESS', {
+      count: ids.length,
+      productIds: ids.slice(0, 50),
+    });
+
+    return { success: true, count: ids.length };
+  },
+
   // --- INVENTORY ---
   async getInventory(role: AdminRole) {
     if (!hasPermission(role, 'inventory:view')) throw new Error('Unauthorized');

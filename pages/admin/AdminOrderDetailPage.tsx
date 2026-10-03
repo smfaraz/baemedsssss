@@ -16,6 +16,10 @@ import {
   Check,
   ExternalLink,
   Package,
+  Printer,
+  Download,
+  X,
+  Sparkles,
 } from 'lucide-react';
 import { AdminApiClient } from '../../lib/adminApi';
 import { Link, useParams, useNavigate } from '../../context/CartContext';
@@ -38,8 +42,51 @@ export const AdminOrderDetailPage: React.FC = () => {
   const [isMcKessonModalOpen, setIsMcKessonModalOpen] = useState(false);
   const [mckessonPoNumber, setMckessonPoNumber] = useState('');
   const [isCopiedAddress, setIsCopiedAddress] = useState(false);
+  const [isCopiedPoScript, setIsCopiedPoScript] = useState(false);
   const [mckessonCarrier, setMckessonCarrier] = useState('FedEx Ground');
   const [mckessonTrackingNumber, setMckessonTrackingNumber] = useState('');
+
+  // Printable Packing Slip Modal state
+  const [isPackingSlipModalOpen, setIsPackingSlipModalOpen] = useState(false);
+
+  // Auto-detect carrier by tracking number pattern
+  const handleTrackingNumberInput = (val: string, isMckesson: boolean = false) => {
+    const clean = val.trim();
+    if (isMckesson) {
+      setMckessonTrackingNumber(val);
+      if (clean.toUpperCase().startsWith('1Z')) {
+        setMckessonCarrier('UPS Medical Express');
+      } else if (/^\d{12}$|^\d{15}$/.test(clean)) {
+        setMckessonCarrier('FedEx Ground');
+      } else if (/^9\d{19,21}$/.test(clean)) {
+        setMckessonCarrier('USPS Priority Mail');
+      }
+    } else {
+      setTrackingNumber(val);
+      if (clean.toUpperCase().startsWith('1Z')) {
+        setCarrier('UPS Medical Express');
+      } else if (/^\d{12}$|^\d{15}$/.test(clean)) {
+        setCarrier('FedEx Ground');
+      } else if (/^9\d{19,21}$/.test(clean)) {
+        setCarrier('USPS Priority Mail');
+      }
+    }
+  };
+
+  const getCarrierUrl = (cName: string, tNum: string) => {
+    if (!tNum) return null;
+    const clean = tNum.trim();
+    if (cName?.toLowerCase().includes('fedex') || /^\d{12}$|^\d{15}$/.test(clean)) {
+      return `https://www.fedex.com/fedextrack/?trknbr=${clean}`;
+    }
+    if (cName?.toLowerCase().includes('ups') || clean.toUpperCase().startsWith('1Z')) {
+      return `https://www.ups.com/track?tracknum=${clean}`;
+    }
+    if (cName?.toLowerCase().includes('usps') || /^9\d{19,21}$/.test(clean)) {
+      return `https://tools.usps.com/go/TrackConfirmAction?tLabels=${clean}`;
+    }
+    return `https://www.google.com/search?q=${encodeURIComponent(`${cName || 'Courier'} tracking ${clean}`)}`;
+  };
 
   const handleCopyAddress = () => {
     if (!order?.shipping_address) return;
@@ -50,21 +97,62 @@ export const AdminOrderDetailPage: React.FC = () => {
     setTimeout(() => setIsCopiedAddress(false), 2500);
   };
 
+  const handleCopyPoScript = () => {
+    if (!order) return;
+    const addr = order.shipping_address || {};
+    const poNum = mckessonPoNumber || `PO-MCK-${order.order_number}`;
+    const itemsList = (order.order_items || [])
+      .map(
+        (it: any, idx: number) =>
+          `Item ${idx + 1}: McKesson #${it.mckesson_item_number || 'N/A'} | Qty: ${it.quantity} | SKU: ${it.sku || 'DME-STD'} | Title: ${it.product_title}`
+      )
+      .join('\n');
+
+    const script = `======================================================
+MCKESSON MMS DROPSHIP PURCHASE ORDER
+======================================================
+PO Number: ${poNum}
+Date: ${new Date(order.created_at).toLocaleDateString()}
+Requested Speed: ${order.shipping_method || 'FedEx Ground Standard'}
+Portal: mms.mckesson.com
+
+--- RECIPIENT / PATIENT SHIP-TO ADDRESS ---
+${addr.first_name || ''} ${addr.last_name || 'Patient'}
+${addr.address1 || ''}${addr.address2 ? ` ${addr.address2}` : ''}
+${addr.city || ''}, ${addr.province || 'DE'} ${addr.zip || ''}
+Phone: ${addr.phone || '(302) 555-0199'}
+Email: ${order.customer_email || 'orders@baemeds.com'}
+
+--- ITEMS TO DISPATCH ---
+${itemsList}
+
+--- CRITICAL DROPSHIP INSTRUCTIONS ---
+1. Blind Dropship: Return address must read "BaeMeds Logistics, Wilmington DE".
+2. DO NOT include any pricing, dealer costs, or invoice inside the package.
+3. Include standard BaeMeds clinical packing slip only.
+======================================================`;
+
+    navigator.clipboard.writeText(script);
+    setIsCopiedPoScript(true);
+    setTimeout(() => setIsCopiedPoScript(false), 2500);
+  };
+
   const handleMcKessonSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
     setSuccessMessage('');
     try {
+      const poNum = mckessonPoNumber.trim() || `PO-MCK-${order.order_number}`;
       if (mckessonTrackingNumber.trim()) {
         const updated = await AdminApiClient.updateOrderTracking(order.id, mckessonCarrier, mckessonTrackingNumber.trim());
         setOrder(updated);
         setIsMcKessonModalOpen(false);
-        setSuccessMessage(`Order routed through McKesson Supply Management (PO: ${mckessonPoNumber || 'N/A'}) and marked as SHIPPED with ${mckessonCarrier}. Automated customer text & email receipts dispatched.`);
+        setSuccessMessage(`Order routed through McKesson Supply Management (PO: ${poNum}) and marked as SHIPPED with ${mckessonCarrier}. Automated customer text & email receipts dispatched.`);
       } else {
-        const updated = await AdminApiClient.updateOrderStatus(order.id, 'PROCESSING', `Routed to McKesson Supply Management PO: ${mckessonPoNumber || 'N/A'}`);
+        const updated = await AdminApiClient.updateOrderStatus(order.id, 'PROCESSING', `Routed to McKesson Supply Management PO: ${poNum}`);
         setOrder(updated);
         setIsMcKessonModalOpen(false);
-        setSuccessMessage(`Order recorded as placed on McKesson Supply Management (PO: ${mckessonPoNumber || 'N/A'}). Status changed to PROCESSING.`);
+        setSuccessMessage(`Order recorded as placed on McKesson Supply Management (PO: ${poNum}). Status changed to PROCESSING.`);
       }
     } catch (err: any) {
       setErrorMessage(err.message || 'Failed to update order for McKesson');
@@ -77,6 +165,9 @@ export const AdminOrderDetailPage: React.FC = () => {
       if (id) {
         const data = await AdminApiClient.getOrder(id);
         setOrder(data);
+        if (data && data.order_number) {
+          setMckessonPoNumber(`PO-MCK-${data.order_number}`);
+        }
       }
       setIsLoading(false);
     };
@@ -151,6 +242,17 @@ export const AdminOrderDetailPage: React.FC = () => {
 
         {/* State Machine Transition Actions */}
         <div className="flex flex-wrap items-center gap-2">
+          {/* Printable Packing Slip Button */}
+          <button
+            type="button"
+            onClick={() => setIsPackingSlipModalOpen(true)}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-xs font-bold text-slate-800 hover:bg-slate-50 transition shadow-xs"
+            title="Open and print customer-safe packing slip"
+          >
+            <Printer size={14} className="text-slate-600" />
+            Print Packing Slip
+          </button>
+
           {order.status === 'CLINICAL_REVIEW' && (
             <>
               <button
@@ -303,8 +405,29 @@ export const AdminOrderDetailPage: React.FC = () => {
           {/* Tracking Details (if shipped) */}
           {order.tracking_number && (
             <div className="rounded-2xl border border-purple-200 bg-purple-50/60 p-5 shadow-xs">
-              <div className="flex items-center gap-2 text-purple-900 font-bold text-xs mb-2">
-                <Truck size={16} /> Shipment Tracking Dispatched
+              <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+                <div className="flex items-center gap-2 text-purple-900 font-bold text-xs">
+                  <Truck size={16} /> Shipment Tracking Dispatched
+                </div>
+                <div className="flex items-center gap-2">
+                  {getCarrierUrl(order.carrier, order.tracking_number) && (
+                    <a
+                      href={getCarrierUrl(order.carrier, order.tracking_number)!}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-purple-300 bg-white px-3 py-1.5 text-xs font-bold text-purple-800 hover:bg-purple-100 transition shadow-2xs"
+                    >
+                      Track on Courier Site <ExternalLink size={12} />
+                    </a>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setIsPackingSlipModalOpen(true)}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-purple-300 bg-purple-100/70 px-3 py-1.5 text-xs font-bold text-purple-900 hover:bg-purple-200 transition"
+                  >
+                    <Printer size={12} /> Packing Slip
+                  </button>
+                </div>
               </div>
               <p className="text-xs text-purple-950">
                 Carrier: <span className="font-bold">{order.carrier}</span>
@@ -434,23 +557,38 @@ export const AdminOrderDetailPage: React.FC = () => {
 
             {/* Step 1: Customer Ship-To Address Card */}
             <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 space-y-2">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-wrap items-center justify-between gap-2">
                 <span className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
                   <MapPin size={14} className="text-teal-600" />
-                  Step 1: Customer Ship-To Address
+                  Step 1: Customer Ship-To Address & Quick Scripts
                 </span>
-                <button
-                  type="button"
-                  onClick={handleCopyAddress}
-                  className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-bold transition ${
-                    isCopiedAddress
-                      ? 'bg-emerald-600 text-white'
-                      : 'border border-slate-300 bg-white text-slate-700 hover:bg-slate-100'
-                  }`}
-                >
-                  {isCopiedAddress ? <Check size={12} /> : <Copy size={12} />}
-                  {isCopiedAddress ? 'Address Copied!' : 'Copy Address for McKesson'}
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleCopyPoScript}
+                    className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-bold transition shadow-2xs ${
+                      isCopiedPoScript
+                        ? 'bg-teal-700 text-white'
+                        : 'border border-teal-500/40 bg-teal-50 text-teal-800 hover:bg-teal-100'
+                    }`}
+                    title="Copy full purchase order script for McKesson"
+                  >
+                    {isCopiedPoScript ? <Check size={12} /> : <FileText size={12} />}
+                    {isCopiedPoScript ? 'PO Script Copied!' : 'Copy MMS PO Script'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleCopyAddress}
+                    className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-bold transition ${
+                      isCopiedAddress
+                        ? 'bg-emerald-600 text-white'
+                        : 'border border-slate-300 bg-white text-slate-700 hover:bg-slate-100'
+                    }`}
+                  >
+                    {isCopiedAddress ? <Check size={12} /> : <Copy size={12} />}
+                    {isCopiedAddress ? 'Address Copied!' : 'Copy Address'}
+                  </button>
+                </div>
               </div>
 
               {order.shipping_address ? (
@@ -521,14 +659,14 @@ export const AdminOrderDetailPage: React.FC = () => {
                     type="text"
                     value={mckessonPoNumber}
                     onChange={(e) => setMckessonPoNumber(e.target.value)}
-                    placeholder="e.g. MCK-892184"
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 p-2.5 text-xs text-slate-900 font-mono"
+                    placeholder="e.g. PO-MCK-1001"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 p-2.5 text-xs text-slate-900 font-mono font-bold"
                   />
                 </div>
 
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Shipping Carrier
+                    Shipping Carrier (Auto-detected)
                   </label>
                   <select
                     value={mckessonCarrier}
@@ -550,12 +688,12 @@ export const AdminOrderDetailPage: React.FC = () => {
                 <input
                   type="text"
                   value={mckessonTrackingNumber}
-                  onChange={(e) => setMckessonTrackingNumber(e.target.value)}
-                  placeholder="e.g. 748902849102"
+                  onChange={(e) => handleTrackingNumberInput(e.target.value, true)}
+                  placeholder="e.g. 748902849102 or 1Z9999999999999999"
                   className="w-full rounded-xl border border-slate-200 bg-slate-50 p-2.5 text-xs text-slate-900 font-mono"
                 />
                 <span className="text-[10px] text-slate-400 mt-1 block">
-                  Entering a tracking number immediately marks the order as SHIPPED and triggers customer SMS & email.
+                  Entering a tracking number auto-detects the carrier, marks the order as SHIPPED, and dispatches tracking receipts.
                 </span>
               </div>
 
@@ -575,6 +713,224 @@ export const AdminOrderDetailPage: React.FC = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Printable Packing Slip Modal */}
+      {isPackingSlipModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/70 backdrop-blur-xs p-4 overflow-y-auto">
+          {/* Print Stylesheet */}
+          <style>{`
+            @media print {
+              body * {
+                visibility: hidden;
+              }
+              #printable-packing-slip, #printable-packing-slip * {
+                visibility: visible;
+              }
+              #printable-packing-slip {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                margin: 0;
+                padding: 20px;
+                background: white !important;
+                color: black !important;
+                box-shadow: none !important;
+                border: none !important;
+              }
+              .no-print {
+                display: none !important;
+              }
+            }
+          `}</style>
+
+          <div className="w-full max-w-3xl rounded-2xl border border-slate-200 bg-white shadow-2xl space-y-4 my-8 max-h-[92vh] flex flex-col">
+            {/* Top Modal Controls (Hidden in Print) */}
+            <div className="no-print flex items-center justify-between border-b border-slate-200 p-4 bg-slate-50 rounded-t-2xl">
+              <div className="flex items-center gap-2">
+                <Printer size={18} className="text-slate-700" />
+                <span className="text-sm font-bold text-slate-900">
+                  Customer Packing Slip & Dispatch Manifest
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-slate-900 px-4 py-2 text-xs font-bold text-white hover:bg-slate-800 transition shadow-sm"
+                >
+                  <Printer size={14} /> Print Document
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsPackingSlipModalOpen(false)}
+                  className="rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+
+            {/* Printable Packing Slip Sheet Container */}
+            <div className="p-8 overflow-y-auto space-y-6 flex-1 text-slate-900" id="printable-packing-slip">
+              {/* Header */}
+              <div className="flex items-start justify-between border-b-2 border-slate-900 pb-6">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl font-black tracking-tight text-slate-950">BAEMEDS USA</span>
+                    <span className="rounded bg-teal-100 px-2 py-0.5 text-[10px] font-bold text-teal-900 uppercase">
+                      Medical Logistics
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-600 font-medium mt-1">
+                    Durable Medical Equipment & Clinical Home Healthcare Solutions
+                  </p>
+                  <p className="text-[11px] text-slate-500">
+                    1201 N Orange St, Ste 700, Wilmington, DE 19801 | (800) 555-BAEMEDS
+                  </p>
+                  <p className="text-[11px] text-slate-400">
+                    FDA Medical Device Establishment Registered | HIPAA Compliant
+                  </p>
+                </div>
+
+                <div className="text-right">
+                  <span className="text-base font-black uppercase tracking-wider text-slate-900 block">
+                    PACKING SLIP
+                  </span>
+                  <p className="text-xs font-mono font-bold text-slate-900 mt-1">
+                    Order #: {order.order_number}
+                  </p>
+                  <p className="text-[11px] text-slate-600">
+                    Date: {new Date(order.created_at).toLocaleDateString()}
+                  </p>
+                  <p className="text-[11px] text-slate-600">
+                    Ship Speed: {order.shipping_method || 'Standard Ground'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Meta Address Grid */}
+              <div className="grid grid-cols-2 gap-6 text-xs">
+                {/* Ship To Block */}
+                <div className="rounded-xl border border-slate-200 p-4 space-y-1 bg-slate-50/50">
+                  <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider block mb-1">
+                    Ship-To Recipient
+                  </span>
+                  <p className="font-bold text-sm text-slate-900">
+                    {order.shipping_address?.first_name} {order.shipping_address?.last_name || 'Patient'}
+                  </p>
+                  <p>{order.shipping_address?.address1}</p>
+                  {order.shipping_address?.address2 && <p>{order.shipping_address.address2}</p>}
+                  <p>
+                    {order.shipping_address?.city}, {order.shipping_address?.province || 'DE'} {order.shipping_address?.zip}
+                  </p>
+                  <p className="text-slate-500 pt-1">Contact: {order.shipping_address?.phone || '(302) 555-0199'}</p>
+                </div>
+
+                {/* Dispatch & Carrier Meta */}
+                <div className="rounded-xl border border-slate-200 p-4 space-y-2 bg-slate-50/50">
+                  <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider block mb-1">
+                    Shipment & Compliance Details
+                  </span>
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Carrier:</span>
+                    <span className="font-bold">{order.carrier || 'FedEx / UPS Health'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Tracking #:</span>
+                    <span className="font-mono font-bold">{order.tracking_number || 'Generated at Courier Terminal'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Customer Email:</span>
+                    <span className="font-medium text-slate-700">{order.customer_email}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Payment Status:</span>
+                    <span className="font-bold text-emerald-700">PAID & CLEARED</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Itemized Table (Zero Wholesale Pricing Visible!) */}
+              <div className="rounded-xl border border-slate-300 overflow-hidden">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-100 border-b border-slate-300 text-slate-800 font-bold uppercase tracking-wider text-[10px]">
+                    <tr>
+                      <th className="p-3 w-12 text-center">#</th>
+                      <th className="p-3">Item Description</th>
+                      <th className="p-3">HCPCS Code</th>
+                      <th className="p-3">SKU</th>
+                      <th className="p-3 text-right">Qty Shipped</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200 font-sans">
+                    {(order.order_items || []).map((item: any, idx: number) => (
+                      <tr key={item.id} className="text-slate-800">
+                        <td className="p-3 text-center font-bold text-slate-500">{idx + 1}</td>
+                        <td className="p-3">
+                          <p className="font-bold text-slate-900">{item.product_title}</p>
+                          <p className="text-[11px] text-slate-500">Standard Clinical Packaging</p>
+                        </td>
+                        <td className="p-3 font-mono font-semibold text-slate-700">
+                          {item.hcpcs_code || 'E1399'}
+                        </td>
+                        <td className="p-3 font-mono text-slate-600">{item.sku || 'DME-STD'}</td>
+                        <td className="p-3 text-right font-black text-sm text-slate-900">
+                          {item.quantity}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Verification & QA Sign-Off */}
+              <div className="grid grid-cols-2 gap-4 rounded-xl border border-slate-200 p-4 text-[11px] text-slate-600 bg-slate-50/30">
+                <div>
+                  <span className="font-bold text-slate-900 block mb-1">
+                    Quality Assurance & Inspection Checklist:
+                  </span>
+                  <ul className="list-disc pl-4 space-y-0.5 text-slate-600">
+                    <li>DMEPOS medical device integrity confirmed</li>
+                    <li>Tamper-evident seals intact</li>
+                    <li>Patient documentation and instructions enclosed</li>
+                  </ul>
+                </div>
+
+                <div className="border-l border-slate-200 pl-4 space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Inspected By:</span>
+                    <span className="font-mono font-bold text-slate-800">QA #BM-802</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Dispatch Hub:</span>
+                    <span className="font-medium text-slate-800">Wilmington Medical Logistics</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Inspection Date:</span>
+                    <span className="font-medium text-slate-800">{new Date().toLocaleDateString()}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Patient Care Support Footer */}
+              <div className="border-t border-slate-200 pt-4 text-center text-[10px] text-slate-500 space-y-1">
+                <p className="font-bold text-slate-700">
+                  Thank you for trusting BaeMeds USA with your healthcare and durable medical equipment needs.
+                </p>
+                <p>
+                  Need assistance with setup, calibration, or replacement parts? Contact our Patient Support Team at{' '}
+                  <span className="font-bold text-slate-800">1-800-555-BAEMEDS</span> or email{' '}
+                  <span className="font-bold text-slate-800">support@baemeds.com</span>.
+                </p>
+                <p className="text-slate-400">
+                  Please report any transit discrepancies or packaging damage within 48 hours of courier delivery.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       )}

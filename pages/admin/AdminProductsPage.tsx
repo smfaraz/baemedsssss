@@ -19,6 +19,18 @@ import {
   Star,
   TrendingUp,
   Building2,
+  Download,
+  Upload,
+  FileSpreadsheet,
+  DollarSign,
+  Layers,
+  Boxes,
+  RefreshCw,
+  X,
+  FileText,
+  Check,
+  Copy,
+  Sparkles,
 } from 'lucide-react';
 import { AdminApiClient } from '../../lib/adminApi';
 import { Link, useNavigate } from '../../context/CartContext';
@@ -57,6 +69,26 @@ export const AdminProductsPage: React.FC = () => {
   const [pageSize, setPageSize] = useState(50);
   const [totalProducts, setTotalProducts] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
+
+  // Bulk Operations State
+  const [isProcessingBulk, setIsProcessingBulk] = useState(false);
+  const [isBulkPriceModalOpen, setIsBulkPriceModalOpen] = useState(false);
+  const [bulkPriceMode, setBulkPriceMode] = useState<'percent_inc' | 'percent_dec' | 'fixed_inc' | 'fixed_dec' | 'set_price'>('percent_inc');
+  const [bulkPriceValue, setBulkPriceValue] = useState<number>(10);
+
+  const [isBulkStockModalOpen, setIsBulkStockModalOpen] = useState(false);
+  const [bulkStockInStock, setBulkStockInStock] = useState<boolean>(true);
+  const [bulkStockQuantity, setBulkStockQuantity] = useState<number>(25);
+
+  const [isBulkCategoryModalOpen, setIsBulkCategoryModalOpen] = useState(false);
+  const [bulkCategoryTarget, setBulkCategoryTarget] = useState<string>(STANDARD_DME_CATEGORIES[0]);
+
+  // CSV Import Modal State
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [importRows, setImportRows] = useState<any[]>([]);
+  const [importFileName, setImportFileName] = useState('');
+  const [importError, setImportError] = useState('');
+  const [isImporting, setIsImporting] = useState(false);
 
   const loadProducts = async () => {
     setIsLoading(true);
@@ -142,6 +174,348 @@ export const AdminProductsPage: React.FC = () => {
     }
   };
 
+  // CSV Export utility
+  const exportProductsToCsv = (itemsToExport: Product[], filename: string) => {
+    const headers = [
+      'ID',
+      'SKU',
+      'Title',
+      'Category',
+      'Retail Price',
+      'Compare At Price',
+      'Wholesale Cost',
+      'Inventory Quantity',
+      'In Stock',
+      'Prescription Required',
+      'HCPCS Code',
+      'McKesson Item Number',
+      'Hero Flag',
+    ];
+
+    const escapeCsv = (val: any) => {
+      if (val === null || val === undefined) return '""';
+      const str = String(val).replace(/"/g, '""');
+      return `"${str}"`;
+    };
+
+    const rows = itemsToExport.map((p) => [
+      escapeCsv(p.id),
+      escapeCsv(p.sku || ''),
+      escapeCsv(p.title),
+      escapeCsv(p.category),
+      escapeCsv(Number(p.price || 0).toFixed(2)),
+      escapeCsv(p.compareAtPrice ? Number(p.compareAtPrice).toFixed(2) : ''),
+      escapeCsv(p.wholesaleCost ? Number(p.wholesaleCost).toFixed(2) : ''),
+      escapeCsv(p.inventoryQuantity ?? 25),
+      escapeCsv(p.inStock !== false ? 'TRUE' : 'FALSE'),
+      escapeCsv(p.prescriptionRequired ? 'TRUE' : 'FALSE'),
+      escapeCsv(p.hcpcsCode || ''),
+      escapeCsv(p.mckessonItemNumber || ''),
+      escapeCsv(p.isHeroProduct ? 'TRUE' : 'FALSE'),
+    ]);
+
+    const csvContent = '\uFEFF' + [headers.join(','), ...rows.map((r) => r.join(','))].join('\r\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    setSuccessMessage(`Successfully exported ${itemsToExport.length} products to ${filename}`);
+  };
+
+  const handleExportSelected = () => {
+    const selectedItems = products.filter((p) => selectedProductIds.includes(p.id));
+    if (!selectedItems.length) return;
+    exportProductsToCsv(selectedItems, `baemeds_selected_products_${new Date().toISOString().slice(0, 10)}.csv`);
+  };
+
+  const handleExportAllFiltered = () => {
+    exportProductsToCsv(filteredProducts, `baemeds_catalog_${new Date().toISOString().slice(0, 10)}.csv`);
+  };
+
+  const downloadSampleCsv = () => {
+    const template = [
+      'id,sku,title,category,price,compareAtPrice,inventoryQuantity,inStock,hcpcsCode,mckessonItemNumber,isHeroProduct',
+      'prod_sample_1,DME-RES-AIR11,AirSense 11 AutoSet CPAP,CPAP Machines,995.00,1199.00,30,TRUE,E0601,1184920,TRUE',
+      'prod_sample_2,DME-DRV-10257,Drive Silver Sport 2 Wheelchair,Wheelchairs,249.99,320.00,15,TRUE,K0001,894102,FALSE',
+      'prod_sample_3,DME-INV-5410IVC,Invacare Semi-Electric Hospital Bed,Hospital Furniture,1450.00,1750.00,8,TRUE,E0260,938210,TRUE',
+    ].join('\r\n');
+    const blob = new Blob(['\uFEFF' + template], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'baemeds_product_import_template.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  // Bulk Operations Handlers
+  const handleApplyBulkPrice = async () => {
+    if (!selectedProductIds.length) return;
+    setIsProcessingBulk(true);
+    setErrorMessage('');
+    try {
+      const selected = products.filter((p) => selectedProductIds.includes(p.id));
+      const updates = selected.map((p) => {
+        let newPrice = Number(p.price || 0);
+        if (bulkPriceMode === 'percent_inc') {
+          newPrice = Math.round(newPrice * (1 + bulkPriceValue / 100) * 100) / 100;
+        } else if (bulkPriceMode === 'percent_dec') {
+          newPrice = Math.max(0, Math.round(newPrice * (1 - bulkPriceValue / 100) * 100) / 100);
+        } else if (bulkPriceMode === 'fixed_inc') {
+          newPrice = Math.round((newPrice + bulkPriceValue) * 100) / 100;
+        } else if (bulkPriceMode === 'fixed_dec') {
+          newPrice = Math.max(0, Math.round((newPrice - bulkPriceValue) * 100) / 100);
+        } else if (bulkPriceMode === 'set_price') {
+          newPrice = Math.max(0, Number(bulkPriceValue));
+        }
+        return {
+          id: p.id,
+          price: newPrice,
+        };
+      });
+
+      await AdminApiClient.bulkUpdateProducts(updates);
+      setSuccessMessage(`Successfully updated retail prices for ${updates.length} products.`);
+      setIsBulkPriceModalOpen(false);
+      setSelectedProductIds([]);
+      loadProducts();
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Failed to apply bulk price update.');
+    } finally {
+      setIsProcessingBulk(false);
+    }
+  };
+
+  const handleApplyBulkStock = async () => {
+    if (!selectedProductIds.length) return;
+    setIsProcessingBulk(true);
+    setErrorMessage('');
+    try {
+      const updates = selectedProductIds.map((id) => ({
+        id,
+        inStock: bulkStockInStock,
+        inventoryQuantity: Math.max(0, Number(bulkStockQuantity)),
+      }));
+
+      await AdminApiClient.bulkUpdateProducts(updates);
+      setSuccessMessage(`Stock and inventory updated for ${updates.length} products.`);
+      setIsBulkStockModalOpen(false);
+      setSelectedProductIds([]);
+      loadProducts();
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Failed to update stock.');
+    } finally {
+      setIsProcessingBulk(false);
+    }
+  };
+
+  const handleApplyBulkCategory = async () => {
+    if (!selectedProductIds.length) return;
+    setIsProcessingBulk(true);
+    setErrorMessage('');
+    try {
+      const updates = selectedProductIds.map((id) => ({
+        id,
+        category: bulkCategoryTarget,
+      }));
+
+      await AdminApiClient.bulkUpdateProducts(updates);
+      setSuccessMessage(`Moved ${updates.length} products to "${bulkCategoryTarget}".`);
+      setIsBulkCategoryModalOpen(false);
+      setSelectedProductIds([]);
+      loadProducts();
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Failed to update categories.');
+    } finally {
+      setIsProcessingBulk(false);
+    }
+  };
+
+  const handleToggleBulkHero = async (enable: boolean) => {
+    if (!selectedProductIds.length) return;
+    setIsProcessingBulk(true);
+    setErrorMessage('');
+    try {
+      const updates = selectedProductIds.map((id) => ({
+        id,
+        isHeroProduct: enable,
+      }));
+
+      await AdminApiClient.bulkUpdateProducts(updates);
+      setSuccessMessage(
+        enable
+          ? `Added ${updates.length} products to Top 100 Flagship Heroes (Google/Meta feeds synced).`
+          : `Removed ${updates.length} products from Flagship Heroes.`
+      );
+      setSelectedProductIds([]);
+      loadProducts();
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Failed to update hero status.');
+    } finally {
+      setIsProcessingBulk(false);
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (!selectedProductIds.length) return;
+    if (
+      !window.confirm(
+        `Are you sure you want to permanently delete ${selectedProductIds.length} selected products? This action cannot be undone.`
+      )
+    ) {
+      return;
+    }
+    setIsProcessingBulk(true);
+    setErrorMessage('');
+    try {
+      await AdminApiClient.bulkDeleteProducts(selectedProductIds);
+      setSuccessMessage(`Successfully deleted ${selectedProductIds.length} products.`);
+      setSelectedProductIds([]);
+      loadProducts();
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Failed to delete selected products.');
+    } finally {
+      setIsProcessingBulk(false);
+    }
+  };
+
+  // CSV File Upload Handler
+  const handleCsvFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImportFileName(file.name);
+    setImportError('');
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const text = event.target?.result as string;
+        const lines = text.split(/\r\n|\n/).filter((l) => l.trim().length > 0);
+        if (lines.length < 2) {
+          setImportError('CSV file must have a header row and at least 1 data row.');
+          return;
+        }
+
+        const parseLine = (line: string): string[] => {
+          const result: string[] = [];
+          let current = '';
+          let inQuotes = false;
+          for (let i = 0; i < line.length; i++) {
+            const char = line[i];
+            if (char === '"') {
+              if (inQuotes && line[i + 1] === '"') {
+                current += '"';
+                i++;
+              } else {
+                inQuotes = !inQuotes;
+              }
+            } else if (char === ',' && !inQuotes) {
+              result.push(current.trim());
+              current = '';
+            } else {
+              current += char;
+            }
+          }
+          result.push(current.trim());
+          return result;
+        };
+
+        const headers = parseLine(lines[0]).map((h) => h.toLowerCase().replace(/[^a-z0-9]/g, ''));
+        const rows: any[] = [];
+
+        for (let i = 1; i < lines.length; i++) {
+          const values = parseLine(lines[i]);
+          const row: any = {};
+          headers.forEach((h, idx) => {
+            row[h] = values[idx] || '';
+          });
+
+          // Match by id or sku
+          const id = row.id || row.productid;
+          const sku = row.sku;
+          const price = row.price || row.retailprice;
+          const qty = row.inventoryquantity || row.qty || row.inventory;
+          const inStock = row.instock;
+          const category = row.category;
+          const hero = row.isheroproduct || row.hero;
+
+          if (id || sku) {
+            rows.push({
+              id,
+              sku,
+              title: row.title || row.name || 'Unnamed item',
+              price: price !== undefined && price !== '' ? Number(price) : undefined,
+              inventoryQuantity: qty !== undefined && qty !== '' ? Number(qty) : undefined,
+              inStock: inStock !== undefined && inStock !== '' ? inStock.toLowerCase() === 'true' || inStock === '1' : undefined,
+              category: category || undefined,
+              isHeroProduct: hero !== undefined && hero !== '' ? hero.toLowerCase() === 'true' || hero === '1' : undefined,
+            });
+          }
+        }
+
+        if (rows.length === 0) {
+          setImportError('No valid rows containing "id" or "sku" columns found in CSV.');
+          return;
+        }
+
+        setImportRows(rows);
+      } catch (err: any) {
+        setImportError(err.message || 'Failed to parse CSV file.');
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  const handleConfirmImport = async () => {
+    if (!importRows.length) return;
+    setIsImporting(true);
+    setImportError('');
+    try {
+      // Find matching product IDs for any row specified only by SKU
+      const resolvedUpdates: any[] = [];
+      for (const row of importRows) {
+        let targetId = row.id;
+        if (!targetId && row.sku) {
+          const match = products.find((p) => p.sku === row.sku);
+          if (match) targetId = match.id;
+        }
+        if (targetId) {
+          const updateObj: any = { id: targetId };
+          if (row.price !== undefined && !isNaN(row.price)) updateObj.price = row.price;
+          if (row.inventoryQuantity !== undefined && !isNaN(row.inventoryQuantity)) {
+            updateObj.inventoryQuantity = row.inventoryQuantity;
+          }
+          if (row.inStock !== undefined) updateObj.inStock = row.inStock;
+          if (row.category) updateObj.category = row.category;
+          if (row.isHeroProduct !== undefined) updateObj.isHeroProduct = row.isHeroProduct;
+          resolvedUpdates.push(updateObj);
+        }
+      }
+
+      if (resolvedUpdates.length === 0) {
+        throw new Error('None of the rows matched existing catalog product IDs or SKUs.');
+      }
+
+      await AdminApiClient.bulkUpdateProducts(resolvedUpdates);
+      setSuccessMessage(`Successfully updated ${resolvedUpdates.length} products from CSV import.`);
+      setIsImportModalOpen(false);
+      setImportRows([]);
+      setImportFileName('');
+      loadProducts();
+    } catch (err: any) {
+      setImportError(err.message || 'Failed to process product import.');
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header Bar */}
@@ -152,7 +526,23 @@ export const AdminProductsPage: React.FC = () => {
             Authoritative DME catalog management, HCPCS codes, clinical verification, and variant pricing.
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          <button
+            type="button"
+            onClick={handleExportAllFiltered}
+            className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs font-bold text-slate-700 shadow-soft hover:bg-slate-50 transition"
+            title="Download CSV of all currently filtered products"
+          >
+            <Download size={15} /> Export Catalog CSV
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsImportModalOpen(true)}
+            className="flex items-center gap-2 rounded-xl border border-teal-500/30 bg-teal-50 px-3.5 py-2.5 text-xs font-bold text-teal-800 shadow-soft hover:bg-teal-100 transition"
+            title="Bulk update products or prices via CSV file"
+          >
+            <Upload size={15} /> Import Products CSV
+          </button>
           <Link
             to="/admin/products/new"
             className="flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-xs font-bold text-white shadow-soft hover:bg-slate-800 transition"
@@ -278,20 +668,92 @@ export const AdminProductsPage: React.FC = () => {
 
         {/* Bulk Selection Bar */}
         {selectedProductIds.length > 0 && (
-          <div className="flex items-center justify-between rounded-xl bg-slate-900 px-4 py-2.5 text-xs text-white">
-            <span className="font-semibold">{selectedProductIds.length} products selected</span>
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-slate-950 p-3 text-xs text-white shadow-lg border border-slate-800">
             <div className="flex items-center gap-2">
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-medical-primary text-[11px] font-black text-white">
+                {selectedProductIds.length}
+              </span>
+              <span className="font-bold tracking-tight">Products Selected</span>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-1.5">
+              {/* Bulk Price Adjust */}
               <button
-                onClick={() => alert(`Bulk export of ${selectedProductIds.length} products initiated.`)}
-                className="rounded-lg bg-slate-800 px-3 py-1.5 font-bold hover:bg-slate-700"
+                type="button"
+                onClick={() => setIsBulkPriceModalOpen(true)}
+                className="flex items-center gap-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 px-3 py-1.5 font-bold hover:bg-amber-500/30 transition shadow-xs"
               >
-                Export CSV
+                <DollarSign size={13} />
+                Bulk Price
+              </button>
+
+              {/* Bulk Stock Status */}
+              <button
+                type="button"
+                onClick={() => setIsBulkStockModalOpen(true)}
+                className="flex items-center gap-1 rounded-lg bg-teal-500/20 text-teal-300 border border-teal-500/40 px-3 py-1.5 font-bold hover:bg-teal-500/30 transition shadow-xs"
+              >
+                <Boxes size={13} />
+                Set Stock
+              </button>
+
+              {/* Bulk Category */}
+              <button
+                type="button"
+                onClick={() => setIsBulkCategoryModalOpen(true)}
+                className="flex items-center gap-1 rounded-lg bg-sky-500/20 text-sky-300 border border-sky-500/40 px-3 py-1.5 font-bold hover:bg-sky-500/30 transition shadow-xs"
+              >
+                <Layers size={13} />
+                Set Category
+              </button>
+
+              {/* Hero Toggle */}
+              <button
+                type="button"
+                onClick={() => handleToggleBulkHero(true)}
+                title="Mark selected as Top 100 Flagship Heroes (Google/Meta Sync)"
+                className="flex items-center gap-1 rounded-lg bg-yellow-500/20 text-yellow-300 border border-yellow-500/40 px-2.5 py-1.5 font-bold hover:bg-yellow-500/30 transition"
+              >
+                <Star size={12} className="fill-current" />
+                Make Hero
               </button>
               <button
-                onClick={() => setSelectedProductIds([])}
-                className="rounded-lg border border-slate-700 px-3 py-1.5 font-bold hover:bg-slate-800"
+                type="button"
+                onClick={() => handleToggleBulkHero(false)}
+                title="Revert selected to Standard DME"
+                className="rounded-lg border border-slate-700 bg-slate-800 px-2.5 py-1.5 font-bold text-slate-300 hover:bg-slate-700 transition"
               >
-                Clear Selection
+                Standard
+              </button>
+
+              {/* Export Selected CSV */}
+              <button
+                type="button"
+                onClick={handleExportSelected}
+                className="flex items-center gap-1 rounded-lg bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 px-3 py-1.5 font-bold hover:bg-emerald-600/40 transition shadow-xs"
+              >
+                <Download size={13} />
+                Export CSV
+              </button>
+
+              {/* Delete Selected */}
+              <button
+                type="button"
+                onClick={handleBulkDelete}
+                className="flex items-center gap-1 rounded-lg bg-rose-600/30 text-rose-300 border border-rose-500/40 px-3 py-1.5 font-bold hover:bg-rose-600/40 transition shadow-xs"
+              >
+                <Trash2 size={13} />
+                Delete
+              </button>
+
+              {/* Clear */}
+              <button
+                type="button"
+                onClick={() => setSelectedProductIds([])}
+                className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-700 bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white transition"
+                title="Clear selection"
+              >
+                <X size={13} />
               </button>
             </div>
           </div>
@@ -615,6 +1077,395 @@ export const AdminProductsPage: React.FC = () => {
           </div>
         </div>
       </div>
+      {/* MODAL 1: Bulk Price Adjustment */}
+      {isBulkPriceModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4">
+          <div className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-50 text-amber-600 border border-amber-200">
+                  <DollarSign size={18} />
+                </div>
+                <div>
+                  <h3 className="text-sm font-black text-slate-900">Bulk Price Adjustment</h3>
+                  <p className="text-[11px] text-slate-500">
+                    Update pricing across {selectedProductIds.length} selected products simultaneously
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsBulkPriceModalOpen(false)}
+                className="text-slate-400 hover:text-slate-600"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Adjustment Type</label>
+                <select
+                  value={bulkPriceMode}
+                  onChange={(e) => setBulkPriceMode(e.target.value as any)}
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 p-2.5 text-xs text-slate-900 font-semibold focus:border-medical-primary focus:outline-none"
+                >
+                  <option value="percent_inc">Percentage Increase (+%)</option>
+                  <option value="percent_dec">Percentage Discount (-%)</option>
+                  <option value="fixed_inc">Fixed Dollar Increase (+$)</option>
+                  <option value="fixed_dec">Fixed Dollar Discount (-$)</option>
+                  <option value="set_price">Set Exact Price ($)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  {bulkPriceMode.startsWith('percent') ? 'Percentage Value (%)' : 'Dollar Value ($)'}
+                </label>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={bulkPriceValue}
+                  onChange={(e) => setBulkPriceValue(parseFloat(e.target.value) || 0)}
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 p-2.5 text-xs text-slate-900 font-bold focus:border-medical-primary focus:outline-none"
+                />
+              </div>
+
+              {/* Live Preview of Price Calculation on up to 3 selected items */}
+              <div className="rounded-xl border border-slate-100 bg-slate-50 p-3 space-y-2">
+                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
+                  Sample Price Preview
+                </span>
+                <div className="divide-y divide-slate-200">
+                  {products
+                    .filter((p) => selectedProductIds.includes(p.id))
+                    .slice(0, 3)
+                    .map((item) => {
+                      const cur = Number(item.price || 0);
+                      let nxt = cur;
+                      if (bulkPriceMode === 'percent_inc') nxt = Math.round(cur * (1 + bulkPriceValue / 100) * 100) / 100;
+                      else if (bulkPriceMode === 'percent_dec') nxt = Math.max(0, Math.round(cur * (1 - bulkPriceValue / 100) * 100) / 100);
+                      else if (bulkPriceMode === 'fixed_inc') nxt = Math.round((cur + bulkPriceValue) * 100) / 100;
+                      else if (bulkPriceMode === 'fixed_dec') nxt = Math.max(0, Math.round((cur - bulkPriceValue) * 100) / 100);
+                      else if (bulkPriceMode === 'set_price') nxt = Math.max(0, bulkPriceValue);
+
+                      return (
+                        <div key={item.id} className="py-1.5 flex items-center justify-between text-xs">
+                          <span className="truncate max-w-[240px] text-slate-700 font-medium">{item.title}</span>
+                          <div className="flex items-center gap-1.5 font-mono">
+                            <span className="text-slate-400 line-through">${cur.toFixed(2)}</span>
+                            <span className="text-slate-400">→</span>
+                            <span className="font-bold text-emerald-700">${nxt.toFixed(2)}</span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={() => setIsBulkPriceModalOpen(false)}
+                className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={isProcessingBulk}
+                onClick={handleApplyBulkPrice}
+                className="flex items-center gap-1.5 rounded-xl bg-amber-500 px-4 py-2 text-xs font-bold text-white hover:bg-amber-600 transition disabled:opacity-50"
+              >
+                {isProcessingBulk ? <RefreshCw size={13} className="animate-spin" /> : <DollarSign size={13} />}
+                Apply to {selectedProductIds.length} Products
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 2: Bulk Stock & Inventory */}
+      {isBulkStockModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4">
+          <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-teal-50 text-teal-600 border border-teal-200">
+                  <Boxes size={18} />
+                </div>
+                <div>
+                  <h3 className="text-sm font-black text-slate-900">Bulk Stock & Inventory</h3>
+                  <p className="text-[11px] text-slate-500">
+                    Set inventory status for {selectedProductIds.length} items
+                  </p>
+                </div>
+              </div>
+              <button onClick={() => setIsBulkStockModalOpen(false)} className="text-slate-400 hover:text-slate-600">
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Availability Status</label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setBulkStockInStock(true)}
+                    className={`rounded-xl border p-3 text-xs font-bold transition flex items-center justify-center gap-2 ${
+                      bulkStockInStock
+                        ? 'border-teal-500 bg-teal-50 text-teal-900'
+                        : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100'
+                    }`}
+                  >
+                    <CheckCircle size={15} className={bulkStockInStock ? 'text-teal-600' : 'text-slate-400'} />
+                    In Stock (Available)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setBulkStockInStock(false)}
+                    className={`rounded-xl border p-3 text-xs font-bold transition flex items-center justify-center gap-2 ${
+                      !bulkStockInStock
+                        ? 'border-rose-500 bg-rose-50 text-rose-900'
+                        : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100'
+                    }`}
+                  >
+                    <AlertCircle size={15} className={!bulkStockInStock ? 'text-rose-600' : 'text-slate-400'} />
+                    Out of Stock
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Set Inventory Quantity (Units)
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  value={bulkStockQuantity}
+                  onChange={(e) => setBulkStockQuantity(parseInt(e.target.value, 10) || 0)}
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 p-2.5 text-xs text-slate-900 font-bold focus:border-medical-primary focus:outline-none"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={() => setIsBulkStockModalOpen(false)}
+                className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={isProcessingBulk}
+                onClick={handleApplyBulkStock}
+                className="flex items-center gap-1.5 rounded-xl bg-teal-600 px-4 py-2 text-xs font-bold text-white hover:bg-teal-700 transition disabled:opacity-50"
+              >
+                {isProcessingBulk ? <RefreshCw size={13} className="animate-spin" /> : <Boxes size={13} />}
+                Update {selectedProductIds.length} Products
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 3: Bulk Category Assignment */}
+      {isBulkCategoryModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4">
+          <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-sky-50 text-sky-600 border border-sky-200">
+                  <Layers size={18} />
+                </div>
+                <div>
+                  <h3 className="text-sm font-black text-slate-900">Set Category</h3>
+                  <p className="text-[11px] text-slate-500">
+                    Re-categorize {selectedProductIds.length} selected items
+                  </p>
+                </div>
+              </div>
+              <button onClick={() => setIsBulkCategoryModalOpen(false)} className="text-slate-400 hover:text-slate-600">
+                <X size={18} />
+              </button>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Target DME Category</label>
+              <select
+                value={bulkCategoryTarget}
+                onChange={(e) => setBulkCategoryTarget(e.target.value)}
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 p-2.5 text-xs text-slate-900 font-semibold focus:border-medical-primary focus:outline-none"
+              >
+                {categories.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={() => setIsBulkCategoryModalOpen(false)}
+                className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={isProcessingBulk}
+                onClick={handleApplyBulkCategory}
+                className="flex items-center gap-1.5 rounded-xl bg-sky-600 px-4 py-2 text-xs font-bold text-white hover:bg-sky-700 transition disabled:opacity-50"
+              >
+                {isProcessingBulk ? <RefreshCw size={13} className="animate-spin" /> : <Layers size={13} />}
+                Move {selectedProductIds.length} Products
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 4: CSV Import */}
+      {isImportModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4">
+          <div className="w-full max-w-2xl rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-teal-50 text-teal-600 border border-teal-200">
+                  <Upload size={18} />
+                </div>
+                <div>
+                  <h3 className="text-sm font-black text-slate-900">Import & Update Products via CSV</h3>
+                  <p className="text-[11px] text-slate-500">
+                    Bulk update prices, inventory quantities, and stock availability from spreadsheet
+                  </p>
+                </div>
+              </div>
+              <button onClick={() => setIsImportModalOpen(false)} className="text-slate-400 hover:text-slate-600">
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Template Download & Instructions */}
+            <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 p-3.5">
+              <div className="text-xs text-slate-600">
+                <p className="font-bold text-slate-800">Supported Columns:</p>
+                <p className="text-[11px] text-slate-500">
+                  <code className="font-mono bg-white px-1 py-0.5 rounded border border-slate-200">id</code> or{' '}
+                  <code className="font-mono bg-white px-1 py-0.5 rounded border border-slate-200">sku</code> (required for matching),{' '}
+                  <code className="font-mono bg-white px-1 py-0.5 rounded border border-slate-200">price</code>,{' '}
+                  <code className="font-mono bg-white px-1 py-0.5 rounded border border-slate-200">inventoryQuantity</code>,{' '}
+                  <code className="font-mono bg-white px-1 py-0.5 rounded border border-slate-200">inStock</code>,{' '}
+                  <code className="font-mono bg-white px-1 py-0.5 rounded border border-slate-200">category</code>,{' '}
+                  <code className="font-mono bg-white px-1 py-0.5 rounded border border-slate-200">isHeroProduct</code>
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={downloadSampleCsv}
+                className="inline-flex items-center gap-1.5 shrink-0 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-100 transition shadow-2xs"
+              >
+                <Download size={13} /> Download Template
+              </button>
+            </div>
+
+            {/* File Upload Drop Zone */}
+            <div className="rounded-xl border-2 border-dashed border-slate-300 p-6 text-center hover:border-teal-500 transition bg-slate-50/50">
+              <input
+                type="file"
+                id="csvFileInput"
+                accept=".csv"
+                onChange={handleCsvFileUpload}
+                className="hidden"
+              />
+              <label
+                htmlFor="csvFileInput"
+                className="cursor-pointer flex flex-col items-center justify-center space-y-2"
+              >
+                <FileSpreadsheet size={32} className="text-teal-600" />
+                <span className="text-xs font-bold text-slate-800">
+                  {importFileName ? importFileName : 'Click to select CSV file from your computer'}
+                </span>
+                <span className="text-[11px] text-slate-400">
+                  Accepts standard comma-separated .csv UTF-8 files
+                </span>
+              </label>
+            </div>
+
+            {importError && (
+              <div className="rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs text-rose-800">
+                {importError}
+              </div>
+            )}
+
+            {/* Preview Parsed Rows */}
+            {importRows.length > 0 && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-bold text-slate-700">
+                    Parsed Rows ({importRows.length} ready to apply)
+                  </span>
+                  <span className="text-slate-400 text-[11px]">Showing first 5 rows preview</span>
+                </div>
+                <div className="rounded-xl border border-slate-200 overflow-hidden bg-white max-h-48 overflow-y-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold">
+                      <tr>
+                        <th className="p-2">ID / SKU</th>
+                        <th className="p-2">Title</th>
+                        <th className="p-2">Price</th>
+                        <th className="p-2">Inventory</th>
+                        <th className="p-2">In Stock</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 font-mono text-[11px]">
+                      {importRows.slice(0, 5).map((r, i) => (
+                        <tr key={i} className="hover:bg-slate-50">
+                          <td className="p-2 text-slate-900 font-bold">{r.id || r.sku}</td>
+                          <td className="p-2 font-sans truncate max-w-[150px]">{r.title}</td>
+                          <td className="p-2 text-emerald-700">{r.price !== undefined ? `$${r.price}` : '—'}</td>
+                          <td className="p-2">{r.inventoryQuantity !== undefined ? r.inventoryQuantity : '—'}</td>
+                          <td className="p-2">{r.inStock !== undefined ? (r.inStock ? 'TRUE' : 'FALSE') : '—'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsImportModalOpen(false);
+                  setImportRows([]);
+                  setImportFileName('');
+                }}
+                className="rounded-xl border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={!importRows.length || isImporting}
+                onClick={handleConfirmImport}
+                className="flex items-center gap-1.5 rounded-xl bg-teal-600 px-5 py-2 text-xs font-bold text-white hover:bg-teal-700 transition disabled:opacity-50 shadow-xs"
+              >
+                {isImporting ? <RefreshCw size={13} className="animate-spin" /> : <Check size={13} />}
+                Apply Updates ({importRows.length} Items)
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -180,6 +180,38 @@ export const AdminApiClient = {
     return data;
   },
 
+  async bulkUpdateProducts(
+    updates: Array<{
+      id: string;
+      price?: number;
+      compareAtPrice?: number | null;
+      inventoryQuantity?: number;
+      inStock?: boolean;
+      category?: string;
+      isHeroProduct?: boolean;
+    }>
+  ) {
+    const res = await fetch('/api/admin/products/bulk-update', {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify({ updates }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to bulk update products');
+    return data;
+  },
+
+  async bulkDeleteProducts(ids: string[]) {
+    const res = await fetch('/api/admin/products/bulk-delete', {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify({ ids }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to bulk delete products');
+    return data;
+  },
+
   async getInventory() {
     const res = await fetch('/api/admin/inventory', { headers: getHeaders() });
     if (!res.ok) {

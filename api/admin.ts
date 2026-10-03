@@ -170,6 +170,18 @@ export default createVercelHandler(async (request: Request) => {
         const parts = subpath.split('/');
         const prodId = parts[1];
 
+        if (subpath === 'products/bulk-update' && method === 'POST') {
+          const body = await readJson<any>(request);
+          const res = await AdminService.bulkUpdateProducts(actor, body.updates);
+          return json(res);
+        }
+
+        if (subpath === 'products/bulk-delete' && method === 'POST') {
+          const body = await readJson<any>(request);
+          const res = await AdminService.bulkDeleteProducts(actor, body.ids);
+          return json(res);
+        }
+
         if (method === 'POST' || method === 'PUT') {
           const body = await readJson<any>(request);
           const saved = await AdminService.saveProduct(actor, body);
