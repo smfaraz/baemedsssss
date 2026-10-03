@@ -33,6 +33,7 @@ import { fetchProductByHandle, fetchRecommendedProducts } from '../lib/commerce'
 import { formatPrice, isValidUSZip } from '../lib/marketConfig';
 import { Analytics } from '../lib/analytics';
 import { Product, ProductVariant } from '../types';
+import { getHighResImageUrl, handleImageFallback } from '../utils/imageOptimizer';
 
 const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -402,7 +403,12 @@ const ProductDetailPage: React.FC = () => {
               }}
             >
               {!imageFailed && activeImage ? (
-                <img src={activeImage} alt={product.title} onError={() => setImageFailed(true)} className="h-full w-full object-contain" />
+                <img
+                  src={getHighResImageUrl(activeImage)}
+                  alt={product.title}
+                  onError={(e) => handleImageFallback(e, () => setImageFailed(true))}
+                  className="h-full w-full object-contain"
+                />
               ) : (
                 <div className="text-center text-medical-text">
                   <ImageOff size={48} className="mx-auto" />
@@ -469,7 +475,12 @@ const ProductDetailPage: React.FC = () => {
                       aria-pressed={activeImage === image}
                       className={`relative h-24 w-24 shrink-0 snap-start rounded-xl border-2 bg-white p-2 transition hover:-translate-y-0.5 hover:border-medical-primary ${activeImage === image ? 'border-medical-primary ring-2 ring-medical-accent' : 'border-slate-200'}`}
                     >
-                      <img src={image} alt={`${product.title} view ${index + 1}`} className="h-full w-full object-contain" />
+                      <img
+                        src={getHighResImageUrl(image)}
+                        alt={`${product.title} view ${index + 1}`}
+                        onError={(e) => handleImageFallback(e)}
+                        className="h-full w-full object-contain"
+                      />
                       <span className={`absolute bottom-1 right-1 rounded-md px-1.5 py-0.5 text-[10px] font-black ${activeImage === image ? 'bg-medical-primary text-white' : 'bg-slate-100 text-slate-600'}`}>
                         {index + 1}
                       </span>

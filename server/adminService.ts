@@ -879,6 +879,15 @@ export const AdminService = {
           isRegulatoryVerified: Boolean(d.is_regulatory_verified),
           wholesaleCost: d.wholesale_cost ? Number(d.wholesale_cost) : undefined,
           costPerItem: d.wholesale_cost ? Number(d.wholesale_cost) : undefined,
+          dealerPrice: d.dealer_price ? Number(d.dealer_price) : undefined,
+          margin: (() => {
+            const p = Number(d.price);
+            const dp = d.dealer_price ? Number(d.dealer_price) : null;
+            if (dp !== null && p > 0) return Math.round(((p - dp) / p) * 100);
+            const wc = d.wholesale_cost ? Number(d.wholesale_cost) : null;
+            if (wc !== null && p > 0) return Math.round(((p - wc) / p) * 100);
+            return undefined;
+          })(),
           sku: d.sku || undefined,
           barcode: d.barcode || undefined,
           mckessonItemNumber: d.mckesson_item_number || undefined,
@@ -982,6 +991,7 @@ export const AdminService = {
       fda_classification: payload.fdaClassification || null,
       is_regulatory_verified: Boolean(payload.isRegulatoryVerified),
       wholesale_cost: payload.wholesaleCost ?? payload.costPerItem ?? null,
+      dealer_price: payload.dealerPrice ?? null,
       sku: payload.sku || null,
       barcode: payload.barcode || null,
       mckesson_item_number: payload.mckessonItemNumber || null,

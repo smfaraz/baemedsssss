@@ -319,6 +319,7 @@ export const AdminProductsPage: React.FC = () => {
                 <th className="px-4 py-3.5">Category</th>
                 <th className="px-4 py-3.5">HCPCS Code</th>
                 <th className="px-4 py-3.5">Retail Price</th>
+                <th className="px-4 py-3.5">Dealer Price</th>
                 <th className="px-4 py-3.5">Wholesale & Margin</th>
                 <th className="px-4 py-3.5">Inventory</th>
                 <th className="px-4 py-3.5">Rx Status</th>
@@ -328,7 +329,7 @@ export const AdminProductsPage: React.FC = () => {
             <tbody className="divide-y divide-slate-100">
               {isLoading ? (
                 <tr>
-                  <td colSpan={9} className="py-12 text-center text-slate-400">
+                  <td colSpan={10} className="py-12 text-center text-slate-400">
                     <div className="flex items-center justify-center gap-2">
                       <div className="h-4 w-4 animate-spin rounded-full border-2 border-medical-primary border-t-transparent" />
                       <span>Loading authoritative product catalog from Supabase...</span>
@@ -414,6 +415,22 @@ export const AdminProductsPage: React.FC = () => {
                       </td>
                       <td className="px-4 py-3.5 font-bold text-slate-900">
                         ${p.price.toFixed(2)}
+                      </td>
+                      <td className="px-4 py-3.5">
+                        {p.dealerPrice && p.dealerPrice > 0 ? (
+                          <div>
+                            <div className="font-mono font-bold text-indigo-800 text-xs">
+                              ${p.dealerPrice.toFixed(2)}
+                            </div>
+                            {p.price > 0 && (
+                              <span className="text-[10px] text-indigo-600 font-semibold bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-100">
+                                {Math.round(((p.price - p.dealerPrice) / p.price) * 100)}% margin
+                              </span>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-slate-400 text-[11px]">—</span>
+                        )}
                       </td>
                       <td className="px-4 py-3.5">
                         {cost > 0 ? (

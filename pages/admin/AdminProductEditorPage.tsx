@@ -22,6 +22,7 @@ import {
   X,
   Sparkles,
   Info,
+  Building2,
 } from 'lucide-react';
 import { AdminApiClient } from '../../lib/adminApi';
 import { Link, useParams, useNavigate } from '../../context/CartContext';
@@ -48,6 +49,7 @@ export const AdminProductEditorPage: React.FC = () => {
   const [price, setPrice] = useState<number>(0);
   const [compareAtPrice, setCompareAtPrice] = useState<number | undefined>(undefined);
   const [costPerItem, setCostPerItem] = useState<number | undefined>(undefined);
+  const [dealerPrice, setDealerPrice] = useState<number | undefined>(undefined);
 
   // 3. Inventory & Dropshipping Identifiers
   const [sku, setSku] = useState('');
@@ -95,6 +97,11 @@ export const AdminProductEditorPage: React.FC = () => {
     return Math.round(((price - costPerItem) / price) * 100);
   }, [price, costPerItem]);
 
+  const dealerMarginPercentage = useMemo(() => {
+    if (!price || !dealerPrice || price <= 0) return null;
+    return Math.round(((price - dealerPrice) / price) * 100);
+  }, [price, dealerPrice]);
+
   useEffect(() => {
     if (!isNew && id) {
       const fetchProduct = async () => {
@@ -110,6 +117,7 @@ export const AdminProductEditorPage: React.FC = () => {
             setPrice(prod.price || 0);
             setCompareAtPrice(prod.compareAtPrice);
             setCostPerItem(prod.wholesaleCost ?? prod.costPerItem ?? undefined);
+            setDealerPrice(prod.dealerPrice ?? undefined);
 
             setSku(prod.sku || `BM-${id.substring(0, 8).toUpperCase()}`);
             setBarcode(prod.barcode || '');
@@ -209,6 +217,7 @@ export const AdminProductEditorPage: React.FC = () => {
         compareAtPrice: compareAtPrice ? Number(compareAtPrice) : undefined,
         wholesaleCost: costPerItem ? Number(costPerItem) : undefined,
         costPerItem: costPerItem ? Number(costPerItem) : undefined,
+        dealerPrice: dealerPrice ? Number(dealerPrice) : undefined,
         sku: sku.trim() || undefined,
         barcode: barcode.trim() || undefined,
         mckessonItemNumber: mckessonItemNumber.trim() || undefined,
@@ -466,6 +475,53 @@ export const AdminProductEditorPage: React.FC = () => {
                   />
                 </div>
               </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1">
+                  <Building2 size={13} className="text-indigo-600" />
+                  Dealer Price ($ USD)
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold">$</span>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={dealerPrice !== undefined ? dealerPrice : ''}
+                    onChange={(e) =>
+                      setDealerPrice(e.target.value ? parseFloat(e.target.value) : undefined)
+                    }
+                    placeholder="e.g. 1100.00"
+                    className="w-full rounded-xl border border-indigo-200 bg-indigo-50/30 py-2.5 pl-8 pr-4 text-xs font-bold text-slate-900 focus:border-indigo-500 focus:bg-white focus:outline-none"
+                  />
+                </div>
+                <span className="text-[10px] text-indigo-600 font-semibold">Price offered to authorized dealers &amp; distributors</span>
+              </div>
+
+              {dealerPrice && price > 0 && (
+                <div className="flex items-center">
+                  <div className="rounded-xl border border-indigo-100 bg-indigo-50/50 p-3 text-xs w-full">
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-600">Dealer Margin</span>
+                      <span className={`font-black text-sm ${
+                        dealerMarginPercentage !== null && dealerMarginPercentage >= 30
+                          ? 'text-emerald-700'
+                          : dealerMarginPercentage !== null && dealerMarginPercentage >= 15
+                          ? 'text-amber-700'
+                          : 'text-rose-700'
+                      }`}>
+                        {dealerMarginPercentage !== null ? `${dealerMarginPercentage}%` : '—'}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between mt-1">
+                      <span className="text-slate-500">Spread (Retail − Dealer)</span>
+                      <span className="font-bold text-slate-900">${(price - dealerPrice).toFixed(2)}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Quick Profit Summary Banner */}

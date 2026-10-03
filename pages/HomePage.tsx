@@ -17,6 +17,7 @@ import { fetchAllProducts, resolveCategoryName } from '../lib/commerce';
 import { useReveal } from '../lib/useReveal';
 import { Product } from '../types';
 import { formatPrice } from '../lib/marketConfig';
+import { getHighResImageUrl, handleImageFallback } from '../utils/imageOptimizer';
 
 const tileAccents = [
   'bg-sky-100 text-sky-700',
@@ -395,9 +396,10 @@ const HomePage: React.FC = () => {
                 >
                   <div className="flex h-32 sm:h-36 w-full items-center justify-center overflow-hidden">
                     <img
-                      src={product.image}
+                      src={getHighResImageUrl(product.image)}
                       alt={product.title}
                       loading="lazy"
+                      onError={(e) => handleImageFallback(e)}
                       className="h-full w-full object-contain"
                     />
                   </div>

@@ -41,6 +41,8 @@ export interface Product {
   isRegulatoryVerified?: boolean;
   weightLbs?: number;
   // Shopify-grade commerce & McKesson dropshipping fields
+  dealerPrice?: number;
+  margin?: number;
   wholesaleCost?: number;
   costPerItem?: number;
   sku?: string;
@@ -64,6 +66,8 @@ export interface ProductVariant {
   size?: string; // e.g. 'Large', 'Medium', 'X-Large', '2X-Large'
   packageQuantity?: string; // e.g. 'Standard Bag', 'Case of 72'
   price: number;
+  dealerPrice?: number;
+  wholesaleCost?: number;
   compareAtPrice?: number | null;
   sku?: string;
   inStock?: boolean;

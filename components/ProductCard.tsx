@@ -6,6 +6,7 @@ import { useReviews } from '../context/ReviewsContext';
 import { flyToCart } from '../lib/flyToCart';
 import { formatPrice } from '../lib/marketConfig';
 import { Product } from '../types';
+import { getHighResImageUrl, handleImageFallback } from '../utils/imageOptimizer';
 
 interface ProductCardProps {
   product: Product;
@@ -80,10 +81,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       <Link to={productPath} className="relative flex h-52 items-center justify-center overflow-hidden bg-slate-50 p-5" aria-label={`View ${product.title}${discount > 0 ? `, ${discount}% off` : ''}`}>
         {product.image && !imageFailed ? (
           <img
-            src={product.image}
+            src={getHighResImageUrl(product.image)}
             alt={product.title}
             loading="lazy"
-            onError={() => setImageFailed(true)}
+            onError={(e) => handleImageFallback(e, () => setImageFailed(true))}
             className={`h-full w-full object-contain transition duration-500 hover:scale-105 ${!product.inStock ? 'grayscale opacity-60' : ''}`}
           />
         ) : (
