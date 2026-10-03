@@ -577,7 +577,7 @@ export const AdminProductEditorPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1 text-teal-800">
+                <label className="block text-xs font-bold mb-1 flex items-center gap-1 text-teal-800">
                   <Barcode size={13} className="text-teal-600" />
                   McKesson Item #
                 </label>
@@ -588,7 +588,19 @@ export const AdminProductEditorPage: React.FC = () => {
                   placeholder="e.g. 918274 or 1102934"
                   className="w-full rounded-xl border border-teal-300 bg-teal-50/50 px-4 py-2.5 text-xs font-mono font-black text-teal-950 focus:border-teal-500 focus:bg-white focus:outline-none"
                 />
-                <span className="text-[10px] text-teal-600 font-semibold">Supply Management portal code</span>
+                <div className="flex items-center justify-between mt-1">
+                  <span className="text-[10px] text-teal-600 font-semibold">MMS McKesson catalog code</span>
+                  {mckessonItemNumber.trim() && (
+                    <a
+                      href={`https://mms.mckesson.com/product/${mckessonItemNumber.trim()}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-[11px] font-bold text-teal-700 hover:text-teal-900 inline-flex items-center gap-1 hover:underline"
+                    >
+                      Verify on mms.mckesson.com <ExternalLink size={10} />
+                    </a>
+                  )}
+                </div>
               </div>
             </div>
 

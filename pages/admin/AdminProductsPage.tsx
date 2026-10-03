@@ -393,9 +393,17 @@ export const AdminProductsPage: React.FC = () => {
                             <div className="flex items-center gap-2 mt-0.5 text-[11px] text-slate-400 font-mono">
                               <span>SKU: {p.sku || p.id.substring(0, 8).toUpperCase()}</span>
                               {p.mckessonItemNumber && (
-                                <span className="text-indigo-600 font-semibold bg-indigo-50 px-1.5 py-0.2 rounded border border-indigo-100">
+                                <a
+                                  href={`https://mms.mckesson.com/product/${p.mckessonItemNumber}`}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="text-indigo-600 font-semibold bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-100 hover:bg-indigo-100 hover:underline inline-flex items-center gap-1 transition"
+                                  title="View on MMS McKesson"
+                                >
                                   MCK #{p.mckessonItemNumber}
-                                </span>
+                                  <ExternalLink size={10} />
+                                </a>
                               )}
                             </div>
                           </div>

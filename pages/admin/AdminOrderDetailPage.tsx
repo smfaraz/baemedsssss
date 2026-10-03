@@ -423,12 +423,12 @@ export const AdminOrderDetailPage: React.FC = () => {
                 </div>
               </div>
               <a
-                href="https://supplymanagement.mckesson.com"
+                href="https://mms.mckesson.com"
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-100 transition"
               >
-                Open McKesson Portal <ExternalLink size={12} />
+                Open McKesson MMS Portal <ExternalLink size={12} />
               </a>
             </div>
 
@@ -478,9 +478,22 @@ export const AdminOrderDetailPage: React.FC = () => {
                     <div>
                       <p className="font-bold text-slate-900">{item.product_title}</p>
                       <div className="flex items-center gap-2 mt-1">
-                        <span className="rounded bg-teal-50 px-1.5 py-0.5 font-mono text-[10px] font-bold text-teal-800 border border-teal-200">
-                          McKesson #: {item.mckesson_item_number || 'MCK-829104'}
-                        </span>
+                        {item.mckesson_item_number ? (
+                          <a
+                            href={`https://mms.mckesson.com/product/${item.mckesson_item_number}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="rounded bg-teal-50 px-1.5 py-0.5 font-mono text-[10px] font-bold text-teal-800 border border-teal-200 hover:bg-teal-100 inline-flex items-center gap-1 transition"
+                            title="Open on mms.mckesson.com"
+                          >
+                            McKesson #: {item.mckesson_item_number}
+                            <ExternalLink size={10} />
+                          </a>
+                        ) : (
+                          <span className="rounded bg-slate-50 px-1.5 py-0.5 font-mono text-[10px] text-slate-500 border border-slate-200">
+                            McKesson #: N/A
+                          </span>
+                        )}
                         <span className="text-slate-400 text-[11px]">SKU: {item.sku || 'DME-STD'}</span>
                       </div>
                     </div>
