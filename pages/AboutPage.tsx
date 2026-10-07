@@ -10,7 +10,7 @@ const priorities = [
   {
     icon: PackageSearch,
     title: 'Easy product search',
-    description: 'Browse by clinical category, compare medical equipment specifications, and check FDA compliance and prescription requirements before ordering.',
+    description: 'Browse by clinical category, compare medical equipment specifications, and check FDA compliance and delivery options before ordering.',
   },
   {
     icon: Headphones,

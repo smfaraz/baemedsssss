@@ -18,6 +18,15 @@ interface CheckoutItem {
   quantity: number;
 }
 
+interface PrescriptionInfo {
+  method: 'doctor_contact' | 'upload' | 'send_later';
+  doctorName?: string;
+  doctorPhone?: string;
+  doctorClinic?: string;
+  rxFileName?: string;
+  notes?: string;
+}
+
 interface CheckoutBody {
   cartId: string;
   email: string;
@@ -32,11 +41,13 @@ interface CheckoutBody {
   country?: string;
   shippingTier?: 'standard' | 'priority' | 'white_glove';
   paymentToken?: string;
-  prescriptionAttested?: boolean;
+  paymentIntentId?: string;
+  prescriptionInfo?: PrescriptionInfo;
   items: CheckoutItem[];
 }
 
 import { createVercelHandler } from '../server/serverlessAdapter.ts';
+import { EmailService } from '../server/emailService.ts';
 
 export default createVercelHandler(async (request: Request) => {
   try {
@@ -62,7 +73,6 @@ export default createVercelHandler(async (request: Request) => {
 
       // Server-authoritative inventory & pricing calculation
       let calculatedSubtotal = 0;
-      let requiresPrescription = false;
       const orderItems = [];
 
       for (const item of body.items) {
@@ -92,10 +102,17 @@ export default createVercelHandler(async (request: Request) => {
 
         if (!product) {
           try {
+            const strippedId = targetId.startsWith('var-') ? targetId.replace(/^var-/, '') : targetId;
+            const lookupIds = Array.from(new Set([targetId, strippedId, `prd-${strippedId}`, altId].filter(Boolean)));
+            const orFilters = [
+              ...lookupIds.map((id) => `id.eq.${id}`),
+              `handle.eq.${targetId}`,
+            ].join(',');
+
             const { data: dbProduct } = await adminSupabase
               .from('products')
               .select('*')
-              .or(`id.eq.${targetId},variant_id.eq.${targetId},handle.eq.${targetId}${altId ? `,id.eq.${altId}` : ''}`)
+              .or(orFilters)
               .limit(1)
               .maybeSingle();
 
@@ -105,9 +122,9 @@ export default createVercelHandler(async (request: Request) => {
                 title: dbProduct.title,
                 handle: dbProduct.handle,
                 price: Number(dbProduct.price),
-                variantId: dbProduct.variant_id || `var-${dbProduct.id}`,
+                variantId: `var-${dbProduct.id}`,
                 category: dbProduct.category,
-                prescriptionRequired: Boolean(dbProduct.prescription_required),
+                prescriptionRequired: false,
               };
             }
           } catch (dbLookupErr) {
@@ -139,16 +156,7 @@ export default createVercelHandler(async (request: Request) => {
         const lineTotal = price * item.quantity;
         calculatedSubtotal += lineTotal;
 
-        const normCategory = `${product.category || ''} ${product.title || ''}`.toLowerCase();
-        const isDmeRegulated =
-          Boolean(product.prescriptionRequired) ||
-          normCategory.includes('oxygen concentrator') ||
-          normCategory.includes('cpap') ||
-          normCategory.includes('bipap');
-
-        if (isDmeRegulated) {
-          requiresPrescription = true;
-        }
+        const isItemRx = false;
 
         orderItems.push({
           product_id: product.id,
@@ -161,19 +169,14 @@ export default createVercelHandler(async (request: Request) => {
           total_price: lineTotal,
           metadata: {
             handle: product.handle,
-            requires_prescription: isDmeRegulated,
             size: matchedVariant?.size,
             package_quantity: matchedVariant?.packageQuantity,
+            requires_prescription: isItemRx,
           },
         });
       }
 
-      if (requiresPrescription && !body.prescriptionAttested) {
-        throw new ApiError(
-          400,
-          'This order contains prescription-required DME medical equipment. Clinical attestation is required.'
-        );
-      }
+      const orderRequiresPrescription = false;
 
       // Server-authoritative shipping calculation
       let shippingAmount = 0;
@@ -190,8 +193,7 @@ export default createVercelHandler(async (request: Request) => {
       }
 
       // Authoritative tax calculation
-      // DME tax rates vary by state; standard calculation abstraction:
-      const taxRate = 0.06; // Standard state sales tax baseline
+      const taxRate = 0.06; // Standard baseline sales tax
       const taxAmount = Number((calculatedSubtotal * taxRate).toFixed(2));
       const totalAmount = Number((calculatedSubtotal + shippingAmount + taxAmount).toFixed(2));
 
@@ -203,14 +205,20 @@ export default createVercelHandler(async (request: Request) => {
         id: orderId,
         order_number: orderNumber,
         customer_email: email,
-        status: requiresPrescription ? 'CLINICAL_REVIEW' : 'PAID',
+        status: 'PAID',
         currency: 'USD',
         subtotal_amount: calculatedSubtotal,
         tax_amount: taxAmount,
         shipping_amount: shippingAmount,
         discount_amount: 0,
         total_amount: totalAmount,
-        requires_prescription: requiresPrescription,
+        requires_prescription: false,
+        prescription_method: null,
+        prescription_doctor_name: null,
+        prescription_doctor_phone: null,
+        prescription_doctor_clinic: null,
+        prescription_file_name: null,
+        payment_intent_id: body.paymentIntentId || body.paymentToken,
         shipping_address: {
           first_name: firstName,
           last_name: lastName,
@@ -247,14 +255,14 @@ export default createVercelHandler(async (request: Request) => {
           id: orderId,
           order_number: orderNumber,
           customer_email: email,
-          status: requiresPrescription ? 'CLINICAL_REVIEW' : 'PAID',
+          status: 'PAID',
           currency: 'USD',
           subtotal_amount: calculatedSubtotal,
           tax_amount: taxAmount,
           shipping_amount: shippingAmount,
           discount_amount: 0,
           total_amount: totalAmount,
-          requires_prescription: requiresPrescription,
+          requires_prescription: orderRequiresPrescription,
           shipping_address: firstPartyOrder.shipping_address,
           billing_address: firstPartyOrder.billing_address,
           shipping_method: shippingMethod,
@@ -271,6 +279,33 @@ export default createVercelHandler(async (request: Request) => {
         // Resilient fallback: order is securely retained in server store
       }
 
+      // Automated Transactional Email Dispatch (Customer Receipt + McKesson Drop-Ship PO Alert)
+      try {
+        await EmailService.sendOrderPlacedEmails({
+          orderId,
+          orderNumber,
+          customerEmail: email,
+          customerName: `${firstName} ${lastName}`.trim(),
+          phone,
+          shippingAddress: firstPartyOrder.shipping_address,
+          shippingMethod,
+          subtotal: calculatedSubtotal,
+          shipping: shippingAmount,
+          tax: taxAmount,
+          total: totalAmount,
+          items: orderItems.map((oi) => ({
+            product_id: oi.product_id,
+            product_title: oi.product_title,
+            sku: oi.sku,
+            unit_price: oi.unit_price,
+            quantity: oi.quantity,
+            total_price: oi.total_price,
+          })),
+        });
+      } catch (emailErr) {
+        console.warn('[checkout] Email dispatch error caught non-blocking:', emailErr);
+      }
+
       return json({
         success: true,
         orderId,
@@ -279,8 +314,8 @@ export default createVercelHandler(async (request: Request) => {
         tax: taxAmount.toFixed(2),
         shipping: shippingAmount.toFixed(2),
         total: totalAmount.toFixed(2),
-        requiresPrescription,
-        status: requiresPrescription ? 'CLINICAL_REVIEW' : 'PAID',
+        requiresPrescription: orderRequiresPrescription,
+        status: 'PAID',
       });
     } catch (error) {
       return errorResponse(error);

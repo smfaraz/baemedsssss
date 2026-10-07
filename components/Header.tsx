@@ -274,7 +274,12 @@ const Header: React.FC = () => {
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="truncate text-sm font-semibold text-slate-800">{product.title}</p>
-                          <p className="text-xs font-bold text-medical-primary">{formatPrice(product.price)}</p>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs font-bold text-medical-primary">{formatPrice(product.price)}</span>
+                            {product.variants && product.variants.length > 1 && (
+                              <span className="text-[10px] font-medium text-slate-500">/ Each</span>
+                            )}
+                          </div>
                         </div>
                       </Link>
                     ))}

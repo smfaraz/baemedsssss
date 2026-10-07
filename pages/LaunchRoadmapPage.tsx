@@ -128,7 +128,7 @@ const INITIAL_DAYS: RoadmapDay[] = [
       { id: 'd2-t11', title: 'Enable FSA and HSA health benefit card acceptance (SIGIS/IIAS)', detail: 'Register with SIGIS to allow patients to purchase approved equipment using pre-tax health cards.', type: 'NON_TECHNICAL', completed: false },
       { id: 'd2-t12', title: 'Verify Affirm and Klarna merchant agreement & payout schedule', detail: 'Confirm installment financing terms, merchant fee percentages, and 0% APR promotional tiers.', type: 'NON_TECHNICAL', completed: false },
       { id: 'd2-t13', title: 'Test purchase using a real pre-tax FSA / HSA card', detail: 'Swipe a physical health savings card to verify the bank recognizes medical equipment classification without declining.', type: 'NON_TECHNICAL', completed: false },
-      { id: 'd2-t14', title: 'Establish merchant chargeback & payment dispute procedure', detail: 'Set up standardized dispute response package with delivery signature proof and doctor prescription documentation.', type: 'NON_TECHNICAL', completed: false },
+      { id: 'd2-t14', title: 'Establish merchant chargeback & payment dispute procedure', detail: 'Set up standardized dispute response package with delivery signature proof and medical order documentation.', type: 'NON_TECHNICAL', completed: false },
     ],
   },
   {
@@ -136,7 +136,7 @@ const INITIAL_DAYS: RoadmapDay[] = [
     date: 'Sat, Oct 03, 2026',
     phaseId: 1,
     phaseTitle: 'Step 1: Website & Cards',
-    title: 'Automated Receipts, Doctor Prescriptions & SMS Tracking',
+    title: 'Automated Receipts, order fulfillment & SMS Tracking',
     subtitle: 'Deploy transactional email servers, DNS anti-spam records, itemized insurance receipts, and text alerts.',
     ownerType: 'Agency',
     criticality: 'HIGH',
@@ -144,7 +144,7 @@ const INITIAL_DAYS: RoadmapDay[] = [
       'Itemized medical invoice with patient name, NPI, and HCPCS codes for insurance claims',
       'Transactional email server (SendGrid/Resend) configured with 100% inbox delivery',
       'SPF, DKIM, and DMARC DNS records added so receipts never land in spam folders',
-      'Automated prescription receipt email confirming doctor review has begun',
+      'Automated order receipt email confirming doctor review has begun',
       'Twilio SMS API connected to text delivery tracking numbers to customer phones',
     ],
     riskMitigation: 'Include big 1-click tracking buttons in every email so customers never have to hunt for their order.',
@@ -152,17 +152,17 @@ const INITIAL_DAYS: RoadmapDay[] = [
       { id: 'd3-t1', title: 'Configure transactional email provider (SendGrid / Resend)', detail: 'Connect production SMTP credentials and dedicated API keys for automated system email delivery.', type: 'TECHNICAL', completed: false },
       { id: 'd3-t2', title: 'Add SPF, DKIM, and DMARC TXT records in DNS', detail: 'Authorize sending IP addresses in domain DNS to guarantee 100% inbox deliverability and eliminate spam flags.', type: 'TECHNICAL', completed: false },
       { id: 'd3-t3', title: 'Wire automated order confirmation email trigger', detail: 'Automatically dispatch branded HTML order confirmation within 3 seconds of Stripe webhook payment success.', type: 'TECHNICAL', completed: false },
-      { id: 'd3-t4', title: 'Wire prescription upload confirmation email trigger', detail: 'Automatically notify patient as soon as their prescription PDF or doctor note is uploaded to the portal.', type: 'TECHNICAL', completed: false },
+      { id: 'd3-t4', title: 'Wire order upload confirmation email trigger', detail: 'Automatically notify patient as soon as their order PDF or doctor note is uploaded to the portal.', type: 'TECHNICAL', completed: false },
       { id: 'd3-t5', title: 'Generate dynamic itemized medical invoice PDF with HCPCS codes', detail: 'Create downloadable medical receipt including patient name, NPI, and HCPCS codes (e.g., E1390, E0601).', type: 'TECHNICAL', completed: true },
       { id: 'd3-t6', title: 'Connect Twilio SMS API for automated shipping tracking texts', detail: 'Send SMS tracking link to customer cell phones the moment carrier scans the package barcode.', type: 'TECHNICAL', completed: false },
-      { id: 'd3-t7', title: 'Configure encrypted HIPAA-compliant private cloud storage', detail: 'Secure all uploaded prescription documents using AES-256 encryption in a private Supabase bucket.', type: 'TECHNICAL', completed: true },
+      { id: 'd3-t7', title: 'Configure encrypted HIPAA-compliant private cloud storage', detail: 'Secure all uploaded order documents using AES-256 encryption in a private Supabase bucket.', type: 'TECHNICAL', completed: true },
       { id: 'd3-t8', title: 'Test email rendering across Gmail, Apple Mail, and Outlook', detail: 'Verify email layouts, buttons, and printable receipts look pixel-perfect in light and dark mode.', type: 'TECHNICAL', completed: false },
-      { id: 'd3-t9', title: 'Create official business inboxes', detail: 'Provision Google Workspace / Microsoft 365 inboxes: support@baemeds.com, orders@baemeds.com, and prescriptions@baemeds.com.', type: 'NON_TECHNICAL', completed: false },
+      { id: 'd3-t9', title: 'Create official business inboxes', detail: 'Provision Google Workspace / Microsoft 365 inboxes: support@baemeds.com, orders@baemeds.com, and care@baemeds.com.', type: 'NON_TECHNICAL', completed: false },
       { id: 'd3-t10', title: 'Design insurance reimbursement receipt template', detail: 'Ensure receipt meets claims criteria for Medicare Supplement, Blue Cross, Aetna, and UnitedHealthcare payback.', type: 'NON_TECHNICAL', completed: true },
-      { id: 'd3-t11', title: 'Write warm patient email copy', detail: 'Compose comforting, reassuring emails: "Order Received", "Prescription Review Started", and "Equipment On The Way".', type: 'NON_TECHNICAL', completed: true },
+      { id: 'd3-t11', title: 'Write warm patient email copy', detail: 'Compose comforting, reassuring emails: "Order Received", "order Review Started", and "Equipment On The Way".', type: 'NON_TECHNICAL', completed: true },
       { id: 'd3-t12', title: 'Add TCPA checkout SMS consent disclosure checkbox', detail: 'Ensure customer consent for text delivery updates complies with federal TCPA mobile carrier regulations.', type: 'NON_TECHNICAL', completed: true },
-      { id: 'd3-t13', title: 'Establish 4-hour doctor prescription review turnaround SLA', detail: 'Dr. Evelyn Reed commits to checking uploaded patient prescriptions twice daily within 4 business hours.', type: 'NON_TECHNICAL', completed: false },
-      { id: 'd3-t14', title: 'Prepare customer support canned email templates', detail: 'Create ready-to-use email responses for order status inquiries, tracking questions, and prescription assistance.', type: 'NON_TECHNICAL', completed: false },
+      { id: 'd3-t13', title: 'Establish 4-hour clinical device check turnaround SLA', detail: 'Dr. Evelyn Reed commits to checking uploaded patient orders twice daily within 4 business hours.', type: 'NON_TECHNICAL', completed: false },
+      { id: 'd3-t14', title: 'Prepare customer support canned email templates', detail: 'Create ready-to-use email responses for order status inquiries, tracking questions, and order assistance.', type: 'NON_TECHNICAL', completed: false },
     ],
   },
   {
@@ -236,21 +236,21 @@ const INITIAL_DAYS: RoadmapDay[] = [
     date: 'Wed, Oct 07, 2026',
     phaseId: 3,
     phaseTitle: 'Step 3: Doctor Checks & Privacy',
-    title: 'Practice Doctor Prescription Reviews',
+    title: 'Practice clinical device checks',
     subtitle: 'Physician NPI validation, 4-hour clinical review queue, and optional online doctor referral link.',
     ownerType: 'Client',
     criticality: 'CRITICAL',
     deliverables: [
-      'Doctor reviews prescriptions within 4 hours during the day',
+      'Doctor reviews orders within 4 hours during the day',
       'Easy lookup to confirm doctor official medical license (NPI)',
-      'Simple link to help patients get a prescription online if they need one',
+      'Simple link to help patients get a order online if they need one',
     ],
     riskMitigation: 'No regulated oxygen machine leaves the warehouse until our doctor gives the green light.',
     tasks: [
-      { id: 'd7-t1', title: 'Practice approving a prescription in admin panel', detail: 'Click approve on order BM-722730-720 and make sure it changes to approved.', type: 'TECHNICAL', completed: true },
+      { id: 'd7-t1', title: 'Practice approving a order in admin panel', detail: 'Click approve on order BM-722730-720 and make sure it changes to approved.', type: 'TECHNICAL', completed: true },
       { id: 'd7-t2', title: 'Connect National Provider Identifier (NPI) lookup', detail: 'Check that doctor name and clinic match official government medical registry.', type: 'TECHNICAL', completed: false },
-      { id: 'd7-t3', title: 'Establish 4-hour daytime clinical review SLA', detail: 'Ensure Dr. Evelyn Reed reviews all uploaded prescriptions twice daily.', type: 'NON_TECHNICAL', completed: false },
-      { id: 'd7-t4', title: 'Add telehealth partner link for patients without prescription', detail: 'Direct customers without an Rx to partner online doctor service.', type: 'NON_TECHNICAL', completed: true },
+      { id: 'd7-t3', title: 'Establish 4-hour daytime clinical review SLA', detail: 'Ensure Dr. Evelyn Reed reviews all uploaded orders twice daily.', type: 'NON_TECHNICAL', completed: false },
+      { id: 'd7-t4', title: 'Add telehealth partner link for patients without order', detail: 'Direct customers without an DME to partner online doctor service.', type: 'NON_TECHNICAL', completed: true },
     ],
   },
   {
@@ -263,16 +263,16 @@ const INITIAL_DAYS: RoadmapDay[] = [
     ownerType: 'Agency',
     criticality: 'CRITICAL',
     deliverables: [
-      'Top-level security so only doctors can view customer prescriptions',
+      'Top-level security so only doctors can view customer orders',
       'Signed privacy promises (BAA) with all software and hosting providers',
-      'A safe log that tracks whenever anyone views a prescription',
+      'A safe log that tracks whenever anyone views a order',
     ],
     riskMitigation: 'Doctor links close automatically after 15 minutes to keep patient info safe.',
     tasks: [
-      { id: 'd8-t1', title: 'Review staff activity log on /admin/audit-logs', detail: 'Ensure every staff login and prescription view is safely recorded.', type: 'TECHNICAL', completed: true },
+      { id: 'd8-t1', title: 'Review staff activity log on /admin/audit-logs', detail: 'Ensure every staff login and order view is safely recorded.', type: 'TECHNICAL', completed: true },
       { id: 'd8-t2', title: 'Verify warehouse packers only see shipping box', detail: 'Packers see what box to ship, but never personal medical diagnoses.', type: 'TECHNICAL', completed: true },
       { id: 'd8-t3', title: 'Execute Business Associate Agreements (BAA)', detail: 'Sign HIPAA privacy agreements with cloud database and email providers.', type: 'NON_TECHNICAL', completed: false },
-      { id: 'd8-t4', title: 'Enforce 15-minute prescription view auto-expiry', detail: 'Doctor prescription preview links expire after 15 minutes for safety.', type: 'TECHNICAL', completed: true },
+      { id: 'd8-t4', title: 'Enforce 15-minute order view auto-expiry', detail: 'medical order preview links expire after 15 minutes for safety.', type: 'TECHNICAL', completed: true },
     ],
   },
   {
@@ -281,7 +281,7 @@ const INITIAL_DAYS: RoadmapDay[] = [
     phaseId: 3,
     phaseTitle: 'Step 3: Doctor Checks & Privacy',
     title: 'Check State Sales Tax Rules',
-    subtitle: 'Configure automated 50-state tax rules, 0% prescription exemptions (PA, DE, etc.), and insurance receipts.',
+    subtitle: 'Configure automated 50-state tax rules, 0% order exemptions (PA, DE, etc.), and insurance receipts.',
     ownerType: 'Client',
     criticality: 'HIGH',
     deliverables: [
@@ -291,7 +291,7 @@ const INITIAL_DAYS: RoadmapDay[] = [
     ],
     riskMitigation: 'Save every tax receipt automatically so end-of-year tax filing is easy and painless.',
     tasks: [
-      { id: 'd9-t1', title: 'Test order to Delaware and Pennsylvania', detail: 'Verify tax shows $0.00 as legally required for prescription medical equipment.', type: 'TECHNICAL', completed: true },
+      { id: 'd9-t1', title: 'Test order to Delaware and Pennsylvania', detail: 'Verify tax shows $0.00 as legally required for order medical equipment.', type: 'TECHNICAL', completed: true },
       { id: 'd9-t2', title: 'Make sure tax amount shows clearly on receipt', detail: 'Needed for patients filing Medicare or private insurance payback claims.', type: 'TECHNICAL', completed: true },
       { id: 'd9-t3', title: 'Confirm tax nexus registration with company CPA', detail: 'Verify economic nexus thresholds across key target states.', type: 'NON_TECHNICAL', completed: false },
     ],
@@ -302,19 +302,19 @@ const INITIAL_DAYS: RoadmapDay[] = [
     phaseId: 4,
     phaseTitle: 'Step 4: Practice & Testing',
     title: 'Run 5 Practice Orders from Start to Finish',
-    subtitle: 'Place real orders for concentrator, wheelchair, and CPAP mask, approve prescriptions, and test refunds.',
+    subtitle: 'Place real orders for concentrator, wheelchair, and CPAP mask, approve orders, and test refunds.',
     ownerType: 'Client & Agency',
     criticality: 'CRITICAL',
     deliverables: [
       'Place 5 test orders for different machines across categories',
-      'Doctor approves test prescriptions in under 15 minutes',
+      'Doctor approves test orders in under 15 minutes',
       'Tracking text messages sent to test phones',
       'Refund test money back to cards right away',
     ],
     riskMitigation: 'Have 3 people buy at the exact same second to make sure the site stays fast.',
     tasks: [
       { id: 'd10-t1', title: 'Order oxygen machine and upload test doctor note', detail: 'Check that order appears in admin queue waiting for doctor approval.', type: 'TECHNICAL', completed: true },
-      { id: 'd10-t2', title: 'Have Dr. Reed approve prescription in admin panel', detail: 'Check that status changes to approved and triggers warehouse.', type: 'NON_TECHNICAL', completed: true },
+      { id: 'd10-t2', title: 'Have Dr. Reed approve order in admin panel', detail: 'Check that status changes to approved and triggers warehouse.', type: 'NON_TECHNICAL', completed: true },
       { id: 'd10-t3', title: 'Type in test FedEx tracking number', detail: 'Check that tracking link shows up on customer account page.', type: 'TECHNICAL', completed: true },
       { id: 'd10-t4', title: 'Execute instant 1-click test refund in Stripe', detail: 'Confirm test charge returns to bank card with zero fees.', type: 'TECHNICAL', completed: true },
     ],
@@ -400,7 +400,7 @@ const INITIAL_DAYS: RoadmapDay[] = [
     tasks: [
       { id: 'd14-t1', title: 'Call 1-800-555-0199 from both iPhones and Androids', detail: 'Make sure audio is crystal clear and calls connect fast.', type: 'TECHNICAL', completed: false },
       { id: 'd14-t2', title: 'Hold 15-minute team check: All leads say "Ready!"', detail: 'Everyone signs off that their department is 100% prepared.', type: 'NON_TECHNICAL', completed: false },
-      { id: 'd14-t3', title: 'Test live chat triage & prescription help desk', detail: 'Simulate customer asking about FSA/HSA cards and ensure rapid reply.', type: 'TECHNICAL', completed: false },
+      { id: 'd14-t3', title: 'Test live chat triage & order help desk', detail: 'Simulate customer asking about FSA/HSA cards and ensure rapid reply.', type: 'TECHNICAL', completed: false },
     ],
   },
   {
@@ -536,7 +536,7 @@ export const LaunchRoadmapPage: React.FC = () => {
       { step: 1, delay: 1000, log: '✓ [READY] Website address is connected and safe with the green lock.' },
       { step: 2, delay: 2200, log: '✓ [READY] Credit cards and health savings (FSA/HSA) cards work.' },
       { step: 3, delay: 3400, log: '✓ [READY] All medical machines are listed with photos and prices.' },
-      { step: 4, delay: 4600, log: '✓ [READY] Doctor prescription review screen is ready for Dr. Reed.' },
+      { step: 4, delay: 4600, log: '✓ [READY] clinical device check screen is ready for Dr. Reed.' },
       { step: 5, delay: 5800, log: '✓ [READY] Patient health privacy is safely locked in.' },
       { step: 6, delay: 7000, log: '🚀 [ALL READY] Everything is set for Opening Day!' },
     ];
@@ -621,7 +621,7 @@ export const LaunchRoadmapPage: React.FC = () => {
                 Our 15-Day Launch Plan
               </h1>
               <p className="text-sm sm:text-base leading-relaxed text-slate-300 max-w-2xl font-normal">
-                Our website is built and ready! We have the medical equipment, card checkout, doctor prescription reviews, and order tracking all in place. Here is our simple 15-day step-by-step plan to open the doors to customers across all 50 states on{' '}
+                Our website is built and ready! We have the medical equipment, card checkout, clinical device checks, and order tracking all in place. Here is our simple 15-day step-by-step plan to open the doors to customers across all 50 states on{' '}
                 <strong className="text-white font-semibold">Thursday, October 15, 2026</strong>.
               </p>
 
@@ -1015,11 +1015,11 @@ export const LaunchRoadmapPage: React.FC = () => {
                 </li>
                 <li className="flex items-start gap-2">
                   <Check size={14} className="text-cyan-400 shrink-0 mt-0.5" />
-                  <span><strong>Email & SMS:</strong> Automated itemized receipts, prescription receipts, and tracking links.</span>
+                  <span><strong>Email & SMS:</strong> Automated itemized receipts, order receipts, and tracking links.</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check size={14} className="text-cyan-400 shrink-0 mt-0.5" />
-                  <span><strong>Data Privacy (HIPAA):</strong> Encrypted prescription files and secure staff audit logging.</span>
+                  <span><strong>Data Privacy (HIPAA):</strong> Encrypted order files and secure staff audit logging.</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check size={14} className="text-cyan-400 shrink-0 mt-0.5" />
@@ -1064,7 +1064,7 @@ export const LaunchRoadmapPage: React.FC = () => {
                 </li>
                 <li className="flex items-start gap-2">
                   <Check size={14} className="text-emerald-400 shrink-0 mt-0.5" />
-                  <span><strong>Doctor Reviews:</strong> Dr. Evelyn Reed checks prescriptions within 4 hours in the admin panel.</span>
+                  <span><strong>Doctor Reviews:</strong> Dr. Evelyn Reed checks orders within 4 hours in the admin panel.</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check size={14} className="text-emerald-400 shrink-0 mt-0.5" />
@@ -1129,7 +1129,7 @@ export const LaunchRoadmapPage: React.FC = () => {
             <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 space-y-1.5">
               <span className="font-mono text-xs font-black text-teal-400">12:00 PM – Night</span>
               <p className="font-bold text-white">Watch Orders & Help Buyers</p>
-              <p className="text-slate-400">Ship orders fast, review prescriptions, and answer calls with a smile.</p>
+              <p className="text-slate-400">Ship orders fast, review orders, and answer calls with a smile.</p>
             </div>
           </div>
         </section>

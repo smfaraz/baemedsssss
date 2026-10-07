@@ -116,8 +116,8 @@ const LegacyAndReviews: React.FC = () => (
             <p className="mt-1 text-xs leading-5 text-slate-600">Insured delivery via FedEx and UPS, with specialized inside placement for heavy durable medical beds and patient lifts.</p>
           </div>
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <h3 className="font-bold text-medical-dark">Clinical Prescription Review</h3>
-            <p className="mt-1 text-xs leading-5 text-slate-600">Secure digital prescription intake complying with federal FDA device distribution standards.</p>
+            <h3 className="font-bold text-medical-dark">Direct Home Delivery</h3>
+            <p className="mt-1 text-xs leading-5 text-slate-600">Factory-sealed medical equipment delivered directly to your doorstep across all 50 states.</p>
           </div>
         </div>
       </div>
@@ -388,31 +388,43 @@ const HomePage: React.FC = () => {
         {heroReel.length > 0 && (
           <div className="marquee-track relative overflow-hidden pb-10 sm:pb-14" aria-label="Featured equipment">
             <div className="marquee">
-              {[...heroReel, ...heroReel].map((product, index) => (
-                <Link
-                  key={`${product.id}-${index}`}
-                  to={`/products/${product.handle}`}
-                  className="mx-2 sm:mx-2.5 flex w-44 sm:w-48 md:w-52 shrink-0 flex-col overflow-hidden rounded-2xl bg-white p-3.5 shadow-lg transition duration-200 hover:-translate-y-1"
-                >
-                  <div className="flex h-32 sm:h-36 w-full items-center justify-center overflow-hidden">
-                    <img
-                      src={getHighResImageUrl(product.image)}
-                      alt={product.title}
-                      loading="lazy"
-                      onError={(e) => handleImageFallback(e)}
-                      className="h-full w-full object-contain"
-                    />
-                  </div>
-                  <div className="mt-2.5">
-                    <p className="truncate text-xs font-bold text-slate-900" title={product.title}>
-                      {product.title}
-                    </p>
-                    <p className="mt-0.5 text-xs font-bold text-[#14539a]">
-                      {formatPrice(product.price)}
-                    </p>
-                  </div>
-                </Link>
-              ))}
+              {[...heroReel, ...heroReel].map((product, index) => {
+                const eaVariant = product.variants?.find((v) =>
+                  /ea|single|unit|each/i.test(v.title || '') ||
+                  /ea|single|unit|each/i.test(v.size || '') ||
+                  (v.packageQuantity && /1\s*(unit|ea|each)/i.test(v.packageQuantity))
+                );
+                const displayPrice = eaVariant ? eaVariant.price : product.price;
+
+                return (
+                  <Link
+                    key={`${product.id}-${index}`}
+                    to={`/products/${product.handle}`}
+                    className="mx-2 sm:mx-2.5 flex w-44 sm:w-48 md:w-52 shrink-0 flex-col overflow-hidden rounded-2xl bg-white p-3.5 shadow-lg transition duration-200 hover:-translate-y-1"
+                  >
+                    <div className="flex h-32 sm:h-36 w-full items-center justify-center overflow-hidden">
+                      <img
+                        src={getHighResImageUrl(product.image)}
+                        alt={product.title}
+                        loading="lazy"
+                        onError={(e) => handleImageFallback(e)}
+                        className="h-full w-full object-contain"
+                      />
+                    </div>
+                    <div className="mt-2.5">
+                      <p className="truncate text-xs font-bold text-slate-900" title={product.title}>
+                        {product.title}
+                      </p>
+                      <div className="mt-0.5 flex items-center gap-1 text-xs font-bold text-[#14539a]">
+                        <span>{formatPrice(displayPrice)}</span>
+                        {product.variants && product.variants.length > 1 && (
+                          <span className="text-[10px] font-medium text-slate-500">/ Each</span>
+                        )}
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
             </div>
           </div>
         )}

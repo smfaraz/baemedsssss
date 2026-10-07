@@ -91,7 +91,7 @@ const MACHINE_COMPARISON = [
     weight: '51 lbs (Heavy-Duty Compressor)',
     sound: '50 dBA (Clinical Grade)',
     power: '590 Watts',
-    idealFor: 'High-flow prescriptions (>5 LPM), Pulmonary Fibrosis, Post-ARDS rehab, Tracheostomy support',
+    idealFor: 'High flow rates (>5 LPM), Pulmonary Fibrosis, Post-ARDS rehab, Tracheostomy support',
     rentalPrice: '$195 / mo',
     buyPrice: '$1,450',
     stockStatus: 'In Stock — Specialized Clinical Dispatch',
@@ -125,8 +125,8 @@ const FAQS = [
     a: 'Yes. Oxygen concentrators, replacement cannulas, filters, and pulse oximeters are 100% eligible medical expenses under IRS guidelines for Flexible Spending Accounts (FSA) and Health Savings Accounts (HSA). You can use your FSA/HSA debit card directly at checkout.',
   },
   {
-    q: 'Is a prescription required to rent or purchase an oxygen concentrator?',
-    a: 'Yes. Under US Food and Drug Administration (FDA) regulations, medical oxygen is classified as a regulated prescription drug/device. A valid prescription from a licensed physician specifying continuous or pulse flow rate (LPM) is required before equipment can be shipped.',
+    q: 'How do I choose between continuous flow and pulse dose oxygen?',
+    a: 'Continuous flow provides a constant stream of oxygen measured in LPM and is ideal for sleep and high-flow needs, while pulse dose delivers oxygen only when you inhale, maximizing battery runtime in portable units.',
   },
   {
     q: 'How fast can an oxygen concentrator be delivered to my home?',
@@ -369,11 +369,11 @@ export const OxygenRentalGuidePage: React.FC = () => {
           <ul className="mt-3.5 space-y-2.5 text-xs sm:text-sm text-slate-700">
             <li className="flex items-start gap-2.5">
               <CheckCircle2 size={16} className="text-teal-700 shrink-0 mt-0.5" />
-              <span><strong>Cost Savings:</strong> Renting a standard 5L unit ($125/month) for short-term recovery saves over <strong>$500</strong> compared to purchasing. Covered under Medicare/insurance with qualifying prescription (HCPCS E1390).</span>
+              <span><strong>Cost Savings:</strong> Renting a standard 5L unit ($125/month) for short-term recovery saves over <strong>$500</strong> compared to purchasing. Covered under Medicare/insurance with qualifying equipment billing (HCPCS E1390).</span>
             </li>
             <li className="flex items-start gap-2.5">
               <CheckCircle2 size={16} className="text-teal-700 shrink-0 mt-0.5" />
-              <span><strong>Flow Matching:</strong> Prescriptions up to 4 LPM require a standard 5 LPM machine. Prescriptions of 5 LPM or higher strictly require a <strong>10 LPM high-flow machine (HCPCS E1390/E1392)</strong> to prevent dangerous purity drop-offs.</span>
+              <span><strong>Flow Matching:</strong> Flow rates up to 4 LPM require a standard 5 LPM machine. Needs of 5 LPM or higher strictly require a <strong>10 LPM high-flow machine (HCPCS E1390/E1392)</strong> to prevent dangerous purity drop-offs.</span>
             </li>
             <li className="flex items-start gap-2.5">
               <CheckCircle2 size={16} className="text-teal-700 shrink-0 mt-0.5" />
@@ -500,14 +500,14 @@ export const OxygenRentalGuidePage: React.FC = () => {
               Home Oxygen Flow &amp; Rental Cost Estimator
             </h3>
             <p className="mt-1 text-xs text-slate-500 sm:text-sm">
-              Adjust the prescription parameters below to calculate recommended hardware, power consumption, and monthly rental terms for your regional delivery zone.
+              Adjust the flow rate parameters below to calculate recommended hardware, power consumption, and monthly rental terms for your regional delivery zone.
             </p>
 
             <div className="mt-6 space-y-6 rounded-xl bg-slate-50 p-5 border border-slate-200/80">
               {/* Slider 1: Flow Rate */}
               <div>
                 <div className="flex justify-between text-xs font-bold text-slate-800 sm:text-sm">
-                  <span>Prescribed Oxygen Flow Rate:</span>
+                  <span>Target Oxygen Flow Rate:</span>
                   <span className="font-mono text-teal-900 font-black text-sm bg-teal-100/70 px-2 py-0.5 rounded">{flowRate} LPM (Liters/Min)</span>
                 </div>
                 <input
@@ -869,7 +869,7 @@ export const OxygenRentalGuidePage: React.FC = () => {
                       {cs.hospital}
                     </span>
                   </div>
-                  <p className="mt-2 text-slate-600"><strong>Prescription:</strong> {cs.condition}</p>
+                  <p className="mt-2 text-slate-600"><strong>Clinical Profile:</strong> {cs.condition}</p>
                   <p className="mt-1 text-slate-700 font-medium"><strong>Clinical Outcome:</strong> {cs.outcome}</p>
                 </div>
               ))}
@@ -934,7 +934,7 @@ export const OxygenRentalGuidePage: React.FC = () => {
           </div>
           <h3 className="text-xl sm:text-2xl font-serif font-bold text-white">Need Immediate Delivery of an Oxygen Concentrator?</h3>
           <p className="mt-2 text-xs sm:text-sm text-slate-300 max-w-lg mx-auto leading-relaxed">
-            Our respiratory clinical support team is on standby to assist with prescription verification, insurance HCPCS coding documentation (E1390/E1392), and expedited delivery across the United States.
+            Our respiratory clinical support team is on standby to assist with equipment selection, insurance HCPCS coding documentation (E1390/E1392), and expedited delivery across the United States.
           </p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
             <a

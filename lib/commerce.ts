@@ -24,14 +24,22 @@ export const mapDbProductToProduct = (d: any): Product => {
     ? seedItem.variants
     : undefined;
 
+  const eaVariant = resolvedVariants?.find((v: any) =>
+    /ea|single|unit|each/i.test(v.title || '') ||
+    /ea|single|unit|each/i.test(v.size || '') ||
+    (v.packageQuantity && /1\s*(unit|ea|each)/i.test(v.packageQuantity))
+  );
+  const primaryPrice = eaVariant ? Number(eaVariant.price) : Number(d.price);
+  const primaryCompareAt = eaVariant?.compareAtPrice ? Number(eaVariant.compareAtPrice) : (d.compare_at_price ? Number(d.compare_at_price) : undefined);
+
   return {
     id: d.id,
     title: d.title,
     handle: d.handle,
     description: d.description || '',
     category: d.category,
-    price: Number(d.price),
-    compareAtPrice: d.compare_at_price ? Number(d.compare_at_price) : undefined,
+    price: primaryPrice,
+    compareAtPrice: primaryCompareAt,
     image: d.featured_image || 'https://placehold.co/600x600?text=DME',
     images: Array.isArray(d.images) && d.images.length > 0 ? d.images : [d.featured_image || 'https://placehold.co/600x600?text=DME'],
     specs: d.specs || '',
@@ -63,7 +71,8 @@ export const mapDbProductToProduct = (d: any): Product => {
 };
 
 export const hydrateCatalogFromSupabase = async (): Promise<Product[]> => {
-  if (isHydratedFromSupabase && catalogCache.length >= 3000) return catalogCache;
+  if (catalogCache.length >= 3000) return catalogCache;
+  if (isHydratedFromSupabase) return catalogCache;
   if (hydrationPromise) return hydrationPromise;
 
   hydrationPromise = (async () => {

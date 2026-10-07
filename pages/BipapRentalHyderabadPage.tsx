@@ -111,7 +111,7 @@ const FAQS = [
   },
   {
     q: 'How quickly can a BiPAP machine be shipped to my home?',
-    a: 'We offer priority expedited shipping across all 50 US states, with overnight air transit available for urgent post-discharge transitions. Equipment is pre-calibrated according to your physician prescription parameters (IPAP, EPAP, backup rate, and rise time).',
+    a: 'We offer priority expedited shipping across all 50 US states, with overnight air transit available for urgent post-discharge transitions. Equipment is pre-calibrated according to your designated therapy parameters (IPAP, EPAP, backup rate, and rise time).',
   },
   {
     q: 'What is the clinical difference between CPAP and BiPAP machines?',
@@ -119,11 +119,11 @@ const FAQS = [
   },
   {
     q: 'Are BiPAP rentals eligible for FSA/HSA and Medicare reimbursement?',
-    a: 'Yes. BiPAP machines are classified as Durable Medical Equipment (DME). With a valid physician prescription and sleep study or blood gas (ABG) documentation, rentals and purchases qualify for tax-free FSA/HSA payment and out-of-pocket insurance claim filing using HCPCS codes E0470 or E0471.',
+    a: 'Yes. BiPAP machines are classified as Durable Medical Equipment (DME). With itemized clinical documentation, rentals and purchases qualify for tax-free FSA/HSA payment and out-of-pocket insurance claim filing using HCPCS codes E0470 or E0471.',
   },
   {
-    q: 'What documentation is required to rent a BiPAP machine?',
-    a: 'Under federal FDA regulations, positive airway pressure devices require a valid physician order or prescription specifying machine mode (CPAP, S, ST, or AVAPS) and target pressure settings (IPAP/EPAP). You can easily upload your prescription during checkout or have your doctor fax it directly to our clinical DME intake desk.',
+    q: 'How are pressure settings configured on rental machines?',
+    a: 'Every machine is calibrated to your recommended target therapy settings (IPAP/EPAP, backup rate, and rise time) prior to dispatch, ensuring immediate, comfortable therapy right out of the box.',
   },
 ];
 
@@ -444,7 +444,7 @@ export const BipapRentalHyderabadPage: React.FC = () => {
             Need Expedited Home Delivery of a BiPAP Machine?
           </h2>
           <p className="mt-2 text-sm sm:text-base text-teal-200 max-w-2xl mx-auto">
-            Contact our 24/7 clinical respiratory team now for prescription validation, insurance coding assistance (HCPCS E0470/E0471), and priority dispatch across the United States.
+            Contact our 24/7 clinical respiratory team now for equipment setup guidance, insurance coding assistance (HCPCS E0470/E0471), and priority dispatch across the United States.
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-4">
             <a

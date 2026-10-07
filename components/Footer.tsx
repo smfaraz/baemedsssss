@@ -24,7 +24,7 @@ const Footer: React.FC = () => {
           {[
             { icon: PackageCheck, title: 'Nationwide US Delivery', text: 'Free standard ground shipping on orders $99+. Expedited air available.', to: '/policies/shipping' },
             { icon: FileText, title: 'FSA / HSA Eligible Receipts', text: 'Itemized medical receipts with HCPCS codes available for reimbursement.', to: '/contact' },
-            { icon: ShieldCheck, title: 'Dedicated Clinical Support', text: 'Get help with product specs, DME options, or prescription requirements.', to: '/contact' },
+            { icon: ShieldCheck, title: 'Dedicated Clinical Support', text: 'Get help with product specs, DME options, or order assistance.', to: '/contact' },
           ].map(({ icon: Icon, title, text, to }) => (
             <Link key={title} to={to} className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.04] p-4 transition hover:border-white/25 hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-medical-accent">
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-medical-primary text-white"><Icon size={21} /></span>
@@ -106,7 +106,7 @@ const Footer: React.FC = () => {
         <div className="container mx-auto px-4 py-4 text-[11px] leading-5 text-slate-400">
           <p className="font-semibold text-slate-300">FDA &amp; Clinical Compliance Notice:</p>
           <p className="mt-1">
-            Information provided on baemeds.com is for informational and educational purposes only and does not substitute for professional medical advice, diagnosis, or treatment. Certain Durable Medical Equipment (DME), including oxygen concentrators, BiPAP, and CPAP systems, require a valid prescription from a licensed US healthcare practitioner prior to fulfillment in accordance with federal and state regulations.
+            Information provided on baemeds.com is for informational and educational purposes only and does not substitute for professional medical advice, diagnosis, or treatment. BaeMeds is an authorized distributor of genuine medical equipment, supplies, and healthcare products across the United States.
           </p>
         </div>
       </div>

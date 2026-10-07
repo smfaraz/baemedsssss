@@ -121,9 +121,15 @@ const ProductDetailPage: React.FC = () => {
     }
 
     if (product.variants && product.variants.length > 0) {
+      // ALWAYS prioritize Single Unit / EA 1 as the main default option
+      const eaVariant = product.variants.find((v) =>
+        /ea|single|unit|each/i.test(v.title || '') ||
+        /ea|single|unit|each/i.test(v.size || '') ||
+        (v.packageQuantity && /1\s*(unit|ea|each)/i.test(v.packageQuantity))
+      );
       let initial = product.variants.find((v) => v.id === product.selectedVariantId);
-      if (!initial) {
-        initial = product.variants.find((v) => v.inStock !== false) || product.variants[0];
+      if (!initial || (!product.selectedVariantId && eaVariant)) {
+        initial = eaVariant || product.variants.find((v) => v.inStock !== false) || product.variants[0];
       }
       setSelectedVariant(initial);
       setSelectedSize(initial.size || '');
@@ -138,7 +144,15 @@ const ProductDetailPage: React.FC = () => {
 
   const availableSizes = useMemo(() => {
     if (!product?.variants) return [];
-    return [...new Set(product.variants.map((v) => v.size).filter(Boolean))] as string[];
+    const sizes = [...new Set(product.variants.map((v) => v.size).filter(Boolean))] as string[];
+    // Guarantee Single Unit / EA 1 option is ALWAYS shown first
+    return sizes.sort((a, b) => {
+      const isA_EA = /ea|single|unit|each/i.test(a);
+      const isB_EA = /ea|single|unit|each/i.test(b);
+      if (isA_EA && !isB_EA) return -1;
+      if (!isA_EA && isB_EA) return 1;
+      return 0;
+    });
   }, [product?.variants]);
 
   const availablePacks = useMemo(() => {
@@ -516,11 +530,6 @@ const ProductDetailPage: React.FC = () => {
               <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-medical-text">
                 FSA / HSA Eligible
               </span>
-              {product.requiresPrescription && (
-                <span className="rounded-full border border-amber-300 bg-amber-50 px-3 py-1 text-xs font-bold text-amber-900">
-                  Rx Required
-                </span>
-              )}
             </div>
 
             {/* Multi-Variant Size & Quantity Selector */}
@@ -530,7 +539,7 @@ const ProductDetailPage: React.FC = () => {
                   <div>
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-xs font-bold uppercase tracking-wider text-medical-text">
-                        Select Size: <strong className="text-medical-dark font-extrabold">{selectedSize}</strong>
+                        Select {availableSizes.some((s) => /unit|pack|case|box|ea|cs/i.test(s)) ? 'Packaging / Option' : 'Size'}: <strong className="text-medical-dark font-extrabold">{selectedSize}</strong>
                       </span>
                       {selectedVariant?.size && (
                         <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full border ${
@@ -603,19 +612,26 @@ const ProductDetailPage: React.FC = () => {
             )}
 
             <div className="mt-5 rounded-3xl border border-medical-primary/20 bg-gradient-to-br from-white via-white to-medical-light/50 p-5 shadow-soft sm:p-6">
-              <div className="flex flex-wrap items-end gap-3">
-                <span className="text-3xl font-bold text-medical-dark">{formatPrice(currentPrice)}</span>
-                {currentCompareAtPrice && currentCompareAtPrice > currentPrice && (
-                  <span className="pb-1 text-lg text-medical-text line-through">{formatPrice(currentCompareAtPrice)}</span>
-                )}
-                {discount > 0 && (
-                  <span className="mb-1 rounded-full bg-medical-accent px-2.5 py-1 text-xs font-black text-medical-dark">
-                    {discount}% off
+              <div className="flex flex-wrap items-baseline gap-3">
+                <span className="text-3xl font-black text-medical-dark">{formatPrice(currentPrice)}</span>
+                {selectedVariant?.packageQuantity && (
+                  <span className="text-xs font-bold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200">
+                    {selectedVariant.packageQuantity}
                   </span>
                 )}
+                {currentCompareAtPrice && currentCompareAtPrice > currentPrice && (
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-base text-slate-400 line-through font-medium">
+                      MSRP {formatPrice(currentCompareAtPrice)}
+                    </span>
+                    <span className="rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 text-xs font-black text-emerald-800 shadow-xs">
+                      Save ${(currentCompareAtPrice - currentPrice).toFixed(2)} ({discount}% OFF)
+                    </span>
+                  </div>
+                )}
               </div>
-              <p className="mt-2 text-xs leading-5 text-medical-text">
-                Applicable state sales taxes, shipping options, and carrier delivery dates calculated at checkout.
+              <p className="mt-2 text-xs leading-5 text-slate-500 font-medium">
+                ★ Direct distributor pricing • Official manufacturer warranty included
               </p>
 
               <div className="mt-5 grid gap-3 sm:grid-cols-[132px_1fr_1fr]">
@@ -767,19 +783,9 @@ const ProductDetailPage: React.FC = () => {
                   <th scope="row" className="py-3 pr-4 font-bold text-medical-dark">FDA Regulatory Status</th>
                   <td className="py-3 text-medical-text">
                     {product.fdaClassification || (
-                      product.requiresPrescription || product.category.toLowerCase().includes('oxygen') || product.category.toLowerCase().includes('cpap')
+                      product.category.toLowerCase().includes('oxygen') || product.category.toLowerCase().includes('cpap')
                         ? 'FDA Class II Medical Device (510(k) Cleared)'
                         : 'FDA Class I Medical Device (Hospital & Home Grade)'
-                    )}
-                  </td>
-                </tr>
-                <tr className="hover:bg-slate-50/60">
-                  <th scope="row" className="py-3 pr-4 font-bold text-medical-dark">Prescription (Rx) Status</th>
-                  <td className="py-3 text-medical-text">
-                    {product.requiresPrescription ? (
-                      <span className="font-bold text-amber-800">Prescription Required (Valid US Doctor Rx Needed Prior to Shipment)</span>
-                    ) : (
-                      <span className="font-semibold text-medical-secondary">Over-The-Counter (OTC) • No Prescription Needed</span>
                     )}
                   </td>
                 </tr>

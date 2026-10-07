@@ -198,7 +198,7 @@ export const AdminCustomerDetailPage: React.FC = () => {
               <span>HIPAA Privacy Safeguard</span>
             </div>
             <p className="text-[11px] text-blue-700 leading-relaxed">
-              Clinical prescriptions and diagnostic telemetry linked to this patient are accessible exclusively in the Clinical Review Queue.
+              Clinical documentations and diagnostic telemetry linked to this patient are accessible exclusively in the Clinical Review Queue.
             </p>
           </div>
         </div>

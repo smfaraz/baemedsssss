@@ -113,14 +113,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
     {
       title: 'CLINICAL & COMPLIANCE',
       items: [
-        {
-          label: 'Prescription Queue',
-          href: '/admin/prescriptions',
-          icon: FileCheck2,
-          permission: 'prescriptions:view',
-          badge: 'Rx',
-          badgeColor: 'bg-amber-100 text-amber-800',
-        },
+
         {
           label: 'Audit Logs',
           href: '/admin/audit-logs',

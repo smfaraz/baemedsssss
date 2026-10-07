@@ -71,7 +71,7 @@ export const AdminOrdersPage: React.FC = () => {
       'Subtotal ($)',
       'Tax ($)',
       'Shipping ($)',
-      'Prescription Required',
+      'Special Handling',
       'Shipping Method',
       'Carrier',
       'Tracking Number',
@@ -87,7 +87,7 @@ export const AdminOrdersPage: React.FC = () => {
       `"${Number(o.subtotal_amount || 0).toFixed(2)}"`,
       `"${Number(o.tax_amount || 0).toFixed(2)}"`,
       `"${Number(o.shipping_amount || 0).toFixed(2)}"`,
-      `"${o.requires_prescription ? 'Yes' : 'No'}"`,
+      `"${o.requires_order ? 'Yes' : 'No'}"`,
       `"${o.shipping_method || 'Standard Ground'}"`,
       `"${o.carrier || ''}"`,
       `"${o.tracking_number || ''}"`,
@@ -109,7 +109,7 @@ export const AdminOrdersPage: React.FC = () => {
         <div>
           <h1 className="text-2xl font-black text-slate-900">Orders</h1>
           <p className="text-xs text-slate-500">
-            Manage incoming medical supply orders, prescription validations, and delivery fulfillment.
+            Manage incoming medical supply orders, clinical verifications, and delivery fulfillment.
           </p>
         </div>
 

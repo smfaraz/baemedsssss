@@ -20,6 +20,8 @@ function apiDevMiddleware() {
             handler = (await server.ssrLoadModule('./api/admin.ts')).default;
           } else if (pathname.startsWith('/api/checkout')) {
             handler = (await server.ssrLoadModule('./api/checkout.ts')).default;
+          } else if (pathname.startsWith('/api/payment-intent')) {
+            handler = (await server.ssrLoadModule('./api/payment-intent.ts')).default;
           } else if (pathname.startsWith('/api/auth')) {
             handler = (await server.ssrLoadModule('./api/auth.ts')).default;
           } else if (pathname.startsWith('/api/cart')) {

@@ -91,7 +91,7 @@ const SupportCenter: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'bot',
-      content: `I am ${APP_NAME} AI Assistant. Tell me what you need, or choose a question below. I can help you find products, check prescription requirements, and assist with checkout.`,
+      content: `I am ${APP_NAME} AI Assistant. Tell me what you need, or choose a question below. I can help you find products, check product specifications, and assist with checkout.`,
       actions: [
         { label: 'Browse catalogue', to: '/products' },
         { label: 'Contact us', to: '/contact' },
@@ -292,7 +292,7 @@ const SupportCenter: React.FC = () => {
 
     if (/return|refund|cancel/.test(normalizedQuestion)) {
       return {
-        content: 'We offer a 30-day return policy for unopened, unsealed consumer supplies. Medical devices requiring prescriptions and hygiene-sensitive items are subject to FDA safety return guidelines.',
+        content: 'We offer a 30-day return policy for unopened, unsealed supplies. Hygiene-sensitive items and clinical accessories are subject to healthcare safety return guidelines.',
         actions: [
           { label: 'Read return policy', to: '/policies/returns' },
           { label: 'Contact us', to: '/contact' },
@@ -427,7 +427,12 @@ const SupportCenter: React.FC = () => {
                             <img src={product.image} alt={product.title} className="h-14 w-14 shrink-0 rounded-lg bg-white object-contain" loading="lazy" />
                             <div className="min-w-0 flex-1">
                               <h3 className="line-clamp-2 text-xs font-black leading-4 text-medical-dark">{product.title}</h3>
-                              <p className="mt-1 text-xs font-bold text-medical-primary">{formatPrice(product.price)}</p>
+                              <div className="mt-1 flex items-center gap-1.5 text-xs font-bold text-medical-primary">
+                                <span>{formatPrice(product.price)}</span>
+                                {product.variants && product.variants.length > 1 && (
+                                  <span className="text-[10px] font-medium text-slate-500">/ Each</span>
+                                )}
+                              </div>
                               <p className={`mt-0.5 text-[11px] font-bold ${product.inStock ? 'text-emerald-700' : 'text-rose-700'}`}>{product.inStock ? 'In stock' : 'Out of stock'}</p>
                             </div>
                           </div>

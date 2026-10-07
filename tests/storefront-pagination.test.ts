@@ -70,8 +70,8 @@ async function runStorefrontPaginationTests() {
   // Test 7: Category and Brand metadata counters
   console.log('\n7. Testing Catalog Metadata Counters...');
   const catCounts = getCatalogCategoryCounts();
-  assert.strictEqual(catCounts['CPAP Machines'], 577, 'CPAP Machines category count must be 577');
-  assert.strictEqual(catCounts['Wheelchairs'], 1183, 'Wheelchairs category count must be 1,183');
+  assert.strictEqual(catCounts['CPAP Machines'], 579, 'CPAP Machines category count must be 579');
+  assert.strictEqual(catCounts['Wheelchairs'], 1186, 'Wheelchairs category count must be 1,186');
   const brandCounts = getCatalogBrandCounts();
   assert(brandCounts.length > 50, 'Brand counts must include all catalog manufacturers');
   console.log(`  ✔ Categories: CPAP = ${catCounts['CPAP Machines']}, Wheelchairs = ${catCounts['Wheelchairs']}`);

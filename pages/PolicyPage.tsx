@@ -7,7 +7,7 @@ type PolicyType = 'privacy' | 'terms' | 'shipping' | 'returns';
 
 const policies: Array<{ type: PolicyType; label: string; description: string }> = [
   { type: 'privacy', label: 'Privacy Policy', description: 'How customer and healthcare information is collected, protected, and handled.' },
-  { type: 'terms', label: 'Terms of Service', description: 'The terms governing storefront browsing, prescription requirements, and purchases.' },
+  { type: 'terms', label: 'Terms of Service', description: 'The terms governing storefront browsing, medical supply orders, and purchases.' },
   { type: 'shipping', label: 'Shipping & Delivery', description: 'US nationwide carrier shipping, tracking, delivery timelines, and medical freight.' },
   { type: 'returns', label: 'Returns & Refunds', description: '30-day return policy, FDA hygiene exceptions, and refund procedures.' },
 ];
@@ -49,7 +49,7 @@ const PrivacyPolicy = () => (
       <ul className="list-disc space-y-2 pl-5 marker:text-medical-primary">
         <li><strong className="text-slate-800">Identity and Contact Data:</strong> Full name, shipping address, billing address, phone number, and email address.</li>
         <li><strong className="text-slate-800">Order and Financial Records:</strong> Products purchased, quantities, pricing, sales tax calculated, shipping carrier, tracking numbers, and transaction status tokens provided by our PCI-compliant payment gateways. We do not store full credit card numbers or CVVs on our servers.</li>
-        <li><strong className="text-slate-800">Prescription and Health-Related Order Data:</strong> For items designated as requiring a prescription (Rx) or durable medical equipment (DME), we or our clinical fulfillment partners may collect physician prescriptions, NPI details, clinical authorizations, and diagnosis/intake documentation strictly for order verification.</li>
+        <li><strong className="text-slate-800">Healthcare Equipment & Delivery Preferences:</strong> For specialized durable medical equipment (DME), we collect device configuration preferences and freight delivery specifications.</li>
         <li><strong className="text-slate-800">Technical and Device Telemetry:</strong> IP address, device type, operating system, browser type, and timestamps collected for security logging, fraud prevention, and session maintenance. Protected health information is strictly excluded from analytics and marketing pixels.</li>
       </ul>
     </Section>
@@ -57,7 +57,6 @@ const PrivacyPolicy = () => (
     <Section title="3. How We Use Your Information">
       <ul className="list-disc space-y-2 pl-5 marker:text-medical-primary">
         <li>To process, fulfill, and deliver orders for medical equipment and clinical supplies.</li>
-        <li>To verify physician prescription compliance where required by FDA and state board regulations.</li>
         <li>To compute applicable state and local sales tax based on the delivery destination.</li>
         <li>To provide order confirmation, carrier tracking updates, and customer support.</li>
         <li>To maintain auditable transaction logs for accounting, compliance, and fraud prevention.</li>
@@ -69,10 +68,10 @@ const PrivacyPolicy = () => (
     <Section title="4. Healthcare Privacy & HIPAA-Conscious Safeguards">
       <p>We recognize the sensitive nature of medical and health-related purchases. While standard direct-to-consumer retail transactions generally fall under FTC guidelines and state consumer privacy laws rather than HIPAA, our architecture implements technical and organizational safeguards aligned with HIPAA security standards:</p>
       <ul className="list-disc space-y-2 pl-5 marker:text-medical-primary">
-        <li><strong>Role-Based Access Control (RBAC):</strong> Administrative access to order histories and prescription attachments is restricted strictly to authorized clinical fulfillment and compliance personnel.</li>
+        <li><strong>Role-Based Access Control (RBAC):</strong> Administrative access to order records and fulfillment queues is restricted strictly to authorized operations personnel.</li>
         <li><strong>Encryption in Transit and at Rest:</strong> All web traffic is encrypted via TLS 1.3, and sensitive databases employ AES-256 encryption at rest.</li>
-        <li><strong>Audit Logging:</strong> Administrative events, access to prescription files, and customer account modifications are recorded in immutable audit logs with automatic PHI redaction.</li>
-        <li><strong>Zero-PHI Analytics:</strong> Google Analytics and third-party advertising tags are strictly prohibited from collecting patient diagnosis, prescription, or clinical details.</li>
+        <li><strong>Audit Logging:</strong> Administrative events and customer account modifications are recorded in immutable audit logs with automatic PHI redaction.</li>
+        <li><strong>Zero-PHI Analytics:</strong> Google Analytics and third-party advertising tags are strictly prohibited from collecting patient health data.</li>
       </ul>
     </Section>
 
@@ -117,9 +116,8 @@ const TermsPolicy = () => (
       <p>Always consult a licensed physician or healthcare professional regarding medical conditions, device settings, oxygen flow rates, or sleep therapy equipment. You agree to follow all manufacturer guidelines and clinical operating instructions.</p>
     </Section>
 
-    <Section title="3. Prescription-Required (Rx) Products">
-      <p>Certain medical devices (such as CPAP machines, BiPAP systems, oxygen concentrators, and specialized clinical monitors) are classified as prescription-required devices under US FDA regulations.</p>
-      <p>For these products, order fulfillment is contingent upon receipt and clinical verification of a valid physician prescription. Orders will not be dispatched until verification is complete.</p>
+    <Section title="3. Medical Equipment & Supplies Fulfillment">
+      <p>All medical equipment, durable healthcare goods, and clinical supplies are fulfilled in brand-new factory packaging and dispatched via insured nationwide carrier or freight delivery.</p>
     </Section>
 
     <Section title="4. Pricing, Taxes & Payment">
@@ -265,7 +263,7 @@ const PolicyPage: React.FC<{ type: PolicyType }> = ({ type }) => {
               <FileCheck2 className="mt-1 shrink-0 text-medical-accent" size={25} aria-hidden="true" />
               <div>
                 <h2 className="text-2xl font-bold">Questions about our {currentPolicy.label.toLowerCase()}?</h2>
-                <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-200">Contact our US support specialists if you have questions regarding prescription requirements, return authorization, or state sales tax exemption.</p>
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-200">Contact our US support specialists if you have questions regarding shipping delivery, return authorization, or state sales tax exemption.</p>
               </div>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">

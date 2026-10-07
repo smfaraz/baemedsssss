@@ -877,15 +877,13 @@ export const AdminService = {
           hcpcsCode: d.hcpcs_code,
           fdaClassification: d.fda_classification,
           isRegulatoryVerified: Boolean(d.is_regulatory_verified),
-          wholesaleCost: d.wholesale_cost ? Number(d.wholesale_cost) : undefined,
-          costPerItem: d.wholesale_cost ? Number(d.wholesale_cost) : undefined,
-          dealerPrice: d.dealer_price ? Number(d.dealer_price) : undefined,
+          wholesaleCost: d.wholesale_cost ? Number(d.wholesale_cost) : (d.dealer_price ? Number(d.dealer_price) : undefined),
+          costPerItem: d.wholesale_cost ? Number(d.wholesale_cost) : (d.dealer_price ? Number(d.dealer_price) : undefined),
+          dealerPrice: d.dealer_price ? Number(d.dealer_price) : (d.wholesale_cost ? Number(d.wholesale_cost) : undefined),
           margin: (() => {
             const p = Number(d.price);
-            const dp = d.dealer_price ? Number(d.dealer_price) : null;
+            const dp = d.dealer_price ? Number(d.dealer_price) : (d.wholesale_cost ? Number(d.wholesale_cost) : null);
             if (dp !== null && p > 0) return Math.round(((p - dp) / p) * 100);
-            const wc = d.wholesale_cost ? Number(d.wholesale_cost) : null;
-            if (wc !== null && p > 0) return Math.round(((p - wc) / p) * 100);
             return undefined;
           })(),
           sku: d.sku || undefined,
@@ -929,7 +927,11 @@ export const AdminService = {
         );
       }
       total = seedList.length;
-      products = seedList.slice(from, to + 1);
+      products = seedList.slice(from, to + 1).map((item) => ({
+        ...item,
+        dealerPrice: item.dealerPrice ?? item.wholesaleCost ?? item.costPerItem,
+        wholesaleCost: item.wholesaleCost ?? item.dealerPrice ?? item.costPerItem,
+      }));
     }
 
     return {

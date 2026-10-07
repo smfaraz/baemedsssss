@@ -108,6 +108,8 @@ const OrderSuccessPage: React.FC = () => {
             </div>
           </div>
 
+
+
           {/* Line items if available */}
           {orderDetails && orderDetails.items && orderDetails.items.length > 0 && (
             <div className="mt-6 pt-6 border-t border-medical-light">
@@ -171,7 +173,7 @@ const OrderSuccessPage: React.FC = () => {
                     Clinical &amp; Order Assistance
                   </span>
                   <p className="text-xs text-medical-text/75">
-                    Have questions about biomedical calibration, prescription review, or white-glove freight setup?
+                    Have questions about biomedical calibration, equipment delivery, or white-glove freight setup?
                   </p>
                 </div>
                 <div className="mt-3 flex gap-2">

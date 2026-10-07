@@ -36,3 +36,9 @@ dev-server.stderr.log
 
 # Local client documentation package
 Mohsin_Enterprises_Package/
+
+# IDE & temporary backup files
+*.bak*
+.commandcode/
+.agents/
+skills-lock.json

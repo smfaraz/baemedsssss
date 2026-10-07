@@ -11,7 +11,7 @@ const Testimonials: React.FC = () => {
           <p className="text-sm font-bold uppercase tracking-[0.16em] text-medical-primary">Need help choosing?</p>
           <h2 className="mt-2 text-3xl font-bold text-medical-text sm:text-4xl">Ask before you order</h2>
           <p className="mt-3 max-w-2xl text-base leading-7 text-slate-600">
-            Share the product name or the clinical specifications you need. Our nationwide equipment specialists can assist you with sizing, prescriptions, and compatibility.
+            Share the product name or the clinical specifications you need. Our nationwide equipment specialists can assist you with sizing, specifications, and compatibility.
           </p>
         </div>
         <div className="grid gap-3 sm:grid-cols-3 lg:min-w-[560px]">

@@ -205,7 +205,7 @@ export const ProductResearchPage: React.FC = () => {
       'Customer Savings ($)',
       'Net Profit ($)',
       'Gross Margin (%)',
-      'Doctor Prescription Required',
+      'Fulfillment Classification',
       'HCPCS Code',
       'Supplier',
     ].join(',');
@@ -1112,14 +1112,10 @@ export const ProductResearchPage: React.FC = () => {
 
                   <div className="flex items-center justify-between text-slate-300">
                     <span className="flex items-center gap-1.5 text-slate-400">
-                      <Stethoscope size={14} className="text-teal-400" /> Doctor Prescription:
+                      <ShieldCheck size={14} className="text-teal-400" /> Fulfillment Classification:
                     </span>
-                    <span
-                      className={`font-bold ${
-                        selectedProduct.requiresRx ? 'text-amber-400' : 'text-emerald-400'
-                      }`}
-                    >
-                      {selectedProduct.requiresRx ? 'Required (Rx Medical Machine)' : 'Not Required (Cash-Pay OTC)'}
+                    <span className="font-bold text-emerald-400">
+                      Direct Home Delivery (Cash-Pay OTC)
                     </span>
                   </div>
 

@@ -26,7 +26,7 @@ export const AdminTaxPage: React.FC = () => {
             engine: 'Authoritative State Nexus Engine',
             delawareSalesTaxRate: 0.0,
             exemptions: {
-              dmePrescriptionExempt: true,
+              dmeOrderExempt: true,
               respiratorySuppliesExempt: true,
               otcEquipmentTaxable: true,
             },
@@ -73,7 +73,7 @@ export const AdminTaxPage: React.FC = () => {
         <div>
           <h1 className="text-2xl font-black text-slate-900 tracking-tight">Tax & Nexus Management</h1>
           <p className="text-xs text-slate-500 mt-1">
-            US sales tax nexus, Delaware home jurisdiction, and medical device prescription exemption rules.
+            US sales tax nexus, Delaware home jurisdiction, and medical device order exemption rules.
           </p>
         </div>
         <button
@@ -103,7 +103,7 @@ export const AdminTaxPage: React.FC = () => {
           <span>Statutory Tax Exemption Standard</span>
         </div>
         <p className="text-[11px] text-amber-800 leading-relaxed">
-          Under US state tax laws, medical supplies and DME are <strong>not universally tax-exempt</strong> by default. Exemption applies specifically when a product is supported by a valid physician prescription or designated under specific state medical exemptions. Over-the-counter wellness products remain taxable where nexus exists.
+          Under US state tax laws, medical supplies and DME are <strong>not universally tax-exempt</strong> by default. Exemption applies specifically when a product is supported by a valid physician order or designated under specific state medical exemptions. Over-the-counter wellness products remain taxable where nexus exists.
         </p>
       </div>
 
@@ -118,11 +118,11 @@ export const AdminTaxPage: React.FC = () => {
           <label className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
             <input
               type="checkbox"
-              defaultChecked={tax.exemptions?.dmePrescriptionExempt}
+              defaultChecked={tax.exemptions?.dmeOrderExempt}
               className="rounded border-slate-300 text-medical-primary focus:ring-medical-primary"
             />
             <div>
-              <span className="font-bold text-slate-900">Exempt Certified Prescription DME Equipment</span>
+              <span className="font-bold text-slate-900">Exempt Certified Order DME Equipment</span>
               <p className="text-[11px] text-slate-500">
                 Oxygen concentrators and CPAP machines with verified clinical scripts are exempted from sales tax in supported states.
               </p>
@@ -138,7 +138,7 @@ export const AdminTaxPage: React.FC = () => {
             <div>
               <span className="font-bold text-slate-900">Enforce Tax on Over-The-Counter (OTC) Retail Supplies</span>
               <p className="text-[11px] text-slate-500">
-                Non-prescription accessory items, pulse oximeters, and wellness gear are taxed according to delivery jurisdiction.
+                Non-order accessory items, pulse oximeters, and wellness gear are taxed according to delivery jurisdiction.
               </p>
             </div>
           </label>

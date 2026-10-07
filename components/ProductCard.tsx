@@ -34,8 +34,15 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const [cartState, setCartState] = React.useState<'idle' | 'adding' | 'added' | 'error'>('idle');
   const [offerRemaining, setOfferRemaining] = React.useState(() => getOfferRemaining(product.id));
   const summary = getReviewsSummary(product.id, product.rating || 0, product.reviewCount || 0);
-  const discount = product.compareAtPrice
-    ? Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100)
+  const eaVariant = product.variants?.find((v) =>
+    /ea|single|unit|each/i.test(v.title || '') ||
+    /ea|single|unit|each/i.test(v.size || '') ||
+    (v.packageQuantity && /1\s*(unit|ea|each)/i.test(v.packageQuantity))
+  ) || (product.variants && product.variants.length > 0 ? product.variants[0] : undefined);
+  const mainPrice = eaVariant ? eaVariant.price : product.price;
+  const mainCompareAt = eaVariant?.compareAtPrice ?? product.compareAtPrice;
+  const discount = mainCompareAt && mainCompareAt > mainPrice
+    ? Math.round(((mainCompareAt - mainPrice) / mainCompareAt) * 100)
     : 0;
   const inWishlist = isInWishlist(product.id);
   const productPath = `/products/${product.handle}`;
@@ -52,7 +59,22 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     flyToCart(event.currentTarget, product.image || undefined);
     setCartState('adding');
     try {
-      await addToCart(product);
+      const itemToAdd: Product = eaVariant
+        ? {
+            ...product,
+            id: `${product.id}-${eaVariant.id}`,
+            variantId: eaVariant.id,
+            price: eaVariant.price,
+            compareAtPrice: eaVariant.compareAtPrice ?? product.compareAtPrice,
+            sku: eaVariant.sku || product.sku,
+            title: `${product.title} - ${eaVariant.title}`,
+            specs: eaVariant.size
+              ? `Packaging: ${eaVariant.size}${eaVariant.packageQuantity ? ` · ${eaVariant.packageQuantity}` : ''}`
+              : product.specs,
+            image: eaVariant.image || product.image,
+          }
+        : product;
+      await addToCart(itemToAdd);
       setCartState('added');
     } catch (error) {
       console.error('Add to cart failed:', error);
@@ -105,18 +127,17 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                   ★ Best Seller
                 </span>
               )}
-              {discount > 0 && <span className="rounded-full bg-medical-accent px-2.5 py-1 text-[10px] font-black text-medical-dark">{discount}% off</span>}
+              {discount > 0 && (
+                <span className="rounded-full bg-emerald-600 px-2.5 py-1 text-[10px] font-black text-white shadow-sm">
+                  {discount}% OFF
+                </span>
+              )}
               <span className="inline-flex items-center gap-1 rounded-full border border-rose-200 bg-rose-600 px-2.5 py-1 text-[10px] font-black text-white shadow-sm" title="Offer availability is item-specific">
                 <Clock3 size={11} /> Offer ends in {offerRemaining}
               </span>
-              {product.requiresPrescription && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-blue-700 px-2.5 py-1 text-[10px] font-black text-white">
-                  Rx Required
-                </span>
-              )}
               {product.variants && product.variants.length > 1 && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-teal-800 px-2.5 py-1 text-[10px] font-black text-white shadow-sm">
-                  {product.variants.length} Sizes Available
+                  Single &amp; Case Available
                 </span>
               )}
             </>
@@ -144,20 +165,25 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
         <div className="mt-auto flex items-end justify-between gap-3 border-t border-slate-200 pt-4">
           <div>
-            {product.compareAtPrice && product.compareAtPrice > product.price && (
-              <p className="text-xs text-medical-text line-through">{formatPrice(product.compareAtPrice)}</p>
+            {mainCompareAt && mainCompareAt > mainPrice && (
+              <p className="text-[11px] text-slate-400 font-medium line-through">
+                MSRP {formatPrice(mainCompareAt)}
+              </p>
             )}
             <p className={`text-lg font-black ${product.inStock ? 'text-amber-900' : 'text-medical-text'}`}>
-              {product.variants && product.variants.length > 1 ? `From ${formatPrice(product.price)}` : formatPrice(product.price)}
+              {formatPrice(mainPrice)}
+              {product.variants && product.variants.length > 1 && (
+                <span className="ml-1 text-[11px] font-bold text-slate-500 font-sans tracking-normal">/ Each</span>
+              )}
             </p>
           </div>
           {product.variants && product.variants.length > 1 ? (
             <Link
               to={productPath}
               className="tap-target inline-flex items-center justify-center gap-1 rounded-xl bg-medical-primary px-3 text-xs font-bold text-white hover:bg-medical-dark transition"
-              aria-label={`Select size and quantity for ${product.title}`}
+              aria-label={`Select option for ${product.title}`}
             >
-              Choose Size
+              Choose Option
             </Link>
           ) : (
             <button

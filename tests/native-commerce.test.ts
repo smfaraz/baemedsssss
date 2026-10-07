@@ -1,10 +1,10 @@
 /**
  * BaeMeds Native First-Party Commerce Test Suite
  * Validates:
- * 1. Native Catalog Seed & Retrieval (119 products, handle lookup, search, categories)
+ * 1. Native Catalog Seed & Retrieval (catalog items, handle lookup, search, categories)
  * 2. Native Cart Operations & Cost Calculations
  * 3. Native Server Checkout Authoritative Calculations
- * 4. Prescription Attestation Requirement
+ * 4. Authoritative Pricing & Total Validation
  * 5. Zero-Shopify Runtime Dependency Verification
  */
 
@@ -65,35 +65,34 @@ async function testNativeCatalog() {
 async function testNativeCheckoutApi() {
   console.log('Testing Server Authoritative Checkout API...');
 
-  // 1. Missing Rx attestation on oxygen concentrator must throw 400
-  const oxygenSeed = (await fetchProductsByCategory('Oxygen Concentrator'))[0];
-  const rxReq = new Request('https://baemeds.com/api/checkout', {
+  const sampleProduct = (await fetchAllProducts())[0];
+
+  // 1. Missing required fields must throw 400
+  const invalidReq = new Request('https://baemeds.com/api/checkout', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Origin': 'https://baemeds.com',
     },
     body: JSON.stringify({
-      cartId: 'test_cart_rx',
-      email: 'patient@example.com',
-      firstName: 'John',
+      cartId: 'test_cart_invalid',
+      email: 'invalid-email-format',
+      firstName: '',
       lastName: 'Doe',
       address1: '123 Health Ave',
       city: 'Wilmington',
       province: 'DE',
       zip: '19801',
-      prescriptionAttested: false, // Intentionally false
-      items: [{ id: 'line_1', merchandiseId: oxygenSeed.id, quantity: 1 }],
+      items: [{ id: 'line_1', merchandiseId: sampleProduct.id, quantity: 1 }],
     }),
   });
 
-  const rxRes = await checkoutHandler.fetch(rxReq);
-  const rxData = await rxRes.json();
-  if (rxRes.status !== 400 || !rxData.error?.includes('prescription')) {
-    throw new Error(`Expected Rx attestation error, got status ${rxRes.status}: ${JSON.stringify(rxData)}`);
+  const invalidRes = await checkoutHandler.fetch(invalidReq);
+  if (invalidRes.status !== 400) {
+    throw new Error(`Expected validation error 400, got status ${invalidRes.status}`);
   }
 
-  // 2. Valid checkout with attestation must calculate totals authoritatively
+  // 2. Valid checkout must calculate totals authoritatively
   const validReq = new Request('https://baemeds.com/api/checkout', {
     method: 'POST',
     headers: {
@@ -109,9 +108,8 @@ async function testNativeCheckoutApi() {
       city: 'Wilmington',
       province: 'DE',
       zip: '19801',
-      prescriptionAttested: true,
       shippingTier: 'standard',
-      items: [{ id: 'line_1', merchandiseId: oxygenSeed.id, quantity: 1 }],
+      items: [{ id: 'line_1', merchandiseId: sampleProduct.id, quantity: 1 }],
     }),
   });
 
@@ -121,7 +119,7 @@ async function testNativeCheckoutApi() {
     throw new Error(`Valid checkout failed: ${JSON.stringify(validData)}`);
   }
 
-  const expectedSubtotal = Number(oxygenSeed.price);
+  const expectedSubtotal = Number(sampleProduct.price);
   const calculatedSubtotal = Number(validData.subtotal);
   if (Math.abs(expectedSubtotal - calculatedSubtotal) > 0.01) {
     throw new Error(`Subtotal mismatch: expected ${expectedSubtotal}, got ${calculatedSubtotal}`);

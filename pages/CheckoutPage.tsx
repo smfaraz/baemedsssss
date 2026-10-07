@@ -1,30 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import { 
   ArrowLeft, 
-  CheckCircle, 
+  ArrowRight,
+  Check,
   CreditCard, 
-  FileText, 
   Lock, 
   ShieldCheck, 
   Truck, 
-  AlertCircle 
+  AlertCircle,
+  Phone,
+  User,
+  MapPin
 } from 'lucide-react';
 import { APP_NAME } from '../constants';
 import { Link, useCart, useNavigate } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { Analytics } from '../lib/analytics';
+import { StripePaymentSection } from '../components/checkout/StripePaymentSection';
+
+export type CheckoutStepId = 'shipping' | 'delivery' | 'payment';
 
 export const CheckoutPage: React.FC = () => {
   const { cart, cartTotal, clearCart } = useCart();
   const { customer, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
-  // Track begin_checkout in GA4 & Meta Pixel
-  useEffect(() => {
-    if (cart && cart.length > 0) {
-      Analytics.trackBeginCheckout(cart, cartTotal);
-    }
-  }, []);
+  // Stepper State (3 Streamlined Steps)
+  const [currentStep, setCurrentStep] = useState<CheckoutStepId>('shipping');
+
+  const stepList: { id: CheckoutStepId; title: string; shortTitle: string }[] = [
+    { id: 'shipping', title: '1. Patient & Shipping Address', shortTitle: 'Shipping' },
+    { id: 'delivery', title: '2. Delivery Speed', shortTitle: 'Delivery' },
+    { id: 'payment', title: '3. Secure Payment', shortTitle: 'Payment' },
+  ];
+
+  const currentStepIndex = stepList.findIndex((s) => s.id === currentStep);
 
   // Form State
   const [email, setEmail] = useState('');
@@ -37,17 +47,59 @@ export const CheckoutPage: React.FC = () => {
   const [province, setProvince] = useState('DE');
   const [zip, setZip] = useState('');
   const [shippingTier, setShippingTier] = useState<'standard' | 'priority' | 'white_glove'>('standard');
-  
-  // Payment mock state (tokenized)
-  const [cardNumber, setCardNumber] = useState('');
-  const [cardExp, setCardExp] = useState('');
-  const [cardCvv, setCardCvv] = useState('');
-  const [cardName, setCardName] = useState('');
 
-  // Prescription attestation
-  const [rxAttested, setRxAttested] = useState(false);
+  // Stripe state
+  const [stripeClientSecret, setStripeClientSecret] = useState('');
+  const [stripePublishableKey, setStripePublishableKey] = useState(
+    (import.meta as any).env?.VITE_STRIPE_PUBLISHABLE_KEY || ''
+  );
+  const [paymentIntentId, setPaymentIntentId] = useState('');
+  const [isInitializingStripe, setIsInitializingStripe] = useState(true);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+
+  // Step transition handlers
+  const goToNextFromShipping = () => {
+    setErrorMessage('');
+    if (!email || !email.includes('@') || !email.includes('.')) {
+      setErrorMessage('Please enter a valid email address.');
+      return;
+    }
+    if (!firstName.trim()) {
+      setErrorMessage('Please enter your first name.');
+      return;
+    }
+    if (!lastName.trim()) {
+      setErrorMessage('Please enter your last name.');
+      return;
+    }
+    if (!address1.trim()) {
+      setErrorMessage('Please enter your street address.');
+      return;
+    }
+    if (!city.trim()) {
+      setErrorMessage('Please enter your city.');
+      return;
+    }
+    if (!province.trim()) {
+      setErrorMessage('Please enter your 2-letter state code (e.g. DE, CA, NY).');
+      return;
+    }
+    if (!zip.trim()) {
+      setErrorMessage('Please enter your ZIP code.');
+      return;
+    }
+
+    setCurrentStep('delivery');
+    window.scrollTo({ top: 120, behavior: 'smooth' });
+  };
+
+  const goToNextFromDelivery = () => {
+    setErrorMessage('');
+    setCurrentStep('payment');
+    window.scrollTo({ top: 120, behavior: 'smooth' });
+  };
 
   // Auto-populate if customer is authenticated
   useEffect(() => {
@@ -66,15 +118,6 @@ export const CheckoutPage: React.FC = () => {
     }
   }, [customer]);
 
-  // Check if any cart item requires Rx
-  const hasRxItem = cart.some(
-    (item) =>
-      (item as any).prescriptionRequired ||
-      item.category?.toLowerCase().includes('oxygen') ||
-      item.category?.toLowerCase().includes('cpap') ||
-      item.category?.toLowerCase().includes('bipap')
-  );
-
   // Financial calculations
   let shippingCost = 0;
   if (shippingTier === 'priority') {
@@ -88,20 +131,88 @@ export const CheckoutPage: React.FC = () => {
   const taxAmount = Number((cartTotal * 0.06).toFixed(2));
   const finalTotal = Number((cartTotal + shippingCost + taxAmount).toFixed(2));
 
-  const handleCheckoutSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // Initialize or update Stripe PaymentIntent
+  useEffect(() => {
+    let isMounted = true;
+    const initIntent = async () => {
+      try {
+        setIsInitializingStripe(true);
+        const res = await fetch('/api/payment-intent', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            amount: Math.round(finalTotal * 100),
+            currency: 'usd',
+            cartTotal,
+            shippingCost,
+            taxAmount,
+            shippingTier,
+            metadata: {
+              customer_email: email,
+              items_count: cart.reduce((s, i) => s + i.quantity, 0),
+            },
+          }),
+        });
+
+        if (!res.ok) {
+          const errData = await res.json();
+          throw new Error(errData.error || 'Failed to initialize payment gateway.');
+        }
+
+        const data = await res.json();
+        if (isMounted) {
+          if (data.clientSecret) setStripeClientSecret(data.clientSecret);
+          if (data.paymentIntentId) setPaymentIntentId(data.paymentIntentId);
+          if (data.publishableKey) setStripePublishableKey(data.publishableKey);
+        }
+      } catch (err: any) {
+        console.error('[CheckoutPage] Stripe init error:', err);
+        if (isMounted) {
+          setErrorMessage(err.message || 'Unable to connect to payment gateway.');
+        }
+      } finally {
+        if (isMounted) {
+          setIsInitializingStripe(false);
+        }
+      }
+    };
+
+    initIntent();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [finalTotal]);
+
+  // Validation before Stripe confirms payment
+  const validateCheckoutForm = (): string | null => {
+    if (!email || !email.includes('@') || !email.includes('.')) {
+      return 'Please enter a valid email address.';
+    }
+    if (!firstName.trim()) {
+      return 'Please enter your first name.';
+    }
+    if (!lastName.trim()) {
+      return 'Please enter your last name.';
+    }
+    if (!address1.trim()) {
+      return 'Please enter your shipping street address.';
+    }
+    if (!city.trim()) {
+      return 'Please enter your city.';
+    }
+    if (!province.trim()) {
+      return 'Please enter your 2-letter state code (e.g. DE, CA, NY).';
+    }
+    if (!zip.trim()) {
+      return 'Please enter your ZIP code.';
+    }
+
+    return null;
+  };
+
+  const handlePaymentSuccess = async (confirmedIntentId: string) => {
     setErrorMessage('');
-
-    if (!cart.length) {
-      navigate('/cart');
-      return;
-    }
-
-    if (hasRxItem && !rxAttested) {
-      setErrorMessage('Please acknowledge the clinical prescription attestation to proceed.');
-      return;
-    }
-
     setIsSubmitting(true);
 
     try {
@@ -130,23 +241,23 @@ export const CheckoutPage: React.FC = () => {
           zip,
           country: 'United States',
           shippingTier,
-          prescriptionAttested: rxAttested,
           items: itemsPayload,
-          paymentToken: `tok_bm_${Date.now()}`,
+          paymentIntentId: confirmedIntentId,
+          paymentToken: confirmedIntentId,
         }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || 'Unable to place order. Please check details.');
+        throw new Error(data.error || 'Payment processed, but order creation failed. Please contact customer support.');
       }
 
       // Order success!
       const orderRecord = {
         orderId: data.orderId,
         orderNumber: data.orderNumber || data.orderId,
-        total: data.order?.total || Number((cartTotal + shippingCost + taxAmount).toFixed(2)),
+        total: data.order?.total || finalTotal,
         customer: {
           email,
           firstName,
@@ -216,7 +327,7 @@ export const CheckoutPage: React.FC = () => {
             <ArrowLeft size={16} /> Back to Cart
           </Link>
           <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-medical-text/70">
-            <Lock size={14} className="text-medical-primary" /> 256-Bit Encrypted DME Checkout
+            <Lock size={14} className="text-medical-primary" /> 256-Bit Encrypted Secure Checkout
           </div>
         </div>
 
@@ -227,306 +338,450 @@ export const CheckoutPage: React.FC = () => {
           </div>
         )}
 
-        <form onSubmit={handleCheckoutSubmit} className="grid gap-8 lg:grid-cols-12">
-          {/* Checkout Details Form */}
-          <div className="space-y-6 lg:col-span-7">
-            {/* Contact Information */}
-            <section className="rounded-2xl border border-medical-light bg-white p-6 shadow-soft sm:p-8">
-              <div className="flex items-center justify-between border-b border-medical-light pb-4">
-                <h2 className="text-lg font-bold text-medical-dark">1. Patient / Contact Information</h2>
-                {!isAuthenticated && (
-                  <Link to="/login" className="text-xs font-semibold text-medical-primary hover:underline">
-                    Sign in for faster checkout
-                  </Link>
-                )}
-              </div>
-              <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                <div className="sm:col-span-2">
-                  <label className="block text-xs font-bold uppercase tracking-wider text-medical-text/80 mb-1">
-                    Email Address *
-                  </label>
-                  <input
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="patient@example.com"
-                    className="w-full rounded-xl border border-medical-light bg-[#fbfaf8] px-4 py-2.5 text-sm text-medical-dark focus:border-medical-primary focus:bg-white focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-medical-text/80 mb-1">
-                    First Name *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    placeholder="Jane"
-                    className="w-full rounded-xl border border-medical-light bg-[#fbfaf8] px-4 py-2.5 text-sm text-medical-dark focus:border-medical-primary focus:bg-white focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-medical-text/80 mb-1">
-                    Last Name *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    placeholder="Doe"
-                    className="w-full rounded-xl border border-medical-light bg-[#fbfaf8] px-4 py-2.5 text-sm text-medical-dark focus:border-medical-primary focus:bg-white focus:outline-none"
-                  />
-                </div>
-                <div className="sm:col-span-2">
-                  <label className="block text-xs font-bold uppercase tracking-wider text-medical-text/80 mb-1">
-                    Phone Number (for delivery & clinical coordination)
-                  </label>
-                  <input
-                    type="tel"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="(555) 000-0000"
-                    className="w-full rounded-xl border border-medical-light bg-[#fbfaf8] px-4 py-2.5 text-sm text-medical-dark focus:border-medical-primary focus:bg-white focus:outline-none"
-                  />
-                </div>
-              </div>
-            </section>
-
-            {/* Shipping Address */}
-            <section className="rounded-2xl border border-medical-light bg-white p-6 shadow-soft sm:p-8">
-              <h2 className="border-b border-medical-light pb-4 text-lg font-bold text-medical-dark">
-                2. Shipping Address
-              </h2>
-              <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                <div className="sm:col-span-2">
-                  <label className="block text-xs font-bold uppercase tracking-wider text-medical-text/80 mb-1">
-                    Street Address *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={address1}
-                    onChange={(e) => setAddress1(e.target.value)}
-                    placeholder="123 Medical Center Way"
-                    className="w-full rounded-xl border border-medical-light bg-[#fbfaf8] px-4 py-2.5 text-sm text-medical-dark focus:border-medical-primary focus:bg-white focus:outline-none"
-                  />
-                </div>
-                <div className="sm:col-span-2">
-                  <label className="block text-xs font-bold uppercase tracking-wider text-medical-text/80 mb-1">
-                    Apartment, Suite, Unit (optional)
-                  </label>
-                  <input
-                    type="text"
-                    value={address2}
-                    onChange={(e) => setAddress2(e.target.value)}
-                    placeholder="Suite 400"
-                    className="w-full rounded-xl border border-medical-light bg-[#fbfaf8] px-4 py-2.5 text-sm text-medical-dark focus:border-medical-primary focus:bg-white focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-medical-text/80 mb-1">
-                    City *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                    placeholder="Wilmington"
-                    className="w-full rounded-xl border border-medical-light bg-[#fbfaf8] px-4 py-2.5 text-sm text-medical-dark focus:border-medical-primary focus:bg-white focus:outline-none"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-medical-text/80 mb-1">
-                      State *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={province}
-                      onChange={(e) => setProvince(e.target.value.toUpperCase())}
-                      placeholder="DE"
-                      maxLength={2}
-                      className="w-full rounded-xl border border-medical-light bg-[#fbfaf8] px-4 py-2.5 text-sm text-medical-dark focus:border-medical-primary focus:bg-white focus:outline-none"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-medical-text/80 mb-1">
-                      ZIP *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={zip}
-                      onChange={(e) => setZip(e.target.value)}
-                      placeholder="19801"
-                      className="w-full rounded-xl border border-medical-light bg-[#fbfaf8] px-4 py-2.5 text-sm text-medical-dark focus:border-medical-primary focus:bg-white focus:outline-none"
-                    />
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* Shipping Method */}
-            <section className="rounded-2xl border border-medical-light bg-white p-6 shadow-soft sm:p-8">
-              <h2 className="border-b border-medical-light pb-4 text-lg font-bold text-medical-dark">
-                3. Shipping & Delivery Tier
-              </h2>
-              <div className="mt-4 space-y-3">
-                <label className={`flex cursor-pointer items-center justify-between rounded-xl border p-4 transition ${shippingTier === 'standard' ? 'border-medical-primary bg-medical-light/30' : 'border-medical-light hover:bg-[#faf9f6]'}`}>
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="radio"
-                      name="shippingTier"
-                      checked={shippingTier === 'standard'}
-                      onChange={() => setShippingTier('standard')}
-                      className="text-medical-primary focus:ring-medical-primary"
-                    />
-                    <div>
-                      <p className="text-sm font-bold text-medical-dark">Standard Ground Delivery</p>
-                      <p className="text-xs text-medical-text/70">3-5 business days across the contiguous United States</p>
+        {/* Step Progress Bar */}
+        <div className="mb-8 rounded-2xl border border-medical-light bg-white p-4 sm:p-5 shadow-soft">
+          <div className="flex items-center justify-between">
+            {stepList.map((step, idx) => {
+              const isCompleted = idx < currentStepIndex;
+              const isCurrent = idx === currentStepIndex;
+              return (
+                <React.Fragment key={step.id}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (idx <= currentStepIndex) {
+                        setCurrentStep(step.id);
+                        window.scrollTo({ top: 120, behavior: 'smooth' });
+                      }
+                    }}
+                    disabled={idx > currentStepIndex}
+                    className={`group flex items-center gap-2.5 text-left transition ${
+                      isCurrent
+                        ? 'cursor-default'
+                        : isCompleted
+                        ? 'cursor-pointer hover:opacity-85'
+                        : 'cursor-not-allowed opacity-40'
+                    }`}
+                  >
+                    <div
+                      className={`flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl text-xs sm:text-sm font-bold transition ${
+                        isCompleted
+                          ? 'bg-emerald-600 text-white shadow-xs'
+                          : isCurrent
+                          ? 'bg-medical-primary text-white shadow-md shadow-medical-primary/20 ring-4 ring-medical-primary/15'
+                          : 'bg-slate-100 text-slate-500'
+                      }`}
+                    >
+                      {isCompleted ? <Check size={18} className="stroke-[3]" /> : idx + 1}
                     </div>
-                  </div>
-                  <span className="text-sm font-bold text-medical-dark">
-                    {cartTotal >= 99 ? 'FREE' : '$12.00'}
-                  </span>
-                </label>
-
-                <label className={`flex cursor-pointer items-center justify-between rounded-xl border p-4 transition ${shippingTier === 'priority' ? 'border-medical-primary bg-medical-light/30' : 'border-medical-light hover:bg-[#faf9f6]'}`}>
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="radio"
-                      name="shippingTier"
-                      checked={shippingTier === 'priority'}
-                      onChange={() => setShippingTier('priority')}
-                      className="text-medical-primary focus:ring-medical-primary"
-                    />
-                    <div>
-                      <p className="text-sm font-bold text-medical-dark">Priority Medical Courier</p>
-                      <p className="text-xs text-medical-text/70">1-2 business days with temperature & handling protection</p>
+                    <div className="hidden sm:block">
+                      <p
+                        className={`text-xs font-semibold uppercase tracking-wider ${
+                          isCurrent
+                            ? 'text-medical-primary font-bold'
+                            : isCompleted
+                            ? 'text-emerald-700'
+                            : 'text-slate-400'
+                        }`}
+                      >
+                        Step {idx + 1}
+                      </p>
+                      <p
+                        className={`text-sm font-bold ${
+                          isCurrent ? 'text-slate-900' : isCompleted ? 'text-slate-700' : 'text-slate-400'
+                        }`}
+                      >
+                        {step.shortTitle}
+                      </p>
                     </div>
-                  </div>
-                  <span className="text-sm font-bold text-medical-dark">$25.00</span>
-                </label>
+                  </button>
 
-                <label className={`flex cursor-pointer items-center justify-between rounded-xl border p-4 transition ${shippingTier === 'white_glove' ? 'border-medical-primary bg-medical-light/30' : 'border-medical-light hover:bg-[#faf9f6]'}`}>
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="radio"
-                      name="shippingTier"
-                      checked={shippingTier === 'white_glove'}
-                      onChange={() => setShippingTier('white_glove')}
-                      className="text-medical-primary focus:ring-medical-primary"
-                    />
-                    <div>
-                      <p className="text-sm font-bold text-medical-dark">White-Glove DME Setup & In-Service</p>
-                      <p className="text-xs text-medical-text/70">Scheduled delivery, unpacking, room placement, and clinician device orientation</p>
-                    </div>
-                  </div>
-                  <span className="text-sm font-bold text-medical-dark">$95.00</span>
-                </label>
-              </div>
-            </section>
-
-            {/* Prescription Attestation (if applicable) */}
-            {hasRxItem && (
-              <section className="rounded-2xl border-2 border-amber-300 bg-amber-50/70 p-6 shadow-soft">
-                <div className="flex items-start gap-3">
-                  <FileText className="mt-0.5 text-amber-700 shrink-0" size={22} />
-                  <div>
-                    <h3 className="text-sm font-bold text-amber-900">Clinical DME Prescription Attestation</h3>
-                    <p className="mt-1 text-xs leading-relaxed text-amber-800">
-                      Your order contains regulated medical supplies or equipment (e.g. Oxygen / CPAP / BiPAP). In compliance with FDA regulations and state pharmacy board mandates, a prescription is required.
-                    </p>
-                    <label className="mt-4 flex cursor-pointer items-start gap-3">
-                      <input
-                        type="checkbox"
-                        checked={rxAttested}
-                        onChange={(e) => setRxAttested(e.target.checked)}
-                        className="mt-0.5 h-4 w-4 rounded border-amber-400 text-medical-primary focus:ring-medical-primary"
+                  {idx < stepList.length - 1 && (
+                    <div className="flex-1 mx-2 sm:mx-4 h-0.5 bg-slate-200">
+                      <div
+                        className={`h-full transition-all duration-300 ${
+                          idx < currentStepIndex ? 'bg-emerald-600' : 'bg-transparent'
+                        }`}
                       />
-                      <span className="text-xs font-semibold text-amber-950">
-                        I certify that I hold a valid doctor prescription for these items, and authorize {APP_NAME} clinical staff to verify prescription records with my healthcare provider prior to order fulfillment.
-                      </span>
-                    </label>
+                    </div>
+                  )}
+                </React.Fragment>
+              );
+            })}
+          </div>
+
+          {/* Mobile Current Step Label */}
+          <div className="mt-3 block sm:hidden text-center border-t border-slate-100 pt-2.5">
+            <span className="text-xs font-bold text-medical-primary">
+              Step {currentStepIndex + 1} of {stepList.length}: {stepList[currentStepIndex]?.title}
+            </span>
+          </div>
+        </div>
+
+        <div className="grid gap-8 lg:grid-cols-12">
+          {/* Main Checkout Steps Form Area */}
+          <div className="space-y-6 lg:col-span-7">
+
+            {/* Completed Step 1 Summary Card */}
+            {currentStepIndex > 0 && (
+              <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-5 shadow-xs">
+                <div className="flex items-center gap-3.5">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-emerald-800 shrink-0">
+                    <Check size={18} className="stroke-[3]" />
                   </div>
+                  <div>
+                    <span className="font-bold text-slate-900 block text-xs uppercase tracking-wider text-medical-primary">
+                      1. Patient & Shipping Address
+                    </span>
+                    <p className="text-sm font-bold text-medical-dark mt-0.5">
+                      {firstName} {lastName} • {city}, {province} {zip}
+                    </p>
+                    <p className="text-xs text-medical-text/60">
+                      {address1}{address2 ? `, ${address2}` : ''} • {email}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCurrentStep('shipping');
+                    window.scrollTo({ top: 120, behavior: 'smooth' });
+                  }}
+                  className="rounded-xl border border-medical-light bg-medical-light/40 px-3.5 py-2 text-xs font-bold text-medical-primary hover:bg-medical-primary hover:text-white transition ml-3 shrink-0"
+                >
+                  Edit Address
+                </button>
+              </div>
+            )}
+
+            {/* STEP 1: Contact & Shipping Address Form */}
+            {currentStep === 'shipping' && (
+              <>
+                {/* Contact Information */}
+                <section className="rounded-2xl border border-medical-light bg-white p-6 shadow-soft sm:p-8">
+                  <div className="flex items-center justify-between border-b border-medical-light pb-4">
+                    <h2 className="text-lg font-bold text-medical-dark">1. Patient / Contact Information</h2>
+                    {!isAuthenticated && (
+                      <Link to="/login" className="text-xs font-semibold text-medical-primary hover:underline">
+                        Sign in for faster checkout
+                      </Link>
+                    )}
+                  </div>
+                  <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                    <div className="sm:col-span-2">
+                      <label className="block text-xs font-bold uppercase tracking-wider text-medical-text/80 mb-1">
+                        Email Address *
+                      </label>
+                      <input
+                        type="email"
+                        required
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="patient@example.com"
+                        className="w-full rounded-xl border border-medical-light bg-[#fbfaf8] px-4 py-3 text-sm text-medical-dark focus:border-medical-primary focus:bg-white focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-medical-text/80 mb-1">
+                        First Name *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        placeholder="Jane"
+                        className="w-full rounded-xl border border-medical-light bg-[#fbfaf8] px-4 py-3 text-sm text-medical-dark focus:border-medical-primary focus:bg-white focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-medical-text/80 mb-1">
+                        Last Name *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                        placeholder="Doe"
+                        className="w-full rounded-xl border border-medical-light bg-[#fbfaf8] px-4 py-3 text-sm text-medical-dark focus:border-medical-primary focus:bg-white focus:outline-none"
+                      />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <label className="block text-xs font-bold uppercase tracking-wider text-medical-text/80 mb-1">
+                        Phone Number (for delivery updates)
+                      </label>
+                      <input
+                        type="tel"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        placeholder="(555) 000-0000"
+                        className="w-full rounded-xl border border-medical-light bg-[#fbfaf8] px-4 py-3 text-sm text-medical-dark focus:border-medical-primary focus:bg-white focus:outline-none"
+                      />
+                    </div>
+                  </div>
+                </section>
+
+                {/* Shipping Address */}
+                <section className="rounded-2xl border border-medical-light bg-white p-6 shadow-soft sm:p-8">
+                  <h2 className="border-b border-medical-light pb-4 text-lg font-bold text-medical-dark">
+                    Shipping Destination Address
+                  </h2>
+                  <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                    <div className="sm:col-span-2">
+                      <label className="block text-xs font-bold uppercase tracking-wider text-medical-text/80 mb-1">
+                        Street Address *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={address1}
+                        onChange={(e) => setAddress1(e.target.value)}
+                        placeholder="123 Medical Center Way"
+                        className="w-full rounded-xl border border-medical-light bg-[#fbfaf8] px-4 py-3 text-sm text-medical-dark focus:border-medical-primary focus:bg-white focus:outline-none"
+                      />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <label className="block text-xs font-bold uppercase tracking-wider text-medical-text/80 mb-1">
+                        Apartment, Suite, Unit (optional)
+                      </label>
+                      <input
+                        type="text"
+                        value={address2}
+                        onChange={(e) => setAddress2(e.target.value)}
+                        placeholder="Suite 400"
+                        className="w-full rounded-xl border border-medical-light bg-[#fbfaf8] px-4 py-3 text-sm text-medical-dark focus:border-medical-primary focus:bg-white focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-medical-text/80 mb-1">
+                        City *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={city}
+                        onChange={(e) => setCity(e.target.value)}
+                        placeholder="Wilmington"
+                        className="w-full rounded-xl border border-medical-light bg-[#fbfaf8] px-4 py-3 text-sm text-medical-dark focus:border-medical-primary focus:bg-white focus:outline-none"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="block text-xs font-bold uppercase tracking-wider text-medical-text/80 mb-1">
+                          State *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={province}
+                          onChange={(e) => setProvince(e.target.value.toUpperCase())}
+                          placeholder="DE"
+                          maxLength={2}
+                          className="w-full rounded-xl border border-medical-light bg-[#fbfaf8] px-4 py-3 text-sm text-medical-dark focus:border-medical-primary focus:bg-white focus:outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold uppercase tracking-wider text-medical-text/80 mb-1">
+                          ZIP *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={zip}
+                          onChange={(e) => setZip(e.target.value)}
+                          placeholder="19801"
+                          className="w-full rounded-xl border border-medical-light bg-[#fbfaf8] px-4 py-3 text-sm text-medical-dark focus:border-medical-primary focus:bg-white focus:outline-none"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Step 1 Continue Button */}
+                  <div className="mt-8 pt-6 border-t border-medical-light flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="flex items-center gap-2 text-xs text-slate-500">
+                      <ShieldCheck size={16} className="text-medical-primary" />
+                      <span>Encrypted, confidential delivery</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={goToNextFromShipping}
+                      className="w-full sm:w-auto inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-medical-primary px-8 py-3 text-base font-bold text-white shadow-soft hover:bg-medical-dark transition"
+                    >
+                      <span>Continue to Delivery Speed</span>
+                      <ArrowRight size={18} />
+                    </button>
+                  </div>
+                </section>
+              </>
+            )}
+
+            {/* Completed Step 2 (Delivery Speed) Summary Card */}
+            {currentStepIndex > 1 && (
+              <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-5 shadow-xs">
+                <div className="flex items-center gap-3.5">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-emerald-800 shrink-0">
+                    <Check size={18} className="stroke-[3]" />
+                  </div>
+                  <div>
+                    <span className="font-bold text-slate-900 block text-xs uppercase tracking-wider text-medical-primary">
+                      2. Delivery Speed
+                    </span>
+                    <p className="text-sm font-bold text-medical-dark mt-0.5">
+                      {shippingTier === 'standard' && `Standard Ground Delivery (3-5 Days) • ${shippingCost === 0 ? 'FREE' : '$12.00'}`}
+                      {shippingTier === 'priority' && 'Priority Medical Courier (1-2 Days) • $25.00'}
+                      {shippingTier === 'white_glove' && 'White-Glove DME Setup & In-Service • $95.00'}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCurrentStep('delivery');
+                    window.scrollTo({ top: 120, behavior: 'smooth' });
+                  }}
+                  className="rounded-xl border border-medical-light bg-medical-light/40 px-3.5 py-2 text-xs font-bold text-medical-primary hover:bg-medical-primary hover:text-white transition ml-3 shrink-0"
+                >
+                  Change Speed
+                </button>
+              </div>
+            )}
+
+            {/* STEP 2: Shipping Method */}
+            {currentStep === 'delivery' && (
+              <section className="rounded-2xl border border-medical-light bg-white p-6 shadow-soft sm:p-8">
+                <h2 className="border-b border-medical-light pb-4 text-lg font-bold text-medical-dark">
+                  2. Shipping & Delivery Tier
+                </h2>
+                <div className="mt-4 space-y-3">
+                  <label className={`flex cursor-pointer items-center justify-between rounded-xl border p-4 transition ${shippingTier === 'standard' ? 'border-medical-primary bg-medical-light/30' : 'border-medical-light hover:bg-[#faf9f6]'}`}>
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="radio"
+                        name="shippingTier"
+                        checked={shippingTier === 'standard'}
+                        onChange={() => setShippingTier('standard')}
+                        className="text-medical-primary focus:ring-medical-primary"
+                      />
+                      <div>
+                        <p className="text-sm font-bold text-medical-dark">Standard Ground Delivery</p>
+                        <p className="text-xs text-medical-text/70">3-5 business days across the contiguous United States</p>
+                      </div>
+                    </div>
+                    <span className="text-sm font-bold text-medical-dark">
+                      {cartTotal >= 99 ? 'FREE' : '$12.00'}
+                    </span>
+                  </label>
+
+                  <label className={`flex cursor-pointer items-center justify-between rounded-xl border p-4 transition ${shippingTier === 'priority' ? 'border-medical-primary bg-medical-light/30' : 'border-medical-light hover:bg-[#faf9f6]'}`}>
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="radio"
+                        name="shippingTier"
+                        checked={shippingTier === 'priority'}
+                        onChange={() => setShippingTier('priority')}
+                        className="text-medical-primary focus:ring-medical-primary"
+                      />
+                      <div>
+                        <p className="text-sm font-bold text-medical-dark">Priority Medical Courier</p>
+                        <p className="text-xs text-medical-text/70">1-2 business days with temperature & handling protection</p>
+                      </div>
+                    </div>
+                    <span className="text-sm font-bold text-medical-dark">$25.00</span>
+                  </label>
+
+                  <label className={`flex cursor-pointer items-center justify-between rounded-xl border p-4 transition ${shippingTier === 'white_glove' ? 'border-medical-primary bg-medical-light/30' : 'border-medical-light hover:bg-[#faf9f6]'}`}>
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="radio"
+                        name="shippingTier"
+                        checked={shippingTier === 'white_glove'}
+                        onChange={() => setShippingTier('white_glove')}
+                        className="text-medical-primary focus:ring-medical-primary"
+                      />
+                      <div>
+                        <p className="text-sm font-bold text-medical-dark">White-Glove DME Setup & In-Service</p>
+                        <p className="text-xs text-medical-text/70">Scheduled delivery, unpacking, room placement, and clinician device orientation</p>
+                      </div>
+                    </div>
+                    <span className="text-sm font-bold text-medical-dark">$95.00</span>
+                  </label>
+                </div>
+
+                {/* Step 2 Continue Button */}
+                <div className="mt-8 pt-6 border-t border-medical-light flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCurrentStep('shipping');
+                      window.scrollTo({ top: 120, behavior: 'smooth' });
+                    }}
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition"
+                  >
+                    <ArrowLeft size={16} />
+                    <span>Back to Address</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={goToNextFromDelivery}
+                    className="w-full sm:w-auto inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-medical-primary px-8 py-3 text-base font-bold text-white shadow-soft hover:bg-medical-dark transition"
+                  >
+                    <span>Continue to Payment</span>
+                    <ArrowRight size={18} />
+                  </button>
                 </div>
               </section>
             )}
 
-            {/* Payment Section */}
-            <section className="rounded-2xl border border-medical-light bg-white p-6 shadow-soft sm:p-8">
-              <div className="flex items-center justify-between border-b border-medical-light pb-4">
-                <h2 className="text-lg font-bold text-medical-dark">4. Secure Payment</h2>
-                <span className="flex items-center gap-1 text-xs text-medical-text/70">
-                  <ShieldCheck size={16} className="text-medical-primary" /> PCI-DSS Compliant
-                </span>
-              </div>
-              <div className="mt-4 space-y-4">
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-medical-text/80 mb-1">
-                    Name on Card *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={cardName}
-                    onChange={(e) => setCardName(e.target.value)}
-                    placeholder="Jane Doe"
-                    className="w-full rounded-xl border border-medical-light bg-[#fbfaf8] px-4 py-2.5 text-sm text-medical-dark focus:border-medical-primary focus:bg-white focus:outline-none"
-                  />
+            {/* STEP 3: Payment Section */}
+            {currentStep === 'payment' && (
+              <section className="rounded-2xl border border-medical-light bg-white p-6 shadow-soft sm:p-8">
+                <div className="flex items-center justify-between border-b border-medical-light pb-4 mb-4">
+                  <h2 className="text-lg font-bold text-medical-dark">
+                    3. Secure Payment
+                  </h2>
+                  <span className="flex items-center gap-1 text-xs text-medical-text/70">
+                    <ShieldCheck size={16} className="text-medical-primary" /> PCI SAQ A Encrypted
+                  </span>
                 </div>
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-medical-text/80 mb-1">
-                    Card Number *
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      required
-                      value={cardNumber}
-                      onChange={(e) => setCardNumber(e.target.value.replace(/\D/g, '').replace(/(\d{4})/g, '$1 ').trim().slice(0, 19))}
-                      placeholder="4000 1234 5678 9010"
-                      className="w-full rounded-xl border border-medical-light bg-[#fbfaf8] px-4 py-2.5 pl-11 text-sm font-mono text-medical-dark focus:border-medical-primary focus:bg-white focus:outline-none"
-                    />
-                    <CreditCard className="absolute left-3.5 top-3 text-medical-text/50" size={18} />
-                  </div>
+
+                <div className="mb-4 flex flex-wrap items-center gap-2 text-xs text-slate-500">
+                  <span className="rounded bg-slate-100 px-2 py-0.5 font-medium text-slate-700">Credit / Debit Card</span>
+                  <span className="rounded bg-slate-100 px-2 py-0.5 font-medium text-slate-700">Apple Pay</span>
+                  <span className="rounded bg-slate-100 px-2 py-0.5 font-medium text-slate-700">Google Pay</span>
+                  <span className="rounded bg-slate-100 px-2 py-0.5 font-medium text-slate-700">FSA / HSA Card</span>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-medical-text/80 mb-1">
-                      Expiration (MM/YY) *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={cardExp}
-                      onChange={(e) => setCardExp(e.target.value.replace(/\D/g, '').replace(/(\d{2})/, '$1/').trim().slice(0, 5))}
-                      placeholder="12/28"
-                      className="w-full rounded-xl border border-medical-light bg-[#fbfaf8] px-4 py-2.5 text-sm font-mono text-medical-dark focus:border-medical-primary focus:bg-white focus:outline-none"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-medical-text/80 mb-1">
-                      Security Code (CVV) *
-                    </label>
-                    <input
-                      type="password"
-                      required
-                      value={cardCvv}
-                      onChange={(e) => setCardCvv(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                      placeholder="123"
-                      maxLength={4}
-                      className="w-full rounded-xl border border-medical-light bg-[#fbfaf8] px-4 py-2.5 text-sm font-mono text-medical-dark focus:border-medical-primary focus:bg-white focus:outline-none"
-                    />
-                  </div>
+
+                <StripePaymentSection
+                  publishableKey={stripePublishableKey}
+                  clientSecret={stripeClientSecret}
+                  onPaymentSuccess={handlePaymentSuccess}
+                  onPaymentError={(msg) => setErrorMessage(msg)}
+                  onBeforeSubmit={validateCheckoutForm}
+                  isSubmitting={isSubmitting}
+                  setIsSubmitting={setIsSubmitting}
+                  submitButtonText={`Place Order & Pay $${finalTotal.toFixed(2)}`}
+                  disabled={isInitializingStripe}
+                />
+
+                <div className="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCurrentStep('delivery');
+                      window.scrollTo({ top: 120, behavior: 'smooth' });
+                    }}
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-medical-primary"
+                  >
+                    <ArrowLeft size={14} />
+                    <span>Change Delivery Options</span>
+                  </button>
+                  <span className="text-[11px] text-slate-400">
+                    Final step: Click Place Order above to complete purchase
+                  </span>
                 </div>
-              </div>
-            </section>
+              </section>
+            )}
           </div>
 
           {/* Order Summary Sidebar */}
@@ -578,28 +833,55 @@ export const CheckoutPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="mt-6 flex w-full min-h-12 items-center justify-center gap-2 rounded-xl bg-medical-primary px-6 py-3 font-bold text-white shadow-soft transition hover:bg-medical-dark disabled:opacity-50"
-              >
-                {isSubmitting ? (
-                  <span>Processing Secure Order...</span>
-                ) : (
-                  <>
-                    <Lock size={16} /> Place Order — ${finalTotal.toFixed(2)}
-                  </>
-                )}
-              </button>
+              {/* Dynamic Step Advance / Submit Button */}
+              {currentStep === 'shipping' && (
+                <button
+                  type="button"
+                  onClick={goToNextFromShipping}
+                  className="mt-6 flex w-full min-h-12 items-center justify-center gap-2 rounded-xl bg-medical-primary px-6 py-3 font-bold text-white shadow-soft transition hover:bg-medical-dark"
+                >
+                  <span>Continue to Step 2 (Delivery)</span>
+                  <ArrowRight size={18} />
+                </button>
+              )}
+
+              {currentStep === 'delivery' && (
+                <button
+                  type="button"
+                  onClick={goToNextFromDelivery}
+                  className="mt-6 flex w-full min-h-12 items-center justify-center gap-2 rounded-xl bg-medical-primary px-6 py-3 font-bold text-white shadow-soft transition hover:bg-medical-dark"
+                >
+                  <span>Continue to Step 3 (Payment)</span>
+                  <ArrowRight size={18} />
+                </button>
+              )}
+
+              {currentStep === 'payment' && (
+                <button
+                  type="submit"
+                  form="stripe-checkout-form"
+                  disabled={isSubmitting || isInitializingStripe}
+                  className="mt-6 flex w-full min-h-12 items-center justify-center gap-2 rounded-xl bg-medical-primary px-6 py-3 font-bold text-white shadow-soft transition hover:bg-medical-dark disabled:opacity-50"
+                >
+                  {isSubmitting ? (
+                    <span>Processing Secure Order...</span>
+                  ) : isInitializingStripe ? (
+                    <span>Connecting Gateway...</span>
+                  ) : (
+                    <>
+                      <Lock size={16} /> Place Order — ${finalTotal.toFixed(2)}
+                    </>
+                  )}
+                </button>
+              )}
 
               <div className="mt-4 flex items-center justify-center gap-2 text-center text-xs text-medical-text/60">
                 <ShieldCheck size={14} className="text-medical-primary" />
-                <span>HIPAA & FDA compliant medical fulfillment</span>
+                <span>Certified medical fulfillment</span>
               </div>
             </div>
           </div>
-        </form>
+        </div>
       </div>
     </main>
   );

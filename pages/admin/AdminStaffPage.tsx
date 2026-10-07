@@ -240,7 +240,7 @@ export const AdminStaffPage: React.FC = () => {
                 >
                   <option value="support_agent">Support Agent (Customer/Order Viewing)</option>
                   <option value="fulfillment_specialist">Fulfillment Specialist (Shipping & Inventory)</option>
-                  <option value="clinical_specialist">Clinical Specialist (Prescription Adjudication)</option>
+                  <option value="clinical_specialist">Clinical Specialist (Order Compliance)</option>
                   <option value="compliance_officer">Compliance Officer (Audit Logs & Review)</option>
                   <option value="super_admin">Super Admin (Full Operational Authorization)</option>
                 </select>

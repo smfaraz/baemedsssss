@@ -99,9 +99,6 @@ const CartPage: React.FC = () => {
     );
   }
 
-  const hasPrescriptionItem = cart.some((item) => item.requiresPrescription);
-  const [rxAttested, setRxAttested] = useState(false);
-
   return (
     <main className="min-h-screen py-8 sm:py-12">
       <div className="container mx-auto max-w-7xl px-4">
@@ -117,20 +114,6 @@ const CartPage: React.FC = () => {
 
         {actionError && <div role="alert" className="mb-5 rounded-xl border border-medical-alert/30 bg-medical-alert/10 p-4 text-sm font-semibold text-medical-alert">{actionError}</div>}
 
-        {hasPrescriptionItem && (
-          <div role="alert" className="mb-6 rounded-2xl border-2 border-amber-300 bg-amber-50/80 p-5 shadow-sm">
-            <div className="flex items-start gap-3">
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-200 text-amber-900 font-black text-sm">Rx</span>
-              <div>
-                <h3 className="font-bold text-amber-950">Clinical Prescription Requirement</h3>
-                <p className="mt-1 text-sm leading-relaxed text-amber-900/90">
-                  Your order contains medical devices subject to FDA and state DME regulations. A valid prescription from a licensed US healthcare provider is required prior to equipment shipment. You can upload your prescription document or provide physician contact information after checkout in your account portal.
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_23rem] lg:items-start">
           <section className="overflow-hidden rounded-2xl border border-medical-light bg-white shadow-soft" aria-label="Cart items">
             <ul className="divide-y divide-medical-light">
@@ -144,9 +127,6 @@ const CartPage: React.FC = () => {
                       <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-2">
                           <p className="text-xs font-semibold uppercase tracking-wide text-medical-text/50">{/mohsin/i.test(item.vendor || '') ? 'Baemeds' : item.vendor || 'Baemeds catalogue'}</p>
-                          {item.requiresPrescription && (
-                            <span className="rounded-md border border-amber-300 bg-amber-100 px-2 py-0.5 text-[10px] font-black text-amber-900 uppercase tracking-wider">Rx Required</span>
-                          )}
                         </div>
                         <h2 className="mt-1 font-bold leading-snug text-medical-dark"><Link to={`/products/${item.handle || item.id}`} className="hover:text-medical-primary transition">{item.title}</Link></h2>
                         {item.specs && <p className="mt-1 line-clamp-2 text-sm text-medical-text/60">{item.specs}</p>}
@@ -175,22 +155,6 @@ const CartPage: React.FC = () => {
               <div className="flex justify-between gap-4 border-t border-medical-light pt-4 text-lg"><dt className="font-bold text-medical-dark">Total</dt><dd className="font-bold text-medical-dark">{formatPrice(cartTotal)}</dd></div>
             </dl>
 
-            {hasPrescriptionItem && (
-              <div className="mt-4 rounded-xl border border-amber-300 bg-amber-50 p-3.5">
-                <label className="flex items-start gap-2.5 cursor-pointer text-xs text-amber-950 font-medium">
-                  <input
-                    type="checkbox"
-                    checked={rxAttested}
-                    onChange={(e) => setRxAttested(e.target.checked)}
-                    className="mt-0.5 h-4 w-4 rounded border-amber-400 text-medical-primary focus:ring-medical-primary"
-                  />
-                  <span>
-                    I certify that I have or will provide a valid medical prescription from a licensed healthcare provider for Rx equipment prior to shipment.
-                  </span>
-                </label>
-              </div>
-            )}
-
             <div className="mt-5 flex items-start gap-3 rounded-xl bg-medical-light p-3 text-sm text-medical-dark">
               <ShieldCheck className="mt-0.5 shrink-0 text-medical-primary" size={19} />
               <p>You will review final shipping, tax, and payment details before placing the order.</p>
@@ -204,11 +168,11 @@ const CartPage: React.FC = () => {
             <button
               type="button"
               onClick={() => navigate('/checkout')}
-              disabled={isLoading || (hasPrescriptionItem && !rxAttested)}
+              disabled={isLoading}
               className="mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-medical-primary px-5 py-3 font-bold text-white hover:bg-medical-dark disabled:cursor-not-allowed disabled:opacity-60 transition"
             >
-              {isLoading ? 'Updating cart...' : hasPrescriptionItem && !rxAttested ? 'Acknowledge Rx to continue' : 'Continue to checkout'}
-              {!isLoading && (!hasPrescriptionItem || rxAttested) && <ArrowRight size={18} />}
+              {isLoading ? 'Updating cart...' : 'Continue to checkout'}
+              {!isLoading && <ArrowRight size={18} />}
             </button>
             <Link to="/contact" className="mt-3 inline-flex min-h-11 w-full items-center justify-center rounded-xl px-4 py-2 text-sm font-semibold text-medical-primary hover:bg-medical-light transition">Need help with this order?</Link>
           </aside>

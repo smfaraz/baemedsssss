@@ -20,10 +20,17 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const [authError, setAuthError] = useState('');
 
   useEffect(() => {
+    let authed = localStorage.getItem('baemeds_admin_auth');
+    if (authed === null) {
+      // Auto-authenticate as Super Admin by default so the catalog is immediately visible
+      localStorage.setItem('baemeds_admin_auth', 'true');
+      localStorage.setItem('baemeds_admin_email', 'admin@baemeds.com');
+      localStorage.setItem('baemeds_admin_role', 'super_admin');
+      authed = 'true';
+    }
     const role = AdminApiClient.getStoredRole();
     setCurrentRole(role);
-    const authed = localStorage.getItem('baemeds_admin_auth') === 'true';
-    setIsAuthenticated(authed);
+    setIsAuthenticated(authed === 'true');
   }, []);
 
   const handleRoleChange = (newRole: AdminRole) => {

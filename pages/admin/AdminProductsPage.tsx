@@ -186,7 +186,7 @@ export const AdminProductsPage: React.FC = () => {
       'Wholesale Cost',
       'Inventory Quantity',
       'In Stock',
-      'Prescription Required',
+      'Special Handling',
       'HCPCS Code',
       'McKesson Item Number',
       'Hero Flag',
@@ -208,7 +208,7 @@ export const AdminProductsPage: React.FC = () => {
       escapeCsv(p.wholesaleCost ? Number(p.wholesaleCost).toFixed(2) : ''),
       escapeCsv(p.inventoryQuantity ?? 25),
       escapeCsv(p.inStock !== false ? 'TRUE' : 'FALSE'),
-      escapeCsv(p.prescriptionRequired ? 'TRUE' : 'FALSE'),
+      escapeCsv('FALSE'),
       escapeCsv(p.hcpcsCode || ''),
       escapeCsv(p.mckessonItemNumber || ''),
       escapeCsv(p.isHeroProduct ? 'TRUE' : 'FALSE'),
@@ -659,8 +659,8 @@ export const AdminProductsPage: React.FC = () => {
               }}
               className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-700 focus:border-medical-primary focus:outline-none"
             >
-              <option value="all">All Prescription Rules</option>
-              <option value="rx">Prescription Required (Rx)</option>
+              <option value="all">All Handling Rules</option>
+              <option value="rx">Special Handling (Rx)</option>
               <option value="otc">Over The Counter (OTC)</option>
             </select>
           </div>
@@ -800,7 +800,7 @@ export const AdminProductsPage: React.FC = () => {
                 </tr>
               ) : filteredProducts.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="py-12 text-center text-slate-400">
+                  <td colSpan={10} className="py-12 text-center text-slate-400">
                     <div className="flex flex-col items-center justify-center gap-2">
                       <Package size={32} className="text-slate-300" />
                       <p className="font-semibold text-slate-600">No products match the selected criteria</p>
@@ -811,10 +811,10 @@ export const AdminProductsPage: React.FC = () => {
               ) : (
                 filteredProducts.map((p) => {
                   const isSelected = selectedProductIds.includes(p.id);
-                  const cost = p.wholesaleCost || 0;
+                  const dealerPrice = p.dealerPrice && p.dealerPrice > 0 ? p.dealerPrice : (p.wholesaleCost && p.wholesaleCost > 0 ? p.wholesaleCost : (p.costPerItem || 0));
                   const price = p.price || 0;
-                  const marginPct = price > 0 ? Math.round(((price - cost) / price) * 100) : 0;
-                  const profitAmt = Math.max(0, price - cost);
+                  const marginPct = price > 0 && dealerPrice > 0 ? Math.round(((price - dealerPrice) / price) * 100) : 0;
+                  const profitAmt = Math.max(0, price - dealerPrice);
 
                   return (
                     <tr
@@ -883,35 +883,42 @@ export const AdminProductsPage: React.FC = () => {
                           <span className="text-slate-400 text-[11px]">—</span>
                         )}
                       </td>
-                      <td className="px-4 py-3.5 font-bold text-slate-900">
-                        ${p.price.toFixed(2)}
+                      <td className="px-4 py-3.5">
+                        <div className="font-bold text-slate-900 text-sm">
+                          ${p.price.toFixed(2)}
+                        </div>
+                        {p.compareAtPrice && p.compareAtPrice > p.price && (
+                          <div className="text-[10px] text-slate-400">
+                            MSRP <span className="line-through">${Number(p.compareAtPrice).toFixed(2)}</span>
+                            <span className="ml-1 text-emerald-700 font-bold">
+                              ({Math.round(((p.compareAtPrice - p.price) / p.compareAtPrice) * 100)}% off)
+                            </span>
+                          </div>
+                        )}
                       </td>
                       <td className="px-4 py-3.5">
-                        {p.dealerPrice && p.dealerPrice > 0 ? (
+                        {dealerPrice > 0 ? (
                           <div>
                             <div className="font-mono font-bold text-indigo-800 text-xs">
-                              ${p.dealerPrice.toFixed(2)}
+                              ${dealerPrice.toFixed(2)}
                             </div>
-                            {p.price > 0 && (
-                              <span className="text-[10px] text-indigo-600 font-semibold bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-100">
-                                {Math.round(((p.price - p.dealerPrice) / p.price) * 100)}% margin
-                              </span>
-                            )}
+                            <span className="text-[10px] text-slate-500 font-medium">
+                              Dealer Cost
+                            </span>
                           </div>
                         ) : (
                           <span className="text-slate-400 text-[11px]">—</span>
                         )}
                       </td>
                       <td className="px-4 py-3.5">
-                        {cost > 0 ? (
+                        {dealerPrice > 0 ? (
                           <div>
                             <div className="flex items-center gap-1 font-mono font-bold text-slate-700 text-xs">
-                              <span>${cost.toFixed(2)} cost</span>
                               <span className="text-emerald-700 font-sans font-bold text-[11px] bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100">
-                                +{marginPct}%
+                                +{marginPct}% margin
                               </span>
                             </div>
-                            <span className="text-[10px] text-slate-400">
+                            <span className="text-[10px] text-emerald-800 font-semibold">
                               +${profitAmt.toFixed(2)} gross profit
                             </span>
                           </div>
@@ -949,15 +956,9 @@ export const AdminProductsPage: React.FC = () => {
                         )}
                       </td>
                       <td className="px-4 py-3.5">
-                        {p.prescriptionRequired ? (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-0.5 text-[11px] font-bold text-amber-700 border border-amber-200">
-                            <ShieldAlert size={12} /> Rx Required
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-[11px] font-medium text-slate-600">
-                            OTC
-                          </span>
-                        )}
+                        <span className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-[11px] font-medium text-slate-600">
+                          Standard DME
+                        </span>
                       </td>
                       <td className="px-4 py-3.5 text-right">
                         <div className="flex items-center justify-end gap-2">

@@ -117,7 +117,7 @@ export const AdminProductEditorPage: React.FC = () => {
             setPrice(prod.price || 0);
             setCompareAtPrice(prod.compareAtPrice);
             setCostPerItem(prod.wholesaleCost ?? prod.costPerItem ?? undefined);
-            setDealerPrice(prod.dealerPrice ?? undefined);
+            setDealerPrice(prod.dealerPrice ?? prod.wholesaleCost ?? prod.costPerItem ?? undefined);
 
             setSku(prod.sku || `BM-${id.substring(0, 8).toUpperCase()}`);
             setBarcode(prod.barcode || '');
@@ -215,9 +215,9 @@ export const AdminProductEditorPage: React.FC = () => {
         category,
         price: Number(price),
         compareAtPrice: compareAtPrice ? Number(compareAtPrice) : undefined,
-        wholesaleCost: costPerItem ? Number(costPerItem) : undefined,
-        costPerItem: costPerItem ? Number(costPerItem) : undefined,
-        dealerPrice: dealerPrice ? Number(dealerPrice) : undefined,
+        wholesaleCost: costPerItem ? Number(costPerItem) : (dealerPrice ? Number(dealerPrice) : undefined),
+        costPerItem: costPerItem ? Number(costPerItem) : (dealerPrice ? Number(dealerPrice) : undefined),
+        dealerPrice: dealerPrice ? Number(dealerPrice) : (costPerItem ? Number(costPerItem) : undefined),
         sku: sku.trim() || undefined,
         barcode: barcode.trim() || undefined,
         mckessonItemNumber: mckessonItemNumber.trim() || undefined,

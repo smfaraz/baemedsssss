@@ -1,3 +1,5 @@
+import type React from 'react';
+
 /**
  * Utility to ensure all product images load in crystal-clear high-definition (HD)
  * Transforms tiny McKesson thumbnails (/Item_Detail/) into full-resolution studio shots (/Item_Zoom/)

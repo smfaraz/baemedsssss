@@ -113,7 +113,7 @@ export const AdminAuditLogsPage: React.FC = () => {
         <div className="flex items-center gap-3">
           <ShieldCheck size={22} className="shrink-0 text-emerald-400" />
           <span>
-            <strong>HIPAA § 164.312(b) Audit Control Standard:</strong> All administrative modifications, catalog pricing changes, patient record queries, and prescription reviews are permanently logged and cryptographically timestamped.
+            <strong>HIPAA § 164.312(b) Audit Control Standard:</strong> All administrative modifications, catalog pricing changes, patient record queries, and compliance reviews are permanently logged and cryptographically timestamped.
           </span>
         </div>
       </div>

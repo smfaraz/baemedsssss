@@ -19,10 +19,7 @@ const AccountPage: React.FC = () => {
   const [actionMessage, setActionMessage] = useState('');
   const [savingAddress, setSavingAddress] = useState(false);
   const [refreshingOrders, setRefreshingOrders] = useState(false);
-  const [prescriptions, setPrescriptions] = useState<Array<{ id: string; fileName: string; status: string; uploadedAt: string; orderId?: string }>>([]);
-  const [uploadingRx, setUploadingRx] = useState(false);
-  const [showRxUpload, setShowRxUpload] = useState(false);
-  const [rxOrderInput, setRxOrderInput] = useState('');
+
 
   useEffect(() => { if (!isLoading && !isAuthenticated) navigate('/login?returnTo=%2Faccount'); }, [isLoading, isAuthenticated, navigate]);
   const updateAddress = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => setNewAddress((current) => ({ ...current, [event.target.name]: event.target.value }));
@@ -88,114 +85,6 @@ const AccountPage: React.FC = () => {
               )}
             </section>
 
-            <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-soft sm:p-6">
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-medical-light text-medical-primary">
-                    <FileText size={22} aria-hidden="true" />
-                  </span>
-                  <div>
-                    <h2 className="text-xl font-bold text-medical-dark">Prescriptions (Rx)</h2>
-                    <p className="text-xs text-slate-500">Medical documentation for clinical DME orders.</p>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setShowRxUpload((prev) => !prev)}
-                  className="flex h-11 w-11 items-center justify-center rounded-xl text-medical-primary hover:bg-medical-light"
-                  aria-label="Upload prescription"
-                >
-                  <Plus aria-hidden="true" />
-                </button>
-              </div>
-
-              {showRxUpload && (
-                <div className="mt-5 border-t border-slate-200 pt-5">
-                  <h3 className="text-sm font-bold text-medical-dark">Upload Physician Prescription</h3>
-                  <p className="mt-1 text-xs text-slate-500">Supported formats: PDF, JPEG, PNG, WebP (Max 10MB).</p>
-                  <div className="mt-3 space-y-3">
-                    <label className="block">
-                      <span className="mb-1 block text-xs font-semibold text-slate-600">Associated Order Number (optional)</span>
-                      <input
-                        type="text"
-                        placeholder="e.g. 1024"
-                        value={rxOrderInput}
-                        onChange={(e) => setRxOrderInput(e.target.value)}
-                        className={fieldClass}
-                      />
-                    </label>
-                    <label className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 p-4 hover:bg-slate-100 cursor-pointer transition">
-                      <Upload size={24} className="text-slate-400" />
-                      <span className="mt-2 text-xs font-bold text-medical-primary">Select prescription file</span>
-                      <span className="text-[11px] text-slate-500">PDF, JPG, PNG up to 10MB</span>
-                      <input
-                        type="file"
-                        accept=".pdf,image/jpeg,image/png,image/webp"
-                        className="hidden"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (!file) return;
-                          if (file.size > 10 * 1024 * 1024) {
-                            setActionError('File size exceeds the 10 MB limit.');
-                            return;
-                          }
-                          const validMimes = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
-                          if (!validMimes.includes(file.type)) {
-                            setActionError('Please upload a valid PDF, JPEG, PNG, or WebP document.');
-                            return;
-                          }
-                          setActionError('');
-                          setUploadingRx(true);
-                          try {
-                            const newRx = {
-                              id: `rx-${Date.now()}`,
-                              fileName: file.name.replace(/[^a-zA-Z0-9._-]/g, '_'),
-                              status: 'UNDER_REVIEW',
-                              uploadedAt: new Date().toLocaleDateString('en-US'),
-                              orderId: rxOrderInput.trim() || undefined,
-                            };
-                            setPrescriptions((prev) => [newRx, ...prev]);
-                            setShowRxUpload(false);
-                            setRxOrderInput('');
-                            setActionMessage(`Prescription "${newRx.fileName}" submitted and queued for clinical specialist review.`);
-                          } catch {
-                            setActionError('Failed to record prescription document.');
-                          } finally {
-                            setUploadingRx(false);
-                          }
-                        }}
-                      />
-                    </label>
-                  </div>
-                </div>
-              )}
-
-              <div className="mt-5 space-y-3">
-                {prescriptions.length ? (
-                  prescriptions.map((rx) => (
-                    <article key={rx.id} className="rounded-xl border border-slate-200 p-3.5 text-sm">
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="min-w-0">
-                          <p className="font-bold text-medical-dark truncate">{rx.fileName}</p>
-                          <p className="text-xs text-slate-500 mt-0.5">Uploaded {rx.uploadedAt} {rx.orderId ? `• Order #${rx.orderId}` : ''}</p>
-                        </div>
-                        <span className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-bold ${
-                          rx.status === 'APPROVED' ? 'bg-emerald-100 text-emerald-800' :
-                          rx.status === 'REJECTED' ? 'bg-rose-100 text-rose-800' :
-                          'bg-amber-100 text-amber-900'
-                        }`}>
-                          {formatStatus(rx.status)}
-                        </span>
-                      </div>
-                    </article>
-                  ))
-                ) : (
-                  <p className="rounded-xl bg-slate-50 p-4 text-xs text-slate-500">
-                    No prescriptions uploaded yet. When purchasing prescription-required DME, upload your documentation here for clinical verification.
-                  </p>
-                )}
-              </div>
-            </section>
           </div>
 
           <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-soft sm:p-6">

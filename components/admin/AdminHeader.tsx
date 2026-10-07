@@ -21,7 +21,7 @@ interface AdminHeaderProps {
 
 const ROLES: { role: AdminRole; label: string; desc: string }[] = [
   { role: 'super_admin', label: 'Super Admin', desc: 'Full unrestricted platform management' },
-  { role: 'clinical_specialist', label: 'Clinical Specialist', desc: 'Prescription review & clinical gating' },
+  { role: 'clinical_specialist', label: 'Clinical Specialist', desc: 'Equipment compliance & order fulfillment' },
   { role: 'fulfillment_specialist', label: 'Fulfillment Specialist', desc: 'Orders, shipping, & inventory' },
   { role: 'support_agent', label: 'Support Agent', desc: 'Customer service & non-PHI orders' },
   { role: 'compliance_officer', label: 'Compliance Officer', desc: 'HIPAA audit logs & governance' },
