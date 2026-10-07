@@ -57,25 +57,24 @@ async function generateCompleteSitemap() {
     { path: '/policies/returns', priority: '0.5', changefreq: 'monthly' },
   ];
 
-  // 2. All 17 Medical Category Routes
+  // 2. All 16 Medical Category Routes
   const categories = [
-    "Oxygen Concentrator",
-    "BiPAP",
-    "CPAP",
-    "Patient Monitor",
-    "Masks & Accessories",
-    "ECG Machine",
-    "BP Monitor",
-    "Glucometer",
-    "Nebulizer",
-    "Suction Machine",
-    "Thermometer",
+    "CPAP Machines",
+    "CPAP Masks & Accessories",
+    "BiPAP Machines",
+    "Oxygen Concentrators",
+    "Nebulizers",
+    "Suction Machines",
+    "Patient Monitors",
+    "Blood Pressure Monitors",
+    "Glucometers",
+    "Wheelchairs",
+    "Wheelchair Parts & Accessories",
+    "Walkers & Rollators",
     "Hospital Furniture",
-    "Wheelchair",
-    "Syringe Pump",
-    "Defibrillator",
-    "Sterilizer",
-    "Orthopedic"
+    "Commodes & Bath Safety",
+    "Incontinence & Care",
+    "Breast Pumps"
   ];
 
   // 3. Fetch 100% of products with pagination from Shopify

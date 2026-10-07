@@ -387,9 +387,9 @@ const Header: React.FC = () => {
               </div>
             )}
           </div>
-          <Link to="/products?category=Oxygen%20Concentrator" className="hover:text-medical-primary">Respiratory care</Link>
-          <Link to="/products?category=Patient%20Monitor" className="hover:text-medical-primary">Diagnostics</Link>
-          <Link to="/products?category=Hospital%20Furniture" className="hover:text-medical-primary">Mobility & furniture</Link>
+          <Link to="/products?category=Oxygen%20Concentrators" className="hover:text-medical-primary">Respiratory care</Link>
+          <Link to="/products?category=Patient%20Monitors" className="hover:text-medical-primary">Diagnostics</Link>
+          <Link to="/products?category=Wheelchairs" className="hover:text-medical-primary">Mobility & wheelchairs</Link>
           <Link to="/bulk-orders" className="hover:text-medical-primary">Hospital orders</Link>
           <div className="ml-auto flex items-center gap-7">
             <Link to="/about" className="hover:text-medical-primary">About</Link>

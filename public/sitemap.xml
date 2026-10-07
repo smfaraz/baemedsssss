@@ -56,67 +56,73 @@
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://baemeds.com/products?category=Oxygen%20Concentrator</loc>
+    <loc>https://baemeds.com/products?category=CPAP%20Machines</loc>
     <lastmod>2026-10-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://baemeds.com/products?category=BiPAP</loc>
+    <loc>https://baemeds.com/products?category=CPAP%20Masks%20%26%20Accessories</loc>
     <lastmod>2026-10-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://baemeds.com/products?category=CPAP</loc>
+    <loc>https://baemeds.com/products?category=BiPAP%20Machines</loc>
     <lastmod>2026-10-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://baemeds.com/products?category=Patient%20Monitor</loc>
+    <loc>https://baemeds.com/products?category=Oxygen%20Concentrators</loc>
     <lastmod>2026-10-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://baemeds.com/products?category=Masks%20%26%20Accessories</loc>
+    <loc>https://baemeds.com/products?category=Nebulizers</loc>
     <lastmod>2026-10-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://baemeds.com/products?category=ECG%20Machine</loc>
+    <loc>https://baemeds.com/products?category=Suction%20Machines</loc>
     <lastmod>2026-10-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://baemeds.com/products?category=BP%20Monitor</loc>
+    <loc>https://baemeds.com/products?category=Patient%20Monitors</loc>
     <lastmod>2026-10-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://baemeds.com/products?category=Glucometer</loc>
+    <loc>https://baemeds.com/products?category=Blood%20Pressure%20Monitors</loc>
     <lastmod>2026-10-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://baemeds.com/products?category=Nebulizer</loc>
+    <loc>https://baemeds.com/products?category=Glucometers</loc>
     <lastmod>2026-10-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://baemeds.com/products?category=Suction%20Machine</loc>
+    <loc>https://baemeds.com/products?category=Wheelchairs</loc>
     <lastmod>2026-10-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://baemeds.com/products?category=Thermometer</loc>
+    <loc>https://baemeds.com/products?category=Wheelchair%20Parts%20%26%20Accessories</loc>
+    <lastmod>2026-10-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://baemeds.com/products?category=Walkers%20%26%20Rollators</loc>
     <lastmod>2026-10-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
@@ -128,31 +134,19 @@
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://baemeds.com/products?category=Wheelchair</loc>
+    <loc>https://baemeds.com/products?category=Commodes%20%26%20Bath%20Safety</loc>
     <lastmod>2026-10-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://baemeds.com/products?category=Syringe%20Pump</loc>
+    <loc>https://baemeds.com/products?category=Incontinence%20%26%20Care</loc>
     <lastmod>2026-10-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://baemeds.com/products?category=Defibrillator</loc>
-    <lastmod>2026-10-07</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.85</priority>
-  </url>
-  <url>
-    <loc>https://baemeds.com/products?category=Sterilizer</loc>
-    <lastmod>2026-10-07</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.85</priority>
-  </url>
-  <url>
-    <loc>https://baemeds.com/products?category=Orthopedic</loc>
+    <loc>https://baemeds.com/products?category=Breast%20Pumps</loc>
     <lastmod>2026-10-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>

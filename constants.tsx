@@ -19,7 +19,11 @@ import {
   Accessibility,
   User,
   Baby,
-  Sparkles
+  Sparkles,
+  Wrench,
+  Bath,
+  PersonStanding,
+  Layers
 } from 'lucide-react';
 
 export const APP_NAME = "BaeMeds";
@@ -60,10 +64,10 @@ export const CATEGORIES: Category[] = [
     image: "https://imgcdn.mckesson.com/CumulusWeb/Images/Item_Detail/1195496_pkgfront.jpg"
   },
   {
-    name: "Wheelchairs",
-    icon: <Accessibility size={28} />,
-    slug: "Wheelchairs",
-    image: "https://dphpia7d6qb4m.cloudfront.net/images/dr-k3_01_t.png"
+    name: "CPAP Masks & Accessories",
+    icon: <Layers size={28} />,
+    slug: "CPAP Masks & Accessories",
+    image: "https://imgcdn.mckesson.com/CumulusWeb/Images/Item_Zoom/575592.jpg"
   },
   {
     name: "BiPAP Machines",
@@ -72,8 +76,38 @@ export const CATEGORIES: Category[] = [
     image: "https://imgcdn.mckesson.com/CumulusWeb/Images/Item_Detail/RESPIR_561425.jpg"
   },
   {
+    name: "Wheelchairs",
+    icon: <Accessibility size={28} />,
+    slug: "Wheelchairs",
+    image: "https://dphpia7d6qb4m.cloudfront.net/images/dr-k3_01_t.png"
+  },
+  {
+    name: "Walkers & Rollators",
+    icon: <PersonStanding size={28} />,
+    slug: "Walkers & Rollators",
+    image: "https://imgcdn.mckesson.com/CumulusWeb/Images/Item_Zoom/1120964_left.jpg"
+  },
+  {
+    name: "Wheelchair Parts & Accessories",
+    icon: <Wrench size={28} />,
+    slug: "Wheelchair Parts & Accessories",
+    image: "https://imgcdn.mckesson.com/CumulusWeb/Images/Item_Zoom/787561.jpg"
+  },
+  {
+    name: "Commodes & Bath Safety",
+    icon: <Bath size={28} />,
+    slug: "Commodes & Bath Safety",
+    image: "https://imgcdn.mckesson.com/CumulusWeb/Images/Item_Zoom/1065228_left.jpg"
+  },
+  {
+    name: "Hospital Furniture",
+    icon: <Bed size={28} />,
+    slug: "Hospital Furniture",
+    image: "https://cf1.bettymills.com/store/images/product/500/DRV15033.JPG"
+  },
+  {
     name: "Patient Monitors",
-    icon: <Activity size={28} />,
+    icon: <HeartPulse size={28} />,
     slug: "Patient Monitors",
     image: "https://dphpia7d6qb4m.cloudfront.net/images/mq-mq3000_01_t.png"
   },
@@ -112,11 +146,5 @@ export const CATEGORIES: Category[] = [
     icon: <Sparkles size={28} />,
     slug: "Incontinence & Care",
     image: "https://imgcdn.mckesson.com/CumulusWeb/Images/Item_Detail/165216_ppkgleft.jpg"
-  },
-  {
-    name: "Hospital Furniture",
-    icon: <Bed size={28} />,
-    slug: "Hospital Furniture",
-    image: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=600&auto=format&fit=crop"
   }
 ];

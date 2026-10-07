@@ -118,20 +118,23 @@ export const CATEGORY_KEYWORDS: Record<string, string[]> = {
   "Oxygen Concentrators": ["oxygen concentrator", "oxygen concentrators", "concentrator", "concentrators", "oxygen generator", "portable oxygen concentrator", "portable concentrator", "5 liter concentrators", "10 liter concentrators", "respiratory therapy", "oxygen therapy"],
   "BiPAP Machines": ["bipap", "bipap machines", "bi-level", "bilevel", "vpap", "lumis"],
   "CPAP Machines": ["cpap", "cpap machines", "auto cpap", "sleep apnea", "airsense", "resmart"],
-  "Patient Monitors": ["patient monitor", "patient monitors", "patient monitoring", "multipara monitor", "vital signs monitor", "pulse oximeter", "pulse oximeters"],
+  "CPAP Masks & Accessories": ["cpap mask", "cpap masks", "mask components", "cpap headgear", "nasal mask", "full face mask", "nasal pillow", "cpap tubing", "cpap filter", "cpap filters", "masks and accessories", "masks & accessories"],
+  "Patient Monitors": ["patient monitor", "patient monitors", "patient monitoring", "multipara monitor", "vital signs monitor", "pulse oximeter", "pulse oximeters", "chair scale", "wheelchair scale"],
   "ECG Machines": ["ecg", "ekg", "electrocardiogram", "cardiograph"],
   "Blood Pressure Monitors": ["bp", "bp monitor", "blood pressure", "blood pressure monitors", "sphygmomanometer", "hypertension"],
-  "Glucometers": ["glucometer", "glucometers", "glucose", "blood sugar", "diabetes", "accu-chek"],
+  "Glucometers": ["glucometer", "glucometers", "glucose", "blood sugar", "diabetes", "accu-chek", "cgm"],
   "Nebulizers": ["nebulizer", "nebulizers", "compressor nebulizer", "mesh", "inhaler", "omron"],
   "Suction Machines": ["suction", "suction machine", "suction machines", "aspirator", "vacuum", "phlegm"],
   "Syringe Pumps": ["syringe pump", "syringe pumps", "infusion pump", "perfusor"],
   "Defibrillators": ["defibrillator", "defibrillators", "aed", "shock"],
   "Sterilizers": ["sterilizer", "sterilizers", "autoclave", "disinfection"],
   "Thermometers": ["thermometer", "thermometers", "infrared thermometer", "temperature gun"],
-  "Hospital Furniture": ["hospital bed", "medical bed", "fowler bed", "hospital mattress", "overbed table", "examination table", "hospital trolley", "stretcher"],
-  "Wheelchairs": ["wheelchair", "wheelchairs", "mobility & wheelchairs", "mobility", "transport chair", "commode", "walker"],
+  "Hospital Furniture": ["hospital bed", "hospital beds", "hospital beds and furnishings", "hospital beds & furnishings", "medical bed", "fowler bed", "overbed table", "overbed tables", "examination table", "hospital trolley", "stretcher", "trapeze", "patient lift"],
+  "Wheelchairs": ["wheelchair", "wheelchairs", "transport chair", "transport chairs", "manual wheelchair", "bariatric wheelchair"],
+  "Walkers & Rollators": ["walker", "walkers", "rollator", "rollators", "crutch", "crutches", "cane", "canes", "quad cane"],
+  "Wheelchair Parts & Accessories": ["wheelchair cushion", "wheelchair parts", "wheelchair accessories", "caster", "legrest", "footrest", "anti-tipper", "armrest pad", "wheelchair tire"],
+  "Commodes & Bath Safety": ["commode", "commodes", "commode chair", "shower chair", "bath bench", "transfer bench", "bath safety"],
   "Orthopedic Supports": ["orthopedic", "orthopaedic", "knee support", "back support", "cervical collar", "brace", "splint"],
-  "Masks & Accessories": ["cpap mask", "bipap mask", "oxygen mask", "nasal mask", "full face mask", "oxygen cannula", "cpap tubing", "respiratory supplies", "respiratory accessories"],
   "Breast Pumps": ["breast pump", "breast pumps", "breastpump", "lactation", "maternity", "medela", "ameda", "spectra"],
   "Incontinence & Care": ["incontinence", "incontinence & care", "briefs", "underwear", "adult brief", "diaper", "underpad", "chux"]
 };
@@ -140,17 +143,36 @@ export const normalizeCategoryKey = (value: string): string =>
   (value || '').toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]/g, '');
 
 export const resolveCategoryName = (categoryOrSlug: string): string => {
+  if (!categoryOrSlug) return '';
   const cleanInput = normalizeCategoryKey(categoryOrSlug);
+
+  // 1. Direct exact canonical match across all defined categories
+  for (const canonicalName of Object.keys(CATEGORY_KEYWORDS)) {
+    if (normalizeCategoryKey(canonicalName) === cleanInput) {
+      return canonicalName;
+    }
+  }
+
+  // 2. Exact keyword match
   for (const [canonicalName, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
-    const normCanonical = normalizeCategoryKey(canonicalName);
-    if (normCanonical === cleanInput) return canonicalName;
+    if (keywords.some((kw) => normalizeCategoryKey(kw) === cleanInput)) {
+      return canonicalName;
+    }
+  }
+
+  // 3. Substring keyword match (prioritize longer/more specific subcategories first)
+  const sortedEntries = Object.entries(CATEGORY_KEYWORDS).sort(
+    (a, b) => b[0].length - a[0].length
+  );
+  for (const [canonicalName, keywords] of sortedEntries) {
     if (keywords.some((kw) => {
       const normKw = normalizeCategoryKey(kw);
-      return cleanInput === normKw || cleanInput.includes(normKw) || normKw.includes(cleanInput);
+      return cleanInput.includes(normKw) || normKw.includes(cleanInput);
     })) {
       return canonicalName;
     }
   }
+
   return categoryOrSlug;
 };
 

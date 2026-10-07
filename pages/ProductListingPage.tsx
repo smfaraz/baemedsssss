@@ -31,16 +31,20 @@ const ITEMS_PER_PAGE = 50;
 const CATEGORY_DESCRIPTIONS: Record<string, string> = {
   "Oxygen Concentrators": "Hospital-grade stationary 5L & 10L oxygen concentrators and lightweight portable travel POC units with pre-shipment calibration, manufacturer warranties, and insured US carrier delivery.",
   "CPAP Machines": "Advanced auto-adjusting CPAP systems engineered for quiet, compliant obstructive sleep apnea management with heated humidification and companion accessories.",
+  "CPAP Masks & Accessories": "Full-face, nasal, and pillow mask assemblies, replacement cushions, headgear, heated circuits, micro-filters, and sanitization accessories.",
   "BiPAP Machines": "High-performance bi-level positive airway pressure units for non-invasive respiratory ventilation, COPD support, and complex sleep therapy.",
   "Wheelchairs": "Lightweight transport chairs, standard folding wheelchairs, and heavy-duty bariatric mobility systems with certified weight capacities.",
-  "Patient Monitors": "Multiparameter clinical telemetry monitors, vital signs diagnostic stations, and OLED fingertip pulse oximeters.",
+  "Walkers & Rollators": "Ergonomic 4-wheel rollators with hand brakes, folding mobility walkers, adjustable quad canes, and clinical forearm crutches.",
+  "Wheelchair Parts & Accessories": "Therapeutic pressure-relief cushions, replacement casters, elevating legrests, armrest pads, anti-tippers, and mounting hardware.",
+  "Commodes & Bath Safety": "Multi-function 3-in-1 bedside commodes, drop-arm commode chairs, transfer benches, and non-slip clinical shower chairs.",
+  "Patient Monitors": "Multiparameter clinical telemetry monitors, vital signs diagnostic stations, clinical wheelchair scales, and OLED pulse oximeters.",
   "Nebulizers": "Heavy-duty piston compressor nebulizers and portable ultrasonic mesh inhalers for effective aerosol respiratory therapy.",
   "Blood Pressure Monitors": "Clinical digital upper arm blood pressure monitors and professional aneroid sphygmomanometer kits with calibrated cuffs.",
   "Glucometers": "Fast, accurate blood glucose meters, multi-test memory systems, and comprehensive diabetic monitoring kits.",
   "Suction Machines": "High-vacuum clinical suction units, surgical aspirators, and emergency phlegm clearance machines for hospital and home care.",
   "Breast Pumps": "Hospital-grade electric breast pumps, closed-system double pumping kits, and maternity lactation accessories.",
   "Incontinence & Care": "Premium absorbent briefs, protective underwear, and clinical disposable underpads for comprehensive patient hygiene.",
-  "Hospital Furniture": "Durable clinical beds, overbed tables, exam stretchers, and specialized healthcare facility furnishings."
+  "Hospital Furniture": "Full-electric clinical beds, spring-assisted overbed tables, trapeze bars, patient lifts, and specialized facility furnishings."
 };
 
 const renderPaginationPages = (
