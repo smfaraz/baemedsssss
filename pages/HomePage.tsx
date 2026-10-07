@@ -10,6 +10,7 @@ import ProductCard from '../components/ProductCard';
 import ProductCardSkeleton from '../components/ProductCardSkeleton';
 import SEO from '../components/SEO';
 import TrustBadges from '../components/TrustBadges';
+import TrustedBrandsMarquee from '../components/TrustedBrandsMarquee';
 import { CATEGORIES, CONTACT_PHONE } from '../constants';
 import { Link } from '../context/CartContext';
 import { getRecentlyViewedProducts } from '../lib/recentlyViewed';
@@ -429,6 +430,9 @@ const HomePage: React.FC = () => {
           </div>
         )}
       </section>
+
+      {/* Trusted Medical Brands Marquee */}
+      <TrustedBrandsMarquee />
 
       {/* Category Grid: Browse by Need */}
       <section className="reveal-on-scroll border-b border-slate-200 bg-white py-10 md:py-14">

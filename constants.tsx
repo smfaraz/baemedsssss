@@ -148,3 +148,113 @@ export const CATEGORIES: Category[] = [
     image: "https://imgcdn.mckesson.com/CumulusWeb/Images/Item_Detail/165216_ppkgleft.jpg"
   }
 ];
+
+export interface TrustedBrand {
+  name: string;
+  logo: string;
+  searchQuery: string;
+  category?: string;
+  tagline: string;
+}
+
+export const TRUSTED_BRANDS: TrustedBrand[] = [
+  {
+    name: 'Drive DeVilbiss Healthcare',
+    logo: '/brands/drive-devilbiss.png',
+    searchQuery: 'Drive DeVilbiss',
+    category: 'Wheelchairs',
+    tagline: 'Mobility & Respiratory Leaders'
+  },
+  {
+    name: 'ResMed',
+    logo: '/brands/resmed.svg',
+    searchQuery: 'ResMed',
+    category: 'CPAP Masks & Accessories',
+    tagline: 'Sleep Apnea & Respiratory Care'
+  },
+  {
+    name: 'Philips Respironics',
+    logo: '/brands/philips.svg',
+    searchQuery: 'Respironics',
+    category: 'CPAP Machines',
+    tagline: 'Clinical Respiratory Systems'
+  },
+  {
+    name: 'Inogen',
+    logo: '/brands/inogen.png',
+    searchQuery: 'Inogen',
+    category: 'Oxygen Concentrators',
+    tagline: 'Portable Oxygen Concentrators'
+  },
+  {
+    name: 'Fisher & Paykel',
+    logo: '/brands/fisher-paykel.svg',
+    searchQuery: 'Fisher & Paykel',
+    category: 'CPAP Masks & Accessories',
+    tagline: 'Innovative Respiratory & Humidification'
+  },
+  {
+    name: 'McKesson',
+    logo: '/brands/mckesson.svg',
+    searchQuery: 'McKesson',
+    category: 'Incontinence & Care',
+    tagline: 'Hospital & Clinical Care Supplies'
+  },
+  {
+    name: 'Medline',
+    logo: '/brands/medline.svg',
+    searchQuery: 'Medline',
+    category: 'Wheelchairs',
+    tagline: 'Durable Medical Equipment & Care'
+  },
+  {
+    name: 'Welch Allyn',
+    logo: '/brands/welch-allyn.svg',
+    searchQuery: 'Welch Allyn',
+    category: 'Patient Monitors',
+    tagline: 'Diagnostic Monitoring & Vital Signs'
+  },
+  {
+    name: 'Cardinal Health',
+    logo: '/brands/cardinal-health.svg',
+    searchQuery: 'Cardinal',
+    category: 'Incontinence & Care',
+    tagline: 'Essential Medical Infrastructure'
+  },
+  {
+    name: 'OMRON Healthcare',
+    logo: '/brands/omron.svg',
+    searchQuery: 'Omron',
+    category: 'Blood Pressure Monitors',
+    tagline: 'Cardiovascular & Vital Diagnostics'
+  },
+  {
+    name: 'Abbott',
+    logo: '/brands/abbott.svg',
+    searchQuery: 'Abbott',
+    category: 'Glucometers',
+    tagline: 'Diabetes Care & Continuous Monitoring'
+  },
+  {
+    name: 'BD (Becton Dickinson)',
+    logo: '/brands/bd.svg',
+    searchQuery: 'BD',
+    category: 'Glucometers',
+    tagline: 'Medical Technology & Diagnostics'
+  },
+  {
+    name: 'Invacare',
+    logo: '/brands/invacare.gif',
+    searchQuery: 'Invacare',
+    category: 'Wheelchairs',
+    tagline: 'Rehabilitation & Homecare Mobility'
+  },
+  {
+    name: '3M Littmann',
+    logo: '/brands/3m.svg',
+    searchQuery: '3M',
+    category: 'Patient Monitors',
+    tagline: 'Clinical Acoustics & Diagnostics'
+  }
+];
+
