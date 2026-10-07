@@ -79,13 +79,13 @@ export const CATEGORIES: Category[] = [
     name: "Wheelchairs",
     icon: <Accessibility size={28} />,
     slug: "Wheelchairs",
-    image: "https://dphpia7d6qb4m.cloudfront.net/images/dr-k3_01_t.png"
+    image: "/assets/live-baemeds/middleaged-man-in-wheelchair.jpg"
   },
   {
     name: "Walkers & Rollators",
     icon: <PersonStanding size={28} />,
     slug: "Walkers & Rollators",
-    image: "https://imgcdn.mckesson.com/CumulusWeb/Images/Item_Zoom/1120964_left.jpg"
+    image: "/assets/live-baemeds/group-in-walkers.webp"
   },
   {
     name: "Wheelchair Parts & Accessories",
@@ -97,13 +97,13 @@ export const CATEGORIES: Category[] = [
     name: "Commodes & Bath Safety",
     icon: <Bath size={28} />,
     slug: "Commodes & Bath Safety",
-    image: "https://imgcdn.mckesson.com/CumulusWeb/Images/Item_Zoom/1065228_left.jpg"
+    image: "/assets/live-baemeds/karman-product-2.webp"
   },
   {
     name: "Hospital Furniture",
     icon: <Bed size={28} />,
     slug: "Hospital Furniture",
-    image: "https://cf1.bettymills.com/store/images/product/500/DRV15033.JPG"
+    image: "/assets/live-baemeds/durable-medical-equipment.jpg"
   },
   {
     name: "Patient Monitors",
@@ -248,6 +248,13 @@ export const TRUSTED_BRANDS: TrustedBrand[] = [
     searchQuery: 'Invacare',
     category: 'Wheelchairs',
     tagline: 'Rehabilitation & Homecare Mobility'
+  },
+  {
+    name: 'Karman Healthcare',
+    logo: '/assets/live-baemeds/karman-product-4.webp',
+    searchQuery: 'Karman',
+    category: 'Wheelchairs',
+    tagline: 'Ergonomic Mobility & Standing Wheelchairs'
   },
   {
     name: '3M Littmann',

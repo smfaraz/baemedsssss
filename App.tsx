@@ -126,6 +126,8 @@ const AppContent: React.FC = () => {
 
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
+          <Route path="/bulk-orders" element={<BulkOrderPage />} />
+          <Route path="/bulk-order" element={<BulkOrderPage />} />
           <Route path="/policies/privacy" element={<PolicyPage type="privacy" />} />
           <Route path="/policies/terms" element={<PolicyPage type="terms" />} />
           <Route path="/policies/shipping" element={<PolicyPage type="shipping" />} />

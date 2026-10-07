@@ -64,10 +64,68 @@ const AboutPage: React.FC = () => {
 
           <div className="relative">
             <img
-              src={aboutImg}
-              alt="A selection of mobility and home-care medical equipment"
+              src="/assets/live-baemeds/middleaged-man-in-wheelchair.jpg"
+              alt="Middle-aged man in lightweight wheelchair — BaeMeds mobility equipment"
               className="aspect-[4/3] w-full rounded-2xl object-cover shadow-soft"
             />
+          </div>
+        </div>
+      </section>
+
+      {/* Authentic BaeMeds Equipment & Mobility Showcase Gallery */}
+      <section className="bg-slate-100/70 border-b border-slate-200 py-12 sm:py-16">
+        <div className="container mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-10">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-medical-primary">Nationwide Equipment in Action</p>
+            <h2 className="mt-2 text-2xl font-black text-slate-900 sm:text-3xl">Durable Medical &amp; Mobility Solutions</h2>
+            <p className="mt-2 text-sm text-slate-600">Pre-calibrated hospital beds, wheelchairs, rollators, and respiratory devices helping patients maintain independence across America.</p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="group overflow-hidden rounded-2xl bg-white border border-slate-200 shadow-sm transition hover:shadow-md">
+              <div className="h-56 overflow-hidden">
+                <img
+                  src="/assets/live-baemeds/durable-medical-equipment.jpg"
+                  alt="Durable medical equipment in modern clinical healthcare setting"
+                  className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                  loading="lazy"
+                />
+              </div>
+              <div className="p-4">
+                <h3 className="font-bold text-slate-900 text-sm">Certified Clinical &amp; Home Care Equipment</h3>
+                <p className="mt-1 text-xs text-slate-600">Hospital-grade patient room equipment, electronic beds, and support surfaces.</p>
+              </div>
+            </div>
+
+            <div className="group overflow-hidden rounded-2xl bg-white border border-slate-200 shadow-sm transition hover:shadow-md">
+              <div className="h-56 overflow-hidden">
+                <img
+                  src="/assets/live-baemeds/group-in-walkers.webp"
+                  alt="Active individuals utilizing rolling walkers and rollators"
+                  className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                  loading="lazy"
+                />
+              </div>
+              <div className="p-4">
+                <h3 className="font-bold text-slate-900 text-sm">Mobility Independence &amp; Rehabilitation</h3>
+                <p className="mt-1 text-xs text-slate-600">Ergonomic four-wheel rollators, knee scooters, and assisted ambulation frames.</p>
+              </div>
+            </div>
+
+            <div className="group overflow-hidden rounded-2xl bg-white border border-slate-200 shadow-sm transition hover:shadow-md sm:col-span-2 lg:col-span-1">
+              <div className="h-56 overflow-hidden">
+                <img
+                  src="/assets/live-baemeds/lifestyle-power-wheelchair.jpg"
+                  alt="Power standing and motorized wheelchair mobility assistance"
+                  className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                  loading="lazy"
+                />
+              </div>
+              <div className="p-4">
+                <h3 className="font-bold text-slate-900 text-sm">Full-Power &amp; Transport Wheelchairs</h3>
+                <p className="mt-1 text-xs text-slate-600">Lightweight foldable power chairs and heavy-duty bariatric transport chairs.</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>

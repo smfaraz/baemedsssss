@@ -31,7 +31,7 @@ const tileAccents = [
 const EquipmentPromotion: React.FC = () => (
   <section className="reveal-on-scroll container mx-auto px-4 pb-3 pt-4" aria-labelledby="equipment-promotion-title">
     <div className="relative overflow-hidden rounded-3xl bg-medical-dark text-white shadow-xl">
-      <img src="/rental-hero.png" alt="Medical equipment available across the United States" className="absolute inset-0 h-full w-full object-cover object-right" />
+      <img src="/assets/live-baemeds/durable-medical-equipment.jpg" alt="Durable medical equipment available across the United States" className="absolute inset-0 h-full w-full object-cover object-right" />
       <div className="absolute inset-0 bg-gradient-to-r from-medical-dark via-medical-dark/95 to-medical-dark/20" aria-hidden="true" />
       <div className="relative max-w-xl px-6 py-9 sm:px-9 sm:py-12">
         <p className="text-xs font-black uppercase tracking-[0.2em] text-teal-300">Nationwide US Equipment</p>

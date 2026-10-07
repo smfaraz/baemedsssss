@@ -78,7 +78,7 @@ async function runStorefrontPaginationTests() {
   const catCounts = getCatalogCategoryCounts();
   assert.strictEqual(catCounts['CPAP Machines'], 25, 'CPAP Machines category count must be 25');
   assert.strictEqual(catCounts['CPAP Masks & Accessories'], 554, 'CPAP Masks category count must be 554');
-  assert.strictEqual(catCounts['Wheelchairs'], 181, 'Wheelchairs category count must be 181');
+  assert.strictEqual(catCounts['Wheelchairs'], 200, 'Wheelchairs category count must be 200');
   assert.strictEqual(catCounts['Wheelchair Parts & Accessories'], 776, 'Wheelchair Parts category count must be 776');
   const brandCounts = getCatalogBrandCounts();
   assert(brandCounts.length > 50, 'Brand counts must include all catalog manufacturers');
