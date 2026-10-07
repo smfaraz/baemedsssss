@@ -3,7 +3,6 @@ import {
   ArrowRight,
   Building2,
   CheckCircle2,
-  Clock3,
   PackageCheck,
 } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
@@ -28,47 +27,6 @@ const tileAccents = [
   'bg-rose-100 text-rose-700',
   'bg-indigo-100 text-indigo-700',
 ];
-
-const OfferCountdownBanner: React.FC = () => {
-  const [remaining, setRemaining] = useState(() => 42 * 24 * 60 * 60);
-
-  useEffect(() => {
-    const timer = window.setInterval(() => setRemaining((value) => (value > 0 ? value - 1 : 42 * 24 * 60 * 60)), 1000);
-    return () => window.clearInterval(timer);
-  }, []);
-
-  const days = Math.floor(remaining / 86400);
-  const hours = Math.floor((remaining % 86400) / 3600);
-  const minutes = Math.floor((remaining % 3600) / 60);
-  const seconds = remaining % 60;
-  const unit = (value: number) => String(value).padStart(2, '0');
-
-  return (
-    <section className="reveal-on-scroll container mx-auto px-4 pb-2 pt-2" aria-label="Limited time offer">
-      <div className="overflow-hidden rounded-2xl border border-rose-300 bg-rose-600 text-white shadow-lg">
-        <div className="flex flex-col gap-4 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-          <div className="flex items-start gap-3">
-            <span className="mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/15"><Clock3 size={23} /></span>
-            <div>
-              <p className="text-xs font-black uppercase tracking-[0.16em] text-rose-100">BaeMeds Offer Window</p>
-              <h2 className="mt-1 text-xl font-black tracking-tight sm:text-2xl">Save on Essential Home &amp; Hospital Equipment</h2>
-              <p className="mt-1 text-sm text-rose-100">Inspected, factory-sealed equipment with manufacturer warranties and itemized FSA/HSA invoices.</p>
-            </div>
-          </div>
-          <div className="shrink-0" aria-live="polite">
-            <p className="mb-1 text-[10px] font-black uppercase tracking-[0.16em] text-rose-100">Special Pricing Ends In</p>
-            <div className="flex items-center gap-1.5 font-mono text-lg font-black sm:text-xl">
-              <span className="rounded-lg bg-white px-2 py-1 text-rose-700">{days}d</span>
-              <span>:</span><span className="rounded-lg bg-white px-2 py-1 text-rose-700">{unit(hours)}</span>
-              <span>:</span><span className="rounded-lg bg-white px-2 py-1 text-rose-700">{unit(minutes)}</span>
-              <span>:</span><span className="rounded-lg bg-white px-2 py-1 text-rose-700">{unit(seconds)}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-};
 
 const EquipmentPromotion: React.FC = () => (
   <section className="reveal-on-scroll container mx-auto px-4 pb-3 pt-4" aria-labelledby="equipment-promotion-title">
@@ -514,9 +472,6 @@ const HomePage: React.FC = () => {
 
       {/* Equipment Promotion Banner */}
       <EquipmentPromotion />
-
-      {/* Offer Countdown Banner */}
-      <OfferCountdownBanner />
 
       {/* Recently Viewed Shelf */}
       {recentlyViewedProducts.length > 0 && (
