@@ -152,9 +152,11 @@
     "rating": 4.7,
     "reviewCount": 94,
     "warranty": "3-Year Manufacturer Warranty on Device (1-Year on Sieve Tubes & Battery)",
-    "image": "https://www.oxygentimes.com/storage/productlargeimages/adc6023110f648cebf0fa9cf0162075e1636561376.jpg",
+    "image": "/assets/images/philips-simplygo-mini-hd.jpg",
     "images": [
-      "https://www.oxygentimes.com/storage/productlargeimages/adc6023110f648cebf0fa9cf0162075e1636561376.jpg"
+      "/assets/images/philips-simplygo-mini-hd.jpg",
+      "/assets/images/philips-simplygo-mini-battery.jpg",
+      "/assets/images/philips-simplygo-mini-backpack.jpg"
     ],
     "specs": "Flow Settings: Pulse Dose 1 to 5 | Weight: 5.0 lbs with standard battery (6.0 lbs with extended battery) | Sound Level: 40 dBA at Setting 2 | Battery Life: Up to 4.5 hours (standard) / 9.0 hours (extended) | Touchscreen LCD Display | FAA Certified for Flight.",
     "specifications": {
@@ -183,7 +185,6 @@
       "Portable Oxygen",
       "Touchscreen",
       "FAA Approved",
-      "Rx Required",
       "Flagship Hero"
     ]
   },
