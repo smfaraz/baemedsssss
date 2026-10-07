@@ -131,6 +131,39 @@ export const CheckoutPage: React.FC = () => {
   const taxAmount = Number((cartTotal * 0.06).toFixed(2));
   const finalTotal = Number((cartTotal + shippingCost + taxAmount).toFixed(2));
 
+  // Handle redirect return from payment providers (Amazon Pay, Klarna, Cash App, etc.)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const urlParams = new URLSearchParams(window.location.search);
+    const paymentIntentId = urlParams.get('payment_intent');
+    const redirectStatus = urlParams.get('redirect_status');
+
+    if (paymentIntentId && redirectStatus === 'succeeded') {
+      try {
+        const saved = sessionStorage.getItem('baemeds_pending_checkout');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed.email) setEmail(parsed.email);
+          if (parsed.firstName) setFirstName(parsed.firstName);
+          if (parsed.lastName) setLastName(parsed.lastName);
+          if (parsed.phone) setPhone(parsed.phone);
+          if (parsed.address1) setAddress1(parsed.address1);
+          if (parsed.address2) setAddress2(parsed.address2);
+          if (parsed.city) setCity(parsed.city);
+          if (parsed.province) setProvince(parsed.province);
+          if (parsed.zip) setZip(parsed.zip);
+          if (parsed.shippingTier) setShippingTier(parsed.shippingTier);
+
+          handlePaymentSuccess(paymentIntentId, parsed);
+        }
+      } catch (e) {
+        console.error('Error recovering payment redirect state:', e);
+      }
+    } else if (redirectStatus && redirectStatus !== 'succeeded') {
+      setErrorMessage(`Payment authorization status: ${redirectStatus}. Please select your payment method again.`);
+    }
+  }, []);
+
   // Initialize or update Stripe PaymentIntent
   useEffect(() => {
     let isMounted = true;
@@ -141,7 +174,8 @@ export const CheckoutPage: React.FC = () => {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            amount: Math.round(finalTotal * 100),
+            amount: finalTotal,
+            amountInCents: Math.round(finalTotal * 100),
             currency: 'usd',
             cartTotal,
             shippingCost,
@@ -208,15 +242,43 @@ export const CheckoutPage: React.FC = () => {
       return 'Please enter your ZIP code.';
     }
 
+    try {
+      sessionStorage.setItem('baemeds_pending_checkout', JSON.stringify({
+        email,
+        firstName,
+        lastName,
+        phone,
+        address1,
+        address2,
+        city,
+        province,
+        zip,
+        shippingTier,
+        cart,
+      }));
+    } catch {}
+
     return null;
   };
 
-  const handlePaymentSuccess = async (confirmedIntentId: string) => {
+  const handlePaymentSuccess = async (confirmedIntentId: string, overrideData?: any) => {
     setErrorMessage('');
     setIsSubmitting(true);
 
     try {
-      const itemsPayload = cart.map((item) => ({
+      const activeEmail = overrideData?.email || email;
+      const activeFirstName = overrideData?.firstName || firstName;
+      const activeLastName = overrideData?.lastName || lastName;
+      const activePhone = overrideData?.phone || phone;
+      const activeAddress1 = overrideData?.address1 || address1;
+      const activeAddress2 = overrideData?.address2 || address2;
+      const activeCity = overrideData?.city || city;
+      const activeProvince = overrideData?.province || province;
+      const activeZip = overrideData?.zip || zip;
+      const activeShippingTier = overrideData?.shippingTier || shippingTier;
+      const activeCart = (overrideData?.cart && overrideData.cart.length > 0) ? overrideData.cart : cart;
+
+      const itemsPayload = activeCart.map((item: any) => ({
         id: item.id,
         merchandiseId: item.variantId || item.id,
         quantity: item.quantity,
@@ -230,17 +292,17 @@ export const CheckoutPage: React.FC = () => {
         },
         body: JSON.stringify({
           cartId: localStorage.getItem('shopify_cart_id') || 'cart_default',
-          email,
-          firstName,
-          lastName,
-          phone,
-          address1,
-          address2,
-          city,
-          province,
-          zip,
+          email: activeEmail,
+          firstName: activeFirstName,
+          lastName: activeLastName,
+          phone: activePhone,
+          address1: activeAddress1,
+          address2: activeAddress2,
+          city: activeCity,
+          province: activeProvince,
+          zip: activeZip,
           country: 'United States',
-          shippingTier,
+          shippingTier: activeShippingTier,
           items: itemsPayload,
           paymentIntentId: confirmedIntentId,
           paymentToken: confirmedIntentId,
@@ -259,20 +321,20 @@ export const CheckoutPage: React.FC = () => {
         orderNumber: data.orderNumber || data.orderId,
         total: data.order?.total || finalTotal,
         customer: {
-          email,
-          firstName,
-          lastName,
-          phone,
+          email: activeEmail,
+          firstName: activeFirstName,
+          lastName: activeLastName,
+          phone: activePhone,
         },
         shippingAddress: {
-          address1,
-          address2,
-          city,
-          province,
-          zip,
+          address1: activeAddress1,
+          address2: activeAddress2,
+          city: activeCity,
+          province: activeProvince,
+          zip: activeZip,
           country: 'United States',
         },
-        items: cart.map((item) => ({
+        items: activeCart.map((item: any) => ({
           title: item.title,
           quantity: item.quantity,
           price: item.price,
@@ -281,13 +343,14 @@ export const CheckoutPage: React.FC = () => {
       };
       sessionStorage.setItem('baemeds_last_order', JSON.stringify(orderRecord));
       sessionStorage.setItem('last_placed_order', JSON.stringify(data));
+      sessionStorage.removeItem('baemeds_pending_checkout');
 
       // Trigger GA4 & Meta Pixel Purchase event with Google Ads conversion
       Analytics.trackPurchase({
         orderNumber: data.orderNumber || data.orderId,
         totalAmount: orderRecord.total,
         currency: 'USD',
-        items: cart.map((item) => ({
+        items: activeCart.map((item: any) => ({
           id: item.id,
           title: item.title,
           price: item.price,
@@ -762,6 +825,7 @@ export const CheckoutPage: React.FC = () => {
                   setIsSubmitting={setIsSubmitting}
                   submitButtonText={`Place Order & Pay $${finalTotal.toFixed(2)}`}
                   disabled={isInitializingStripe}
+                  returnUrl={`${typeof window !== 'undefined' ? window.location.origin : 'https://www.baemeds.com'}/checkout?payment_redirect=true`}
                 />
 
                 <div className="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between">

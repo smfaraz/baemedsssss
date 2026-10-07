@@ -18,6 +18,7 @@ interface StripePaymentSectionProps {
   setIsSubmitting: (submitting: boolean) => void;
   submitButtonText?: string;
   disabled?: boolean;
+  returnUrl?: string;
 }
 
 const PaymentFormInner: React.FC<{
@@ -28,6 +29,7 @@ const PaymentFormInner: React.FC<{
   setIsSubmitting: (submitting: boolean) => void;
   submitButtonText?: string;
   disabled?: boolean;
+  returnUrl?: string;
 }> = ({
   onPaymentSuccess,
   onPaymentError,
@@ -36,6 +38,7 @@ const PaymentFormInner: React.FC<{
   setIsSubmitting,
   submitButtonText,
   disabled,
+  returnUrl,
 }) => {
   const stripe = useStripe();
   const elements = useElements();
@@ -58,8 +61,14 @@ const PaymentFormInner: React.FC<{
     setElementError(null);
 
     try {
+      const origin = typeof window !== 'undefined' ? window.location.origin : 'https://www.baemeds.com';
+      const finalReturnUrl = returnUrl || `${origin}/checkout?payment_redirect=true`;
+
       const { error, paymentIntent } = await stripe.confirmPayment({
         elements,
+        confirmParams: {
+          return_url: finalReturnUrl,
+        },
         redirect: 'if_required',
       });
 
@@ -133,6 +142,7 @@ export const StripePaymentSection: React.FC<StripePaymentSectionProps> = ({
   setIsSubmitting,
   submitButtonText,
   disabled,
+  returnUrl,
 }) => {
   const stripePromise = React.useMemo(() => {
     if (!publishableKey) return null;
@@ -174,6 +184,7 @@ export const StripePaymentSection: React.FC<StripePaymentSectionProps> = ({
         setIsSubmitting={setIsSubmitting}
         submitButtonText={submitButtonText}
         disabled={disabled}
+        returnUrl={returnUrl}
       />
     </Elements>
   );

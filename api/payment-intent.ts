@@ -3,7 +3,8 @@ import { createVercelHandler } from '../server/serverlessAdapter.ts';
 import { PaymentService } from '../server/paymentService.ts';
 
 interface PaymentIntentBody {
-  amount: number; // in USD (e.g. 149.99)
+  amount?: number; // in USD (e.g. 149.99)
+  amountInCents?: number; // in cents (e.g. 14999)
   currency?: string;
   orderNumber?: string;
   customerEmail?: string;
@@ -19,11 +20,14 @@ export default createVercelHandler(async (request: Request) => {
 
     const body = await readJson<PaymentIntentBody>(request);
 
-    if (typeof body.amount !== 'number' || body.amount <= 0) {
+    let amountInCents = 0;
+    if (typeof body.amountInCents === 'number' && body.amountInCents > 0) {
+      amountInCents = Math.round(body.amountInCents);
+    } else if (typeof body.amount === 'number' && body.amount > 0) {
+      amountInCents = Math.round(body.amount * 100);
+    } else {
       throw new ApiError(400, 'Valid order amount is required.');
     }
-
-    const amountInCents = Math.round(body.amount * 100);
     const result = await PaymentService.createPaymentIntent({
       amountInCents,
       currency: body.currency || 'usd',
