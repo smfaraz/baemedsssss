@@ -431,9 +431,6 @@ const HomePage: React.FC = () => {
         )}
       </section>
 
-      {/* Trusted Medical Brands Marquee */}
-      <TrustedBrandsMarquee />
-
       {/* Category Grid: Browse by Need */}
       <section className="reveal-on-scroll border-b border-slate-200 bg-white py-10 md:py-14">
         <div className="container mx-auto px-4">
@@ -465,6 +462,9 @@ const HomePage: React.FC = () => {
           )}
         </div>
       </section>
+
+      {/* Trusted Medical Brands Marquee */}
+      <TrustedBrandsMarquee />
 
       {/* Shelf 1: Flagship Hospital & Home Care Equipment */}
       <ProductShelf
