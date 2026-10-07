@@ -233,64 +233,6 @@ const AdminPage: React.FC = () => {
             <LogIn size={18} />
             {loading ? "Signing in…" : "Sign in"}
           </button>
-
-          {/* Development Quick Access */}
-          <div className="mt-6 border-t border-slate-200 pt-5 text-center">
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-              Developer / QA Environment
-            </p>
-            <button
-              type="button"
-              onClick={() => {
-                setSession(true);
-                setEnquiries([
-                  {
-                    id: "enq_demo_101",
-                    type: "rental",
-                    product: "Philips EverFlo Oxygen Concentrator",
-                    name: "Dr. Robert Vance, MD",
-                    phone: "(302) 555-0199",
-                    email: "dr.vance@wilmingtonhealth.org",
-                    rental_duration: "3 months",
-                    message: "Urgent discharge DME rental required for outpatient respiratory recovery.",
-                    status: "new",
-                    created_at: new Date(Date.now() - 3600000).toISOString(),
-                  },
-                  {
-                    id: "enq_demo_102",
-                    type: "bulk",
-                    product: "ResMed AirSense 10 AutoSet CPAP",
-                    name: "Delaware Sleep Institute",
-                    phone: "(302) 555-8821",
-                    email: "procurement@delsleep.com",
-                    rental_duration: null,
-                    message: "Requesting volume clinic quote for 10 units with standard warranty.",
-                    status: "contacted",
-                    created_at: new Date(Date.now() - 86400000).toISOString(),
-                  },
-                  {
-                    id: "enq_demo_103",
-                    type: "availability",
-                    product: "Contec CMS8000 Multipara Patient Monitor",
-                    name: "Sarah Jenkins, RN",
-                    phone: "(215) 555-4301",
-                    email: "sjenkins@hospicecare.net",
-                    rental_duration: null,
-                    message: "Checking lead time for 2 monitors with adult and pediatric cuffs.",
-                    status: "closed",
-                    created_at: new Date(Date.now() - 172800000).toISOString(),
-                  },
-                ]);
-                setSubscribers([
-                  { id: "sub_1", email: "clinic@pennmedicine.org", subscribed_at: new Date().toISOString() },
-                  { id: "sub_2", email: "caregiver.ann@gmail.com", subscribed_at: new Date(Date.now() - 86400000).toISOString() },
-                ]);
-              }}
-              className="mt-3 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-medical-primary bg-medical-light/40 px-4 text-xs font-bold text-medical-primary transition hover:bg-medical-primary hover:text-white"
-            >
-              ⚡ Quick Access Admin (Demo / Local Dev)
-            </button>
-          </div>
         </form>
       </main>
     );

@@ -143,8 +143,27 @@ export default createVercelHandler(async (request: Request) => {
       const subpath = url.pathname.replace(/^\/api\/admin\/?/, '');
       const method = request.method;
 
-      // Authenticate & resolve role
+      // Handle unauthenticated staff login
+      if (subpath === 'login' && method === 'POST') {
+        const body = await readJson<{ email?: string; password?: string }>(request);
+        if (!body.email || !body.password) {
+          throw new ApiError(400, 'Staff email and password are required.');
+        }
+        try {
+          const result = await AdminService.authenticateStaff(body.email, body.password);
+          return json(result);
+        } catch (authErr: any) {
+          throw new ApiError(authErr.message?.includes('deactivated') ? 403 : 401, authErr.message || 'Invalid credentials.');
+        }
+      }
+
+      // Authenticate & resolve role for protected administrative operations
       const actor = await resolveAdminActor(request);
+
+      // Verify active session
+      if (subpath === 'session' && method === 'GET') {
+        return json({ user: actor });
+      }
 
       // --- ROUTE DISPATCHER ---
 

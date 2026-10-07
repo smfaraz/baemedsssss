@@ -27,9 +27,11 @@ import ProductResearchPage from './pages/ProductResearchPage';
 
 import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
+import { AdminAuthProvider } from './context/AdminAuthContext';
 import { ReviewsProvider } from './context/ReviewsContext';
 
 import AdminLayout from './components/admin/AdminLayout';
+import RequirePermission from './components/admin/RequirePermission';
 import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import AdminOrdersPage from './pages/admin/AdminOrdersPage';
 import AdminOrderDetailPage from './pages/admin/AdminOrderDetailPage';
@@ -74,32 +76,34 @@ const AppContent: React.FC = () => {
 
   if (isAdminRoute) {
     return (
-      <AdminLayout>
-        <Routes>
-          <Route path="/admin" element={<AdminDashboardPage />} />
-          <Route path="/admin/roadmap" element={<LaunchRoadmapPage />} />
-          <Route path="/admin/research" element={<ProductResearchPage />} />
-          <Route path="/admin/orders" element={<AdminOrdersPage />} />
-          <Route path="/admin/orders/:id" element={<AdminOrderDetailPage />} />
-          <Route path="/admin/products" element={<AdminProductsPage />} />
-          <Route path="/admin/products/new" element={<AdminProductEditorPage />} />
-          <Route path="/admin/products/:id" element={<AdminProductEditorPage />} />
-          <Route path="/admin/inventory" element={<AdminInventoryPage />} />
-          <Route path="/admin/customers" element={<AdminCustomersPage />} />
-          <Route path="/admin/customers/:id" element={<AdminCustomerDetailPage />} />
-          <Route path="/admin/prescriptions" element={<AdminPrescriptionsPage />} />
-          <Route path="/admin/prescriptions/:id" element={<AdminPrescriptionDetailPage />} />
-          <Route path="/admin/discounts" element={<AdminDiscountsPage />} />
-          <Route path="/admin/shipping" element={<AdminShippingPage />} />
-          <Route path="/admin/tax" element={<AdminTaxPage />} />
-          <Route path="/admin/analytics" element={<AdminAnalyticsPage />} />
-          <Route path="/admin/audit-logs" element={<AdminAuditLogsPage />} />
-          <Route path="/admin/settings" element={<AdminSettingsPage />} />
-          <Route path="/admin/settings/users" element={<AdminStaffPage />} />
-          <Route path="/admin/settings/roles" element={<AdminRolesPage />} />
-          <Route path="*" element={<AdminDashboardPage />} />
-        </Routes>
-      </AdminLayout>
+      <AdminAuthProvider>
+        <AdminLayout>
+          <Routes>
+            <Route path="/admin" element={<RequirePermission permission="dashboard:view" resourceTitle="Operations Dashboard"><AdminDashboardPage /></RequirePermission>} />
+            <Route path="/admin/roadmap" element={<RequirePermission permission="dashboard:view" resourceTitle="Launch Roadmap"><LaunchRoadmapPage /></RequirePermission>} />
+            <Route path="/admin/research" element={<RequirePermission permission="products:view" resourceTitle="Product Margin Intelligence"><ProductResearchPage /></RequirePermission>} />
+            <Route path="/admin/orders" element={<RequirePermission permission="orders:view" resourceTitle="Orders Directory"><AdminOrdersPage /></RequirePermission>} />
+            <Route path="/admin/orders/:id" element={<RequirePermission permission="orders:view" resourceTitle="Order Details"><AdminOrderDetailPage /></RequirePermission>} />
+            <Route path="/admin/products" element={<RequirePermission permission="products:view" resourceTitle="Catalog Management"><AdminProductsPage /></RequirePermission>} />
+            <Route path="/admin/products/new" element={<RequirePermission permission="products:manage" resourceTitle="New Product Setup"><AdminProductEditorPage /></RequirePermission>} />
+            <Route path="/admin/products/:id" element={<RequirePermission permission="products:manage" resourceTitle="Product Editor"><AdminProductEditorPage /></RequirePermission>} />
+            <Route path="/admin/inventory" element={<RequirePermission permission="inventory:view" resourceTitle="Warehouse Inventory"><AdminInventoryPage /></RequirePermission>} />
+            <Route path="/admin/customers" element={<RequirePermission permission="customers:view" resourceTitle="Customer Records"><AdminCustomersPage /></RequirePermission>} />
+            <Route path="/admin/customers/:id" element={<RequirePermission permission="customers:view" resourceTitle="Customer Detail"><AdminCustomerDetailPage /></RequirePermission>} />
+            <Route path="/admin/prescriptions" element={<RequirePermission permission="prescriptions:view" resourceTitle="Prescription Compliance"><AdminPrescriptionsPage /></RequirePermission>} />
+            <Route path="/admin/prescriptions/:id" element={<RequirePermission permission="prescriptions:view" resourceTitle="Prescription Verification"><AdminPrescriptionDetailPage /></RequirePermission>} />
+            <Route path="/admin/discounts" element={<RequirePermission permission="discounts:view" resourceTitle="Discounts & Coupons"><AdminDiscountsPage /></RequirePermission>} />
+            <Route path="/admin/shipping" element={<RequirePermission permission="shipping:view" resourceTitle="Shipping Configuration"><AdminShippingPage /></RequirePermission>} />
+            <Route path="/admin/tax" element={<RequirePermission permission="tax:view" resourceTitle="Tax Jurisdiction Settings"><AdminTaxPage /></RequirePermission>} />
+            <Route path="/admin/analytics" element={<RequirePermission permission="analytics:view" resourceTitle="Analytics & Reports"><AdminAnalyticsPage /></RequirePermission>} />
+            <Route path="/admin/audit-logs" element={<RequirePermission permission="audit_logs:view" resourceTitle="HIPAA Audit Logs"><AdminAuditLogsPage /></RequirePermission>} />
+            <Route path="/admin/settings" element={<RequirePermission permission="settings:view" resourceTitle="Platform Settings"><AdminSettingsPage /></RequirePermission>} />
+            <Route path="/admin/settings/users" element={<RequirePermission permission="staff:manage" resourceTitle="Staff Management"><AdminStaffPage /></RequirePermission>} />
+            <Route path="/admin/settings/roles" element={<RequirePermission permission="roles:view" resourceTitle="RBAC Role Definitions"><AdminRolesPage /></RequirePermission>} />
+            <Route path="*" element={<AdminDashboardPage />} />
+          </Routes>
+        </AdminLayout>
+      </AdminAuthProvider>
     );
   }
 

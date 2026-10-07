@@ -39,19 +39,12 @@ const handleLogin = async (body: AuthBody) => {
   if (password.length < 6) throw new ApiError(400, 'Password must be at least 6 characters.');
 
   let account = memoryCustomerAccounts.get(email);
-  if (account) {
-    if (account.password && account.password !== password) {
-      throw new ApiError(401, 'Invalid password for this customer account.');
-    }
-  } else {
-    // Instant zero-friction account onboarding
-    account = {
-      email,
-      password,
-      firstName: email.split('@')[0],
-      lastName: 'Patient',
-    };
-    memoryCustomerAccounts.set(email, account);
+  if (!account) {
+    throw new ApiError(401, 'No account found with this email. Please register to create an account.');
+  }
+
+  if (account.password && account.password !== password) {
+    throw new ApiError(401, 'Invalid password for this customer account.');
   }
 
   const token = createSessionToken(email, account.firstName, account.lastName);

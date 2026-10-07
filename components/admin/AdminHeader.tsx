@@ -5,37 +5,35 @@ import {
   Shield,
   LogOut,
   User,
-  Check,
-  ChevronDown,
   ExternalLink,
 } from 'lucide-react';
-import { AdminRole } from '../../types';
+import { AdminRole, AdminUser } from '../../types';
 import { useNavigate } from '../../context/CartContext';
 
 interface AdminHeaderProps {
   currentRole: AdminRole;
-  onRoleChange: (role: AdminRole) => void;
+  currentUser?: AdminUser | null;
   onToggleMobileMenu: () => void;
   onLogout: () => void;
 }
 
-const ROLES: { role: AdminRole; label: string; desc: string }[] = [
-  { role: 'super_admin', label: 'Super Admin', desc: 'Full unrestricted platform management' },
-  { role: 'clinical_specialist', label: 'Clinical Specialist', desc: 'Equipment compliance & order fulfillment' },
-  { role: 'fulfillment_specialist', label: 'Fulfillment Specialist', desc: 'Orders, shipping, & inventory' },
-  { role: 'support_agent', label: 'Support Agent', desc: 'Customer service & non-PHI orders' },
-  { role: 'compliance_officer', label: 'Compliance Officer', desc: 'HIPAA audit logs & governance' },
-];
+const ROLE_BADGES: Record<AdminRole, { label: string; color: string; border: string }> = {
+  super_admin: { label: 'Super Admin', color: 'bg-emerald-50 text-emerald-800', border: 'border-emerald-200' },
+  clinical_specialist: { label: 'Clinical Specialist', color: 'bg-amber-50 text-amber-800', border: 'border-amber-200' },
+  fulfillment_specialist: { label: 'Fulfillment Specialist', color: 'bg-purple-50 text-purple-800', border: 'border-purple-200' },
+  support_agent: { label: 'Support Agent', color: 'bg-blue-50 text-blue-800', border: 'border-blue-200' },
+  compliance_officer: { label: 'Compliance Officer', color: 'bg-sky-50 text-sky-800', border: 'border-sky-200' },
+  customer: { label: 'Customer', color: 'bg-slate-50 text-slate-800', border: 'border-slate-200' },
+};
 
 export const AdminHeader: React.FC<AdminHeaderProps> = ({
   currentRole,
-  onRoleChange,
+  currentUser,
   onToggleMobileMenu,
   onLogout,
 }) => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
-  const [isRoleDropdownOpen, setIsRoleDropdownOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -44,7 +42,9 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
     navigate(`/admin/products?q=${encodeURIComponent(searchQuery.trim())}`);
   };
 
-  const activeEmail = localStorage.getItem('baemeds_admin_email') || 'admin@baemeds.com';
+  const activeEmail = currentUser?.email || localStorage.getItem('baemeds_admin_email') || 'staff@baemeds.com';
+  const activeName = currentUser?.name || localStorage.getItem('baemeds_admin_name') || 'Staff Member';
+  const roleBadge = ROLE_BADGES[currentRole] || ROLE_BADGES.super_admin;
 
   return (
     <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center justify-between border-b border-slate-200 bg-white/95 px-4 backdrop-blur-xs sm:px-6">
@@ -74,55 +74,16 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
         </form>
       </div>
 
-      {/* Right: Role Switcher & User Menu */}
+      {/* Right: Authenticated Role Badge & User Menu */}
       <div className="flex items-center gap-3">
-        {/* Role Switcher for QA & RBAC Demonstration */}
-        <div className="relative">
-          <button
-            type="button"
-            onClick={() => setIsRoleDropdownOpen(!isRoleDropdownOpen)}
-            className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-100"
-          >
-            <Shield size={14} className="text-medical-primary" />
-            <span className="hidden md:inline">Role:</span>
-            <span className="font-bold text-slate-900 capitalize">
-              {currentRole.replace('_', ' ')}
-            </span>
-            <ChevronDown size={14} className="text-slate-400" />
-          </button>
-
-          {isRoleDropdownOpen && (
-            <div className="absolute right-0 mt-2 w-72 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl z-50">
-              <p className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                Switch Operational Persona (RBAC)
-              </p>
-              <div className="space-y-1 mt-1">
-                {ROLES.map((r) => (
-                  <button
-                    key={r.role}
-                    type="button"
-                    onClick={() => {
-                      onRoleChange(r.role);
-                      setIsRoleDropdownOpen(false);
-                    }}
-                    className={`flex w-full items-start justify-between rounded-xl px-3 py-2 text-left text-xs transition ${
-                      currentRole === r.role
-                        ? 'bg-medical-light/40 text-medical-dark font-bold'
-                        : 'text-slate-700 hover:bg-slate-50'
-                    }`}
-                  >
-                    <div>
-                      <p className="font-bold">{r.label}</p>
-                      <p className="text-[11px] font-normal text-slate-500">{r.desc}</p>
-                    </div>
-                    {currentRole === r.role && (
-                      <Check size={16} className="text-medical-primary shrink-0 mt-0.5" />
-                    )}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+        {/* Verified Role Badge (Authoritative, Read-Only) */}
+        <div
+          className={`flex items-center gap-2 rounded-xl border px-3 py-1.5 text-xs font-semibold ${roleBadge.border} ${roleBadge.color}`}
+          title="Authoritative Staff Role assigned via secure administrative directory"
+        >
+          <Shield size={14} className="shrink-0 text-medical-primary" />
+          <span className="hidden md:inline opacity-70 text-[11px] uppercase tracking-wider">Role:</span>
+          <span className="font-bold">{roleBadge.label}</span>
         </div>
 
         {/* User Profile Dropdown */}
@@ -141,22 +102,28 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
           {isUserMenuOpen && (
             <div className="absolute right-0 mt-2 w-64 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl z-50">
               <div className="border-b border-slate-100 px-3 py-2">
-                <p className="text-xs font-bold text-slate-900 capitalize">{currentRole.replace('_', ' ')}</p>
+                <p className="text-xs font-bold text-slate-900">{activeName}</p>
                 <p className="text-[11px] text-slate-500 truncate">{activeEmail}</p>
+                <span className={`inline-block mt-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${roleBadge.color} border ${roleBadge.border}`}>
+                  {roleBadge.label}
+                </span>
               </div>
               <div className="mt-1 space-y-1">
                 <a
                   href="/"
                   target="_blank"
                   rel="noreferrer"
-                  className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                  className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition"
                 >
-                  <ExternalLink size={14} /> Return to Storefront
+                  <ExternalLink size={14} /> Open Storefront
                 </a>
                 <button
                   type="button"
-                  onClick={onLogout}
-                  className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50"
+                  onClick={() => {
+                    setIsUserMenuOpen(false);
+                    onLogout();
+                  }}
+                  className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 transition"
                 >
                   <LogOut size={14} /> Sign Out
                 </button>

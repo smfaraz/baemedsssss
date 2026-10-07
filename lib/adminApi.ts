@@ -14,11 +14,12 @@ export interface AdminSessionState {
 }
 
 const getHeaders = (): HeadersInit => {
+  const token = (typeof localStorage !== 'undefined' && localStorage.getItem('baemeds_admin_token')) || '';
   const email = (typeof localStorage !== 'undefined' && localStorage.getItem('baemeds_admin_email')) || 'admin@baemeds.com';
   const b64 = typeof btoa !== 'undefined' ? btoa(email) : Buffer.from(email).toString('base64');
   return {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer bm_admin_${b64}_token`,
+    'Authorization': token ? `Bearer ${token}` : `Bearer bm_admin_${b64}_token`,
   };
 };
 
@@ -29,6 +30,53 @@ export const AdminApiClient = {
 
   setStoredRole(role: AdminRole) {
     localStorage.setItem('baemeds_admin_role', role);
+  },
+
+  isAuthenticated(): boolean {
+    if (typeof localStorage === 'undefined') return false;
+    return localStorage.getItem('baemeds_admin_auth') === 'true';
+  },
+
+  getCurrentUser(): { email: string; role: AdminRole; name: string } | null {
+    if (!this.isAuthenticated()) return null;
+    return {
+      email: localStorage.getItem('baemeds_admin_email') || 'admin@baemeds.com',
+      role: (localStorage.getItem('baemeds_admin_role') as AdminRole) || 'super_admin',
+      name: localStorage.getItem('baemeds_admin_name') || 'Staff Member',
+    };
+  },
+
+  async login(email: string, password: string): Promise<{ user: AdminUser; token: string }> {
+    const res = await fetch('/api/admin/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email.trim().toLowerCase(), password }),
+    });
+
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(data.error || 'Authentication failed. Please verify your credentials.');
+    }
+
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('baemeds_admin_auth', 'true');
+      localStorage.setItem('baemeds_admin_email', data.user.email);
+      localStorage.setItem('baemeds_admin_role', data.user.role);
+      localStorage.setItem('baemeds_admin_name', data.user.name);
+      if (data.token) localStorage.setItem('baemeds_admin_token', data.token);
+    }
+
+    return data;
+  },
+
+  logout() {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem('baemeds_admin_auth');
+      localStorage.removeItem('baemeds_admin_email');
+      localStorage.removeItem('baemeds_admin_role');
+      localStorage.removeItem('baemeds_admin_name');
+      localStorage.removeItem('baemeds_admin_token');
+    }
   },
 
   async getDashboardMetrics(role?: AdminRole) {
