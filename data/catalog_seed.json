@@ -39876,9 +39876,9 @@
     "compareAtPrice": 1125,
     "wholesaleCost": 748.98,
     "costPerItem": 748.98,
-    "image": "https://imgcdn.mckesson.com/CumulusWeb/Images/Item_Zoom/ImageNotAvailable_gray_.jpg",
+    "image": "/assets/products/scale-tronix-6702-handrail.jpg",
     "images": [
-      "https://imgcdn.mckesson.com/CumulusWeb/Images/Item_Zoom/ImageNotAvailable_gray_.jpg"
+      "/assets/products/scale-tronix-6702-handrail.jpg"
     ],
     "specs": "Wheelchair Hand Rail For 6702 Wheelchair Scale. Manufacturer: Welch Allyn. MPN: 60224. HCPCS: N/A.",
     "description": "<p class=\"lead font-medium text-slate-800\"><strong>Wheelchair Hand Rail For 6702 Wheelchair Scale</strong> supplied directly through authorized medical distributor networks by <strong>Welch Allyn</strong>.</p>\n      <p>Engineered for exceptional clinical efficacy, user safety, and strict regulatory adherence in home and institutional environments.</p>\n      <div class=\"mt-4 p-4 rounded-xl bg-slate-50 border border-slate-200\">\n        <h4 class=\"font-bold text-slate-900 mb-2\">Clinical Product Details:</h4>\n        <ul class=\"space-y-1 text-sm text-slate-700\">\n          <li><strong>HCPCS Reimbursement Code:</strong> Unassigned / Consult Provider</li>\n          <li><strong>McKesson Item Number:</strong> 1017547</li>\n          <li><strong>Manufacturer MPN:</strong> 60224</li>\n          <li><strong>therapy Requirement:</strong> Over The Counter (OTC)</li>\n          <li><strong>FSA / HSA:</strong> Qualified Medical Expense Eligible</li>\n          <li><strong>Warranty:</strong> Manufacturer Limited Warranty Included</li>\n        </ul>\n      </div>",
@@ -39912,7 +39912,10 @@
     "warranty": "1 to 5 Years Manufacturer Limited Warranty",
     "weightLbs": 24,
     "variantId": "var-1017547",
-    "heroRank": 9999
+    "heroRank": 9999,
+    "gallery": [
+      "/assets/products/scale-tronix-6702-handrail.jpg"
+    ]
   },
   {
     "id": "prd-842536",
@@ -40308,9 +40311,9 @@
     "compareAtPrice": 129.99,
     "wholesaleCost": 77.01,
     "costPerItem": 77.01,
-    "image": "https://imgcdn.mckesson.com/CumulusWeb/Images/Item_Zoom/ImageNotAvailable_gray_.jpg",
+    "image": "/assets/products/posey-alarm-belt.jpg",
     "images": [
-      "https://imgcdn.mckesson.com/CumulusWeb/Images/Item_Zoom/ImageNotAvailable_gray_.jpg"
+      "/assets/products/posey-alarm-belt.jpg"
     ],
     "specs": "Alarm Belt Sensor Posey® Up to 115 Inch Length. Manufacturer: Tidi Products. MPN: 8372L. HCPCS: N/A.",
     "description": "<p class=\"lead font-medium text-slate-800\"><strong>Alarm Belt Sensor Posey® Up to 115 Inch Length</strong> supplied directly through authorized medical distributor networks by <strong>Tidi Products</strong>.</p>\n      <p>Engineered for exceptional clinical efficacy, user safety, and strict regulatory adherence in home and institutional environments.</p>\n      <div class=\"mt-4 p-4 rounded-xl bg-slate-50 border border-slate-200\">\n        <h4 class=\"font-bold text-slate-900 mb-2\">Clinical Product Details:</h4>\n        <ul class=\"space-y-1 text-sm text-slate-700\">\n          <li><strong>HCPCS Reimbursement Code:</strong> Unassigned / Consult Provider</li>\n          <li><strong>McKesson Item Number:</strong> 665153</li>\n          <li><strong>Manufacturer MPN:</strong> 8372L</li>\n          <li><strong>therapy Requirement:</strong> Over The Counter (OTC)</li>\n          <li><strong>FSA / HSA:</strong> Qualified Medical Expense Eligible</li>\n          <li><strong>Warranty:</strong> Manufacturer Limited Warranty Included</li>\n        </ul>\n      </div>",
@@ -40344,7 +40347,10 @@
     "warranty": "1 to 5 Years Manufacturer Limited Warranty",
     "weightLbs": 3,
     "variantId": "var-665153",
-    "heroRank": 9999
+    "heroRank": 9999,
+    "gallery": [
+      "/assets/products/posey-alarm-belt.jpg"
+    ]
   },
   {
     "id": "prd-842064",
@@ -102377,9 +102383,9 @@
     "compareAtPrice": 94.99,
     "wholesaleCost": 56.76,
     "costPerItem": 56.76,
-    "image": "https://imgcdn.mckesson.com/CumulusWeb/Images/Item_Zoom/ImageNotAvailable_gray_.jpg",
+    "image": "/assets/products/welch-allyn-snapquik-cuff.jpg",
     "images": [
-      "https://imgcdn.mckesson.com/CumulusWeb/Images/Item_Zoom/ImageNotAvailable_gray_.jpg"
+      "/assets/products/welch-allyn-snapquik-cuff.jpg"
     ],
     "specs": "Single Patient Use Blood Pressure Cuff SnapQuik™ 5.4 to 9.1 cm Arm Vinyl Cuff Neonatal 3 Cuff. Manufacturer: Welch Allyn. MPN: NEO-3-1. HCPCS: N/A.",
     "description": "<p class=\"lead font-medium text-slate-800\"><strong>Single Patient Use Blood Pressure Cuff SnapQuik™ 5.4 to 9.1 cm Arm Vinyl Cuff Neonatal 3 Cuff</strong> supplied directly through authorized medical distributor networks by <strong>Welch Allyn</strong>.</p>\n      <p>Engineered for exceptional clinical efficacy, user safety, and strict regulatory adherence in home and institutional environments.</p>\n      <div class=\"mt-4 p-4 rounded-xl bg-slate-50 border border-slate-200\">\n        <h4 class=\"font-bold text-slate-900 mb-2\">Clinical Product Details:</h4>\n        <ul class=\"space-y-1 text-sm text-slate-700\">\n          <li><strong>HCPCS Reimbursement Code:</strong> Unassigned / Consult Provider</li>\n          <li><strong>McKesson Item Number:</strong> 1139516</li>\n          <li><strong>Manufacturer MPN:</strong> NEO-3-1</li>\n          <li><strong>therapy Requirement:</strong> Over The Counter (OTC)</li>\n          <li><strong>FSA / HSA:</strong> Qualified Medical Expense Eligible</li>\n          <li><strong>Warranty:</strong> Manufacturer Limited Warranty Included</li>\n        </ul>\n      </div>",
@@ -102413,7 +102419,10 @@
     "warranty": "1 to 5 Years Manufacturer Limited Warranty",
     "weightLbs": 2,
     "variantId": "var-1139516",
-    "heroRank": 9999
+    "heroRank": 9999,
+    "gallery": [
+      "/assets/products/welch-allyn-snapquik-cuff.jpg"
+    ]
   },
   {
     "id": "prd-257009",
@@ -102893,9 +102902,9 @@
     "compareAtPrice": 7.99,
     "wholesaleCost": 3.47,
     "costPerItem": 3.47,
-    "image": "https://imgcdn.mckesson.com/CumulusWeb/Images/Item_Zoom/ImageNotAvailable_gray_.jpg",
+    "image": "/assets/products/welch-allyn-trimline-cuff.jpg",
     "images": [
-      "https://imgcdn.mckesson.com/CumulusWeb/Images/Item_Zoom/ImageNotAvailable_gray_.jpg"
+      "/assets/products/welch-allyn-trimline-cuff.jpg"
     ],
     "specs": "Single Patient Use Blood Pressure Cuff Trimline® 9 to 14.8 cm Arm Cloth Fabric Cuff Infant Cuff. Manufacturer: Welch Allyn. MPN: 39045. HCPCS: N/A. Available in Single Unit (EA 1) or Clinic Case Pack (CS/20).",
     "description": "<p class=\"lead font-medium text-slate-800\"><strong>Single Patient Use Blood Pressure Cuff Trimline® 9 to 14.8 cm Arm Cloth Fabric Cuff Infant Cuff</strong> supplied directly through authorized medical distributor networks by <strong>Welch Allyn</strong>.</p>\n      <p>Engineered for exceptional clinical efficacy, user safety, and strict regulatory adherence in home and institutional environments.</p>\n      <div class=\"mt-4 p-4 rounded-xl bg-slate-50 border border-slate-200\">\n        <h4 class=\"font-bold text-slate-900 mb-2\">Clinical Product Details:</h4>\n        <ul class=\"space-y-1 text-sm text-slate-700\">\n          <li><strong>HCPCS Reimbursement Code:</strong> Unassigned / Consult Provider</li>\n          <li><strong>McKesson Item Number:</strong> 846837</li>\n          <li><strong>Manufacturer MPN:</strong> 39045</li>\n          <li><strong>therapy Requirement:</strong> Over The Counter (OTC)</li>\n          <li><strong>FSA / HSA:</strong> Qualified Medical Expense Eligible</li>\n          <li><strong>Warranty:</strong> Manufacturer Limited Warranty Included</li>\n        </ul>\n      </div>",
@@ -102962,6 +102971,9 @@
         "inventoryQuantity": 12,
         "image": "https://imgcdn.mckesson.com/CumulusWeb/Images/Item_Zoom/ImageNotAvailable_gray_.jpg"
       }
+    ],
+    "gallery": [
+      "/assets/products/welch-allyn-trimline-cuff.jpg"
     ]
   },
   {
@@ -104499,9 +104511,9 @@
     "compareAtPrice": 169.99,
     "wholesaleCost": 101.47,
     "costPerItem": 101.47,
-    "image": "https://imgcdn.mckesson.com/CumulusWeb/Images/Item_Zoom/ImageNotAvailable_gray_.jpg",
+    "image": "/assets/products/welch-allyn-durashock.png",
     "images": [
-      "https://imgcdn.mckesson.com/CumulusWeb/Images/Item_Zoom/ImageNotAvailable_gray_.jpg"
+      "/assets/products/welch-allyn-durashock.png"
     ],
     "specs": "Aneroid Sphygmomanometer Unit DuraShock® Large Adult Cuff Arm Vinyl Cuff 34 - 50 cm Pocket Aneroid. Manufacturer: Welch Allyn. MPN: DS44-12. HCPCS: N/A.",
     "description": "<p class=\"lead font-medium text-slate-800\"><strong>Aneroid Sphygmomanometer Unit DuraShock® Large Adult Cuff Arm Vinyl Cuff 34 - 50 cm Pocket Aneroid</strong> supplied directly through authorized medical distributor networks by <strong>Welch Allyn</strong>.</p>\n      <p>Engineered for exceptional clinical efficacy, user safety, and strict regulatory adherence in home and institutional environments.</p>\n      <div class=\"mt-4 p-4 rounded-xl bg-slate-50 border border-slate-200\">\n        <h4 class=\"font-bold text-slate-900 mb-2\">Clinical Product Details:</h4>\n        <ul class=\"space-y-1 text-sm text-slate-700\">\n          <li><strong>HCPCS Reimbursement Code:</strong> Unassigned / Consult Provider</li>\n          <li><strong>McKesson Item Number:</strong> 436397</li>\n          <li><strong>Manufacturer MPN:</strong> DS44-12</li>\n          <li><strong>therapy Requirement:</strong> Over The Counter (OTC)</li>\n          <li><strong>FSA / HSA:</strong> Qualified Medical Expense Eligible</li>\n          <li><strong>Warranty:</strong> Manufacturer Limited Warranty Included</li>\n        </ul>\n      </div>",
@@ -104535,7 +104547,10 @@
     "warranty": "1 to 5 Years Manufacturer Limited Warranty",
     "weightLbs": 4,
     "variantId": "var-436397",
-    "heroRank": 9999
+    "heroRank": 9999,
+    "gallery": [
+      "/assets/products/welch-allyn-durashock.png"
+    ]
   },
   {
     "id": "prd-555883",
@@ -107778,9 +107793,9 @@
     "compareAtPrice": 10413.99,
     "wholesaleCost": 7006.26,
     "costPerItem": 7006.26,
-    "image": "https://imgcdn.mckesson.com/CumulusWeb/Images/Item_Zoom/ImageNotAvailable_gray_.jpg",
+    "image": "/assets/products/welch-allyn-connex-csm.jpg",
     "images": [
-      "https://imgcdn.mckesson.com/CumulusWeb/Images/Item_Zoom/ImageNotAvailable_gray_.jpg"
+      "/assets/products/welch-allyn-connex-csm.jpg"
     ],
     "specs": "Patient Monitor Connex® Monitoring NIPB, Pulse Rate, SpO2, SureTemp AC Power. Manufacturer: Welch Allyn. MPN: 67MXTP-B. HCPCS: N/A.",
     "description": "<p class=\"lead font-medium text-slate-800\"><strong>Patient Monitor Connex® Monitoring NIPB, Pulse Rate, SpO2, SureTemp AC Power</strong> supplied directly through authorized medical distributor networks by <strong>Welch Allyn</strong>.</p>\n      <p>Engineered for exceptional clinical efficacy, user safety, and strict regulatory adherence in home and institutional environments.</p>\n      <div class=\"mt-4 p-4 rounded-xl bg-slate-50 border border-slate-200\">\n        <h4 class=\"font-bold text-slate-900 mb-2\">Clinical Product Details:</h4>\n        <ul class=\"space-y-1 text-sm text-slate-700\">\n          <li><strong>HCPCS Reimbursement Code:</strong> Unassigned / Consult Provider</li>\n          <li><strong>McKesson Item Number:</strong> 1117522</li>\n          <li><strong>Manufacturer MPN:</strong> 67MXTP-B</li>\n          <li><strong>therapy Requirement:</strong> Over The Counter (OTC)</li>\n          <li><strong>FSA / HSA:</strong> Qualified Medical Expense Eligible</li>\n          <li><strong>Warranty:</strong> Manufacturer Limited Warranty Included</li>\n        </ul>\n      </div>",
@@ -107814,7 +107829,10 @@
     "warranty": "1 to 5 Years Manufacturer Limited Warranty",
     "weightLbs": 227,
     "variantId": "var-1117522",
-    "heroRank": 9999
+    "heroRank": 9999,
+    "gallery": [
+      "/assets/products/welch-allyn-connex-csm.jpg"
+    ]
   },
   {
     "id": "prd-971872",
@@ -161349,13 +161367,9 @@
     "inventoryQuantity": 25,
     "trackInventory": true,
     "isHeroProduct": false,
-    "image": "https://dphpia7d6qb4m.cloudfront.net/images/ino-is-501-na16_01_l.png",
+    "image": "/assets/products/inogen-one-g5.jpg",
     "images": [
-      "https://dphpia7d6qb4m.cloudfront.net/images/ino-is-501-na16_01_l.png",
-      "https://dphpia7d6qb4m.cloudfront.net/images/ino-is-501-na8_01_l.png",
-      "https://dphpia7d6qb4m.cloudfront.net/images/ino-is-501-na16_02_l.png",
-      "https://dphpia7d6qb4m.cloudfront.net/images/ino-is-501-na16_03_l.png",
-      "https://dphpia7d6qb4m.cloudfront.net/images/ino-is-501-na16_04_l.png"
+      "/assets/products/inogen-one-g5.jpg"
     ],
     "specs": "Flow Settings: 1 to 6 Pulse Dose | Battery Run Time: Up to 13 hours (16-cell double battery) | Weight: 5.7 lbs with double battery | Sound Level: 38 dBA | FAA Air Travel Compliant | Inogen Connect mobile app enabled.",
     "description": "<p>The Inogen One G5 with Double 16-Cell Battery offers unmatched all-day battery life for oxygen-dependent individuals on the move. Delivers medical-grade oxygen across 6 pulse settings for up to 13 continuous hours between wall or vehicle charges. FAA approved for airline flights.</p>",
@@ -161378,7 +161392,10 @@
       "Inogen"
     ],
     "heroRank": 9999,
-    "variantId": "var-o2-ino-g5-16"
+    "variantId": "var-o2-ino-g5-16",
+    "gallery": [
+      "/assets/products/inogen-one-g5.jpg"
+    ]
   },
   {
     "id": "prd-o2-ino-g4-8",
@@ -161663,11 +161680,9 @@
     "inventoryQuantity": 25,
     "trackInventory": true,
     "isHeroProduct": false,
-    "image": "https://dphpia7d6qb4m.cloudfront.net/images/p2_01_l.png",
+    "image": "/assets/products/oxlife-independence.jpg",
     "images": [
-      "https://dphpia7d6qb4m.cloudfront.net/images/p2_01_l.png",
-      "https://dphpia7d6qb4m.cloudfront.net/images/p2_02_l.png",
-      "https://dphpia7d6qb4m.cloudfront.net/images/p2_03_l.png"
+      "/assets/products/oxlife-independence.jpg"
     ],
     "specs": "Dual Flow: Continuous Flow up to 3.0 LPM + Pulse Dose Settings 1 to 6 | Integrated 6\" rugged all-terrain wheels & telescoping handle | Patented EnergySmart® technology | Dual battery architecture with hot-swap capability.",
     "description": "<p>The O2 Concepts Oxlife Independence is a true 2-in-1 portable oxygen concentrator offering both continuous flow up to 3 LPM and pulse dose up to setting 6. Features an integrated heavy-duty wheeled cart built into the chassis, making it the most rugged high-flow POC for outdoor and travel use.</p>",
@@ -161689,7 +161704,10 @@
       "O2 Concepts"
     ],
     "heroRank": 9999,
-    "variantId": "var-o2-o2c-oxlife"
+    "variantId": "var-o2-o2c-oxlife",
+    "gallery": [
+      "/assets/products/oxlife-independence.jpg"
+    ]
   },
   {
     "id": "prd-o2-rh-lm10a",
@@ -161715,10 +161733,9 @@
     "inventoryQuantity": 25,
     "trackInventory": true,
     "isHeroProduct": false,
-    "image": "https://dphpia7d6qb4m.cloudfront.net/images/lm5ba_01_l.png",
+    "image": "/assets/products/rhythm-lm10a.jpg",
     "images": [
-      "https://dphpia7d6qb4m.cloudfront.net/images/lm5ba_01_l.png",
-      "https://dphpia7d6qb4m.cloudfront.net/images/lm5ba_02_l.png"
+      "/assets/products/rhythm-lm10a.jpg"
     ],
     "specs": "Flow Range: 1.0 to 10.0 LPM Continuous Flow | Oxygen Purity: 93% ± 3% | Sound Level: 50 dBA | Weight: 44 lbs | Digital operating hour meter | High-output medical compressor.",
     "description": "<p>The Rhythm LM10A 10L Stationary Oxygen Concentrator provides reliable continuous-flow oxygen therapy up to 10 liters per minute for high-flow respiratory patients. Features an ultra-durable compressor, low maintenance requirements, and intuitive mechanical controls.</p>",
@@ -161740,7 +161757,10 @@
       "Rhythm Healthcare"
     ],
     "heroRank": 9999,
-    "variantId": "var-o2-rh-lm10a"
+    "variantId": "var-o2-rh-lm10a",
+    "gallery": [
+      "/assets/products/rhythm-lm10a.jpg"
+    ]
   },
   {
     "id": "prd-o2-ino-athome",
@@ -161766,11 +161786,9 @@
     "inventoryQuantity": 25,
     "trackInventory": true,
     "isHeroProduct": false,
-    "image": "https://dphpia7d6qb4m.cloudfront.net/images/dv-525ds_01_l.png",
+    "image": "/assets/products/inogen-at-home-5l.png",
     "images": [
-      "https://dphpia7d6qb4m.cloudfront.net/images/dv-525ds_01_l.png",
-      "https://dphpia7d6qb4m.cloudfront.net/images/dv-525ds_02_l.png",
-      "https://dphpia7d6qb4m.cloudfront.net/images/dv-525ds_03_l.png"
+      "/assets/products/inogen-at-home-5l.png"
     ],
     "specs": "Continuous Flow: 1.0 to 5.0 LPM | Weight: 18 lbs (half the weight of typical 5L concentrators) | Power: 100W at flow setting 2 | Sound Level: 40 dBA | Ultra-compact home profile.",
     "description": "<p>The Inogen At Home is one of the lightest and most energy-efficient 5 LPM continuous flow home oxygen concentrators available. At only 18 pounds, it is half the weight of traditional units and uses significantly less electricity, saving hundreds annually on utility bills.</p>",
@@ -161792,7 +161810,10 @@
       "Inogen"
     ],
     "heroRank": 9999,
-    "variantId": "var-o2-ino-athome"
+    "variantId": "var-o2-ino-athome",
+    "gallery": [
+      "/assets/products/inogen-at-home-5l.png"
+    ]
   },
   {
     "id": "prd-o2-airsep-10",
@@ -161818,12 +161839,9 @@
     "inventoryQuantity": 25,
     "trackInventory": true,
     "isHeroProduct": false,
-    "image": "https://dphpia7d6qb4m.cloudfront.net/images/dv-1025ds_01_l.png",
+    "image": "/assets/products/airsep-newlife-intensity-10.png",
     "images": [
-      "https://dphpia7d6qb4m.cloudfront.net/images/dv-1025ds_01_l.png",
-      "https://dphpia7d6qb4m.cloudfront.net/images/dv-1025ds_02_l.png",
-      "https://dphpia7d6qb4m.cloudfront.net/images/dv-1025ds_03_l.png",
-      "https://dphpia7d6qb4m.cloudfront.net/images/dv-1025ds_04_l.png"
+      "/assets/products/airsep-newlife-intensity-10.png"
     ],
     "specs": "Flow Range: 2.0 to 10.0 LPM Continuous Flow | High Delivery Pressure: 20 psig (138 kPa) | Ideal for long tubing runs, tracheostomies, and medication nebulization | Heavy-duty commercial chassis.",
     "description": "<p>The AirSep NewLife Intensity 10 is a high-pressure, high-flow stationary oxygen concentrator engineered for specialized clinical requirements. With 20 psi delivery pressure, it easily powers jet nebulizers, venturi masks, and extra-long oxygen tubing runs that stall standard 5 psi machines.</p>",
@@ -161845,7 +161863,10 @@
       "AirSep Corporation"
     ],
     "heroRank": 9999,
-    "variantId": "var-o2-airsep-10"
+    "variantId": "var-o2-airsep-10",
+    "gallery": [
+      "/assets/products/airsep-newlife-intensity-10.png"
+    ]
   },
   {
     "id": "prd-o2-react-10",
@@ -161871,12 +161892,9 @@
     "inventoryQuantity": 25,
     "trackInventory": true,
     "isHeroProduct": false,
-    "image": "https://dphpia7d6qb4m.cloudfront.net/images/dv-1025ds_01_l.png",
+    "image": "/assets/products/react-health-stratus.jpg",
     "images": [
-      "https://dphpia7d6qb4m.cloudfront.net/images/dv-1025ds_01_l.png",
-      "https://dphpia7d6qb4m.cloudfront.net/images/dv-1025ds_02_l.png",
-      "https://dphpia7d6qb4m.cloudfront.net/images/dv-1025ds_03_l.png",
-      "https://dphpia7d6qb4m.cloudfront.net/images/dv-1025ds_04_l.png"
+      "/assets/products/react-health-stratus.jpg"
     ],
     "specs": "Continuous Flow: 2.0 to 10.0 LPM | High purity 87% to 95.6% across all flow settings | Dual flowmeter capability available | Sound Level: 58 dBA | Heavy-duty dual-head compressor.",
     "description": "<p>The React Health 10 Liter Concentrator delivers the clinical reliability and high-volume performance required for patients needing more than 5 LPM. Designed as a cost-effective, dependable alternative to liquid oxygen installations.</p>",
@@ -161898,7 +161916,10 @@
       "React Health"
     ],
     "heroRank": 9999,
-    "variantId": "var-o2-react-10"
+    "variantId": "var-o2-react-10",
+    "gallery": [
+      "/assets/products/react-health-stratus.jpg"
+    ]
   },
   {
     "id": "prd-o2-sequal-5",
@@ -161924,11 +161945,9 @@
     "inventoryQuantity": 25,
     "trackInventory": true,
     "isHeroProduct": false,
-    "image": "https://dphpia7d6qb4m.cloudfront.net/images/p2_01_l.png",
+    "image": "/assets/products/sequal-eclipse-5.png",
     "images": [
-      "https://dphpia7d6qb4m.cloudfront.net/images/p2_01_l.png",
-      "https://dphpia7d6qb4m.cloudfront.net/images/p2_02_l.png",
-      "https://dphpia7d6qb4m.cloudfront.net/images/p2_03_l.png"
+      "/assets/products/sequal-eclipse-5.png"
     ],
     "specs": "Continuous Flow: 0.5 to 3.0 LPM | Pulse Settings: 1 to 9 (up to 192 mL bolus) | autoSAT® technology maintains oxygen bolus as breath rate increases | Runs and charges on DC vehicle power | FAA Certified.",
     "description": "<p>The Sequal Eclipse 5 is the ultimate heavy-duty transportable oxygen concentrator. Delivers continuous flow up to 3 LPM and pulse boluses up to setting 9. Operates and fully charges its internal power cartridge simultaneously from a standard vehicle 12V DC outlet, making cross-country road trips and international travel seamless.</p>",
@@ -161951,7 +161970,10 @@
       "Sequal"
     ],
     "heroRank": 9999,
-    "variantId": "var-o2-sequal-5"
+    "variantId": "var-o2-sequal-5",
+    "gallery": [
+      "/assets/products/sequal-eclipse-5.png"
+    ]
   },
   {
     "id": "prd-karman-1",
