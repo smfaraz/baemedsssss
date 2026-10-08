@@ -21,8 +21,6 @@ import OrderSuccessPage from './pages/OrderSuccessPage';
 import ThankYouPage from './pages/ThankYouPage';
 import NotFoundPage from './pages/NotFoundPage';
 import AdminPage from './pages/AdminPage';
-import LaunchRoadmapPage from './pages/LaunchRoadmapPage';
-import ProductResearchPage from './pages/ProductResearchPage';
 
 
 import { CartProvider } from './context/CartContext';
@@ -40,16 +38,15 @@ import AdminProductEditorPage from './pages/admin/AdminProductEditorPage';
 import AdminInventoryPage from './pages/admin/AdminInventoryPage';
 import AdminCustomersPage from './pages/admin/AdminCustomersPage';
 import AdminCustomerDetailPage from './pages/admin/AdminCustomerDetailPage';
-import AdminPrescriptionsPage from './pages/admin/AdminPrescriptionsPage';
-import AdminPrescriptionDetailPage from './pages/admin/AdminPrescriptionDetailPage';
 import AdminDiscountsPage from './pages/admin/AdminDiscountsPage';
-import AdminShippingPage from './pages/admin/AdminShippingPage';
 import AdminTaxPage from './pages/admin/AdminTaxPage';
 import AdminAnalyticsPage from './pages/admin/AdminAnalyticsPage';
 import AdminAuditLogsPage from './pages/admin/AdminAuditLogsPage';
+import AdminCompliancePage from './pages/admin/AdminCompliancePage';
 import AdminStaffPage from './pages/admin/AdminStaffPage';
 import AdminRolesPage from './pages/admin/AdminRolesPage';
 import AdminSettingsPage from './pages/admin/AdminSettingsPage';
+import AdminInvoiceSettingsPage from './pages/admin/AdminInvoiceSettingsPage';
 
 // Deterministic indexed catalogue bot plus direct human support controls.
 import SupportCenter from './components/SupportCenter';
@@ -66,22 +63,12 @@ const AppContent: React.FC = () => {
   const { pathname } = useLocation();
   const isAdminRoute = pathname.startsWith('/admin');
 
-  if (pathname === '/roadmap' || pathname === '/launch-roadmap') {
-    return <LaunchRoadmapPage />;
-  }
-
-  if (pathname === '/research' || pathname === '/product-research') {
-    return <ProductResearchPage />;
-  }
-
   if (isAdminRoute) {
     return (
       <AdminAuthProvider>
         <AdminLayout>
           <Routes>
             <Route path="/admin" element={<RequirePermission permission="dashboard:view" resourceTitle="Operations Dashboard"><AdminDashboardPage /></RequirePermission>} />
-            <Route path="/admin/roadmap" element={<RequirePermission permission="dashboard:view" resourceTitle="Launch Roadmap"><LaunchRoadmapPage /></RequirePermission>} />
-            <Route path="/admin/research" element={<RequirePermission permission="products:view" resourceTitle="Product Margin Intelligence"><ProductResearchPage /></RequirePermission>} />
             <Route path="/admin/orders" element={<RequirePermission permission="orders:view" resourceTitle="Orders Directory"><AdminOrdersPage /></RequirePermission>} />
             <Route path="/admin/orders/:id" element={<RequirePermission permission="orders:view" resourceTitle="Order Details"><AdminOrderDetailPage /></RequirePermission>} />
             <Route path="/admin/products" element={<RequirePermission permission="products:view" resourceTitle="Catalog Management"><AdminProductsPage /></RequirePermission>} />
@@ -90,14 +77,13 @@ const AppContent: React.FC = () => {
             <Route path="/admin/inventory" element={<RequirePermission permission="inventory:view" resourceTitle="Warehouse Inventory"><AdminInventoryPage /></RequirePermission>} />
             <Route path="/admin/customers" element={<RequirePermission permission="customers:view" resourceTitle="Customer Records"><AdminCustomersPage /></RequirePermission>} />
             <Route path="/admin/customers/:id" element={<RequirePermission permission="customers:view" resourceTitle="Customer Detail"><AdminCustomerDetailPage /></RequirePermission>} />
-            <Route path="/admin/prescriptions" element={<RequirePermission permission="prescriptions:view" resourceTitle="Prescription Compliance"><AdminPrescriptionsPage /></RequirePermission>} />
-            <Route path="/admin/prescriptions/:id" element={<RequirePermission permission="prescriptions:view" resourceTitle="Prescription Verification"><AdminPrescriptionDetailPage /></RequirePermission>} />
             <Route path="/admin/discounts" element={<RequirePermission permission="discounts:view" resourceTitle="Discounts & Coupons"><AdminDiscountsPage /></RequirePermission>} />
-            <Route path="/admin/shipping" element={<RequirePermission permission="shipping:view" resourceTitle="Shipping Configuration"><AdminShippingPage /></RequirePermission>} />
             <Route path="/admin/tax" element={<RequirePermission permission="tax:view" resourceTitle="Tax Jurisdiction Settings"><AdminTaxPage /></RequirePermission>} />
             <Route path="/admin/analytics" element={<RequirePermission permission="analytics:view" resourceTitle="Analytics & Reports"><AdminAnalyticsPage /></RequirePermission>} />
             <Route path="/admin/audit-logs" element={<RequirePermission permission="audit_logs:view" resourceTitle="HIPAA Audit Logs"><AdminAuditLogsPage /></RequirePermission>} />
+            <Route path="/admin/compliance" element={<RequirePermission permission="compliance:view" resourceTitle="FDA Device Compliance"><AdminCompliancePage /></RequirePermission>} />
             <Route path="/admin/settings" element={<RequirePermission permission="settings:view" resourceTitle="Platform Settings"><AdminSettingsPage /></RequirePermission>} />
+            <Route path="/admin/settings/invoices" element={<RequirePermission permission="settings:view" resourceTitle="Invoice & Documentation Customizer"><AdminInvoiceSettingsPage /></RequirePermission>} />
             <Route path="/admin/settings/users" element={<RequirePermission permission="staff:manage" resourceTitle="Staff Management"><AdminStaffPage /></RequirePermission>} />
             <Route path="/admin/settings/roles" element={<RequirePermission permission="roles:view" resourceTitle="RBAC Role Definitions"><AdminRolesPage /></RequirePermission>} />
             <Route path="*" element={<AdminDashboardPage />} />

@@ -22,6 +22,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { AdminApiClient } from '../../lib/adminApi';
+import { getInvoiceSettings, InvoiceSettings } from '../../lib/invoiceConfig';
 import { Link, useParams, useNavigate } from '../../context/CartContext';
 
 export const AdminOrderDetailPage: React.FC = () => {
@@ -46,8 +47,16 @@ export const AdminOrderDetailPage: React.FC = () => {
   const [mckessonCarrier, setMckessonCarrier] = useState('FedEx Ground');
   const [mckessonTrackingNumber, setMckessonTrackingNumber] = useState('');
 
-  // Printable Packing Slip Modal state
+  // Printable Packing Slip & Invoice Modal state
   const [isPackingSlipModalOpen, setIsPackingSlipModalOpen] = useState(false);
+  const [documentMode, setDocumentMode] = useState<'invoice' | 'slip'>('invoice');
+  const [invoiceConfig, setInvoiceConfig] = useState<InvoiceSettings>(getInvoiceSettings());
+
+  const handleOpenPrintModal = (mode: 'invoice' | 'slip' = 'invoice') => {
+    setDocumentMode(mode);
+    setInvoiceConfig(getInvoiceSettings());
+    setIsPackingSlipModalOpen(true);
+  };
 
   // Auto-detect carrier by tracking number pattern
   const handleTrackingNumberInput = (val: string, isMckesson: boolean = false) => {
@@ -242,15 +251,15 @@ ${itemsList}
 
         {/* State Machine Transition Actions */}
         <div className="flex flex-wrap items-center gap-2">
-          {/* Printable Packing Slip Button */}
+          {/* Printable Invoice & Packing Slip Button */}
           <button
             type="button"
-            onClick={() => setIsPackingSlipModalOpen(true)}
+            onClick={() => handleOpenPrintModal('invoice')}
             className="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-xs font-bold text-slate-800 hover:bg-slate-50 transition shadow-xs"
-            title="Open and print customer-safe packing slip"
+            title="Open and print official tax invoice or fulfillment packing slip"
           >
             <Printer size={14} className="text-slate-600" />
-            Print Packing Slip
+            Print Invoice / Slip
           </button>
 
           {order.status === 'CLINICAL_REVIEW' && (
@@ -746,17 +755,49 @@ ${itemsList}
               }
             }
           `}</style>
-
           <div className="w-full max-w-3xl rounded-2xl border border-slate-200 bg-white shadow-2xl space-y-4 my-8 max-h-[92vh] flex flex-col">
             {/* Top Modal Controls (Hidden in Print) */}
             <div className="no-print flex items-center justify-between border-b border-slate-200 p-4 bg-slate-50 rounded-t-2xl">
               <div className="flex items-center gap-2">
                 <Printer size={18} className="text-slate-700" />
                 <span className="text-sm font-bold text-slate-900">
-                  Customer Packing Slip & Dispatch Manifest
+                  {documentMode === 'invoice' ? 'Official Tax Invoice' : 'Fulfillment Packing Slip'}
                 </span>
+                <div className="flex items-center gap-1 bg-white rounded-lg border border-slate-300 p-0.5 text-xs ml-2">
+                  <button
+                    type="button"
+                    onClick={() => setDocumentMode('invoice')}
+                    className={`rounded px-2.5 py-1 font-semibold transition ${
+                      documentMode === 'invoice'
+                        ? 'bg-[#14539A] text-white shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    Tax Invoice
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDocumentMode('slip')}
+                    className={`rounded px-2.5 py-1 font-semibold transition ${
+                      documentMode === 'slip'
+                        ? 'bg-[#14539A] text-white shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    Packing Slip
+                  </button>
+                </div>
               </div>
+
               <div className="flex items-center gap-2">
+                <Link
+                  to="/admin/settings/invoices"
+                  target="_blank"
+                  className="rounded-xl border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition inline-flex items-center gap-1"
+                >
+                  <FileText size={13} />
+                  <span>Customize Template</span>
+                </Link>
                 <button
                   type="button"
                   onClick={() => window.print()}
@@ -774,33 +815,44 @@ ${itemsList}
               </div>
             </div>
 
-            {/* Printable Packing Slip Sheet Container */}
+            {/* Printable Document Sheet Container */}
             <div className="p-8 overflow-y-auto space-y-6 flex-1 text-slate-900" id="printable-packing-slip">
               {/* Header */}
               <div className="flex items-start justify-between border-b-2 border-slate-900 pb-6">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-2xl font-black tracking-tight text-slate-950">BAEMEDS USA</span>
+                    <span className="text-2xl font-black tracking-tight text-slate-950 uppercase">
+                      {invoiceConfig.companyName}
+                    </span>
                     <span className="rounded bg-teal-100 px-2 py-0.5 text-[10px] font-bold text-teal-900 uppercase">
-                      Medical Logistics
+                      DMEPOS Clinical
                     </span>
                   </div>
                   <p className="text-xs text-slate-600 font-medium mt-1">
-                    Durable Medical Equipment & Clinical Home Healthcare Solutions
+                    {invoiceConfig.tagline}
                   </p>
                   <p className="text-[11px] text-slate-500">
-                    1201 N Orange St, Ste 700, Wilmington, DE 19801 | (800) 555-BAEMEDS
+                    {invoiceConfig.remitAddressLine1}{invoiceConfig.remitAddressLine2 ? `, ${invoiceConfig.remitAddressLine2}` : ''} | {invoiceConfig.remitCityStateZip}
                   </p>
-                  <p className="text-[11px] text-slate-400">
-                    FDA Medical Device Establishment Registered | HIPAA Compliant
+                  <p className="text-[11px] text-slate-400 font-mono">
+                    Tel: {invoiceConfig.phone} | Billing: {invoiceConfig.email} | {invoiceConfig.website}
                   </p>
+                  <div className="flex flex-wrap gap-2 pt-1 text-[10px] font-mono text-slate-500">
+                    <span>EIN: <strong>{invoiceConfig.einTaxId}</strong></span>
+                    <span>•</span>
+                    <span>Lic: <strong>{invoiceConfig.dmeLicenseNumber}</strong></span>
+                    <span>•</span>
+                    <span>NPI: <strong>{invoiceConfig.npiNumber}</strong></span>
+                    <span>•</span>
+                    <span>PTAN: <strong>{invoiceConfig.medicarePtan}</strong></span>
+                  </div>
                 </div>
 
                 <div className="text-right">
                   <span className="text-base font-black uppercase tracking-wider text-slate-900 block">
-                    PACKING SLIP
+                    {documentMode === 'invoice' ? 'OFFICIAL TAX INVOICE' : 'PACKING SLIP'}
                   </span>
-                  <p className="text-xs font-mono font-bold text-slate-900 mt-1">
+                  <p className="text-xs font-mono font-bold text-[#14539A] mt-1">
                     Order #: {order.order_number}
                   </p>
                   <p className="text-[11px] text-slate-600">
@@ -827,13 +879,13 @@ ${itemsList}
                   <p>
                     {order.shipping_address?.city}, {order.shipping_address?.province || 'DE'} {order.shipping_address?.zip}
                   </p>
-                  <p className="text-slate-500 pt-1">Contact: {order.shipping_address?.phone || '(302) 555-0199'}</p>
+                  <p className="text-slate-500 pt-1">Contact: {order.shipping_address?.phone || invoiceConfig.phone}</p>
                 </div>
 
-                {/* Dispatch & Carrier Meta */}
+                {/* Dispatch & Remit Meta */}
                 <div className="rounded-xl border border-slate-200 p-4 space-y-2 bg-slate-50/50">
                   <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider block mb-1">
-                    Shipment & Compliance Details
+                    {documentMode === 'invoice' ? 'Remittance & Status' : 'Shipment & Compliance Details'}
                   </span>
                   <div className="flex justify-between">
                     <span className="text-slate-500">Carrier:</span>
@@ -854,80 +906,128 @@ ${itemsList}
                 </div>
               </div>
 
-              {/* Itemized Table (Zero Wholesale Pricing Visible!) */}
+              {/* Itemized Table */}
               <div className="rounded-xl border border-slate-300 overflow-hidden">
                 <table className="w-full text-left text-xs">
                   <thead className="bg-slate-100 border-b border-slate-300 text-slate-800 font-bold uppercase tracking-wider text-[10px]">
                     <tr>
                       <th className="p-3 w-12 text-center">#</th>
                       <th className="p-3">Item Description</th>
-                      <th className="p-3">HCPCS Code</th>
-                      <th className="p-3">SKU</th>
-                      <th className="p-3 text-right">Qty Shipped</th>
+                      {invoiceConfig.showHcpcsCodes && <th className="p-3">HCPCS Code</th>}
+                      {invoiceConfig.showSku && <th className="p-3">SKU</th>}
+                      <th className="p-3 text-center">Qty</th>
+                      {documentMode === 'invoice' && <th className="p-3 text-right">Unit Price</th>}
+                      {documentMode === 'invoice' && <th className="p-3 text-right">Total</th>}
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-200 font-sans">
-                    {(order.order_items || []).map((item: any, idx: number) => (
-                      <tr key={item.id} className="text-slate-800">
-                        <td className="p-3 text-center font-bold text-slate-500">{idx + 1}</td>
-                        <td className="p-3">
-                          <p className="font-bold text-slate-900">{item.product_title}</p>
-                          <p className="text-[11px] text-slate-500">Standard Clinical Packaging</p>
-                        </td>
-                        <td className="p-3 font-mono font-semibold text-slate-700">
-                          {item.hcpcs_code || 'E1399'}
-                        </td>
-                        <td className="p-3 font-mono text-slate-600">{item.sku || 'DME-STD'}</td>
-                        <td className="p-3 text-right font-black text-sm text-slate-900">
-                          {item.quantity}
-                        </td>
-                      </tr>
-                    ))}
+                    {(order.order_items || []).map((item: any, idx: number) => {
+                      const itemPrice = typeof item.price === 'number' ? item.price : parseFloat(item.price) || 0;
+                      const itemTotal = itemPrice * (item.quantity || 1);
+                      return (
+                        <tr key={item.id} className="text-slate-800">
+                          <td className="p-3 text-center font-bold text-slate-500">{idx + 1}</td>
+                          <td className="p-3">
+                            <p className="font-bold text-slate-900">{item.product_title}</p>
+                            <p className="text-[11px] text-slate-500">Standard Clinical Packaging</p>
+                          </td>
+                          {invoiceConfig.showHcpcsCodes && (
+                            <td className="p-3 font-mono font-semibold text-slate-700">
+                              {item.hcpcs_code || 'E1399'}
+                            </td>
+                          )}
+                          {invoiceConfig.showSku && (
+                            <td className="p-3 font-mono text-slate-600">{item.sku || 'DME-STD'}</td>
+                          )}
+                          <td className="p-3 text-center font-black text-sm text-slate-900">
+                            {item.quantity}
+                          </td>
+                          {documentMode === 'invoice' && (
+                            <td className="p-3 text-right font-mono font-medium">${itemPrice.toFixed(2)}</td>
+                          )}
+                          {documentMode === 'invoice' && (
+                            <td className="p-3 text-right font-mono font-bold">${itemTotal.toFixed(2)}</td>
+                          )}
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
 
-              {/* Verification & QA Sign-Off */}
-              <div className="grid grid-cols-2 gap-4 rounded-xl border border-slate-200 p-4 text-[11px] text-slate-600 bg-slate-50/30">
-                <div>
-                  <span className="font-bold text-slate-900 block mb-1">
-                    Quality Assurance & Inspection Checklist:
-                  </span>
-                  <ul className="list-disc pl-4 space-y-0.5 text-slate-600">
-                    <li>DMEPOS medical device integrity confirmed</li>
-                    <li>Tamper-evident seals intact</li>
-                    <li>Patient documentation and instructions enclosed</li>
-                  </ul>
-                </div>
+              {/* Financial Totals for Invoice Mode */}
+              {documentMode === 'invoice' && (
+                <div className="grid grid-cols-2 gap-4 items-start pt-2">
+                  <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-3 text-xs space-y-1.5">
+                    <span className="text-[10px] font-mono font-bold uppercase text-slate-500 block">
+                      Remittance Memo & Terms
+                    </span>
+                    <p className="text-slate-700 font-medium">{invoiceConfig.paymentTerms}</p>
+                    <p className="text-[11px] font-mono text-slate-800">{invoiceConfig.bankRoutingInfo}</p>
+                  </div>
 
-                <div className="border-l border-slate-200 pl-4 space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">Inspected By:</span>
-                    <span className="font-mono font-bold text-slate-800">QA #BM-802</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">Dispatch Hub:</span>
-                    <span className="font-medium text-slate-800">Wilmington Medical Logistics</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-500">Inspection Date:</span>
-                    <span className="font-medium text-slate-800">{new Date().toLocaleDateString()}</span>
+                  <div className="space-y-1 text-xs text-right">
+                    <div className="flex justify-between text-slate-600">
+                      <span>Subtotal:</span>
+                      <span className="font-mono font-medium">${(order.total_amount || 0).toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between text-slate-600">
+                      <span>Insured Freight Delivery:</span>
+                      <span className="font-mono font-medium text-emerald-700">INCLUDED</span>
+                    </div>
+                    <div className="flex justify-between border-t-2 border-slate-900 pt-2 text-sm font-bold text-slate-900">
+                      <span>Total Paid:</span>
+                      <span className="font-mono text-base font-black text-[#14539A]">
+                        ${(order.total_amount || 0).toFixed(2)}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
+
+              {/* Verification & QA Sign-Off for Packing Slip Mode */}
+              {documentMode === 'slip' && (
+                <div className="grid grid-cols-2 gap-4 rounded-xl border border-slate-200 p-4 text-[11px] text-slate-600 bg-slate-50/30">
+                  <div>
+                    <span className="font-bold text-slate-900 block mb-1">
+                      Quality Assurance & Inspection Checklist:
+                    </span>
+                    <ul className="list-disc pl-4 space-y-0.5 text-slate-600">
+                      <li>DMEPOS medical device integrity confirmed</li>
+                      <li>Tamper-evident seals intact</li>
+                      <li>Patient documentation and instructions enclosed</li>
+                    </ul>
+                  </div>
+
+                  <div className="border-l border-slate-200 pl-4 space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Inspected By:</span>
+                      <span className="font-mono font-bold text-slate-800">QA #BM-802</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Dispatch Hub:</span>
+                      <span className="font-medium text-slate-800">Wilmington Medical Logistics</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-500">Inspection Date:</span>
+                      <span className="font-medium text-slate-800">{new Date().toLocaleDateString()}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Patient Care Support Footer */}
               <div className="border-t border-slate-200 pt-4 text-center text-[10px] text-slate-500 space-y-1">
                 <p className="font-bold text-slate-700">
-                  Thank you for trusting BaeMeds USA with your healthcare and durable medical equipment needs.
+                  {invoiceConfig.footerNote}
                 </p>
                 <p>
-                  Need assistance with setup, calibration, or replacement parts? Contact our Patient Support Team at{' '}
-                  <span className="font-bold text-slate-800">1-800-555-BAEMEDS</span> or email{' '}
-                  <span className="font-bold text-slate-800">support@baemeds.com</span>.
+                  Need assistance with setup, calibration, or replacement parts? Contact Patient Support at{' '}
+                  <span className="font-bold text-slate-800">{invoiceConfig.phone}</span> or email{' '}
+                  <span className="font-bold text-slate-800">{invoiceConfig.email}</span>.
                 </p>
                 <p className="text-slate-400">
-                  Please report any transit discrepancies or packaging damage within 48 hours of courier delivery.
+                  {invoiceConfig.hygienePolicyNotice}
                 </p>
               </div>
             </div>

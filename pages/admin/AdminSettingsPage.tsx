@@ -4,6 +4,7 @@ import {
   Building,
   ShieldCheck,
   Users,
+  FileText,
   Lock,
   Mail,
   Phone,
@@ -47,7 +48,23 @@ export const AdminSettingsPage: React.FC = () => {
       )}
 
       {/* Quick Links to Sub-Settings */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <Link
+          to="/admin/settings/invoices"
+          className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-5 shadow-soft hover:border-[#14539A] transition group"
+        >
+          <div className="flex items-center gap-3">
+            <div className="rounded-xl bg-indigo-50 p-2.5 text-indigo-600 group-hover:bg-[#14539A] group-hover:text-white transition">
+              <FileText size={20} />
+            </div>
+            <div>
+              <h3 className="font-bold text-slate-900 text-sm">Invoice & Slip Studio</h3>
+              <p className="text-xs text-slate-500">Design tax invoices, HCPCS codes, and remit footers</p>
+            </div>
+          </div>
+          <ExternalLink size={16} className="text-slate-400 group-hover:text-[#14539A]" />
+        </Link>
+
         <Link
           to="/admin/settings/users"
           className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-5 shadow-soft hover:border-medical-primary transition group"

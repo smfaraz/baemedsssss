@@ -111,169 +111,167 @@ export const AdminInventoryPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header Bar */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="space-y-4 font-sans text-slate-800 antialiased pb-10">
+      {/* 1. Header Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3">
         <div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight">Inventory Management</h1>
-          <p className="text-xs text-slate-500 mt-1">
+          <div className="flex items-center gap-2">
+            <h1 className="text-base font-bold text-slate-900 tracking-tight">Inventory Control</h1>
+            <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 border border-slate-200 px-2 py-0.5 text-[10px] font-mono font-medium text-slate-600">
+              {inventory.length} Tracked SKUs
+            </span>
+          </div>
+          <p className="text-xs text-slate-500 mt-0.5">
             Real-time physical stock counts, warehouse reservations, and audited stock adjustments.
           </p>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => alert('Exporting inventory ledger to CSV...')}
-            className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 shadow-xs transition"
+            className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-xs hover:bg-slate-50 transition"
           >
-            <FileSpreadsheet size={15} /> Export Ledger
+            <FileSpreadsheet size={13} /> Export Ledger
           </button>
         </div>
       </div>
 
       {/* Notifications */}
       {errorMessage && (
-        <div className="flex items-center justify-between rounded-xl border border-rose-200 bg-rose-50 p-4 text-xs font-medium text-rose-800">
+        <div className="flex items-center justify-between rounded-md border border-rose-200 bg-rose-50 p-3 text-xs font-medium text-rose-800">
           <div className="flex items-center gap-2">
-            <AlertTriangle size={16} className="shrink-0" />
+            <AlertTriangle size={14} className="shrink-0" />
             <span>{errorMessage}</span>
           </div>
-          <button onClick={() => setErrorMessage('')} className="font-bold underline">Dismiss</button>
+          <button onClick={() => setErrorMessage('')} className="font-semibold underline">Dismiss</button>
         </div>
       )}
 
       {successMessage && (
-        <div className="flex items-center justify-between rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-xs font-medium text-emerald-800">
+        <div className="flex items-center justify-between rounded-md border border-emerald-200 bg-emerald-50 p-3 text-xs font-medium text-emerald-800">
           <div className="flex items-center gap-2">
-            <CheckCircle size={16} className="shrink-0" />
+            <CheckCircle size={14} className="shrink-0" />
             <span>{successMessage}</span>
           </div>
-          <button onClick={() => setSuccessMessage('')} className="font-bold underline">Dismiss</button>
+          <button onClick={() => setSuccessMessage('')} className="font-semibold underline">Dismiss</button>
         </div>
       )}
 
-      {/* Filters Bar */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-soft">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="relative flex-1 max-w-md">
-            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Filter by product name or SKU..."
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2 pl-9 pr-4 text-xs text-slate-900 placeholder:text-slate-400 focus:border-medical-primary focus:bg-white focus:outline-none"
-            />
-          </div>
+      {/* 2. Controls Ribbon: Tabs & Search */}
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-2">
+        <div className="flex gap-1 overflow-x-auto">
+          <button
+            onClick={() => setStatusFilter('all')}
+            className={`rounded px-3 py-1.5 text-xs font-semibold whitespace-nowrap transition ${
+              statusFilter === 'all'
+                ? 'bg-slate-900 text-white shadow-xs'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+            }`}
+          >
+            All Inventory ({inventory.length})
+          </button>
+          <button
+            onClick={() => setStatusFilter('LOW_STOCK')}
+            className={`rounded px-3 py-1.5 text-xs font-semibold whitespace-nowrap transition ${
+              statusFilter === 'LOW_STOCK'
+                ? 'bg-amber-600 text-white shadow-xs'
+                : 'text-amber-800 bg-amber-50/60 border border-amber-200/80 hover:bg-amber-100'
+            }`}
+          >
+            Low Stock (&lt; 5)
+          </button>
+          <button
+            onClick={() => setStatusFilter('OUT_OF_STOCK')}
+            className={`rounded px-3 py-1.5 text-xs font-semibold whitespace-nowrap transition ${
+              statusFilter === 'OUT_OF_STOCK'
+                ? 'bg-rose-600 text-white shadow-xs'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+            }`}
+          >
+            Out of Stock
+          </button>
+        </div>
 
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setStatusFilter('all')}
-              className={`rounded-xl px-3 py-1.5 text-xs font-bold transition ${
-                statusFilter === 'all'
-                  ? 'bg-slate-900 text-white'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-              }`}
-            >
-              All Inventory
-            </button>
-            <button
-              onClick={() => setStatusFilter('LOW_STOCK')}
-              className={`rounded-xl px-3 py-1.5 text-xs font-bold transition ${
-                statusFilter === 'LOW_STOCK'
-                  ? 'bg-amber-600 text-white'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-              }`}
-            >
-              Low Stock (&lt; 5)
-            </button>
-            <button
-              onClick={() => setStatusFilter('OUT_OF_STOCK')}
-              className={`rounded-xl px-3 py-1.5 text-xs font-bold transition ${
-                statusFilter === 'OUT_OF_STOCK'
-                  ? 'bg-rose-600 text-white'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-              }`}
-            >
-              Out of Stock
-            </button>
-          </div>
+        <div className="relative w-full sm:w-64">
+          <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search product or SKU..."
+            className="w-full rounded border border-slate-200 bg-white py-1 pl-7 pr-3 text-xs text-slate-800 placeholder:text-slate-400 focus:border-[#14539A] focus:outline-none"
+          />
         </div>
       </div>
 
-      {/* Inventory Table */}
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-soft">
+      {/* 3. Inventory Table */}
+      <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-xs">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs text-slate-700">
-            <thead className="border-b border-slate-100 bg-slate-50/80 font-bold uppercase tracking-wider text-slate-500">
+          <table className="w-full text-left text-xs">
+            <thead className="border-b border-slate-200/80 bg-slate-50/50 text-[10px] font-mono uppercase tracking-wider text-slate-500">
               <tr>
-                <th className="px-4 py-3.5">Product & SKU</th>
-                <th className="px-4 py-3.5">Category</th>
-                <th className="px-4 py-3.5 text-center">Available</th>
-                <th className="px-4 py-3.5 text-center">Reserved</th>
-                <th className="px-4 py-3.5 text-center">On Hand Total</th>
-                <th className="px-4 py-3.5">Stock Status</th>
-                <th className="px-4 py-3.5 text-right">Adjustment</th>
+                <th className="px-4 py-2.5">Product & SKU</th>
+                <th className="px-4 py-2.5">Category</th>
+                <th className="px-4 py-2.5 text-center">Available</th>
+                <th className="px-4 py-2.5 text-center">Reserved</th>
+                <th className="px-4 py-2.5 text-center">On Hand Total</th>
+                <th className="px-4 py-2.5">Stock Status</th>
+                <th className="px-4 py-2.5 text-right">Adjustment</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-slate-100 font-normal">
               {isLoading ? (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-slate-400">
-                    <div className="flex items-center justify-center gap-2">
-                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-medical-primary border-t-transparent" />
-                      <span>Syncing warehouse inventory...</span>
-                    </div>
+                  <td colSpan={7} className="py-8 text-center text-xs font-mono text-slate-400">
+                    Syncing warehouse inventory counts...
                   </td>
                 </tr>
               ) : filteredInventory.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-slate-400">
-                    <div className="flex flex-col items-center justify-center gap-2">
-                      <Boxes size={32} className="text-slate-300" />
-                      <p className="font-semibold text-slate-600">No inventory matches filter</p>
-                    </div>
+                  <td colSpan={7} className="py-12 text-center text-xs text-slate-400">
+                    <Boxes size={28} className="mx-auto text-slate-300 mb-1" />
+                    <p className="font-semibold text-slate-600">No inventory matches filter</p>
                   </td>
                 </tr>
               ) : (
                 filteredInventory.map((item) => (
-                  <tr key={item.productId} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="px-4 py-3.5">
-                      <div className="font-bold text-slate-900 line-clamp-1">{item.title}</div>
-                      <span className="font-mono text-[11px] text-slate-400">SKU: {item.sku}</span>
+                  <tr key={item.productId} className="hover:bg-slate-50/80 transition">
+                    <td className="px-4 py-3">
+                      <div className="font-semibold text-slate-900 truncate max-w-[240px]">{item.title}</div>
+                      <span className="font-mono text-[10px] text-slate-400">SKU: {item.sku}</span>
                     </td>
-                    <td className="px-4 py-3.5 font-medium text-slate-600">
+                    <td className="px-4 py-3 text-slate-600 text-[11px]">
                       {item.category}
                     </td>
-                    <td className="px-4 py-3.5 text-center font-bold text-slate-900 text-sm">
+                    <td className="px-4 py-3 text-center font-mono font-bold text-slate-900">
                       {item.available}
                     </td>
-                    <td className="px-4 py-3.5 text-center font-medium text-slate-500">
+                    <td className="px-4 py-3 text-center font-mono text-slate-500">
                       {item.reserved}
                     </td>
-                    <td className="px-4 py-3.5 text-center font-bold text-slate-700">
+                    <td className="px-4 py-3 text-center font-mono font-semibold text-slate-700">
                       {item.total}
                     </td>
-                    <td className="px-4 py-3.5">
+                    <td className="px-4 py-3">
                       {item.status === 'IN_STOCK' && (
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-0.5 text-[11px] font-bold text-emerald-700 border border-emerald-200">
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-0.5 text-[10px] font-mono font-medium text-emerald-800 border border-emerald-200">
                           <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> In Stock
                         </span>
                       )}
                       {item.status === 'LOW_STOCK' && (
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-0.5 text-[11px] font-bold text-amber-700 border border-amber-200">
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-0.5 text-[10px] font-mono font-medium text-amber-800 border border-amber-300">
                           <span className="h-1.5 w-1.5 rounded-full bg-amber-500" /> Low Stock
                         </span>
                       )}
                       {item.status === 'OUT_OF_STOCK' && (
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-50 px-2.5 py-0.5 text-[11px] font-bold text-rose-700 border border-rose-200">
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-50 px-2.5 py-0.5 text-[10px] font-mono font-medium text-rose-800 border border-rose-300">
                           <span className="h-1.5 w-1.5 rounded-full bg-rose-500" /> Out of Stock
                         </span>
                       )}
                     </td>
-                    <td className="px-4 py-3.5 text-right">
+                    <td className="px-4 py-3 text-right">
                       <button
                         onClick={() => handleOpenAdjustmentModal(item)}
-                        className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 shadow-2xs hover:bg-slate-50 hover:border-medical-primary hover:text-medical-primary transition"
+                        className="rounded-md border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-medium text-slate-700 shadow-xs hover:bg-slate-50 hover:border-[#14539A] hover:text-[#14539A] transition"
                       >
                         Adjust Stock
                       </button>

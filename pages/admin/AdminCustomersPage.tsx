@@ -110,7 +110,10 @@ export const AdminCustomersPage: React.FC = () => {
                   <td colSpan={7} className="py-12 text-center text-slate-400">
                     <div className="flex flex-col items-center justify-center gap-2">
                       <Users size={32} className="text-slate-300" />
-                      <p className="font-semibold text-slate-600">No customers found</p>
+                      <p className="font-semibold text-slate-700">No Registered Customer Accounts</p>
+                      <p className="text-[11px] text-slate-400">
+                        Customer profiles and lifetime spending metrics populate automatically as checkout orders are completed.
+                      </p>
                     </div>
                   </td>
                 </tr>

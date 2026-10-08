@@ -26,24 +26,41 @@ export const AdminCustomerDetailPage: React.FC = () => {
       setIsLoading(true);
       try {
         const list = await AdminApiClient.getCustomers();
-        const found = list.find((c) => c.id === id) || {
-          id: id || 'cust_001',
-          name: 'Sarah Miller',
-          email: 'sarah.miller@example.com',
-          phone: '(302) 555-0144',
-          ordersCount: 3,
-          lifetimeSpend: 2450.0,
-          state: 'DE',
-          status: 'Active Patient',
-          createdAt: '2026-01-12T09:30:00Z',
-        };
-        setCustomer(found);
-
         const allOrders = await AdminApiClient.getOrders();
-        const custOrders = allOrders.filter(
-          (o) => o.customer_email?.toLowerCase() === found.email?.toLowerCase()
-        );
-        setOrders(custOrders.length > 0 ? custOrders : allOrders.slice(0, 2));
+        let found = list.find((c) => c.id === id);
+        if (!found) {
+          const matchingOrder = allOrders.find(
+            (o) => o.customer_email === id || o.customer_id === id || o.shipping_address?.email === id
+          );
+          if (matchingOrder) {
+            const email = matchingOrder.customer_email || matchingOrder.shipping_address?.email || '';
+            const matchingOrders = allOrders.filter((o) => o.customer_email === email);
+            const totalSpend = matchingOrders.reduce((sum, o) => sum + (o.total_amount || 0), 0);
+            const name = matchingOrder.customer_name ||
+              (matchingOrder.shipping_address ? `${matchingOrder.shipping_address.first_name} ${matchingOrder.shipping_address.last_name || ''}`.trim() : email.split('@')[0]);
+            found = {
+              id: id || 'cust_temp',
+              name: name || 'Registered Customer',
+              email: email,
+              phone: matchingOrder.shipping_address?.phone || '',
+              ordersCount: matchingOrders.length,
+              lifetimeSpend: totalSpend,
+              state: matchingOrder.shipping_address?.province || 'US',
+              status: 'Active Customer',
+              createdAt: matchingOrder.created_at || new Date().toISOString(),
+            };
+          }
+        }
+        setCustomer(found || null);
+
+        if (found) {
+          const custOrders = allOrders.filter(
+            (o) => o.customer_email?.toLowerCase() === found.email?.toLowerCase()
+          );
+          setOrders(custOrders);
+        } else {
+          setOrders([]);
+        }
       } catch {
       } finally {
         setIsLoading(false);
@@ -135,29 +152,35 @@ export const AdminCustomerDetailPage: React.FC = () => {
             </h2>
 
             <div className="divide-y divide-slate-100">
-              {orders.map((ord) => (
-                <div key={ord.id} className="py-3 flex items-center justify-between text-xs">
-                  <div>
-                    <Link
-                      to={`/admin/orders/${ord.id}`}
-                      className="font-bold text-slate-900 hover:text-medical-primary hover:underline"
-                    >
-                      {ord.order_number || ord.id}
-                    </Link>
-                    <p className="text-[11px] text-slate-400">
-                      {new Date(ord.created_at).toLocaleDateString()} • {ord.order_items?.length || 1} items
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <span className="font-black text-slate-900">${ord.total_amount?.toFixed(2)}</span>
+              {orders.length === 0 ? (
+                <div className="py-8 text-center text-xs text-slate-400">
+                  No orders recorded for this customer account yet.
+                </div>
+              ) : (
+                orders.map((ord) => (
+                  <div key={ord.id} className="py-3 flex items-center justify-between text-xs">
                     <div>
-                      <span className="inline-flex rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-600">
-                        {ord.status}
-                      </span>
+                      <Link
+                        to={`/admin/orders/${ord.id}`}
+                        className="font-bold text-slate-900 hover:text-medical-primary hover:underline"
+                      >
+                        {ord.order_number || ord.id}
+                      </Link>
+                      <p className="text-[11px] text-slate-400">
+                        {new Date(ord.created_at).toLocaleDateString()} • {ord.order_items?.length || 1} items
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <span className="font-black text-slate-900">${ord.total_amount?.toFixed(2)}</span>
+                      <div>
+                        <span className="inline-flex rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-600">
+                          {ord.status}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
         </div>
@@ -183,11 +206,18 @@ export const AdminCustomerDetailPage: React.FC = () => {
 
               <div>
                 <span className="text-slate-400 text-[11px] font-bold uppercase">Default Delivery Address</span>
-                <p className="font-semibold text-slate-800 mt-0.5">
-                  1420 Market St<br />
-                  Wilmington, DE 19801<br />
-                  United States
-                </p>
+                {orders.length > 0 && orders[0].shipping_address ? (
+                  <p className="font-semibold text-slate-800 mt-0.5 leading-relaxed">
+                    {orders[0].shipping_address.first_name} {orders[0].shipping_address.last_name || ''}<br />
+                    {orders[0].shipping_address.address1}{orders[0].shipping_address.address2 ? ` ${orders[0].shipping_address.address2}` : ''}<br />
+                    {orders[0].shipping_address.city}, {orders[0].shipping_address.province || customer.state || 'DE'} {orders[0].shipping_address.zip || ''}<br />
+                    {orders[0].shipping_address.country || 'United States'}
+                  </p>
+                ) : (
+                  <p className="font-medium text-slate-400 mt-0.5 italic">
+                    No verified shipping address on file
+                  </p>
+                )}
               </div>
             </div>
           </div>

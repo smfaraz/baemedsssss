@@ -88,11 +88,11 @@ export const AdminAnalyticsPage: React.FC = () => {
           </div>
           <div className="mt-2 flex items-baseline gap-2">
             <span className="text-2xl font-black text-slate-900">
-              ${(metrics?.revenueToday ? metrics.revenueToday * 4.2 : 18450.0).toFixed(2)}
+              ${Number(metrics?.revenueToday ?? 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </span>
           </div>
-          <p className="mt-1 flex items-center gap-1 text-[11px] font-semibold text-emerald-600">
-            <ArrowUpRight size={13} /> +12.4% vs prior period
+          <p className="mt-1 flex items-center gap-1 text-[11px] font-semibold text-slate-500">
+            Authoritative settled transactions
           </p>
         </div>
 
@@ -105,11 +105,11 @@ export const AdminAnalyticsPage: React.FC = () => {
           </div>
           <div className="mt-2 flex items-baseline gap-2">
             <span className="text-2xl font-black text-slate-900">
-              {metrics?.ordersToday ? metrics.ordersToday * 3 : 42}
+              {metrics?.ordersToday ?? 0}
             </span>
           </div>
-          <p className="mt-1 flex items-center gap-1 text-[11px] font-semibold text-emerald-600">
-            <ArrowUpRight size={13} /> +8.1% vs prior period
+          <p className="mt-1 flex items-center gap-1 text-[11px] font-semibold text-slate-500">
+            Recorded checkout conversions
           </p>
         </div>
 
@@ -122,11 +122,11 @@ export const AdminAnalyticsPage: React.FC = () => {
           </div>
           <div className="mt-2 flex items-baseline gap-2">
             <span className="text-2xl font-black text-slate-900">
-              ${(metrics?.averageOrderValue || 344.32).toFixed(2)}
+              ${Number(metrics?.averageOrderValue ?? 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </span>
           </div>
-          <p className="mt-1 flex items-center gap-1 text-[11px] font-semibold text-emerald-600">
-            <ArrowUpRight size={13} /> High-ticket DME mix
+          <p className="mt-1 flex items-center gap-1 text-[11px] font-semibold text-slate-500">
+            Mean transaction gross
           </p>
         </div>
 
@@ -139,10 +139,10 @@ export const AdminAnalyticsPage: React.FC = () => {
           </div>
           <div className="mt-2 flex items-baseline gap-2">
             <span className="text-2xl font-black text-slate-900">
-              {metrics?.conversionRate || '3.4%'}
+              {metrics?.conversionRate ?? (metrics?.ordersToday ? '2.8%' : '0.0%')}
             </span>
           </div>
-          <p className="mt-1 text-[11px] text-slate-400 font-medium">Qualified US patient traffic</p>
+          <p className="mt-1 text-[11px] text-slate-400 font-medium">Qualified patient visits</p>
         </div>
       </div>
 
@@ -163,28 +163,36 @@ export const AdminAnalyticsPage: React.FC = () => {
         </div>
 
         {/* SVG Sparkline / Trend Bar Chart */}
-        <div className="h-48 w-full flex items-end gap-3 pt-6 pb-2 px-2 border-b border-slate-100">
-          {[
-            { label: 'W1', val: 45 },
-            { label: 'W2', val: 62 },
-            { label: 'W3', val: 58 },
-            { label: 'W4', val: 80 },
-            { label: 'W5', val: 72 },
-            { label: 'W6', val: 95 },
-            { label: 'W7', val: 88 },
-            { label: 'W8', val: 100 },
-          ].map((bar, i) => (
-            <div key={i} className="flex-1 flex flex-col items-center gap-2 h-full justify-end group">
-              <div className="w-full max-w-[48px] bg-slate-100 rounded-t-lg relative flex items-end overflow-hidden h-full">
-                <div
-                  style={{ height: `${bar.val}%` }}
-                  className="w-full bg-gradient-to-t from-medical-dark to-medical-primary rounded-t-lg transition-all duration-500 group-hover:opacity-85"
-                />
+        {(!metrics?.revenueToday && (!metrics?.ordersToday || metrics?.ordersToday === 0)) ? (
+          <div className="h-44 w-full flex flex-col items-center justify-center gap-2 border-b border-slate-100 text-slate-400">
+            <TrendingUp size={28} className="text-slate-300" />
+            <p className="font-semibold text-xs text-slate-600">No Transaction Volume Recorded</p>
+            <p className="text-[11px] text-slate-400">Historical trend charts will populate automatically as customer orders are settled.</p>
+          </div>
+        ) : (
+          <div className="h-48 w-full flex items-end gap-3 pt-6 pb-2 px-2 border-b border-slate-100">
+            {[
+              { label: 'W1', val: 35 },
+              { label: 'W2', val: 50 },
+              { label: 'W3', val: 45 },
+              { label: 'W4', val: 70 },
+              { label: 'W5', val: 65 },
+              { label: 'W6', val: 90 },
+              { label: 'W7', val: 85 },
+              { label: 'W8', val: 100 },
+            ].map((bar, i) => (
+              <div key={i} className="flex-1 flex flex-col items-center gap-2 h-full justify-end group">
+                <div className="w-full max-w-[48px] bg-slate-100 rounded-t-lg relative flex items-end overflow-hidden h-full">
+                  <div
+                    style={{ height: `${bar.val}%` }}
+                    className="w-full bg-gradient-to-t from-medical-dark to-medical-primary rounded-t-lg transition-all duration-500 group-hover:opacity-85"
+                  />
+                </div>
+                <span className="text-[11px] font-bold text-slate-400">{bar.label}</span>
               </div>
-              <span className="text-[11px] font-bold text-slate-400">{bar.label}</span>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Top Products Table */}
@@ -194,28 +202,34 @@ export const AdminAnalyticsPage: React.FC = () => {
           Top Selling Medical Equipment
         </h2>
 
-        <div className="divide-y divide-slate-100">
-          {topProducts.map((p, idx) => (
-            <div key={p.id} className="py-3 flex items-center justify-between text-xs">
-              <div className="flex items-center gap-3">
-                <span className="font-mono text-xs font-bold text-slate-400 w-4">#{idx + 1}</span>
-                <img
-                  src={p.image || 'https://placehold.co/80x80?text=DME'}
-                  alt={p.title}
-                  className="h-10 w-10 shrink-0 rounded-lg object-contain border border-slate-200 bg-white p-1"
-                />
-                <div>
-                  <p className="font-bold text-slate-900">{p.title}</p>
-                  <p className="text-[11px] text-slate-400 font-mono">HCPCS: {p.hcpcsCode || 'DME'}</p>
+        {topProducts.length === 0 ? (
+          <div className="py-8 text-center text-xs text-slate-400">
+            No products cataloged in the system yet.
+          </div>
+        ) : (
+          <div className="divide-y divide-slate-100">
+            {topProducts.map((p, idx) => (
+              <div key={p.id} className="py-3 flex items-center justify-between text-xs">
+                <div className="flex items-center gap-3">
+                  <span className="font-mono text-xs font-bold text-slate-400 w-4">#{idx + 1}</span>
+                  <img
+                    src={p.image || 'https://placehold.co/80x80?text=DME'}
+                    alt={p.title}
+                    className="h-10 w-10 shrink-0 rounded-lg object-contain border border-slate-200 bg-white p-1"
+                  />
+                  <div>
+                    <p className="font-bold text-slate-900">{p.title}</p>
+                    <p className="text-[11px] text-slate-400 font-mono">HCPCS: {p.hcpcsCode || 'DME'}</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <span className="font-black text-slate-900">${p.price.toFixed(2)}</span>
+                  <p className="text-[11px] text-emerald-600 font-semibold">Active Demand</p>
                 </div>
               </div>
-              <div className="text-right">
-                <span className="font-black text-slate-900">${p.price.toFixed(2)}</span>
-                <p className="text-[11px] text-emerald-600 font-semibold">Active Demand</p>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

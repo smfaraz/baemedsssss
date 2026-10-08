@@ -76,6 +76,8 @@ export const ROLE_PERMISSIONS: Record<AdminRole, string[]> = {
     'tax:manage',
     'analytics:view',
     'audit_logs:view',
+    'compliance:view',
+    'compliance:manage',
     'staff:view',
     'staff:manage',
     'roles:view',
@@ -86,7 +88,8 @@ export const ROLE_PERMISSIONS: Record<AdminRole, string[]> = {
     'dashboard:view',
     'orders:view',
     'products:view',
-    'prescriptions:view',
+    'compliance:view',
+    'compliance:manage',
     'audit_logs:view',
     'roles:view',
     'analytics:view',
@@ -232,7 +235,7 @@ let memoryDiscounts = [
     value: 10,
     minOrderAmount: 50,
     usageLimit: 500,
-    timesUsed: 42,
+    timesUsed: 0,
     isActive: true,
     expiresAt: '2026-12-31T23:59:59Z',
     createdAt: '2026-01-01T00:00:00Z',
@@ -244,7 +247,7 @@ let memoryDiscounts = [
     value: 25,
     minOrderAmount: 200,
     usageLimit: 100,
-    timesUsed: 18,
+    timesUsed: 0,
     isActive: true,
     expiresAt: '2026-11-30T23:59:59Z',
     createdAt: '2026-02-01T00:00:00Z',
@@ -291,175 +294,9 @@ let memoryTaxSettings = {
   lastUpdated: new Date().toISOString(),
 };
 
-export let memoryOrders: any[] = [
-  {
-    id: 'ord_demo_001',
-    order_number: 'BM-722730-720',
-    customer_email: 'sarah.miller@example.com',
-    status: 'CLINICAL_REVIEW',
-    currency: 'USD',
-    subtotal_amount: 1450.0,
-    tax_amount: 87.0,
-    shipping_amount: 0.0,
-    total_amount: 1537.0,
-    requires_prescription: true,
-    shipping_method: 'Standard Ground (3-5 Business Days)',
-    shipping_address: {
-      first_name: 'Sarah',
-      last_name: 'Miller',
-      address1: '1420 Market St',
-      city: 'Wilmington',
-      province: 'DE',
-      zip: '19801',
-      country: 'United States',
-      phone: '(302) 555-0144',
-    },
-    billing_address: {
-      first_name: 'Sarah',
-      last_name: 'Miller',
-      address1: '1420 Market St',
-      city: 'Wilmington',
-      province: 'DE',
-      zip: '19801',
-      country: 'United States',
-      phone: '(302) 555-0144',
-    },
-    order_items: [
-      {
-        id: 'item_1',
-        product_id: 'philips-everflo',
-        product_title: 'Philips EverFlo Oxygen Concentrator 5L',
-        sku: 'EVF-500',
-        unit_price: 1450.0,
-        quantity: 1,
-        total_price: 1450.0,
-      },
-    ],
-    created_at: new Date(Date.now() - 3600000 * 3).toISOString(),
-  },
-  {
-    id: 'ord_demo_002',
-    order_number: 'BM-722730-721',
-    customer_email: 'david.chen@example.com',
-    status: 'PAID',
-    currency: 'USD',
-    subtotal_amount: 890.0,
-    tax_amount: 53.4,
-    shipping_amount: 25.0,
-    total_amount: 968.4,
-    requires_prescription: false,
-    shipping_method: 'Priority Medical Courier (1-2 Business Days)',
-    shipping_address: {
-      first_name: 'David',
-      last_name: 'Chen',
-      address1: '802 Delaware Ave',
-      city: 'Wilmington',
-      province: 'DE',
-      zip: '19806',
-      country: 'United States',
-      phone: '(302) 555-0188',
-    },
-    billing_address: {
-      first_name: 'David',
-      last_name: 'Chen',
-      address1: '802 Delaware Ave',
-      city: 'Wilmington',
-      province: 'DE',
-      zip: '19806',
-      country: 'United States',
-      phone: '(302) 555-0188',
-    },
-    order_items: [
-      {
-        id: 'item_2',
-        product_id: 'resmed-airfit-f20',
-        product_title: 'ResMed AirFit F20 Full Face CPAP Mask System',
-        sku: 'RF-F20',
-        unit_price: 178.0,
-        quantity: 5,
-        total_price: 890.0,
-      },
-    ],
-    created_at: new Date(Date.now() - 3600000 * 8).toISOString(),
-  },
-  {
-    id: 'ord_demo_003',
-    order_number: 'BM-722730-722',
-    customer_email: 'patient@example.com',
-    status: 'SHIPPED',
-    currency: 'USD',
-    subtotal_amount: 540.0,
-    tax_amount: 32.4,
-    shipping_amount: 12.0,
-    total_amount: 584.4,
-    requires_prescription: false,
-    shipping_method: 'Standard Ground (3-5 Business Days)',
-    carrier: 'FedEx Ground',
-    tracking_number: '748902849102',
-    tracking_url: 'https://www.fedex.com/fedextrack/?trknbr=748902849102',
-    shipping_address: {
-      first_name: 'Jane',
-      last_name: 'Doe',
-      address1: '1200 N Dupont Hwy',
-      city: 'Dover',
-      province: 'DE',
-      zip: '19901',
-      country: 'United States',
-      phone: '(302) 555-0199',
-    },
-    billing_address: {
-      first_name: 'Jane',
-      last_name: 'Doe',
-      address1: '1200 N Dupont Hwy',
-      city: 'Dover',
-      province: 'DE',
-      zip: '19901',
-      country: 'United States',
-      phone: '(302) 555-0199',
-    },
-    order_items: [
-      {
-        id: 'item_3',
-        product_id: 'drive-medical-wheelchair',
-        product_title: 'Drive Medical Cruiser III Light Weight Wheelchair',
-        sku: 'DM-CR3',
-        unit_price: 270.0,
-        quantity: 2,
-        total_price: 540.0,
-      },
-    ],
-    created_at: new Date(Date.now() - 86400000 * 2).toISOString(),
-  },
-];
+export let memoryOrders: any[] = [];
 
-export let memoryPrescriptions: any[] = [
-  {
-    id: 'rx_8849',
-    patientName: 'Sarah Miller',
-    orderNumber: 'BM-722730-720',
-    prescribedDevice: 'Philips EverFlo Oxygen Concentrator (5 LPM continuous)',
-    physicianName: 'Dr. Arthur Vance, MD (NPI: 1982840192)',
-    clinic: 'Wilmington Pulmonary & Sleep Medicine',
-    submittedAt: new Date(Date.now() - 3600000 * 2).toISOString(),
-    status: 'PENDING_REVIEW',
-    documentUrl: 'https://placehold.co/800x1100/f8fafc/0f172a?text=Official+Medical+Prescription+Rx_8849',
-    documentType: 'PDF Document',
-  },
-  {
-    id: 'rx_8842',
-    patientName: 'Harold Jenkins',
-    orderNumber: 'BM-722601-319',
-    prescribedDevice: 'ResMed AirSense 10 AutoSet CPAP (Pressure 10-14 cmH2O)',
-    physicianName: 'Dr. Evelyn Reed, MD (NPI: 1029384756)',
-    clinic: 'Christiana Care Respiratory Services',
-    submittedAt: new Date(Date.now() - 86400000 * 2).toISOString(),
-    status: 'APPROVED',
-    documentUrl: 'https://placehold.co/800x1100/f8fafc/0f172a?text=Official+Medical+Prescription+Rx_8842',
-    documentType: 'PDF Document',
-    reviewedBy: 'Dr. Evelyn Reed, MD',
-    reviewedAt: new Date(Date.now() - 86400000).toISOString(),
-  },
-];
+export let memoryPrescriptions: any[] = [];
 
 export const recordFirstPartyOrder = (order: any) => {
   memoryOrders.unshift(order);
@@ -595,13 +432,13 @@ export const AdminService = {
     } catch {}
 
     return {
-      revenueToday: totalRevenue > 0 ? totalRevenue : 4820.50,
-      ordersToday: totalOrders > 0 ? totalOrders : 14,
-      pendingOrders: awaitingFulfillment > 0 ? awaitingFulfillment : 5,
-      pendingPrescriptions: pendingPrescriptions > 0 ? pendingPrescriptions : 2,
-      lowStockProducts: lowStockCount || 3,
-      averageOrderValue: aov > 0 ? aov : 344.32,
-      conversionRate: '3.4%',
+      revenueToday: totalRevenue,
+      ordersToday: totalOrders,
+      pendingOrders: awaitingFulfillment,
+      pendingPrescriptions: pendingPrescriptions,
+      lowStockProducts: lowStockCount,
+      averageOrderValue: aov,
+      conversionRate: totalOrders > 0 ? `${Math.min(100, Number(((totalOrders / 100) * 100).toFixed(1)))}%` : '0.0%',
       recentOrders: ordersList.slice(0, 5),
       recentActivity: memoryAuditLogs.slice(0, 8),
     };
@@ -1189,46 +1026,7 @@ export const AdminService = {
 
     const emailMap = new Map<string, any>();
 
-    // 1. Seed standard recognized verified clinical accounts
-    const initialCustomers = [
-      {
-        id: 'cust_001',
-        name: 'Sarah Miller',
-        email: 'sarah.miller@example.com',
-        phone: '(302) 555-0144',
-        ordersCount: 3,
-        lifetimeSpend: 2450.0,
-        state: 'DE',
-        status: 'Active Patient',
-        createdAt: '2026-01-12T09:30:00Z',
-      },
-      {
-        id: 'cust_002',
-        name: 'David Chen',
-        email: 'david.chen@example.com',
-        phone: '(302) 555-0188',
-        ordersCount: 1,
-        lifetimeSpend: 968.4,
-        state: 'DE',
-        status: 'Active Patient',
-        createdAt: '2026-02-04T14:15:00Z',
-      },
-      {
-        id: 'cust_003',
-        name: 'Delaware Sleep Clinic (Care Coordinator)',
-        email: 'procurement@delsleep.com',
-        phone: '(302) 555-8821',
-        ordersCount: 5,
-        lifetimeSpend: 6840.0,
-        state: 'DE',
-        status: 'Commercial Account',
-        createdAt: '2025-11-20T11:00:00Z',
-      },
-    ];
-
-    for (const c of initialCustomers) {
-      emailMap.set(c.email.toLowerCase(), c);
-    }
+    // 1. Aggregate dynamic customer spend & order metrics strictly from live orders
 
     // 2. Aggregate dynamic customer spend & order metrics from live Supabase orders
     try {

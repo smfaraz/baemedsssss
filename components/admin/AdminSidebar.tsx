@@ -6,21 +6,18 @@ import {
   Boxes,
   Users,
   FileCheck2,
+  FileText,
   Tag,
-  Truck,
   Receipt,
   BarChart3,
   ShieldCheck,
   Settings,
-  ChevronRight,
-  Stethoscope,
   ExternalLink,
-  Rocket,
 } from 'lucide-react';
 import { Link, useLocation } from '../../context/CartContext';
 import { AdminRole } from '../../types';
 import { ROLE_PERMISSIONS } from '../../lib/rbacConfig';
-import { APP_NAME } from '../../constants';
+import BrandMark from '../BrandMark';
 
 interface AdminSidebarProps {
   currentRole: AdminRole;
@@ -56,54 +53,36 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       title: 'OVERVIEW',
       items: [
         {
-          label: 'Dashboard',
+          label: 'Operations Deck',
           href: '/admin',
           icon: LayoutDashboard,
           permission: 'dashboard:view',
         },
-        {
-          label: '15-Day Launch Roadmap',
-          href: '/admin/roadmap',
-          icon: Rocket,
-          permission: 'dashboard:view',
-          badge: 'Oct 15',
-          badgeColor: 'bg-teal-500/20 text-teal-400 font-bold border border-teal-500/30',
-        },
       ],
     },
     {
-      title: 'COMMERCE',
+      title: 'COMMERCE & LOGISTICS',
       items: [
         {
-          label: 'Orders',
+          label: 'Orders & Fulfillment',
           href: '/admin/orders',
           icon: ShoppingCart,
           permission: 'orders:view',
-          badge: 'Live',
-          badgeColor: 'bg-emerald-100 text-emerald-800',
         },
         {
-          label: 'Products',
+          label: 'Product Catalog',
           href: '/admin/products',
           icon: Package,
           permission: 'products:view',
         },
         {
-          label: 'Product Research & Margins',
-          href: '/admin/research',
-          icon: BarChart3,
-          permission: 'products:view',
-          badge: '549 SKUs',
-          badgeColor: 'bg-teal-500/20 text-teal-400 font-bold border border-teal-500/30',
-        },
-        {
-          label: 'Inventory',
+          label: 'Inventory Control',
           href: '/admin/inventory',
           icon: Boxes,
           permission: 'inventory:view',
         },
         {
-          label: 'Customers',
+          label: 'Customer Accounts',
           href: '/admin/customers',
           icon: Users,
           permission: 'customers:view',
@@ -111,40 +90,45 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       ],
     },
     {
-      title: 'CLINICAL & COMPLIANCE',
+      title: 'COMPLIANCE & AUDIT',
       items: [
-
         {
-          label: 'Audit Logs',
+          label: 'HIPAA Audit Trail',
           href: '/admin/audit-logs',
           icon: ShieldCheck,
           permission: 'audit_logs:view',
         },
+        {
+          label: 'FDA Device & UDI Registry',
+          href: '/admin/compliance',
+          icon: FileCheck2,
+          permission: 'compliance:view',
+        },
       ],
     },
     {
-      title: 'OPERATIONS',
+      title: 'STORE CONFIGURATION',
       items: [
         {
-          label: 'Discounts',
+          label: 'Promotions & Coupons',
           href: '/admin/discounts',
           icon: Tag,
           permission: 'discounts:view',
         },
         {
-          label: 'Shipping Tiers',
-          href: '/admin/shipping',
-          icon: Truck,
-          permission: 'shipping:view',
+          label: 'Invoice & Slip Design',
+          href: '/admin/settings/invoices',
+          icon: FileText,
+          permission: 'settings:view',
         },
         {
-          label: 'Tax & Nexus',
+          label: 'Tax Nexus Rules',
           href: '/admin/tax',
           icon: Receipt,
           permission: 'tax:view',
         },
         {
-          label: 'Analytics',
+          label: 'Analytics & Revenue',
           href: '/admin/analytics',
           icon: BarChart3,
           permission: 'analytics:view',
@@ -152,19 +136,25 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       ],
     },
     {
-      title: 'SETTINGS',
+      title: 'SECURITY & GOVERNANCE',
       items: [
         {
-          label: 'Staff Accounts',
+          label: 'Staff Directory',
           href: '/admin/settings/users',
           icon: Users,
           permission: 'staff:view',
         },
         {
-          label: 'Role Permissions',
+          label: 'Role Permissions (RBAC)',
           href: '/admin/settings/roles',
-          icon: Settings,
+          icon: ShieldCheck,
           permission: 'roles:view',
+        },
+        {
+          label: 'Platform Settings',
+          href: '/admin/settings',
+          icon: Settings,
+          permission: 'settings:view',
         },
       ],
     },
@@ -175,48 +165,41 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       {/* Mobile Backdrop */}
       {isMobileOpen && (
         <div
-          className="fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-xs lg:hidden"
+          className="fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-xs lg:hidden"
           onClick={onCloseMobile}
         />
       )}
 
       {/* Sidebar Container */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-slate-200 bg-white transition-transform duration-200 lg:static lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-slate-800/80 bg-[#0B1F33] text-slate-300 transition-transform duration-200 lg:static lg:translate-x-0 ${
           isMobileOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         {/* Brand Header */}
-        <div className="flex h-16 shrink-0 items-center justify-between border-b border-slate-200 px-5">
-          <Link to="/admin" className="flex items-center gap-2.5">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-medical-primary text-white shadow-xs">
-              <Stethoscope size={20} />
+        <div className="flex h-14 shrink-0 items-center justify-between border-b border-slate-800/80 px-4">
+          <Link to="/admin" className="flex items-center gap-2">
+            <BrandMark inverse compact />
+            <span className="rounded bg-slate-800 px-1.5 py-0.5 text-[9px] font-mono font-semibold text-slate-300 uppercase tracking-wider">
+              Admin
             </span>
-            <div>
-              <span className="text-base font-black tracking-tight text-slate-900">
-                {APP_NAME}
-              </span>
-              <span className="block text-[10px] font-bold uppercase tracking-wider text-medical-primary">
-                Control Plane
-              </span>
-            </div>
           </Link>
 
           <a
             href="/"
             target="_blank"
             rel="noreferrer"
-            className="flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+            className="flex items-center gap-1 rounded border border-slate-700/80 bg-slate-800/50 px-2 py-1 text-[11px] font-medium text-slate-300 hover:border-slate-600 hover:text-white transition"
             title="Open customer storefront in new tab"
           >
-            Store <ExternalLink size={12} />
+            <span>Store</span>
+            <ExternalLink size={10} />
           </a>
         </div>
 
         {/* Navigation List */}
-        <div className="flex-1 overflow-y-auto px-3 py-4 space-y-6">
+        <div className="flex-1 overflow-y-auto px-2.5 py-3.5 space-y-4">
           {sections.map((section) => {
-            // Filter items by current user permissions
             const visibleItems = section.items.filter(
               (item) => !item.permission || userPerms.includes(item.permission)
             );
@@ -225,10 +208,10 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
 
             return (
               <div key={section.title}>
-                <p className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                <p className="px-2.5 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
                   {section.title}
                 </p>
-                <nav className="mt-2 space-y-1">
+                <nav className="mt-1 space-y-0.5">
                   {visibleItems.map((item) => {
                     const isActive =
                       item.href === '/admin'
@@ -242,26 +225,26 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                         key={item.href}
                         to={item.href}
                         onClick={onCloseMobile}
-                        className={`group flex items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold transition ${
+                        className={`group flex items-center justify-between rounded-md px-2.5 py-1.5 text-xs font-medium transition ${
                           isActive
-                            ? 'bg-slate-900 text-white shadow-xs'
-                            : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                            ? 'bg-[#14539A] text-white shadow-xs'
+                            : 'text-slate-300 hover:bg-slate-800/60 hover:text-white'
                         }`}
                       >
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2.5 truncate">
                           <Icon
-                            size={17}
-                            className={isActive ? 'text-medical-light' : 'text-slate-400 group-hover:text-slate-600'}
+                            size={15}
+                            className={isActive ? 'text-white' : 'text-slate-400 group-hover:text-slate-200'}
                           />
-                          <span>{item.label}</span>
+                          <span className="truncate">{item.label}</span>
                         </div>
 
                         {item.badge && (
                           <span
-                            className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                            className={`rounded px-1.5 py-0.5 text-[9px] font-mono font-bold shrink-0 ${
                               isActive
                                 ? 'bg-white/20 text-white'
-                                : item.badgeColor || 'bg-slate-100 text-slate-700'
+                                : item.badgeColor || 'bg-slate-800 text-slate-300'
                             }`}
                           >
                             {item.badge}
@@ -276,18 +259,20 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
           })}
         </div>
 
-        {/* Footer Role Info */}
-        <div className="shrink-0 border-t border-slate-200 p-4 bg-slate-50/70">
+        {/* Footer Role & HIPAA Badge */}
+        <div className="shrink-0 border-t border-slate-800/80 p-3 bg-slate-950/40">
           <div className="flex items-center justify-between">
             <div className="min-w-0 flex-1">
-              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                Operating Role
-              </p>
-              <p className="truncate text-xs font-black capitalize text-slate-900">
-                {currentRole.replace('_', ' ')}
+              <div className="flex items-center gap-1.5 mb-0.5">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span className="text-[10px] font-mono uppercase tracking-wider text-emerald-400 font-semibold">
+                  HIPAA Enforced
+                </span>
+              </div>
+              <p className="truncate text-xs font-medium text-slate-200 capitalize">
+                {currentRole.replace(/_/g, ' ')}
               </p>
             </div>
-            <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-500 ring-4 ring-emerald-100" />
           </div>
         </div>
       </aside>

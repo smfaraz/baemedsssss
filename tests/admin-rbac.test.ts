@@ -17,6 +17,7 @@ import {
   VALID_ORDER_TRANSITIONS,
   hasPermission,
   ROLE_PERMISSIONS,
+  memoryOrders,
 } from '../server/adminService';
 
 // Helper to create mock Request for /api/admin
@@ -185,14 +186,29 @@ async function testOrderStateMachine() {
     throw new Error('CANCELLED is a terminal state and must not have valid transitions');
   }
 
-  // Test state machine validation rejection via service call
+  // Test state machine validation rejection via service call with test order
+  memoryOrders.push({
+    id: 'ord_test_001',
+    order_number: 'BM-TEST-001',
+    customer_id: 'cust_test',
+    customer_email: 'test@example.com',
+    status: 'CLINICAL_REVIEW',
+    total_amount: 100,
+    created_at: new Date().toISOString(),
+    order_items: [],
+  });
+
   try {
-    await AdminService.updateOrderStatus(actor, 'ord_demo_001', 'SHIPPED'); // ord_demo_001 is CLINICAL_REVIEW
+    await AdminService.updateOrderStatus(actor, 'ord_test_001', 'SHIPPED'); // CLINICAL_REVIEW cannot jump directly to SHIPPED
     throw new Error('Expected illegal transition CLINICAL_REVIEW -> SHIPPED to be rejected!');
   } catch (err: any) {
     if (!err.message.toLowerCase().includes('transition')) {
       throw err;
     }
+  } finally {
+    // Clean up test order
+    const idx = memoryOrders.findIndex((o) => o.id === 'ord_test_001');
+    if (idx !== -1) memoryOrders.splice(idx, 1);
   }
 
   console.log('✔ Order State Machine validation and illegal transition denial passed.');
