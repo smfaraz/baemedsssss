@@ -37,7 +37,7 @@ const ContactPage: React.FC = () => {
     <main className="min-h-screen" style={{ backgroundColor: '#f6f3ee' }}>
       <SEO
         title="Contact Us — US Clinical Support & Customer Care"
-        description="Contact BaeMeds Healthcare USA for clinical respiratory equipment, CPAP/BiPAP rentals, patient monitors, and institutional orders. Call toll-free +1 (800) 555-0199."
+        description="Contact BaeMeds Healthcare USA for durable medical equipment (DME), respiratory supplies, patient monitors, and institutional orders. Call toll-free +1 (800) 555-0199."
         canonical="/contact"
       />
       <section className="bg-medical-dark text-white">
@@ -137,7 +137,7 @@ const ContactPage: React.FC = () => {
                 <option>Product question</option>
                 <option>Order status</option>
                 <option>Return or refund</option>
-                <option>Rental question</option>
+                <option>Prescription (Rx) inquiry</option>
                 <option>Other support</option>
               </select>
             </div>

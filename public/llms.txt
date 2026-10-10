@@ -1,14 +1,14 @@
 # BaeMeds (baemeds.com)
 
-> Durable Medical Equipment (DME), Healthcare Supplies, and Clinical Rental Services across the United States.
+> Durable Medical Equipment (DME) and Home Healthcare Supplies across the United States.
 
 ## About BaeMeds
-BaeMeds (BaeMeds Healthcare LLC) is a nationwide supplier of hospital-grade Durable Medical Equipment (DME), respiratory therapy equipment, and home healthcare supplies. We provide certified sales, flexible monthly rental plans, fast nationwide shipping, and dedicated 24/7 patient technical support across all 50 US states.
+BaeMeds (BaeMeds Healthcare LLC) is a nationwide supplier of hospital-grade Durable Medical Equipment (DME), respiratory therapy equipment, and home healthcare supplies. We provide certified equipment for purchase online, fast nationwide shipping, manufacturer warranties, and dedicated patient customer support across all 50 US states.
 
 ## Core Medical Equipment Categories & Offerings
-- [Oxygen Concentrator Sales & Rental](https://baemeds.com/guides/oxygen-concentrator-rental-guide): 5L and 10L medical oxygen concentrators (HCPCS E1390/E1392) from leading brands (CAIRE, Drive DeVilbiss, Inogen, Philips Respironics) with fast nationwide shipping.
-- [BiPAP & CPAP Sleep Apnea Therapy](https://baemeds.com/guides/bipap-machine-rental-guide): Doctor-prescribed non-invasive ventilation systems (HCPCS E0470/E0471/E0601) including ResMed AirSense 10, ResMed Lumis 150 VPAP ST, and Philips DreamStation.
-- [Multipara Patient Monitors](https://baemeds.com/guides/patient-monitor-guide): Bedside vital signs monitoring systems with continuous ECG, SpO2, NIBP, and temperature for home stepdown recovery and clinical care.
+- [Oxygen Concentrator Sales](https://baemeds.com/products?category=Oxygen%20Concentrators): 5L and 10L medical oxygen concentrators (HCPCS E1390/E1392) from leading brands (CAIRE, Drive DeVilbiss, Inogen, Philips Respironics) with fast nationwide shipping.
+- [BiPAP & CPAP Sleep Apnea Therapy](https://baemeds.com/products?category=BiPAP%20Machines): Doctor-prescribed non-invasive ventilation systems (HCPCS E0470/E0471/E0601) including ResMed AirSense 10, ResMed Lumis 150 VPAP ST, and Philips DreamStation.
+- [Multipara Patient Monitors](https://baemeds.com/products?category=Patient%20Monitors): Bedside vital signs monitoring systems with continuous ECG, SpO2, NIBP, and temperature for home stepdown recovery and clinical care.
 - [Hospital Furniture & Mobility](https://baemeds.com/products?category=Hospital%20Furniture): Adjustable hospital beds, alternating pressure mattresses, and manual/power wheelchairs.
 - [Medical Masks & Tubing](https://baemeds.com/products?category=Masks%20%26%20Accessories): CPAP/BiPAP masks (nasal and full-face), heated humidification chambers, and replacement tubing.
 - [All Products Catalog](https://baemeds.com/products): Full medical catalogue including suction machines, nebulizers, diagnostic instruments, and mobility aids.

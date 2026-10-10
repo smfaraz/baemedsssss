@@ -168,7 +168,7 @@ async function runAudit() {
       const hasPrice = await page.evaluate(() => document.body.innerText.includes('₹'));
       const hasActionBtn = await page.evaluate(() => {
         const btns = Array.from(document.querySelectorAll('button'));
-        return btns.some(b => b.innerText.includes('Add to cart') || b.innerText.includes('Enquire') || b.innerText.includes('Out of stock') || b.innerText.includes('Rent'));
+        return btns.some(b => b.innerText.includes('Add to cart') || b.innerText.includes('Enquire') || b.innerText.includes('Out of stock'));
       });
       
       console.log(`Product "${link}" -> HTTP ${status}, H1: "${h1Text}", Price: ${hasPrice}, Action Button: ${hasActionBtn}`);

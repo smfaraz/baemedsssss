@@ -429,7 +429,7 @@ async function run() {
       isRegulatoryVerified: true,
       prescriptionRequired: true,
       requiresPrescription: true,
-      isRentalAvailable: true,
+      isRentalAvailable: false,
       fsaEligible: true,
       eligibleFsaHsa: true,
       inStock: true,

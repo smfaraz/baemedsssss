@@ -105,6 +105,8 @@ const AppContent: React.FC = () => {
           <Route path="/cart" element={<CartPage />} />
           <Route path="/wishlist" element={<WishlistPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/rentals" element={<Navigate to="/products" replace />} />
+          <Route path="/rental" element={<Navigate to="/products" replace />} />
           <Route path="/guides/oxygen-concentrator-rental-guide" element={<Navigate to="/products?category=Oxygen%20Concentrator" replace />} />
           <Route path="/guides/bipap-machine-rental-guide" element={<Navigate to="/products?category=BiPAP" replace />} />
           <Route path="/guides/patient-monitor-guide" element={<Navigate to="/products?category=Patient%20Monitor" replace />} />

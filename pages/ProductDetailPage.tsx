@@ -384,7 +384,7 @@ const ProductDetailPage: React.FC = () => {
   return (
     <main className="pb-24">
       <SEO
-        title={`${product.title} — Buy & Rent Online`}
+        title={`${product.title} — Buy Online`}
         description={`Order certified ${product.title} from BaeMeds. FSA/HSA eligible, US nationwide delivery with biomedical inspection and manufacturer warranty.`}
         image={product.image}
         type="product"
