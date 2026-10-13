@@ -9,16 +9,16 @@ import {
   json,
   readJson,
   requireSessionToken,
-} from '../server/commerce.ts';
+} from '../server/commerce';
 import {
   isValidUSState,
   isValidUSZip,
   isValidUSPhone,
   normalizeStateCode,
   toE164Phone,
-} from '../lib/marketConfig.ts';
-import { supabase } from '../lib/supabase.ts';
-import { createVercelHandler } from '../server/serverlessAdapter.ts';
+} from '../lib/marketConfig';
+import { supabase } from '../lib/supabase';
+import { createVercelHandler } from '../server/serverlessAdapter';
 
 type AddressBody = {
   id?: unknown;

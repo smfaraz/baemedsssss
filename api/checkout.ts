@@ -7,10 +7,10 @@ import {
   getSessionToken,
   json,
   readJson,
-} from '../server/commerce.ts';
-import { adminSupabase } from '../server/adminSupabase.ts';
+} from '../server/commerce';
+import { adminSupabase } from '../server/adminSupabase';
 import catalogSeed from '../data/catalog_seed.json';
-import { recordFirstPartyOrder } from '../server/adminService.ts';
+import { recordFirstPartyOrder } from '../server/adminService';
 
 interface CheckoutItem {
   id: string;
@@ -46,8 +46,8 @@ interface CheckoutBody {
   items: CheckoutItem[];
 }
 
-import { createVercelHandler } from '../server/serverlessAdapter.ts';
-import { EmailService } from '../server/emailService.ts';
+import { createVercelHandler } from '../server/serverlessAdapter';
+import { EmailService } from '../server/emailService';
 
 export default createVercelHandler(async (request: Request) => {
   try {

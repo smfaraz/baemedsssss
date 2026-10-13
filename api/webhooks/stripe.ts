@@ -1,7 +1,7 @@
 import Stripe from 'stripe';
-import { json } from '../../server/commerce.ts';
-import { adminSupabase } from '../../server/adminSupabase.ts';
-import { createVercelHandler } from '../../server/serverlessAdapter.ts';
+import { json } from '../../server/commerce';
+import { adminSupabase } from '../../server/adminSupabase';
+import { createVercelHandler } from '../../server/serverlessAdapter';
 
 export default createVercelHandler(async (request: Request) => {
   if (request.method !== 'POST') {

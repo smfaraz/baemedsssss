@@ -5,7 +5,7 @@
  * Works seamlessly in Vercel Node Serverless, Vercel Edge, and local Vite dev server.
  */
 
-import './polyfill.ts';
+import './polyfill';
 
 export type FetchHandler = (request: Request) => Promise<Response>;
 

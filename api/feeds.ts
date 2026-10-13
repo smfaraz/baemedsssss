@@ -5,7 +5,7 @@
  */
 
 import { supabase } from '../lib/supabase';
-import { createVercelHandler } from '../server/serverlessAdapter.ts';
+import { createVercelHandler } from '../server/serverlessAdapter';
 
 const BASE_URL = 'https://www.baemeds.com';
 const BRAND = 'BaeMeds USA';

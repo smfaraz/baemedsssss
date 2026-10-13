@@ -12,8 +12,8 @@ import {
   memoryCustomerAccounts,
   readJson,
   sessionCookie,
-} from '../server/commerce.ts';
-import { createVercelHandler } from '../server/serverlessAdapter.ts';
+} from '../server/commerce';
+import { createVercelHandler } from '../server/serverlessAdapter';
 
 type AuthBody = {
   action?: unknown;

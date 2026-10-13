@@ -1,6 +1,6 @@
-import { ApiError, assertSameOrigin, errorResponse, json, readJson } from '../server/commerce.ts';
-import { createVercelHandler } from '../server/serverlessAdapter.ts';
-import { PaymentService } from '../server/paymentService.ts';
+import { ApiError, assertSameOrigin, errorResponse, json, readJson } from '../server/commerce';
+import { createVercelHandler } from '../server/serverlessAdapter';
+import { PaymentService } from '../server/paymentService';
 
 interface PaymentIntentBody {
   amount?: number; // in USD (e.g. 149.99)

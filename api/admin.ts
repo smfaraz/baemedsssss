@@ -4,7 +4,7 @@
  * RBAC authorization, and mutation auditing.
  */
 
-import '../server/polyfill.ts';
+import '../server/polyfill';
 import {
   ApiError,
   errorResponse,
@@ -12,16 +12,16 @@ import {
   json,
   readJson,
   assertSameOrigin,
-} from '../server/commerce.ts';
+} from '../server/commerce';
 import {
   AdminService,
   AdminUser,
   AdminRole,
   hasPermission,
   logAdminAction,
-} from '../server/adminService.ts';
+} from '../server/adminService';
 
-import { adminSupabase } from '../server/adminSupabase.ts';
+import { adminSupabase } from '../server/adminSupabase';
 
 // Resolve caller identity and role from server-authoritative session
 export const resolveAdminActor = async (request: Request): Promise<AdminUser> => {
@@ -162,7 +162,7 @@ export const resolveAdminActor = async (request: Request): Promise<AdminUser> =>
   throw new ApiError(403, 'Forbidden: Insufficient privileges for administrative back office.');
 };
 
-import { createVercelHandler } from '../server/serverlessAdapter.ts';
+import { createVercelHandler } from '../server/serverlessAdapter';
 
 export default createVercelHandler(async (request: Request) => {
     // 0. Handle CORS preflight options

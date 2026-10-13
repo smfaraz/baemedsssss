@@ -3,8 +3,8 @@
  * Replaces server/shopify.ts with direct database authentication, address management, and order processing.
  */
 
-import { Customer, Address, Order } from '../types.ts';
-import { supabase } from '../lib/supabase.ts';
+import { Customer, Address, Order } from '../types';
+import { supabase } from '../lib/supabase';
 
 export const getCustomerOrders = (_email: string): Order[] => [];
 

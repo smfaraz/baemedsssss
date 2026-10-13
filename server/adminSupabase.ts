@@ -7,8 +7,8 @@
  * - Prescription review pipeline
  */
 
-import './polyfill.ts';
-import { MockWebSocket } from './polyfill.ts';
+import './polyfill';
+import { MockWebSocket } from './polyfill';
 import { createClient } from '@supabase/supabase-js';
 
 const getEnvVar = (name: string): string | undefined => {
