@@ -1,5 +1,8 @@
 {
   "functions": {
+    "api/**/*.ts": {
+      "includeFiles": "{server/**,lib/**,data/**,types.ts}"
+    },
     "api/*.ts": {
       "includeFiles": "{server/**,lib/**,data/**,types.ts}"
     }

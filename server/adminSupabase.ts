@@ -7,12 +7,9 @@
  * - Prescription review pipeline
  */
 
+import './polyfill.ts';
+import { MockWebSocket } from './polyfill.ts';
 import { createClient } from '@supabase/supabase-js';
-
-// Polyfill minimal WebSocket constructor if running in older Node.js environments
-if (typeof globalThis.WebSocket === 'undefined') {
-  globalThis.WebSocket = class {} as any;
-}
 
 const getEnvVar = (name: string): string | undefined => {
   if (typeof process !== 'undefined' && process.env && process.env[name]) {
@@ -38,5 +35,8 @@ export const adminSupabase = createClient(SUPABASE_URL, SERVICE_KEY, {
   auth: {
     persistSession: false,
     autoRefreshToken: false,
+  },
+  realtime: {
+    transport: (typeof globalThis.WebSocket !== 'undefined' ? globalThis.WebSocket : MockWebSocket) as any,
   },
 });

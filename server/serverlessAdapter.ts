@@ -5,6 +5,8 @@
  * Works seamlessly in Vercel Node Serverless, Vercel Edge, and local Vite dev server.
  */
 
+import './polyfill.ts';
+
 export type FetchHandler = (request: Request) => Promise<Response>;
 
 const HOP_BY_HOP_HEADERS = new Set([

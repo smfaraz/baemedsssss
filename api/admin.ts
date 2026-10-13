@@ -4,6 +4,7 @@
  * RBAC authorization, and mutation auditing.
  */
 
+import '../server/polyfill.ts';
 import {
   ApiError,
   errorResponse,
@@ -187,16 +188,18 @@ export default createVercelHandler(async (request: Request) => {
       const method = request.method;
 
       // Handle unauthenticated staff login
-      if (subpath === 'login' && method === 'POST') {
-        const body = await readJson<{ email?: string; password?: string }>(request);
-        if (!body.email || !body.password) {
-          throw new ApiError(400, 'Staff email and password are required.');
+      if ((subpath === 'login' || subpath === '' || subpath === 'admin') && method === 'POST') {
+        const body = await readJson<{ email?: string; password?: string }>(request).catch(() => ({} as any));
+        if (body?.email && body?.password) {
+          try {
+            const result = await AdminService.authenticateStaff(body.email, body.password);
+            return json(result);
+          } catch (authErr: any) {
+            throw new ApiError(authErr.message?.includes('deactivated') ? 403 : 401, authErr.message || 'Invalid credentials.');
+          }
         }
-        try {
-          const result = await AdminService.authenticateStaff(body.email, body.password);
-          return json(result);
-        } catch (authErr: any) {
-          throw new ApiError(authErr.message?.includes('deactivated') ? 403 : 401, authErr.message || 'Invalid credentials.');
+        if (subpath === 'login') {
+          throw new ApiError(400, 'Staff email and password are required.');
         }
       }
 
