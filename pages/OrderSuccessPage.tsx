@@ -46,10 +46,6 @@ const OrderSuccessPage: React.FC = () => {
   const [orderDetails, setOrderDetails] = useState<StoredOrderDetails | null>(null);
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && typeof (window as any).gtag_report_conversion === 'function') {
-      (window as any).gtag_report_conversion();
-    }
-
     try {
       const stored = sessionStorage.getItem('baemeds_last_order') || localStorage.getItem('baemeds_last_order');
       if (stored) {

@@ -110,11 +110,6 @@ const AppContent: React.FC = () => {
           <Route path="/guides/oxygen-concentrator-rental-guide" element={<Navigate to="/products?category=Oxygen%20Concentrator" replace />} />
           <Route path="/guides/bipap-machine-rental-guide" element={<Navigate to="/products?category=BiPAP" replace />} />
           <Route path="/guides/patient-monitor-guide" element={<Navigate to="/products?category=Patient%20Monitor" replace />} />
-          <Route path="/guides/oxygen-concentrator-rental-hyderabad" element={<Navigate to="/products?category=Oxygen%20Concentrator" replace />} />
-
-          <Route path="/oxygen-concentrator-rental-hyderabad" element={<Navigate to="/products?category=Oxygen%20Concentrator" replace />} />
-          <Route path="/bipap-machine-on-rent-hyderabad" element={<Navigate to="/products?category=BiPAP" replace />} />
-          <Route path="/patient-monitor-price-hyderabad" element={<Navigate to="/products?category=Patient%20Monitor" replace />} />
 
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />

@@ -51,32 +51,12 @@
       "permanent": true
     },
     {
-      "source": "/guides/oxygen-concentrator-rental-hyderabad",
-      "destination": "https://www.baemeds.com/products?category=Oxygen%20Concentrators",
-      "permanent": true
-    },
-    {
-      "source": "/oxygen-concentrator-rental-hyderabad",
-      "destination": "https://www.baemeds.com/products?category=Oxygen%20Concentrators",
-      "permanent": true
-    },
-    {
       "source": "/guides/bipap-machine-rental-guide",
       "destination": "https://www.baemeds.com/products?category=BiPAP%20Machines",
       "permanent": true
     },
     {
-      "source": "/bipap-machine-on-rent-hyderabad",
-      "destination": "https://www.baemeds.com/products?category=BiPAP%20Machines",
-      "permanent": true
-    },
-    {
       "source": "/guides/patient-monitor-guide",
-      "destination": "https://www.baemeds.com/products?category=Patient%20Monitors",
-      "permanent": true
-    },
-    {
-      "source": "/patient-monitor-price-hyderabad",
       "destination": "https://www.baemeds.com/products?category=Patient%20Monitors",
       "permanent": true
     },

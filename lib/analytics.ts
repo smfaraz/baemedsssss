@@ -1,7 +1,6 @@
 /**
- * BaeMeds Unified Omnichannel Analytics & Conversion Tracking
- * Bridges Google Analytics 4 (GA4 e-commerce standard) and Meta Pixel (CAPI & Browser Pixel)
- * for Google Ads (AW-18416931440), GA4 (G-X64Q6D0M61), and Meta Ads.
+ * BaeMeds USA Healthcare Analytics & Conversion Tracking
+ * Implements standard GA4 e-commerce events and Meta Pixel browser tracking.
  */
 
 import { Product, CartItem } from '../types';
@@ -147,14 +146,6 @@ export const Analytics = {
           price: i.price,
           quantity: i.quantity,
         })),
-      });
-
-      // 2. Google Ads Conversion Event
-      window.gtag('event', 'conversion', {
-        send_to: 'AW-18416931440/XwPhCM6B--scEPCk8M1E',
-        value: order.totalAmount,
-        currency,
-        transaction_id: order.orderNumber,
       });
     }
 
