@@ -164,10 +164,6 @@ export const resolveAdminActor = async (request: Request): Promise<AdminUser> =>
 
 import { createVercelHandler } from '../server/serverlessAdapter.ts';
 
-export const config = {
-  runtime: 'edge',
-};
-
 export default createVercelHandler(async (request: Request) => {
     // 0. Handle CORS preflight options
     if (request.method === 'OPTIONS') {
