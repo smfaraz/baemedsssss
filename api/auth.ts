@@ -79,6 +79,10 @@ const handleLogout = async (request: Request) => {
   return json({ ok: true }, 200, { 'Set-Cookie': clearSessionCookie });
 };
 
+export const config = {
+  runtime: 'edge',
+};
+
 export default createVercelHandler(async (request: Request) => {
   try {
     if (request.method === 'GET') return await handleSession(request);

@@ -9,6 +9,10 @@ import {
 } from '../../server/adminService.ts';
 import { createVercelHandler } from '../../server/serverlessAdapter.ts';
 
+export const config = {
+  runtime: 'edge',
+};
+
 export default createVercelHandler(async (request: Request) => {
   if (request.method === 'OPTIONS') {
     return new Response(null, {

@@ -6,7 +6,6 @@
 
 import { supabase } from '../lib/supabase';
 import { adminSupabase } from './adminSupabase';
-import catalogSeed from '../data/catalog_seed.json';
 import { Product, Order } from '../types';
 
 export type AdminRole =
@@ -741,35 +740,7 @@ export const AdminService = {
       console.warn('Database pagination fetch fallback:', e);
     }
 
-    // Fallback to local catalog seed if database is unreachable or empty
-    if (!products.length && total === 0) {
-      let seedList = [...(catalogSeed as unknown as Product[])];
-      if (options.category && options.category !== 'all') {
-        seedList = seedList.filter((p) => p.category === options.category);
-      }
-      if (options.prescriptionRequired !== undefined) {
-        seedList = seedList.filter((p) => Boolean(p.prescriptionRequired) === options.prescriptionRequired);
-      }
-      if (options.heroOnly) {
-        seedList = seedList.filter((p) => Boolean(p.isHeroProduct));
-      }
-      if (options.query) {
-        const q = options.query.toLowerCase().trim();
-        seedList = seedList.filter(
-          (p) =>
-            p.title.toLowerCase().includes(q) ||
-            p.category.toLowerCase().includes(q) ||
-            p.handle.toLowerCase().includes(q) ||
-            (p.hcpcsCode && p.hcpcsCode.toLowerCase().includes(q))
-        );
-      }
-      total = seedList.length;
-      products = seedList.slice(from, to + 1).map((item) => ({
-        ...item,
-        dealerPrice: item.dealerPrice ?? item.wholesaleCost ?? item.costPerItem,
-        wholesaleCost: item.wholesaleCost ?? item.dealerPrice ?? item.costPerItem,
-      }));
-    }
+    // Database returns empty or error handled
 
     return {
       products,
@@ -1365,7 +1336,7 @@ export const AdminService = {
           createdAt: supaAuth.user.created_at || new Date().toISOString(),
         };
 
-        const b64 = Buffer.from(user.email).toString('base64');
+        const b64 = typeof Buffer !== 'undefined' ? Buffer.from(user.email).toString('base64') : btoa(user.email);
         const token = `bm_admin_${b64}_token`;
 
         await logAdminAction(user.id, user.role, 'STAFF_LOGIN_SUCCESS', 'auth', user.id, 'SUCCESS', {
@@ -1416,7 +1387,7 @@ export const AdminService = {
       authMethod: 'roster',
     });
 
-    const b64 = Buffer.from(staff.email).toString('base64');
+    const b64 = typeof Buffer !== 'undefined' ? Buffer.from(staff.email).toString('base64') : btoa(staff.email);
     const token = `bm_admin_${b64}_token`;
 
     return {

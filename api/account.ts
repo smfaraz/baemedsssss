@@ -111,6 +111,10 @@ const removeAddress = async (request: Request, _token: string) => {
   return json({ ok: true });
 };
 
+export const config = {
+  runtime: 'edge',
+};
+
 export default createVercelHandler(async (request: Request) => {
   try {
     if (request.method !== 'POST' && request.method !== 'DELETE') {

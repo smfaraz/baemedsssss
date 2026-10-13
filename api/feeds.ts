@@ -5,7 +5,6 @@
  */
 
 import { supabase } from '../lib/supabase';
-import rawCatalog from '../data/catalog_seed.json';
 import { createVercelHandler } from '../server/serverlessAdapter.ts';
 
 const BASE_URL = 'https://www.baemeds.com';
@@ -68,9 +67,13 @@ async function getFeedProducts(heroesOnly = false) {
     console.warn('Fallback to local catalog for feeds:', e);
   }
 
-  // Fallback to local seed if database is unreachable
-  return (rawCatalog as any[]).filter((p) => (heroesOnly ? p.isHeroProduct : true));
+  // Fallback to empty if database is unreachable
+  return [];
 }
+
+export const config = {
+  runtime: 'edge',
+};
 
 export default createVercelHandler(async (request: Request) => {
     const url = new URL(request.url);

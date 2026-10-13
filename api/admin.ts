@@ -98,7 +98,10 @@ export const resolveAdminActor = async (request: Request): Promise<AdminUser> =>
     try {
       const parts = token.split('_');
       if (parts[2]) {
-        email = Buffer.from(parts[2], 'base64').toString('utf-8').toLowerCase().trim();
+        email = (typeof Buffer !== 'undefined'
+          ? Buffer.from(parts[2], 'base64').toString('utf-8')
+          : atob(parts[2])
+        ).toLowerCase().trim();
       }
     } catch {}
 
@@ -160,6 +163,10 @@ export const resolveAdminActor = async (request: Request): Promise<AdminUser> =>
 };
 
 import { createVercelHandler } from '../server/serverlessAdapter.ts';
+
+export const config = {
+  runtime: 'edge',
+};
 
 export default createVercelHandler(async (request: Request) => {
     // 0. Handle CORS preflight options
