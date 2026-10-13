@@ -13,8 +13,10 @@ import { formatErrorResponse } from '../../middleware/apiHandler.js';
 export class V1Gateway {
   static async dispatch(request: Request): Promise<Response> {
     const url = new URL(request.url);
+    const querySubpath = url.searchParams.get('subpath') || url.searchParams.get('path');
     const pathWithoutPrefix = url.pathname.replace(/^\/api\/v1\/?/, '');
-    const segments = pathWithoutPrefix.split('/');
+    const fullPath = (querySubpath || (pathWithoutPrefix && pathWithoutPrefix !== 'v1' ? pathWithoutPrefix : '')).replace(/^\/+/, '');
+    const segments = fullPath.split('/');
     const domain = segments[0];
     const subpath = segments.slice(1).join('/');
 

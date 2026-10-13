@@ -94,6 +94,14 @@
   ],
   "rewrites": [
     {
+      "source": "/api/admin/:subpath*",
+      "destination": "/api/admin?subpath=:subpath*"
+    },
+    {
+      "source": "/api/v1/:subpath*",
+      "destination": "/api/v1?subpath=:subpath*"
+    },
+    {
       "source": "/((?!api/|.*\\.[\\w]+$).*)",
       "destination": "/index.html"
     }

@@ -20,6 +20,28 @@ const HOP_BY_HOP_HEADERS = new Set([
 
 export function createVercelHandler(fetchHandler: FetchHandler) {
   const handler = async (req: any, res?: any): Promise<any> => {
+    // 0. Immediate OPTIONS preflight handling
+    if ((req?.method || '').toUpperCase() === 'OPTIONS') {
+      if (res && typeof res.setHeader === 'function') {
+        res.statusCode = 204;
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+        res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization, X-Admin-Role');
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
+        res.end();
+        return;
+      }
+      return new Response(null, {
+        status: 204,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET,OPTIONS,PATCH,DELETE,POST,PUT',
+          'Access-Control-Allow-Headers': 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization, X-Admin-Role',
+          'Access-Control-Allow-Credentials': 'true',
+        },
+      });
+    }
+
     // 1. Direct Web Standard Request (Edge runtime, Vite dev middleware, or unit test)
     if (req instanceof Request || (req && typeof req.text === 'function' && !res)) {
       return await fetchHandler(req);

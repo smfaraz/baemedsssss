@@ -116,44 +116,13 @@ export interface CustomerAccount {
   lastName: string;
 }
 
-export const memoryCustomerAccounts = new Map<string, CustomerAccount>([
-  ['patient@example.com', { email: 'patient@example.com', password: 'password123', firstName: 'Jane', lastName: 'Doe' }],
-  ['sarah.miller@example.com', { email: 'sarah.miller@example.com', password: 'password123', firstName: 'Sarah', lastName: 'Miller' }],
-  ['david.chen@example.com', { email: 'david.chen@example.com', password: 'password123', firstName: 'David', lastName: 'Chen' }],
-]);
+export const memoryCustomerAccounts = new Map<string, CustomerAccount>();
 
 export interface StoredAddress extends Address {
   customerEmail: string;
 }
 
-export const memoryAddresses: StoredAddress[] = [
-  {
-    id: 'addr_demo_01',
-    customerEmail: 'patient@example.com',
-    firstName: 'Jane',
-    lastName: 'Doe',
-    address1: '1200 N Dupont Hwy',
-    address2: 'Suite 400',
-    city: 'Dover',
-    province: 'DE',
-    zip: '19901',
-    country: 'United States',
-    phone: '(302) 555-0199',
-  },
-  {
-    id: 'addr_demo_02',
-    customerEmail: 'sarah.miller@example.com',
-    firstName: 'Sarah',
-    lastName: 'Miller',
-    address1: '1420 Market St',
-    address2: '',
-    city: 'Wilmington',
-    province: 'DE',
-    zip: '19801',
-    country: 'United States',
-    phone: '(302) 555-0144',
-  },
-];
+export const memoryAddresses: StoredAddress[] = [];
 
 export const addCustomerAddress = (email: string, address: Omit<Address, 'id'>): Address => {
   const normEmail = email.toLowerCase().trim();

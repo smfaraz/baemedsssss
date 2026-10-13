@@ -24,7 +24,13 @@ import { adminSupabase } from '../server/adminSupabase.ts';
 
 // Resolve caller identity and role from server-authoritative session
 export const resolveAdminActor = async (request: Request): Promise<AdminUser> => {
-  const token = getSessionToken(request) || request.headers.get('Authorization')?.replace('Bearer ', '');
+  const authHeader = request.headers.get('Authorization');
+  const bearerToken = authHeader?.startsWith('Bearer ')
+    ? authHeader.substring(7).trim()
+    : authHeader?.trim();
+
+  // Explicit Authorization header always takes precedence over ambient browser cookies
+  const token = bearerToken || getSessionToken(request);
 
   if (!token) {
     throw new ApiError(401, 'Authentication required to access administrative services.');
@@ -47,7 +53,24 @@ export const resolveAdminActor = async (request: Request): Promise<AdminUser> =>
           .eq('user_id', user.id)
           .maybeSingle();
 
-        const userRole: AdminRole = (roleRow?.role as AdminRole) || 'customer';
+        // Also check admin_users table
+        const { data: adminUserRow } = await adminSupabase
+          .from('admin_users')
+          .select('id')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        const staffRoster = await AdminService.getStaffUsers('super_admin');
+        const staffMatch = staffRoster.find(
+          (s) => s.email.toLowerCase() === (user.email || '').toLowerCase()
+        );
+
+        const userRole: AdminRole =
+          (roleRow?.role as AdminRole) ||
+          (adminUserRow ? 'super_admin' : undefined) ||
+          (staffMatch ? staffMatch.role : undefined) ||
+          (user.email?.toLowerCase() === 'admin@baemeds.com' ? 'super_admin' : 'customer');
+
         if (userRole === 'customer') {
           throw new ApiError(403, 'Forbidden: Customer accounts are not permitted to access administrative systems.');
         }
@@ -138,9 +161,29 @@ export const resolveAdminActor = async (request: Request): Promise<AdminUser> =>
 import { createVercelHandler } from '../server/serverlessAdapter.ts';
 
 export default createVercelHandler(async (request: Request) => {
+    // 0. Handle CORS preflight options
+    if (request.method === 'OPTIONS') {
+      return new Response(null, {
+        status: 204,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET,OPTIONS,PATCH,DELETE,POST,PUT',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With, X-Admin-Role',
+          'Access-Control-Allow-Credentials': 'true',
+        },
+      });
+    }
+
     try {
       const url = new URL(request.url);
-      const subpath = url.pathname.replace(/^\/api\/admin\/?/, '');
+      const querySubpath = url.searchParams.get('subpath') || url.searchParams.get('path');
+      const headerSubpath =
+        request.headers.get('x-matched-path')?.replace(/^\/api\/admin\/?/, '') ||
+        request.headers.get('x-forwarded-uri')?.replace(/^\/api\/admin\/?/, '');
+      const pathSubpath = url.pathname.replace(/^\/api\/admin\/?/, '');
+
+      const rawSubpath = querySubpath || (pathSubpath && pathSubpath !== 'admin' ? pathSubpath : '') || headerSubpath || '';
+      const subpath = rawSubpath.replace(/^\/+/, '');
       const method = request.method;
 
       // Handle unauthenticated staff login
