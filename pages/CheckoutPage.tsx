@@ -1,22 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  ArrowLeft, 
+import React, { useState, useEffect, useMemo } from 'react';
+import {
+  ArrowLeft,
   ArrowRight,
   Check,
-  CreditCard, 
-  Lock, 
-  ShieldCheck, 
-  Truck, 
+  CreditCard,
+  Lock,
+  ShieldCheck,
+  Truck,
   AlertCircle,
   Phone,
   User,
-  MapPin
+  MapPin,
+  Building2,
+  FileCheck2,
 } from 'lucide-react';
 import { APP_NAME } from '../constants';
 import { Link, useCart, useNavigate } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { Analytics } from '../lib/analytics';
 import { StripePaymentSection } from '../components/checkout/StripePaymentSection';
+import { calculateTaxEstimate, DetailedTaxCalculation } from '../lib/clientTax';
 
 export type CheckoutStepId = 'shipping' | 'delivery' | 'payment';
 
@@ -47,6 +50,10 @@ export const CheckoutPage: React.FC = () => {
   const [province, setProvince] = useState('DE');
   const [zip, setZip] = useState('');
   const [shippingTier, setShippingTier] = useState<'standard' | 'priority' | 'white_glove'>('standard');
+
+  // Institutional Tax Exemption State (Hospitals / 501(c)(3) / Clinics)
+  const [customerIsTaxExempt, setCustomerIsTaxExempt] = useState(false);
+  const [taxExemptionCertificate, setTaxExemptionCertificate] = useState('');
 
   // Stripe state
   const [stripeClientSecret, setStripeClientSecret] = useState('');
@@ -128,7 +135,28 @@ export const CheckoutPage: React.FC = () => {
     shippingCost = cartTotal >= 99 ? 0.0 : 12.0;
   }
 
-  const taxAmount = Number((cartTotal * 0.06).toFixed(2));
+  // Authoritative destination-based sales tax and medical DME exemption calculation
+  const taxCalc: DetailedTaxCalculation = useMemo(() => {
+    return calculateTaxEstimate({
+      items: cart.map((item) => ({
+        id: item.id,
+        title: item.title,
+        price: item.price,
+        quantity: item.quantity,
+        category: item.category,
+        requiresPrescription: item.prescriptionRequired,
+      })),
+      shippingAddress: {
+        state: province,
+        zip,
+        city,
+      },
+      customerIsTaxExempt,
+      taxExemptionCertificate,
+    });
+  }, [cart, province, zip, city, customerIsTaxExempt, taxExemptionCertificate]);
+
+  const taxAmount = taxCalc.estimatedTax;
   const finalTotal = Number((cartTotal + shippingCost + taxAmount).toFixed(2));
 
   // Handle redirect return from payment providers (Amazon Pay, Klarna, Cash App, etc.)
@@ -153,6 +181,8 @@ export const CheckoutPage: React.FC = () => {
           if (parsed.province) setProvince(parsed.province);
           if (parsed.zip) setZip(parsed.zip);
           if (parsed.shippingTier) setShippingTier(parsed.shippingTier);
+          if (parsed.customerIsTaxExempt !== undefined) setCustomerIsTaxExempt(Boolean(parsed.customerIsTaxExempt));
+          if (parsed.taxExemptionCertificate) setTaxExemptionCertificate(parsed.taxExemptionCertificate);
 
           handlePaymentSuccess(paymentIntentId, parsed);
         }
@@ -241,6 +271,9 @@ export const CheckoutPage: React.FC = () => {
     if (!zip.trim()) {
       return 'Please enter your ZIP code.';
     }
+    if (customerIsTaxExempt && !taxExemptionCertificate.trim()) {
+      return 'Please enter your State Sales Tax Exemption Certificate Number or Federal EIN, or uncheck the tax-exempt entity option.';
+    }
 
     try {
       sessionStorage.setItem('baemeds_pending_checkout', JSON.stringify({
@@ -254,9 +287,11 @@ export const CheckoutPage: React.FC = () => {
         province,
         zip,
         shippingTier,
+        customerIsTaxExempt,
+        taxExemptionCertificate,
         cart,
       }));
-    } catch {}
+    } catch { }
 
     return null;
   };
@@ -276,6 +311,8 @@ export const CheckoutPage: React.FC = () => {
       const activeProvince = overrideData?.province || province;
       const activeZip = overrideData?.zip || zip;
       const activeShippingTier = overrideData?.shippingTier || shippingTier;
+      const activeIsTaxExempt = overrideData?.customerIsTaxExempt !== undefined ? overrideData.customerIsTaxExempt : customerIsTaxExempt;
+      const activeTaxCert = overrideData?.taxExemptionCertificate || taxExemptionCertificate;
       const activeCart = (overrideData?.cart && overrideData.cart.length > 0) ? overrideData.cart : cart;
 
       const itemsPayload = activeCart.map((item: any) => ({
@@ -303,6 +340,8 @@ export const CheckoutPage: React.FC = () => {
           zip: activeZip,
           country: 'United States',
           shippingTier: activeShippingTier,
+          customerIsTaxExempt: activeIsTaxExempt,
+          taxExemptionCertificate: activeTaxCert,
           items: itemsPayload,
           paymentIntentId: confirmedIntentId,
           paymentToken: confirmedIntentId,
@@ -418,41 +457,37 @@ export const CheckoutPage: React.FC = () => {
                       }
                     }}
                     disabled={idx > currentStepIndex}
-                    className={`group flex items-center gap-2.5 text-left transition ${
-                      isCurrent
+                    className={`group flex items-center gap-2.5 text-left transition ${isCurrent
                         ? 'cursor-default'
                         : isCompleted
-                        ? 'cursor-pointer hover:opacity-85'
-                        : 'cursor-not-allowed opacity-40'
-                    }`}
+                          ? 'cursor-pointer hover:opacity-85'
+                          : 'cursor-not-allowed opacity-40'
+                      }`}
                   >
                     <div
-                      className={`flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl text-xs sm:text-sm font-bold transition ${
-                        isCompleted
+                      className={`flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl text-xs sm:text-sm font-bold transition ${isCompleted
                           ? 'bg-emerald-600 text-white shadow-xs'
                           : isCurrent
-                          ? 'bg-medical-primary text-white shadow-md shadow-medical-primary/20 ring-4 ring-medical-primary/15'
-                          : 'bg-slate-100 text-slate-500'
-                      }`}
+                            ? 'bg-medical-primary text-white shadow-md shadow-medical-primary/20 ring-4 ring-medical-primary/15'
+                            : 'bg-slate-100 text-slate-500'
+                        }`}
                     >
                       {isCompleted ? <Check size={18} className="stroke-[3]" /> : idx + 1}
                     </div>
                     <div className="hidden sm:block">
                       <p
-                        className={`text-xs font-semibold uppercase tracking-wider ${
-                          isCurrent
+                        className={`text-xs font-semibold uppercase tracking-wider ${isCurrent
                             ? 'text-medical-primary font-bold'
                             : isCompleted
-                            ? 'text-emerald-700'
-                            : 'text-slate-400'
-                        }`}
+                              ? 'text-emerald-700'
+                              : 'text-slate-400'
+                          }`}
                       >
                         Step {idx + 1}
                       </p>
                       <p
-                        className={`text-sm font-bold ${
-                          isCurrent ? 'text-slate-900' : isCompleted ? 'text-slate-700' : 'text-slate-400'
-                        }`}
+                        className={`text-sm font-bold ${isCurrent ? 'text-slate-900' : isCompleted ? 'text-slate-700' : 'text-slate-400'
+                          }`}
                       >
                         {step.shortTitle}
                       </p>
@@ -462,9 +497,8 @@ export const CheckoutPage: React.FC = () => {
                   {idx < stepList.length - 1 && (
                     <div className="flex-1 mx-2 sm:mx-4 h-0.5 bg-slate-200">
                       <div
-                        className={`h-full transition-all duration-300 ${
-                          idx < currentStepIndex ? 'bg-emerald-600' : 'bg-transparent'
-                        }`}
+                        className={`h-full transition-all duration-300 ${idx < currentStepIndex ? 'bg-emerald-600' : 'bg-transparent'
+                          }`}
                       />
                     </div>
                   )}
@@ -657,6 +691,49 @@ export const CheckoutPage: React.FC = () => {
                           className="w-full rounded-xl border border-medical-light bg-[#fbfaf8] px-4 py-3 text-sm text-medical-dark focus:border-medical-primary focus:bg-white focus:outline-none"
                         />
                       </div>
+                    </div>
+
+                    {/* Tax-Exempt Healthcare Facility / Institutional Buyer */}
+                    <div className="sm:col-span-2 mt-2 rounded-2xl border border-medical-light bg-slate-50/70 p-4 transition-all">
+                      <label className="flex items-start gap-3 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={customerIsTaxExempt}
+                          onChange={(e) => setCustomerIsTaxExempt(e.target.checked)}
+                          className="mt-1 h-4 w-4 rounded border-slate-300 text-medical-primary focus:ring-medical-primary"
+                        />
+                        <div className="flex-1">
+                          <div className="flex items-center gap-1.5 font-bold text-medical-dark text-sm">
+                            <Building2 size={16} className="text-medical-primary" />
+                            <span>Tax-Exempt Healthcare Facility / Hospital / 501(c)(3)</span>
+                          </div>
+                          <p className="text-xs text-medical-text/70 mt-0.5">
+                            Check this box if your organization holds a valid State Resale Certificate, Direct Pay Permit, or Federal Tax Exemption Certificate.
+                          </p>
+                        </div>
+                      </label>
+
+                      {customerIsTaxExempt && (
+                        <div className="mt-3.5 pt-3 border-t border-slate-200/80">
+                          <label className="block text-xs font-bold uppercase tracking-wider text-medical-text/80 mb-1">
+                            State Exemption Certificate Number / Federal EIN *
+                          </label>
+                          <div className="relative">
+                            <input
+                              type="text"
+                              value={taxExemptionCertificate}
+                              onChange={(e) => setTaxExemptionCertificate(e.target.value)}
+                              placeholder="e.g. EX-984210-DE or 12-3456789"
+                              className="w-full rounded-xl border border-medical-light bg-white px-4 py-2.5 pl-10 text-sm text-medical-dark focus:border-medical-primary focus:outline-none"
+                            />
+                            <FileCheck2 size={18} className="absolute left-3 top-3 text-emerald-600" />
+                          </div>
+                          <p className="mt-1 text-[11px] text-emerald-700 font-medium flex items-center gap-1">
+                            <Check size={12} className="stroke-[3]" />
+                            <span>Statutory healthcare exemption waives 100% of retail sales tax on this clinical order.</span>
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -887,9 +964,26 @@ export const CheckoutPage: React.FC = () => {
                     {shippingCost === 0 ? 'FREE' : `$${shippingCost.toFixed(2)}`}
                   </span>
                 </div>
-                <div className="flex justify-between">
-                  <span>Estimated Tax (6%)</span>
-                  <span className="font-semibold text-medical-dark">${taxAmount.toFixed(2)}</span>
+                <div className="space-y-1">
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span>Estimated Tax</span>
+                      <span className="text-xs font-mono text-slate-500">({taxCalc.rateLabel})</span>
+                      {taxCalc.isExempt && (
+                        <span className="rounded bg-emerald-100/90 px-1.5 py-0.5 text-[10px] font-bold text-emerald-800 border border-emerald-300">
+                          EXEMPT
+                        </span>
+                      )}
+                    </div>
+                    <span className="font-semibold text-medical-dark">
+                      {taxAmount === 0 ? '$0.00' : `$${taxAmount.toFixed(2)}`}
+                    </span>
+                  </div>
+                  {taxCalc.exemptionReason && (
+                    <p className="text-[11px] text-emerald-700 leading-tight">
+                      {taxCalc.exemptionReason}
+                    </p>
+                  )}
                 </div>
                 <div className="flex justify-between border-t border-medical-light pt-3 text-base font-bold text-medical-dark">
                   <span>Total Due</span>

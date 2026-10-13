@@ -11,6 +11,7 @@ import {
 import { adminSupabase } from '../server/adminSupabase';
 import catalogSeed from '../data/catalog_seed.json';
 import { recordFirstPartyOrder } from '../server/adminService';
+import { TaxService, TaxCalculationItem } from '../server/taxService';
 
 interface CheckoutItem {
   id: string;
@@ -43,6 +44,8 @@ interface CheckoutBody {
   paymentToken?: string;
   paymentIntentId?: string;
   prescriptionInfo?: PrescriptionInfo;
+  customerIsTaxExempt?: boolean;
+  taxExemptionCertificate?: string;
   items: CheckoutItem[];
 }
 
@@ -73,7 +76,9 @@ export default createVercelHandler(async (request: Request) => {
 
       // Server-authoritative inventory & pricing calculation
       let calculatedSubtotal = 0;
+      let orderRequiresPrescription = false;
       const orderItems = [];
+      const taxCalculationItems: TaxCalculationItem[] = [];
 
       for (const item of body.items) {
         if (!item.merchandiseId || typeof item.quantity !== 'number' || item.quantity <= 0) {
@@ -156,7 +161,19 @@ export default createVercelHandler(async (request: Request) => {
         const lineTotal = price * item.quantity;
         calculatedSubtotal += lineTotal;
 
-        const isItemRx = false;
+        const isItemRx = Boolean((product as any).prescriptionRequired || (product as any).prescription_required);
+        if (isItemRx) {
+          orderRequiresPrescription = true;
+        }
+
+        taxCalculationItems.push({
+          id: product.id,
+          title: product.title,
+          price,
+          quantity: item.quantity,
+          category: product.category,
+          requiresPrescription: isItemRx,
+        });
 
         orderItems.push({
           product_id: product.id,
@@ -176,8 +193,6 @@ export default createVercelHandler(async (request: Request) => {
         });
       }
 
-      const orderRequiresPrescription = false;
-
       // Server-authoritative shipping calculation
       let shippingAmount = 0;
       let shippingMethod = 'Standard Ground (3-5 Business Days)';
@@ -192,9 +207,20 @@ export default createVercelHandler(async (request: Request) => {
         shippingAmount = calculatedSubtotal >= 99 ? 0.0 : 12.0;
       }
 
-      // Authoritative tax calculation
-      const taxRate = 0.06; // Standard baseline sales tax
-      const taxAmount = Number((calculatedSubtotal * taxRate).toFixed(2));
+      // Authoritative destination-based sales tax and medical DME exemption calculation
+      const taxCalculation = TaxService.calculateTax({
+        items: taxCalculationItems,
+        shippingAddress: {
+          state: province,
+          zip,
+          city,
+          country,
+        },
+        customerIsTaxExempt: Boolean(body.customerIsTaxExempt),
+        taxExemptionCertificate: body.taxExemptionCertificate,
+      });
+
+      const taxAmount = taxCalculation.estimatedTax;
       const totalAmount = Number((calculatedSubtotal + shippingAmount + taxAmount).toFixed(2));
 
       // Order generation
@@ -212,7 +238,11 @@ export default createVercelHandler(async (request: Request) => {
         shipping_amount: shippingAmount,
         discount_amount: 0,
         total_amount: totalAmount,
-        requires_prescription: false,
+        requires_prescription: orderRequiresPrescription,
+        tax_rate: taxCalculation.taxRate,
+        tax_exemption_reason: taxCalculation.exemptionReason || null,
+        customer_is_tax_exempt: Boolean(body.customerIsTaxExempt),
+        tax_exemption_certificate: body.taxExemptionCertificate || null,
         prescription_method: null,
         prescription_doctor_name: null,
         prescription_doctor_phone: null,
@@ -315,6 +345,9 @@ export default createVercelHandler(async (request: Request) => {
         shipping: shippingAmount.toFixed(2),
         total: totalAmount.toFixed(2),
         requiresPrescription: orderRequiresPrescription,
+        taxRate: taxCalculation.taxRate,
+        isTaxExempt: taxCalculation.isExempt,
+        taxExemptionReason: taxCalculation.exemptionReason || null,
         status: 'PAID',
       });
     } catch (error) {

@@ -62,6 +62,10 @@ const DME_EXEMPT_CATEGORIES = new Set([
   'hospital bed',
   'dialysis',
   'prosthetics',
+  'ventilator',
+  'suction machine',
+  'nebulizer',
+  'mobility',
 ]);
 
 export class TaxService {
@@ -69,15 +73,30 @@ export class TaxService {
    * Determine whether an item qualifies for DME / medical necessity tax exemption
    */
   static isItemTaxExempt(item: TaxCalculationItem, stateCode: string): boolean {
+    const normState = (stateCode || '').trim().toUpperCase();
     // If state has no sales tax, all items are exempt
-    if (NO_SALES_TAX_STATES.has(stateCode)) return true;
+    if (NO_SALES_TAX_STATES.has(normState)) return true;
 
     // Prescription-required devices are exempt from retail sales tax in the vast majority of US states
     if (item.requiresPrescription) return true;
 
     const categoryLower = (item.category || '').toLowerCase();
+    const titleLower = (item.title || '').toLowerCase();
+
+    // General over-the-counter accessories and cleaning supplies without an Rx are taxable retail goods
+    if (
+      categoryLower.includes('accessor') ||
+      categoryLower.includes('sanitation') ||
+      categoryLower.includes('cleaning') ||
+      titleLower.includes('wipe') ||
+      titleLower.includes('cleaner') ||
+      titleLower.includes('sanitiz')
+    ) {
+      return false;
+    }
+
     for (const exemptCat of DME_EXEMPT_CATEGORIES) {
-      if (categoryLower.includes(exemptCat)) return true;
+      if (categoryLower.includes(exemptCat) || titleLower.includes(exemptCat)) return true;
     }
 
     return false;
@@ -91,7 +110,7 @@ export class TaxService {
     const subtotal = request.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
     // Entity-level tax exemption (e.g., 501(c)(3) hospitals, licensed healthcare facilities with exemption certificate)
-    if (request.customerIsTaxExempt && request.taxExemptionCertificate) {
+    if (request.customerIsTaxExempt && request.taxExemptionCertificate?.trim()) {
       return {
         subtotal,
         taxableAmount: 0,
@@ -99,7 +118,7 @@ export class TaxService {
         taxRate: 0,
         state,
         isExempt: true,
-        exemptionReason: `Entity Tax Exemption Certificate: ${request.taxExemptionCertificate}`,
+        exemptionReason: `Healthcare Entity Tax Exemption Certificate: ${request.taxExemptionCertificate.trim()}`,
       };
     }
 
@@ -116,7 +135,7 @@ export class TaxService {
       };
     }
 
-    const baselineRate = STATE_BASELINE_RATES[state] ?? 0.05;
+    const baselineRate = STATE_BASELINE_RATES[state] ?? 0.06;
 
     let taxableAmount = 0;
     for (const item of request.items) {
@@ -135,7 +154,9 @@ export class TaxService {
       taxRate: baselineRate,
       state,
       isExempt,
-      exemptionReason: isExempt ? 'Prescription medical devices and qualifying DME are sales tax exempt.' : undefined,
+      exemptionReason: isExempt
+        ? 'Qualifying Durable Medical Equipment (DME) and Rx devices are sales tax exempt.'
+        : undefined,
     };
   }
 }
