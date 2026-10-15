@@ -64,13 +64,53 @@ async function calculateAuthoritativeTotalInCents(body: PaymentIntentBody): Prom
 
       const { data: dbProducts } = await supabase
         .from('products')
-        .select('id, handle, price')
+        .select('id, handle, price, title, category')
         .or(orFilters);
 
       const priceMap = new Map<string, number>();
+      let hasHeavyDme = false;
+      let hasLargeMachine = false;
+
       (dbProducts || []).forEach((p: any) => {
         priceMap.set(p.id, Number(p.price) || 0);
         if (p.handle) priceMap.set(p.handle, Number(p.price) || 0);
+
+        const cat = (p.category || '').toLowerCase();
+        const title = (p.title || '').toLowerCase();
+        if (
+          cat.includes('wheelchair') ||
+          cat.includes('hospital bed') ||
+          cat.includes('patient lift') ||
+          cat.includes('mobility') ||
+          title.includes('wheelchair') ||
+          title.includes('hospital bed') ||
+          title.includes('patient lift') ||
+          title.includes('lift chair') ||
+          title.includes('commode') ||
+          title.includes('bariatric') ||
+          title.includes('rollator')
+        ) {
+          hasHeavyDme = true;
+        } else if (
+          cat.includes('cpap machine') ||
+          cat.includes('bipap') ||
+          cat.includes('oxygen concentrator') ||
+          cat.includes('suction machine') ||
+          cat.includes('patient monitor') ||
+          cat.includes('respiratory') ||
+          title.includes('cpap machine') ||
+          title.includes('bipap') ||
+          title.includes('oxygen concentrator') ||
+          title.includes('concentrator') ||
+          title.includes('airsense') ||
+          title.includes('aircurve') ||
+          title.includes('suction machine') ||
+          title.includes('patient monitor') ||
+          title.includes('defibrillator') ||
+          title.includes('ventilator')
+        ) {
+          hasLargeMachine = true;
+        }
       });
 
       for (const item of body.items) {
@@ -79,27 +119,32 @@ async function calculateAuthoritativeTotalInCents(body: PaymentIntentBody): Prom
         const unitPrice = priceMap.get(targetId) ?? (priceMap.get(item.id) || 0);
         subtotal += unitPrice * qty;
       }
+
+      // Server-calculated tiered flat shipping (Zero Free Delivery)
+      let baseStandard = 12.0;
+      if (hasHeavyDme) {
+        baseStandard = 45.0;
+      } else if (hasLargeMachine) {
+        baseStandard = 25.0;
+      }
+
+      let shipping = baseStandard;
+      if (body.shippingTier === 'priority') {
+        shipping = baseStandard === 12.0 ? 25.0 : baseStandard + 15.0;
+      } else if (body.shippingTier === 'white_glove') {
+        shipping = baseStandard === 45.0 ? 115.0 : 95.0;
+      }
+
+      // Apply server-validated discount and tax
+      const discount = typeof body.discountAmount === 'number' && body.discountAmount > 0 ? body.discountAmount : 0;
+      const tax = typeof body.taxAmount === 'number' && body.taxAmount > 0 ? body.taxAmount : 0;
+
+      const finalTotal = Math.max(0, subtotal - discount + shipping + tax);
+      if (finalTotal > 0) {
+        return Math.round(finalTotal * 100);
+      }
     } catch (dbErr) {
       console.warn('[PaymentIntent] DB lookup warning, fallback to catalog check:', dbErr);
-    }
-
-    // Server-calculated shipping
-    let shipping = 0;
-    if (body.shippingTier === 'priority') {
-      shipping = 25.0;
-    } else if (body.shippingTier === 'white_glove') {
-      shipping = 95.0;
-    } else {
-      shipping = subtotal >= 99 ? 0.0 : 12.0;
-    }
-
-    // Apply server-validated discount and tax
-    const discount = typeof body.discountAmount === 'number' && body.discountAmount > 0 ? body.discountAmount : 0;
-    const tax = typeof body.taxAmount === 'number' && body.taxAmount > 0 ? body.taxAmount : 0;
-
-    const finalTotal = Math.max(0, subtotal - discount + shipping + tax);
-    if (finalTotal > 0) {
-      return Math.round(finalTotal * 100);
     }
   }
 

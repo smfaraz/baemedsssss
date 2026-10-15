@@ -4,7 +4,7 @@ import { FileText, Headphones, PackageSearch, Truck } from 'lucide-react';
 const badges = [
   { icon: PackageSearch, title: 'DME & Clinical Supplies', description: 'Certified respiratory, diagnostic monitors, mobility, and medical consumables', color: 'bg-sky-100 text-sky-700' },
   { icon: Headphones, title: 'US Clinical Support', description: 'Toll-free customer assistance for product specs, compatibility, and ordering', color: 'bg-emerald-100 text-emerald-700' },
-  { icon: Truck, title: 'Nationwide US Delivery', description: 'Tracked shipping via USPS, UPS & FedEx with free ground on orders $99+', color: 'bg-violet-100 text-violet-700' },
+  { icon: Truck, title: 'Nationwide US Delivery', description: 'Insured tracked shipping via USPS, UPS & FedEx with product-based flat delivery', color: 'bg-violet-100 text-violet-700' },
   { icon: FileText, title: 'FSA / HSA Eligible Receipts', description: 'Itemized medical receipts with HCPCS codes for reimbursement', color: 'bg-amber-100 text-amber-700' },
 ];
 

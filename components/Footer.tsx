@@ -22,7 +22,7 @@ const Footer: React.FC = () => {
       <div className="border-b border-white/10">
         <div className="container mx-auto grid gap-4 px-4 py-6 sm:grid-cols-3">
           {[
-            { icon: PackageCheck, title: 'Nationwide US Delivery', text: 'Free standard ground shipping on orders $99+. Expedited air available.', to: '/policies/shipping' },
+            { icon: PackageCheck, title: 'Nationwide US Delivery', text: 'Insured nationwide carrier delivery with product-based flat-rate shipping.', to: '/policies/shipping' },
             { icon: FileText, title: 'FSA / HSA Eligible Receipts', text: 'Itemized medical receipts with HCPCS codes available for reimbursement.', to: '/contact' },
             { icon: ShieldCheck, title: 'Dedicated Clinical Support', text: 'Get help with product specs, DME options, or order assistance.', to: '/contact' },
           ].map(({ icon: Icon, title, text, to }) => (

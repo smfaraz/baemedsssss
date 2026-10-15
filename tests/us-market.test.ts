@@ -142,10 +142,10 @@ function testShippingService() {
     throw new Error('Expected shipping options to be returned');
   }
 
-  // Free standard shipping on orders over $99
+  // Product-based flat minimum shipping on large machines (Zero free shipping, even over $99)
   const groundOption = options.find(o => o.id === 'standard-ground');
-  if (!groundOption || groundOption.price !== 0) {
-    throw new Error('Expected free standard ground shipping for $895 order');
+  if (!groundOption || groundOption.price !== 25.00) {
+    throw new Error(`Expected $25.00 flat minimum ground shipping for Oxygen Concentrator, got ${groundOption?.price}`);
   }
 
   // Tracking URL tests

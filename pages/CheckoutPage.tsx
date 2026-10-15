@@ -23,6 +23,7 @@ import { Analytics } from '../lib/analytics';
 import { StripePaymentSection } from '../components/checkout/StripePaymentSection';
 import { calculateTaxEstimate, DetailedTaxCalculation } from '../lib/clientTax';
 import { US_STATES, US_STATE_CODES } from '../lib/marketConfig';
+import { calculateTieredShippingFee } from '../lib/shippingRates';
 
 export type CheckoutStepId = 'shipping' | 'delivery' | 'payment';
 
@@ -183,15 +184,24 @@ export const CheckoutPage: React.FC = () => {
     setCouponSuccess('');
   };
 
-  // Financial calculations
-  let shippingCost = 0;
-  if (shippingTier === 'priority') {
-    shippingCost = 25.0;
-  } else if (shippingTier === 'white_glove') {
-    shippingCost = 95.0;
-  } else {
-    shippingCost = cartTotal >= 99 ? 0.0 : 12.0;
-  }
+  // Product-based tiered flat shipping calculation (Zero Free Delivery)
+  const shippingInfo = useMemo(() => {
+    return calculateTieredShippingFee(
+      cart.map((item) => ({
+        id: item.id,
+        title: item.title,
+        price: item.price,
+        quantity: item.quantity,
+        category: item.category,
+      })),
+      shippingTier
+    );
+  }, [cart, shippingTier]);
+
+  const shippingCost = shippingInfo.shippingCost;
+  const standardTierCost = shippingInfo.baseStandardRate;
+  const priorityTierCost = standardTierCost === 12.0 ? 25.0 : standardTierCost + 15.0;
+  const whiteGloveTierCost = standardTierCost === 45.0 ? 115.0 : 95.0;
 
   const discountAmount = appliedCoupon ? appliedCoupon.discountAmount : 0;
   const discountedSubtotal = Math.max(0, cartTotal - discountAmount);
@@ -871,9 +881,9 @@ export const CheckoutPage: React.FC = () => {
                       2. Delivery Speed
                     </span>
                     <p className="text-sm font-bold text-medical-dark mt-0.5">
-                      {shippingTier === 'standard' && `Standard Ground Delivery (3-5 Days) • ${shippingCost === 0 ? 'FREE' : '$12.00'}`}
-                      {shippingTier === 'priority' && 'Priority Medical Courier (1-2 Days) • $25.00'}
-                      {shippingTier === 'white_glove' && 'White-Glove DME Setup & In-Service • $95.00'}
+                      {shippingTier === 'standard' && `Standard Ground Delivery (3-5 Days) • $${standardTierCost.toFixed(2)}`}
+                      {shippingTier === 'priority' && `Priority Medical Courier (1-2 Days) • $${priorityTierCost.toFixed(2)}`}
+                      {shippingTier === 'white_glove' && `White-Glove DME Setup & In-Service • $${whiteGloveTierCost.toFixed(2)}`}
                     </p>
                   </div>
                 </div>
@@ -912,7 +922,7 @@ export const CheckoutPage: React.FC = () => {
                       </div>
                     </div>
                     <span className="text-sm font-bold text-medical-dark">
-                      {cartTotal >= 99 ? 'FREE' : '$12.00'}
+                      ${standardTierCost.toFixed(2)}
                     </span>
                   </label>
 
@@ -930,7 +940,7 @@ export const CheckoutPage: React.FC = () => {
                         <p className="text-xs text-medical-text/70">1-2 business days with temperature & handling protection</p>
                       </div>
                     </div>
-                    <span className="text-sm font-bold text-medical-dark">$25.00</span>
+                    <span className="text-sm font-bold text-medical-dark">${priorityTierCost.toFixed(2)}</span>
                   </label>
 
                   <label className={`flex cursor-pointer items-center justify-between rounded-xl border p-4 transition ${shippingTier === 'white_glove' ? 'border-medical-primary bg-medical-light/30' : 'border-medical-light hover:bg-[#faf9f6]'}`}>
@@ -947,7 +957,7 @@ export const CheckoutPage: React.FC = () => {
                         <p className="text-xs text-medical-text/70">Scheduled delivery, unpacking, room placement, and clinician device orientation</p>
                       </div>
                     </div>
-                    <span className="text-sm font-bold text-medical-dark">$95.00</span>
+                    <span className="text-sm font-bold text-medical-dark">${whiteGloveTierCost.toFixed(2)}</span>
                   </label>
                 </div>
 
@@ -1149,7 +1159,7 @@ export const CheckoutPage: React.FC = () => {
                 <div className="flex justify-between">
                   <span>Shipping</span>
                   <span className="font-semibold text-medical-dark">
-                    {shippingCost === 0 ? 'FREE' : `$${shippingCost.toFixed(2)}`}
+                    ${shippingCost.toFixed(2)}
                   </span>
                 </div>
                 <div className="space-y-1">

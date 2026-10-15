@@ -6,6 +6,7 @@
  */
 
 import { ShippingOption } from '../types';
+import { getBaseFlatShippingRate } from '../lib/shippingRates';
 
 export interface ShippingRateRequest {
   items: Array<{
@@ -56,14 +57,14 @@ export class ShippingService {
       ];
     }
 
-    // Standard orders: Free ground shipping over $99, otherwise $9.95
-    const isFreeStandard = totalOrderValue >= 99.00;
-    const standardRate = isFreeStandard ? 0.00 : 9.95;
+    // Product-based tiered flat ground shipping: $45 heavy DME, $25 large machines, $12 standard items.
+    // Zero free delivery.
+    const standardRate = getBaseFlatShippingRate(request.items);
 
     return [
       {
         id: 'standard-ground',
-        name: isFreeStandard ? 'Free Standard Ground (Orders over $99)' : 'Standard Ground',
+        name: `Standard Insured Ground ($${standardRate.toFixed(2)} Flat)`,
         carrier: totalWeightLbs > 5 ? 'UPS' : 'USPS',
         price: standardRate,
         estimatedDaysMin: 3,
@@ -73,7 +74,7 @@ export class ShippingService {
         id: 'expedited-2day',
         name: 'Expedited 2-Day Air',
         carrier: 'FedEx',
-        price: 24.95,
+        price: Math.max(25.00, standardRate + 15.00),
         estimatedDaysMin: 2,
         estimatedDaysMax: 2,
         guaranteed: true,
@@ -82,7 +83,7 @@ export class ShippingService {
         id: 'priority-overnight',
         name: 'Priority Overnight (Critical Medical Delivery)',
         carrier: 'FedEx',
-        price: 49.95,
+        price: Math.max(49.95, standardRate + 35.00),
         estimatedDaysMin: 1,
         estimatedDaysMax: 1,
         guaranteed: true,

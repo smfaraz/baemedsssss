@@ -520,7 +520,7 @@ const HomePage: React.FC = () => {
                 </span>
               </summary>
               <p className="mt-4 leading-relaxed text-slate-600">
-                We provide standard 2–4 business day ground delivery and expedited overnight air delivery across all 50 US states via USPS, UPS, and FedEx. Free standard ground shipping is included on all equipment orders over $99.
+                We provide standard 2–4 business day ground delivery and expedited overnight air delivery across all 50 US states via USPS, UPS, and FedEx. All orders feature tiered flat-rate insured shipping tailored to equipment size and handling requirements ($12 standard supplies, $25 large machines, $45 heavy DME).
               </p>
             </details>
 

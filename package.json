@@ -16,8 +16,9 @@
     "test:pagination": "tsx tests/storefront-pagination.test.ts",
     "test:adversarial": "tsx tests/adversarial-security.test.ts",
     "test:payment-security": "tsx tests/payment-security-regression.test.ts",
+    "test:shipping": "tsx tests/tiered-shipping.test.ts",
     "test:migration": "tsx scripts/validate_inventory_migration.ts",
-    "test": "npm run test:security && npm run test:concurrency && npm run test:pagination && npm run test:adversarial && npm run test:payment-security",
+    "test": "npm run test:security && npm run test:concurrency && npm run test:pagination && npm run test:adversarial && npm run test:payment-security && npm run test:shipping",
     "seed:supabase": "node scripts/seed-supabase-catalog.mjs",
     "shots": "node scripts/mobile-shots.mjs"
   },

@@ -33,7 +33,7 @@ const TopBar: React.FC = () => {
           <div className="flex items-center gap-2">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 flex-shrink-0"></span>
             <span className="text-white font-medium">Nationwide US Shipping:</span>
-            <span className="text-slate-300">Free Ground on Orders $99+ | Express 2-Day &amp; Priority Overnight Available</span>
+            <span className="text-slate-300">Insured Ground &amp; Medical Freight | Express 2-Day &amp; Priority Overnight Available</span>
           </div>
 
           <div className="flex items-center gap-4 text-slate-300">
