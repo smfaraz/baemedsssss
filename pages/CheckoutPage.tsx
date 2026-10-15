@@ -257,6 +257,11 @@ export const CheckoutPage: React.FC = () => {
 
   // Initialize or update Stripe PaymentIntent with debouncing and safe JSON handling
   useEffect(() => {
+    // Only initialize payment intent once customer reaches delivery or payment step
+    if (currentStep === 'shipping') {
+      return;
+    }
+
     let isMounted = true;
     const timer = setTimeout(async () => {
       try {
@@ -328,7 +333,7 @@ export const CheckoutPage: React.FC = () => {
       isMounted = false;
       clearTimeout(timer);
     };
-  }, [finalTotal, shippingTier, province, zip]);
+  }, [currentStep, finalTotal, shippingTier, province, zip]);
 
   // Validation before Stripe confirms payment
   const validateCheckoutForm = (): string | null => {
