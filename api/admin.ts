@@ -467,7 +467,7 @@ async function handleAdminWeb(request: Request): Promise<Response> {
     }
 }
 
-export default async function handler(req: any, res?: any) {
+export default async function handler(req: any, res?: any): Promise<any> {
   if (req instanceof Request || (!res && typeof req.text === 'function')) {
     return handleAdminWeb(req);
   }
@@ -484,7 +484,8 @@ export default async function handler(req: any, res?: any) {
     if ((req.method || '').toUpperCase() === 'OPTIONS') {
       if (res) {
         res.statusCode = 204;
-        return res.end();
+        res.end();
+        return;
       }
       return;
     }
@@ -513,14 +514,16 @@ export default async function handler(req: any, res?: any) {
           const result = await AdminService.authenticateStaff(body.email, body.password);
           if (res) {
             res.statusCode = 200;
-            return res.end(JSON.stringify(result));
+            res.end(JSON.stringify(result));
+            return;
           }
-          return result;
+          return;
         } catch (authErr: any) {
           const status = authErr.message?.includes('deactivated') ? 403 : 401;
           if (res) {
             res.statusCode = status;
-            return res.end(JSON.stringify({ error: authErr.message || 'Invalid credentials.' }));
+            res.end(JSON.stringify({ error: authErr.message || 'Invalid credentials.' }));
+            return;
           }
         }
       }
@@ -565,7 +568,8 @@ export default async function handler(req: any, res?: any) {
     if (res && !res.headersSent) {
       res.statusCode = 500;
       res.setHeader('Content-Type', 'application/json');
-      return res.end(JSON.stringify({ error: err.message || 'An administrative error occurred.' }));
+      res.end(JSON.stringify({ error: err.message || 'An administrative error occurred.' }));
+      return;
     }
   }
 }

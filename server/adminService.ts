@@ -4,9 +4,8 @@
  * order state machine transitions, audited inventory adjustments, and HIPAA PHI segregation.
  */
 
-import { supabase } from '../lib/supabase';
 import { adminSupabase } from './adminSupabase';
-import { Product, Order } from '../types';
+import type { Product, Order } from '../types';
 
 export type AdminRole =
   | 'super_admin'
