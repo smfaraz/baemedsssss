@@ -282,6 +282,11 @@ export const CheckoutPage: React.FC = () => {
             taxAmount,
             shippingTier,
             paymentIntentId,
+            items: cart.map(i => ({
+              id: i.id,
+              merchandiseId: (i as any).merchandiseId || (i as any).variantId || i.id,
+              quantity: i.quantity,
+            })),
             metadata: {
               customer_email: email,
               items_count: cart.reduce((s, i) => s + i.quantity, 0),

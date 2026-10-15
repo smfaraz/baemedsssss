@@ -34,8 +34,8 @@ async function handleWebhookWeb(request: Request): Promise<Response> {
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
   if (!stripeSecretKey || !webhookSecret) {
-    console.warn('[Stripe Webhook] Keys not configured. Skipping webhook processing.');
-    return json({ received: true, note: 'Stripe keys not configured in environment' });
+    console.error('[Stripe Webhook] Server configuration error: STRIPE_SECRET_KEY or STRIPE_WEBHOOK_SECRET is not configured.');
+    return json({ error: 'Stripe webhook secrets are not configured on server. Fail-closed.' }, 503);
   }
 
   const stripe = new Stripe(stripeSecretKey, { apiVersion: '2025-02-24.acacia' as any });
@@ -63,6 +63,48 @@ async function handleWebhookWeb(request: Request): Promise<Response> {
 
       if (orderNumber) {
         try {
+          const { data: order, error: orderErr } = await supabase
+            .from('orders')
+            .select('id, total_amount, status, payment_status, payment_intent_id')
+            .eq('order_number', orderNumber)
+            .single();
+
+          if (orderErr || !order) {
+            console.warn(`[Stripe Webhook] Order ${orderNumber} not found for payment_intent.succeeded`);
+            break;
+          }
+
+          // Anti-regression: Do not overwrite cancelled or refunded orders
+          if (['CANCELLED', 'REFUNDED'].includes(order.status)) {
+            console.warn(`[Stripe Webhook] Order ${orderNumber} is already ${order.status}. Skipping PAID transition.`);
+            break;
+          }
+
+          // Authoritative amount check
+          const expectedCents = Math.round(Number(order.total_amount || 0) * 100);
+          if (paymentIntent.amount < expectedCents) {
+            console.error(`[Stripe Webhook] Underpayment detected for ${orderNumber}: paid ${paymentIntent.amount}¢, expected ${expectedCents}¢`);
+            await supabase
+              .from('orders')
+              .update({
+                status: 'PAYMENT_MISMATCH',
+                payment_status: 'underpaid',
+                payment_intent_id: paymentIntent.id,
+                updated_at: new Date().toISOString(),
+              })
+              .eq('order_number', orderNumber);
+
+            await supabase.from('audit_logs').insert({
+              action: 'WEBHOOK_PAYMENT_UNDERPAID_ALERT',
+              entity_type: 'ORDER',
+              entity_id: orderNumber,
+              actor_id: 'system_stripe_webhook',
+              details: { paymentIntentId: paymentIntent.id, amountReceived: paymentIntent.amount, amountExpected: expectedCents },
+              created_at: new Date().toISOString(),
+            });
+            break;
+          }
+
           await supabase
             .from('orders')
             .update({
@@ -94,16 +136,84 @@ async function handleWebhookWeb(request: Request): Promise<Response> {
 
       if (orderNumber) {
         try {
+          const { data: order } = await supabase
+            .from('orders')
+            .select('status')
+            .eq('order_number', orderNumber)
+            .single();
+
+          if (order && !['PAID', 'SHIPPED', 'DELIVERED'].includes(order.status)) {
+            await supabase
+              .from('orders')
+              .update({
+                status: 'PAYMENT_FAILED',
+                payment_status: 'failed',
+                updated_at: new Date().toISOString(),
+              })
+              .eq('order_number', orderNumber);
+          }
+        } catch (dbErr: any) {
+          console.error('[Stripe Webhook] DB failure update error:', dbErr.message);
+        }
+      }
+      break;
+    }
+
+    case 'payment_intent.canceled': {
+      const paymentIntent = event.data.object as Stripe.PaymentIntent;
+      const orderNumber = paymentIntent.metadata?.orderNumber;
+
+      if (orderNumber) {
+        try {
+          const { data: order } = await supabase
+            .from('orders')
+            .select('status')
+            .eq('order_number', orderNumber)
+            .single();
+
+          if (order && ['PENDING', 'PROCESSING'].includes(order.status)) {
+            await supabase
+              .from('orders')
+              .update({
+                status: 'CANCELLED',
+                payment_status: 'cancelled',
+                updated_at: new Date().toISOString(),
+              })
+              .eq('order_number', orderNumber);
+          }
+        } catch (dbErr: any) {
+          console.error('[Stripe Webhook] DB cancel update error:', dbErr.message);
+        }
+      }
+      break;
+    }
+
+    case 'charge.refunded': {
+      const charge = event.data.object as Stripe.Charge;
+      const paymentIntentId = typeof charge.payment_intent === 'string' ? charge.payment_intent : charge.payment_intent?.id;
+
+      if (paymentIntentId) {
+        try {
+          const isFullRefund = charge.refunded;
           await supabase
             .from('orders')
             .update({
-              status: 'PAYMENT_FAILED',
-              payment_status: 'failed',
+              status: isFullRefund ? 'REFUNDED' : 'PARTIALLY_REFUNDED',
+              payment_status: isFullRefund ? 'refunded' : 'partially_refunded',
               updated_at: new Date().toISOString(),
             })
-            .eq('order_number', orderNumber);
+            .eq('payment_intent_id', paymentIntentId);
+
+          await supabase.from('audit_logs').insert({
+            action: isFullRefund ? 'ORDER_REFUNDED_FULL' : 'ORDER_REFUNDED_PARTIAL',
+            entity_type: 'CHARGE',
+            entity_id: charge.id,
+            actor_id: 'system_stripe_webhook',
+            details: { paymentIntentId, amountRefunded: charge.amount_refunded, full: isFullRefund },
+            created_at: new Date().toISOString(),
+          });
         } catch (dbErr: any) {
-          console.error('[Stripe Webhook] DB failure update error:', dbErr.message);
+          console.error('[Stripe Webhook] DB refund update error:', dbErr.message);
         }
       }
       break;

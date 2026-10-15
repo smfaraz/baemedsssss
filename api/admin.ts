@@ -12,6 +12,7 @@ if (typeof globalThis !== 'undefined' && !(globalThis as any).WebSocket) {
 }
 
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import Stripe from 'stripe';
 
 // --------------------------------------------------------------------
 // 0. ADMIN SUPABASE CLIENT (Direct Service Role)
@@ -648,6 +649,12 @@ export const AdminService = {
       throw new Error(`Invalid state transition: Cannot transition from ${order.status} to ${nextStatus}`);
     }
 
+    // Enforce orders:refund permission for refund transitions
+    if (nextStatus === 'REFUNDED' && !hasPermission(actor.role, 'orders:refund')) {
+      await logAdminAction(actor.id, actor.role, 'ORDER_REFUND_ATTEMPT', 'order', orderId, 'DENIED');
+      throw new Error('Forbidden: Insufficient privileges to issue refund (requires orders:refund)');
+    }
+
     // Gating check: orders requiring prescription cannot be approved/shipped without clinical specialist
     if (
       order.requires_prescription &&
@@ -666,6 +673,91 @@ export const AdminService = {
     await logAdminAction(actor.id, actor.role, 'ORDER_STATUS_UPDATED', 'order', order.id, 'SUCCESS', {
       previousStatus: order.status,
       nextStatus,
+      reason,
+    });
+
+    return order;
+  },
+
+  async issueOrderRefund(
+    actor: AdminUser,
+    orderId: string,
+    refundAmount?: number,
+    reason?: string
+  ) {
+    if (!hasPermission(actor.role, 'orders:refund')) {
+      await logAdminAction(actor.id, actor.role, 'ORDER_REFUND_ATTEMPT', 'order', orderId, 'DENIED');
+      throw new Error('Forbidden: Insufficient privileges to issue refund (requires orders:refund)');
+    }
+
+    const order = await this.getOrderById(actor.role, orderId);
+
+    const refundableStatuses = ['PAID', 'PROCESSING', 'CLINICAL_APPROVED', 'SHIPPED', 'DELIVERED', 'PARTIALLY_REFUNDED'];
+    if (!refundableStatuses.includes(order.status)) {
+      throw new Error(`Cannot refund order in ${order.status} state`);
+    }
+
+    const total = Number(order.total_amount || 0);
+    const previouslyRefunded = Number((order as any).refunded_amount || 0);
+    const eligibleAmount = Math.max(0, total - previouslyRefunded);
+
+    if (eligibleAmount <= 0) {
+      throw new Error('Order is already fully refunded');
+    }
+
+    const amount = refundAmount !== undefined ? Number(refundAmount) : eligibleAmount;
+    if (isNaN(amount) || amount <= 0) {
+      throw new Error('Refund amount must be a positive number');
+    }
+    if (amount > eligibleAmount + 0.001) {
+      throw new Error(`Refund amount ($${amount.toFixed(2)}) exceeds eligible remaining balance ($${eligibleAmount.toFixed(2)})`);
+    }
+
+    const newTotalRefunded = previouslyRefunded + amount;
+    const isFullRefund = newTotalRefunded >= total - 0.001;
+    const nextStatus = isFullRefund ? 'REFUNDED' : 'PARTIALLY_REFUNDED';
+    const nextPaymentStatus = isFullRefund ? 'refunded' : 'partially_refunded';
+
+    let stripeRefundId: string | undefined = undefined;
+    if (order.payment_intent_id && process.env.STRIPE_SECRET_KEY) {
+      try {
+        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2025-02-24.acacia' as any });
+        const refundObj = await stripe.refunds.create({
+          payment_intent: order.payment_intent_id,
+          amount: Math.round(amount * 100),
+          reason: 'requested_by_customer',
+          metadata: { orderId: order.id, refundedBy: actor.id },
+        });
+        stripeRefundId = refundObj.id;
+      } catch (stripeErr: any) {
+        console.error('[Admin Refund] Stripe refund error:', stripeErr.message);
+        throw new Error(`Stripe refund failed: ${stripeErr.message}`);
+      }
+    }
+
+    try {
+      await adminSupabase
+        .from('orders')
+        .update({
+          status: nextStatus,
+          payment_status: nextPaymentStatus,
+          refunded_amount: newTotalRefunded,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', order.id);
+    } catch (dbErr: any) {
+      console.warn('Admin Supabase refund update fallback:', dbErr.message);
+    }
+
+    order.status = nextStatus;
+    (order as any).payment_status = nextPaymentStatus;
+    (order as any).refunded_amount = newTotalRefunded;
+
+    await logAdminAction(actor.id, actor.role, 'ORDER_REFUND_ISSUED', 'order', order.id, 'SUCCESS', {
+      amount,
+      eligibleRemaining: Math.max(0, eligibleAmount - amount),
+      isFullRefund,
+      stripeRefundId,
       reason,
     });
 
@@ -1807,7 +1899,10 @@ async function handleAdminWeb(request: Request): Promise<Response> {
 
         if (orderId && method === 'PATCH') {
           const body = await readJson<any>(request);
-          if (body.action === 'tracking') {
+          if (body.action === 'refund') {
+            const updated = await AdminService.issueOrderRefund(actor, orderId, body.amount, body.reason);
+            return json({ order: updated });
+          } else if (body.action === 'tracking') {
             const updated = await AdminService.updateOrderTracking(actor, orderId, body.carrier, body.trackingNumber);
             return json({ order: updated });
           } else if (body.action === 'mckesson') {

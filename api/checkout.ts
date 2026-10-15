@@ -927,6 +927,52 @@ async function handleCheckoutWeb(request: Request): Promise<Response> {
 
       const totalAmount = Number(Math.max(0, calculatedSubtotal - discountAmount + shippingAmount + taxAmount).toFixed(2));
 
+      // Server-Authoritative Stripe PaymentIntent Verification
+      const paymentIntentId = body.paymentIntentId || body.paymentToken;
+      const stripeSecretKey = (process.env.STRIPE_SECRET_KEY || '').trim();
+
+      if (paymentIntentId && !paymentIntentId.startsWith('pi_mock_') && stripeSecretKey && !stripeSecretKey.includes('placeholder')) {
+        try {
+          const Stripe = (await import('stripe')).default;
+          const stripe = new Stripe(stripeSecretKey, { apiVersion: '2025-02-24.acacia' as any });
+          const intent = await stripe.paymentIntents.retrieve(paymentIntentId);
+
+          // 1. Verify Payment Intent status
+          if (!['succeeded', 'requires_capture', 'processing'].includes(intent.status)) {
+            throw new ApiError(402, `Payment not completed. Stripe payment intent status is '${intent.status}'.`);
+          }
+
+          // 2. Anti-tampering check: verify paid amount matches authoritative order total
+          const expectedCents = Math.round(totalAmount * 100);
+          if (intent.amount < expectedCents) {
+            throw new ApiError(400, `Payment amount mismatch. Order total is ${totalAmount.toFixed(2)} (${expectedCents}¢), but PaymentIntent was authorized for ${(intent.amount / 100).toFixed(2)} (${intent.amount}¢).`);
+          }
+
+          // 3. Verify currency
+          if ((intent.currency || '').toLowerCase() !== 'usd') {
+            throw new ApiError(400, `Payment currency mismatch. Expected USD, got ${(intent.currency || '').toUpperCase()}.`);
+          }
+
+          // 4. Anti-replay check: ensure PaymentIntent is not already consumed by another order
+          try {
+            const { data: existingOrder } = await adminSupabase
+              .from('orders')
+              .select('id, order_number')
+              .eq('payment_intent_id', paymentIntentId)
+              .maybeSingle();
+
+            if (existingOrder) {
+              throw new ApiError(409, `PaymentIntent ${paymentIntentId} has already been consumed for order #${existingOrder.order_number}.`);
+            }
+          } catch (dbCheckErr) {
+            if (dbCheckErr instanceof ApiError) throw dbCheckErr;
+          }
+        } catch (stripeErr) {
+          if (stripeErr instanceof ApiError) throw stripeErr;
+          throw new ApiError(400, `Stripe payment validation failed: ${stripeErr.message}`);
+        }
+      }
+
       // Order generation
       const orderNumber = `BM-${Date.now().toString().slice(-6)}-${Math.floor(Math.random() * 900 + 100)}`;
       const orderId = `ord_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;

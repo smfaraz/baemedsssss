@@ -64,6 +64,14 @@ const normalizeStateCode = (state: string): string => {
   return found || trimmed.toUpperCase();
 };
 
+import crypto from 'node:crypto';
+
+const SESSION_SECRET = process.env.SESSION_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY || 'baemeds_secure_session_salt_8872';
+
+const signToken = (data: string): string => {
+  return crypto.createHmac('sha256', SESSION_SECRET).update(data).digest('hex');
+};
+
 const extractCustomerProfile = (req: any): { email: string; firstName?: string; lastName?: string } | null => {
   let cookieHeader = '';
   let authHeader = '';
@@ -91,11 +99,23 @@ const extractCustomerProfile = (req: any): { email: string; firstName?: string; 
 
   if (token.startsWith('bm_usr_')) {
     try {
-      const parts = token.split('_');
-      if (parts.length >= 3) {
-        const decoded = Buffer.from(parts[2], 'base64url').toString('utf8');
-        return JSON.parse(decoded);
+      const rest = token.substring('bm_usr_'.length);
+      const lastUnderscore = rest.lastIndexOf('_');
+      if (lastUnderscore === -1) return null;
+      const b64 = rest.substring(0, lastUnderscore);
+      const sig = rest.substring(lastUnderscore + 1);
+      if (!b64 || !sig || signToken(b64) !== sig) {
+        return null; // Cryptographic signature mismatch!
       }
+      const decoded = Buffer.from(b64, 'base64url').toString('utf8');
+      const parsed = JSON.parse(decoded);
+        if (parsed.email && typeof parsed.email === 'string') {
+          return {
+            email: parsed.email.toLowerCase().trim(),
+            firstName: parsed.firstName || 'Patient',
+            lastName: parsed.lastName || '',
+          };
+        }
     } catch {}
   }
 
@@ -131,23 +151,6 @@ export default async function handler(req: any, res?: any) {
     return;
   }
 
-  // Parse Body
-  let body: any = {};
-  if (req instanceof Request || (!res && typeof req?.text === 'function')) {
-    if (['POST', 'DELETE', 'PUT', 'PATCH'].includes(method)) {
-      body = await req.json().catch(() => ({}));
-    }
-  } else {
-    body = req.body;
-    if (typeof body === 'string') {
-      try { body = JSON.parse(body); } catch {}
-    }
-    body = body || {};
-  }
-
-  const profile = extractCustomerProfile(req);
-  const email = profile?.email || 'patient@example.com';
-
   const sendResponse = (status: number, data: any) => {
     if (req instanceof Request || (!res && typeof req?.text === 'function')) {
       return new Response(JSON.stringify(data), { status, headers: corsHeaders });
@@ -161,6 +164,26 @@ export default async function handler(req: any, res?: any) {
     }
     return data;
   };
+
+  const profile = extractCustomerProfile(req);
+  if (!profile || !profile.email) {
+    return sendResponse(401, { error: 'Authentication required to access customer account.' });
+  }
+  const email = profile.email;
+
+  // Parse Body
+  let body: any = {};
+  if (req instanceof Request || (!res && typeof req?.text === 'function')) {
+    if (['POST', 'DELETE', 'PUT', 'PATCH'].includes(method)) {
+      body = await req.json().catch(() => ({}));
+    }
+  } else {
+    body = req.body;
+    if (typeof body === 'string') {
+      try { body = JSON.parse(body); } catch {}
+    }
+    body = body || {};
+  }
 
   try {
     // 1. GET Addresses

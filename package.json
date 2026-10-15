@@ -14,8 +14,9 @@
     "test:security": "tsx tests/security-boundary.test.ts && tsx tests/authorization-pipeline.test.ts && tsx tests/v1-api-contract.test.ts && tsx tests/admin-rbac.test.ts && tsx tests/us-market.test.ts && tsx tests/tax-checkout.test.ts",
     "test:concurrency": "tsx tests/concurrency-inventory.test.ts",
     "test:pagination": "tsx tests/storefront-pagination.test.ts",
+    "test:adversarial": "tsx tests/adversarial-security.test.ts",
     "test:migration": "tsx scripts/validate_inventory_migration.ts",
-    "test": "npm run test:security && npm run test:concurrency && npm run test:pagination",
+    "test": "npm run test:security && npm run test:concurrency && npm run test:pagination && npm run test:adversarial",
     "seed:supabase": "node scripts/seed-supabase-catalog.mjs",
     "shots": "node scripts/mobile-shots.mjs"
   },

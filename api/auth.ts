@@ -50,39 +50,45 @@ const sessionCookie = (token: string) => {
 
 const clearSessionCookie = `${SESSION_COOKIE}=; Path=/; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; Secure; SameSite=Lax`;
 
+import crypto from 'node:crypto';
+
+const SESSION_SECRET = process.env.SESSION_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY || 'baemeds_secure_session_salt_8872';
+
+const signToken = (data: string): string => {
+  return crypto.createHmac('sha256', SESSION_SECRET).update(data).digest('hex');
+};
+
 const createSessionToken = (email: string, firstName?: string, lastName?: string): string => {
   const normEmail = email.toLowerCase().trim();
   const acc = memoryCustomerAccounts.get(normEmail);
   const fName = firstName || acc?.firstName || normEmail.split('@')[0];
   const lName = lastName || acc?.lastName || 'Patient';
-  const payload = JSON.stringify({ email: normEmail, firstName: fName, lastName: lName });
+  const ts = Date.now();
+  const payload = JSON.stringify({ email: normEmail, firstName: fName, lastName: lName, ts });
   const b64 = Buffer.from(payload).toString('base64url');
-  return `bm_usr_${b64}_${Date.now()}`;
+  const sig = signToken(b64);
+  return `bm_usr_${b64}_${sig}`;
 };
 
 const extractCustomerProfile = (sessionToken: string): { email: string; firstName: string; lastName: string } | null => {
   if (!sessionToken || !sessionToken.startsWith('bm_usr_')) return null;
-  const parts = sessionToken.split('_');
-  if (!parts[2]) return null;
+  const rest = sessionToken.substring('bm_usr_'.length);
+  const lastUnderscore = rest.lastIndexOf('_');
+  if (lastUnderscore === -1) return null;
+  const b64 = rest.substring(0, lastUnderscore);
+  const sig = rest.substring(lastUnderscore + 1);
+
+  if (!b64 || !sig || signToken(b64) !== sig) {
+    return null; // Cryptographic signature verification failed - token is forged or tampered
+  }
   try {
-    const raw = Buffer.from(parts[2], 'base64url').toString('utf-8');
-    if (raw.startsWith('{')) {
-      const parsed = JSON.parse(raw);
-      if (parsed.email) {
-        return {
-          email: parsed.email.toLowerCase().trim(),
-          firstName: parsed.firstName || parsed.email.split('@')[0],
-          lastName: parsed.lastName || 'Patient',
-        };
-      }
-    }
-    const email = Buffer.from(parts[2], 'base64').toString('utf-8').toLowerCase().trim();
-    if (email.includes('@')) {
-      const acc = memoryCustomerAccounts.get(email);
+    const raw = Buffer.from(b64, 'base64url').toString('utf-8');
+    const parsed = JSON.parse(raw);
+    if (parsed.email && typeof parsed.email === 'string') {
       return {
-        email,
-        firstName: acc?.firstName || email.split('@')[0],
-        lastName: acc?.lastName || 'Patient',
+        email: parsed.email.toLowerCase().trim(),
+        firstName: parsed.firstName || 'Patient',
+        lastName: parsed.lastName || '',
       };
     }
   } catch {}
@@ -114,7 +120,10 @@ const fetchCustomer = async (sessionToken: string): Promise<Customer | null> => 
   }
 };
 
-const getTokenFromHeaders = (cookieHeader?: string): string => {
+const getTokenFromHeaders = (cookieHeader?: string, authHeader?: string): string => {
+  if (authHeader && authHeader.toLowerCase().startsWith('bearer ')) {
+    return authHeader.substring(7).trim();
+  }
   if (!cookieHeader) return '';
   for (const part of cookieHeader.split(';')) {
     const [name, ...valueParts] = part.trim().split('=');
@@ -141,14 +150,14 @@ async function handleWebStandard(request: Request): Promise<Response> {
 
   try {
     if (request.method === 'GET') {
-      const token = getTokenFromHeaders(request.headers.get('cookie') || '');
+      const token = getTokenFromHeaders(request.headers.get('cookie') || '', request.headers.get('authorization') || '');
       if (!token) {
         return new Response(JSON.stringify({ customer: null }), { status: 200, headers: corsHeaders });
       }
       const customer = await fetchCustomer(token);
       if (!customer) {
-        return new Response(JSON.stringify({ customer: null }), {
-          status: 200,
+        return new Response(JSON.stringify({ error: 'Invalid or forged session token.', customer: null }), {
+          status: 401,
           headers: { ...corsHeaders, 'Set-Cookie': clearSessionCookie },
         });
       }
@@ -241,7 +250,7 @@ export default async function handler(req: any, res?: any) {
     }
 
     if (method === 'GET') {
-      const token = getTokenFromHeaders(req.headers?.cookie);
+      const token = getTokenFromHeaders(req.headers?.cookie, req.headers?.authorization);
       if (!token) {
         if (res) {
           res.statusCode = 200;
@@ -254,10 +263,10 @@ export default async function handler(req: any, res?: any) {
       if (!customer) {
         if (res) {
           res.setHeader('Set-Cookie', clearSessionCookie);
-          res.statusCode = 200;
-          return res.end(JSON.stringify({ customer: null }));
+          res.statusCode = 401;
+          return res.end(JSON.stringify({ error: 'Invalid or forged session token.', customer: null }));
         }
-        return { customer: null };
+        return { error: 'Invalid or forged session token.', customer: null };
       }
 
       if (res) {
