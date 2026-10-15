@@ -315,6 +315,7 @@ async function runAdversarialSuite() {
       email: 'bob@baemeds.com',
       role: 'support_agent' as any,
       status: 'active' as any,
+      isActive: true,
       createdAt: new Date().toISOString()
     };
 

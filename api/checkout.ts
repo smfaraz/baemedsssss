@@ -930,6 +930,8 @@ async function handleCheckoutWeb(request: Request): Promise<Response> {
       // Server-Authoritative Stripe PaymentIntent Verification
       const paymentIntentId = body.paymentIntentId || body.paymentToken;
       const stripeSecretKey = (process.env.STRIPE_SECRET_KEY || '').trim();
+      let determinedStatus = 'PAID';
+      let determinedPaymentStatus = 'paid';
 
       if (paymentIntentId && !paymentIntentId.startsWith('pi_mock_') && stripeSecretKey && !stripeSecretKey.includes('placeholder')) {
         try {
@@ -939,13 +941,26 @@ async function handleCheckoutWeb(request: Request): Promise<Response> {
 
           // 1. Verify Payment Intent status
           if (!['succeeded', 'requires_capture', 'processing'].includes(intent.status)) {
-            throw new ApiError(402, `Payment not completed. Stripe payment intent status is '${intent.status}'.`);
+            throw new ApiError(402, `Payment not completed. Stripe payment intent status is '${intent.status}'. Order cannot be placed in unpaid state.`);
           }
 
-          // 2. Anti-tampering check: verify paid amount matches authoritative order total
+          // Invariant: Uncaptured authorizations and pending processing payments must NOT be marked PAID
+          if (intent.status === 'requires_capture') {
+            determinedStatus = 'AUTHORIZED';
+            determinedPaymentStatus = 'authorized';
+          } else if (intent.status === 'processing') {
+            determinedStatus = 'PENDING';
+            determinedPaymentStatus = 'pending';
+          } else {
+            determinedStatus = 'PAID';
+            determinedPaymentStatus = 'paid';
+          }
+
+          // 2. Anti-tampering check: verify paid amount matches authoritative order total exactly
           const expectedCents = Math.round(totalAmount * 100);
-          if (intent.amount < expectedCents) {
-            throw new ApiError(400, `Payment amount mismatch. Order total is ${totalAmount.toFixed(2)} (${expectedCents}¢), but PaymentIntent was authorized for ${(intent.amount / 100).toFixed(2)} (${intent.amount}¢).`);
+          if (intent.amount !== expectedCents) {
+            const mismatchType = intent.amount < expectedCents ? 'underpaid' : 'overpaid';
+            throw new ApiError(400, `Payment amount mismatch (${mismatchType}). Order total is $${totalAmount.toFixed(2)} (${expectedCents}¢), but PaymentIntent was authorized for $${(intent.amount / 100).toFixed(2)} (${intent.amount}¢).`);
           }
 
           // 3. Verify currency
@@ -981,7 +996,8 @@ async function handleCheckoutWeb(request: Request): Promise<Response> {
         id: orderId,
         order_number: orderNumber,
         customer_email: email,
-        status: 'PAID',
+        status: determinedStatus,
+        payment_status: determinedPaymentStatus,
         currency: 'USD',
         subtotal_amount: calculatedSubtotal,
         tax_amount: taxAmount,
@@ -1036,12 +1052,14 @@ async function handleCheckoutWeb(request: Request): Promise<Response> {
           id: orderId,
           order_number: orderNumber,
           customer_email: email,
-          status: 'PAID',
+          status: determinedStatus,
+          payment_status: determinedPaymentStatus,
+          payment_intent_id: paymentIntentId,
           currency: 'USD',
           subtotal_amount: calculatedSubtotal,
           tax_amount: taxAmount,
           shipping_amount: shippingAmount,
-          discount_amount: 0,
+          discount_amount: discountAmount,
           total_amount: totalAmount,
           requires_prescription: orderRequiresPrescription,
           shipping_address: firstPartyOrder.shipping_address,
@@ -1099,7 +1117,8 @@ async function handleCheckoutWeb(request: Request): Promise<Response> {
         taxRate: taxCalculation.taxRate,
         isTaxExempt: taxCalculation.isExempt,
         taxExemptionReason: taxCalculation.exemptionReason || null,
-        status: 'PAID',
+        status: determinedStatus,
+        paymentStatus: determinedPaymentStatus,
       });
     } catch (error) {
       return errorResponse(error);

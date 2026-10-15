@@ -82,7 +82,7 @@ async function handleWebhookWeb(request: Request): Promise<Response> {
 
           // Authoritative amount check
           const expectedCents = Math.round(Number(order.total_amount || 0) * 100);
-          if (paymentIntent.amount < expectedCents) {
+          if (paymentIntent.amount !== expectedCents) {
             console.error(`[Stripe Webhook] Underpayment detected for ${orderNumber}: paid ${paymentIntent.amount}¢, expected ${expectedCents}¢`);
             await supabase
               .from('orders')
@@ -125,6 +125,36 @@ async function handleWebhookWeb(request: Request): Promise<Response> {
           });
         } catch (dbErr: any) {
           console.error('[Stripe Webhook] DB update error:', dbErr.message);
+        }
+      }
+      break;
+    }
+
+    case 'payment_intent.amount_capturable_updated': {
+      const paymentIntent = event.data.object as Stripe.PaymentIntent;
+      const orderNumber = paymentIntent.metadata?.orderNumber;
+
+      if (orderNumber) {
+        try {
+          const { data: order } = await supabase
+            .from('orders')
+            .select('status')
+            .eq('order_number', orderNumber)
+            .single();
+
+          if (order && !['PAID', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'REFUNDED'].includes(order.status)) {
+            await supabase
+              .from('orders')
+              .update({
+                status: 'AUTHORIZED',
+                payment_status: 'authorized',
+                payment_intent_id: paymentIntent.id,
+                updated_at: new Date().toISOString(),
+              })
+              .eq('order_number', orderNumber);
+          }
+        } catch (dbErr: any) {
+          console.error('[Stripe Webhook] DB authorization update error:', dbErr.message);
         }
       }
       break;
