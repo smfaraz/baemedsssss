@@ -121,15 +121,9 @@ const ProductDetailPage: React.FC = () => {
     }
 
     if (product.variants && product.variants.length > 0) {
-      // ALWAYS prioritize Single Unit / EA 1 as the main default option
-      const eaVariant = product.variants.find((v) =>
-        /ea|single|unit|each/i.test(v.title || '') ||
-        /ea|single|unit|each/i.test(v.size || '') ||
-        (v.packageQuantity && /1\s*(unit|ea|each)/i.test(v.packageQuantity))
-      );
       let initial = product.variants.find((v) => v.id === product.selectedVariantId);
-      if (!initial || (!product.selectedVariantId && eaVariant)) {
-        initial = eaVariant || product.variants.find((v) => v.inStock !== false) || product.variants[0];
+      if (!initial) {
+        initial = product.variants.find((v) => v.inStock !== false) || product.variants[0];
       }
       setSelectedVariant(initial);
       setSelectedSize(initial.size || '');
@@ -145,13 +139,14 @@ const ProductDetailPage: React.FC = () => {
   const availableSizes = useMemo(() => {
     if (!product?.variants) return [];
     const sizes = [...new Set(product.variants.map((v) => v.size).filter(Boolean))] as string[];
-    // Guarantee Single Unit / EA 1 option is ALWAYS shown first
+    const sizeOrder = ['Small', 'Medium', 'Large', 'X-Large', 'XX-Large', '2X-Large', '3X-Large', 'Youth', 'Pediatric', 'Bariatric'];
     return sizes.sort((a, b) => {
-      const isA_EA = /ea|single|unit|each/i.test(a);
-      const isB_EA = /ea|single|unit|each/i.test(b);
-      if (isA_EA && !isB_EA) return -1;
-      if (!isA_EA && isB_EA) return 1;
-      return 0;
+      const idxA = sizeOrder.indexOf(a);
+      const idxB = sizeOrder.indexOf(b);
+      if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+      if (idxA !== -1) return -1;
+      if (idxB !== -1) return 1;
+      return a.localeCompare(b);
     });
   }, [product?.variants]);
 
