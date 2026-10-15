@@ -65,6 +65,8 @@ export interface ProductVariant {
   title: string; // e.g. 'Large' or 'Medium - Pack of 14'
   size?: string; // e.g. 'Large', 'Medium', 'X-Large', '2X-Large'
   packageQuantity?: string; // e.g. 'Standard Bag', 'Case of 72'
+  unitCost?: string; // e.g. '$0.46 / count'
+  waistFit?: string; // e.g. '45" - 58"'
   price: number;
   dealerPrice?: number;
   wholesaleCost?: number;

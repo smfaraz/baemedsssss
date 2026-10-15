@@ -59,6 +59,7 @@ const ProductDetailPage: React.FC = () => {
   const [emailAppOpened, setEmailAppOpened] = useState(false);
   const [zipCode, setZipCode] = useState('');
   const [zipCodeStatus, setZipCodeStatus] = useState<'idle' | 'valid' | 'invalid'>('idle');
+  const [showSizeGuide, setShowSizeGuide] = useState(false);
   const touchStartX = React.useRef<number | null>(null);
 
   useEffect(() => {
@@ -212,6 +213,13 @@ const ProductDetailPage: React.FC = () => {
     : 0;
   const inWishlist = product ? isInWishlist(product.id) : false;
   const phoneHref = `tel:${CONTACT_PHONE.replace(/\D/g, '')}`;
+
+  const isIncontinenceProduct = useMemo(() => {
+    if (!product) return false;
+    const cat = (product.category || '').toLowerCase();
+    const title = (product.title || '').toLowerCase();
+    return cat.includes('incontinence') || /brief|diaper|underwear|pull-on|pull on|liner|underpad/i.test(title);
+  }, [product]);
 
   const handleAddToCart = async (event?: React.MouseEvent<HTMLButtonElement>) => {
     if (!product || !isCurrentlyInStock || isCartLoading) return;
@@ -533,9 +541,20 @@ const ProductDetailPage: React.FC = () => {
                 {availableSizes.length > 0 && (
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-bold uppercase tracking-wider text-medical-text">
-                        Select {availableSizes.some((s) => /unit|pack|case|box|ea|cs/i.test(s)) ? 'Packaging / Option' : 'Size'}: <strong className="text-medical-dark font-extrabold">{selectedSize}</strong>
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold uppercase tracking-wider text-medical-text">
+                          Select {availableSizes.some((s) => /unit|pack|case|box|ea|cs/i.test(s)) ? 'Packaging / Option' : 'Size'}: <strong className="text-medical-dark font-extrabold">{selectedSize}</strong>
+                        </span>
+                        {isIncontinenceProduct && (
+                          <button
+                            type="button"
+                            onClick={() => setShowSizeGuide(!showSizeGuide)}
+                            className="text-[11px] font-bold text-teal-700 hover:text-teal-900 underline flex items-center gap-1 cursor-pointer ml-1"
+                          >
+                            Size Guide
+                          </button>
+                        )}
+                      </div>
                       {selectedVariant?.size && (
                         <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full border ${
                           isCurrentlyInStock
@@ -546,6 +565,27 @@ const ProductDetailPage: React.FC = () => {
                         </span>
                       )}
                     </div>
+
+                    {showSizeGuide && isIncontinenceProduct && (
+                      <div className="mb-3 p-3.5 rounded-xl border border-teal-200 bg-teal-50/70 text-xs">
+                        <div className="flex items-center justify-between font-bold text-teal-950 mb-2">
+                          <span>Adult Incontinence Sizing & Waist Measurement Guide</span>
+                          <button type="button" onClick={() => setShowSizeGuide(false)} className="text-slate-400 hover:text-slate-700 cursor-pointer"><X size={14} /></button>
+                        </div>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-[11px] text-slate-700">
+                          <div className="bg-white p-2 rounded-lg border border-teal-100"><strong className="text-slate-900 block">Small:</strong> 20" – 31" waist</div>
+                          <div className="bg-white p-2 rounded-lg border border-teal-100"><strong className="text-slate-900 block">Medium:</strong> 32" – 44" waist</div>
+                          <div className="bg-white p-2 rounded-lg border border-teal-100"><strong className="text-slate-900 block">Large:</strong> 45" – 58" waist</div>
+                          <div className="bg-white p-2 rounded-lg border border-teal-100"><strong className="text-slate-900 block">X-Large:</strong> 59" – 64" waist</div>
+                          <div className="bg-white p-2 rounded-lg border border-teal-100"><strong className="text-slate-900 block">2X-Large:</strong> 64" – 70" waist</div>
+                          <div className="bg-white p-2 rounded-lg border border-teal-100"><strong className="text-slate-900 block">Bariatric:</strong> 70" – 95"+ waist</div>
+                        </div>
+                        <p className="mt-2 text-[10px] text-teal-900 font-medium italic">
+                          ★ Measure at the widest point between waist and hips. If between sizes, choose the smaller size to ensure leg cuffs seal snugly and prevent leaks.
+                        </p>
+                      </div>
+                    )}
+
                     <div className="flex flex-wrap gap-2">
                       {availableSizes.map((sz) => {
                         const isSelected = sz === selectedSize;
@@ -573,6 +613,12 @@ const ProductDetailPage: React.FC = () => {
                         );
                       })}
                     </div>
+                    {selectedVariant?.waistFit && (
+                      <p className="mt-2 text-[11px] font-medium text-slate-600 flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-teal-500"></span>
+                        Recommended Target Fit: <strong className="text-slate-900">{selectedVariant.waistFit}</strong>
+                      </p>
+                    )}
                   </div>
                 )}
 
@@ -590,13 +636,18 @@ const ProductDetailPage: React.FC = () => {
                             key={pack}
                             type="button"
                             onClick={() => handleSelectPack(pack)}
-                            className={`min-h-10 px-3.5 py-1.5 rounded-xl text-xs font-bold border transition cursor-pointer ${
+                            className={`min-h-10 px-3.5 py-1.5 rounded-xl text-xs font-bold border transition cursor-pointer flex items-center gap-1.5 ${
                               isSelected
                                 ? 'border-medical-dark bg-medical-dark text-white shadow-sm ring-2 ring-medical-dark/20'
                                 : 'border-slate-200 bg-white text-slate-700 hover:border-slate-400 hover:bg-slate-50'
                             }`}
                           >
-                            {pack} {vForPack ? `· ${formatPrice(vForPack.price)}` : ''}
+                            <span>{pack} {vForPack ? `· ${formatPrice(vForPack.price)}` : ''}</span>
+                            {vForPack?.unitCost && (
+                              <span className={`text-[10px] px-1.5 py-0.5 rounded-md font-extrabold ${isSelected ? 'bg-white/20 text-teal-100' : 'bg-emerald-50 text-emerald-800'}`}>
+                                {vForPack.unitCost}
+                              </span>
+                            )}
                           </button>
                         );
                       })}
@@ -628,6 +679,16 @@ const ProductDetailPage: React.FC = () => {
               <p className="mt-2 text-xs leading-5 text-slate-500 font-medium">
                 ★ Direct distributor pricing • Official manufacturer warranty included
               </p>
+
+              {isIncontinenceProduct && (
+                <div className="mt-3.5 rounded-2xl border border-teal-200/80 bg-teal-50/70 p-3 flex items-start gap-2.5">
+                  <ShieldCheck className="text-teal-700 shrink-0 mt-0.5" size={18} />
+                  <div className="text-[11px] text-teal-950 leading-relaxed">
+                    <strong className="font-extrabold text-teal-900 block">100% Discreet Packaging Guaranteed</strong>
+                    <span>Shipped in a plain, unmarked corrugated box with zero external medical or product labels for your absolute personal privacy.</span>
+                  </div>
+                </div>
+              )}
 
               <div className="mt-5 grid gap-3 sm:grid-cols-[132px_1fr_1fr]">
                 <div className="flex min-h-12 items-center justify-between rounded-xl border border-slate-300 bg-white">
