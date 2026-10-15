@@ -77,7 +77,6 @@ export const assertSameOrigin = (request: Request) => {
   }
 };
 import { adminSupabase } from '../server/adminSupabase';
-import catalogSeed from '../data/catalog_seed.json';
 import { AdminService, recordFirstPartyOrder } from '../server/adminService';
 import { TaxService, TaxCalculationItem } from '../server/taxService';
 
