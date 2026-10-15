@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const SITEMAP_PATH = path.resolve(__dirname, '../public/sitemap.xml');
-const SITE_URL = process.env.VITE_SITE_URL || 'https://baemeds.com';
+const SITE_URL = process.env.VITE_SITE_URL || 'https://www.baemeds.com';
 
 async function fetchAllShopifyProducts() {
   const catalogPath = path.resolve(__dirname, '../data/catalog_seed.json');
