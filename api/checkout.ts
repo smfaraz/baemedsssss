@@ -50,10 +50,9 @@ interface CheckoutBody {
   items: CheckoutItem[];
 }
 
-import { createVercelHandler } from '../server/serverlessAdapter';
 import { EmailService } from '../server/emailService';
 
-export default createVercelHandler(async (request: Request) => {
+async function handleCheckoutWeb(request: Request): Promise<Response> {
   try {
     if (request.method !== 'POST') return json({ error: 'Method not allowed.' }, 405, { Allow: 'POST' });
     assertSameOrigin(request);
@@ -378,4 +377,78 @@ export default createVercelHandler(async (request: Request) => {
     } catch (error) {
       return errorResponse(error);
     }
-});
+}
+
+export default async function handler(req: any, res?: any) {
+  if (req instanceof Request || (!res && typeof req.text === 'function')) {
+    return handleCheckoutWeb(req);
+  }
+
+  try {
+    if (res && typeof res.setHeader === 'function') {
+      res.setHeader('Access-Control-Allow-Origin', req.headers?.origin || '*');
+      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Origin');
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+      res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    }
+
+    if ((req.method || '').toUpperCase() === 'OPTIONS') {
+      if (res) {
+        res.statusCode = 204;
+        return res.end();
+      }
+      return;
+    }
+
+    const rawProto = req.headers && req.headers['x-forwarded-proto'];
+    const protocol = (Array.isArray(rawProto) ? rawProto[0] : (rawProto || '').split(',')[0].trim()) || 'https';
+    const rawHost = req.headers && (req.headers['x-forwarded-host'] || req.headers.host);
+    const host = (Array.isArray(rawHost) ? rawHost[0] : (rawHost || '').split(',')[0].trim()) || 'localhost';
+    const parsedUrl = new URL(req.url || '/', `${protocol}://${host}`);
+
+    const headers = new Headers();
+    for (const [key, value] of Object.entries(req.headers || {})) {
+      if (!key || key.startsWith(':') || key.toLowerCase() === 'content-length') continue;
+      try {
+        if (Array.isArray(value)) value.forEach((v) => headers.append(key, v));
+        else if (value !== undefined) headers.set(key, String(value));
+      } catch {}
+    }
+
+    let reqBody: any = undefined;
+    if (!['GET', 'HEAD'].includes((req.method || 'GET').toUpperCase())) {
+      if (req.body !== undefined && req.body !== null) {
+        reqBody = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
+      }
+    }
+
+    const webRequest = new Request(parsedUrl.href, {
+      method: req.method,
+      headers,
+      body: reqBody,
+    });
+
+    const webResponse = await handleCheckoutWeb(webRequest);
+
+    if (res) {
+      res.statusCode = webResponse.status;
+      webResponse.headers.forEach((val, key) => {
+        if (key.toLowerCase() !== 'content-length') {
+          res.setHeader(key, val);
+        }
+      });
+      const buffer = Buffer.from(await webResponse.arrayBuffer());
+      res.end(buffer);
+      return;
+    }
+  } catch (err: any) {
+    if (res && !res.headersSent) {
+      res.statusCode = 500;
+      res.setHeader('Content-Type', 'application/json');
+      return res.end(JSON.stringify({ error: err.message || 'The checkout request could not be completed.' }));
+    }
+  }
+}
+
+handler.fetch = handleCheckoutWeb;

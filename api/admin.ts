@@ -170,9 +170,7 @@ export const resolveAdminActor = async (request: Request): Promise<AdminUser> =>
   throw new ApiError(403, 'Forbidden: Insufficient privileges for administrative back office.');
 };
 
-import { createVercelHandler } from '../server/serverlessAdapter';
-
-export default createVercelHandler(async (request: Request) => {
+async function handleAdminWeb(request: Request): Promise<Response> {
     // 0. Handle CORS preflight options
     if (request.method === 'OPTIONS') {
       return new Response(null, {
@@ -411,4 +409,109 @@ export default createVercelHandler(async (request: Request) => {
       const status = msg.toLowerCase().includes('forbidden') || msg.toLowerCase().includes('unauthorized') ? 403 : 500;
       return json({ error: msg }, status);
     }
-});
+}
+
+export default async function handler(req: any, res?: any) {
+  if (req instanceof Request || (!res && typeof req.text === 'function')) {
+    return handleAdminWeb(req);
+  }
+
+  try {
+    if (res && typeof res.setHeader === 'function') {
+      res.setHeader('Access-Control-Allow-Origin', req.headers?.origin || '*');
+      res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-Admin-Role');
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+      res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    }
+
+    if ((req.method || '').toUpperCase() === 'OPTIONS') {
+      if (res) {
+        res.statusCode = 204;
+        return res.end();
+      }
+      return;
+    }
+
+    const rawProto = req.headers && req.headers['x-forwarded-proto'];
+    const protocol = (Array.isArray(rawProto) ? rawProto[0] : (rawProto || '').split(',')[0].trim()) || 'https';
+    const rawHost = req.headers && (req.headers['x-forwarded-host'] || req.headers.host);
+    const host = (Array.isArray(rawHost) ? rawHost[0] : (rawHost || '').split(',')[0].trim()) || 'localhost';
+    const parsedUrl = new URL(req.url || '/', `${protocol}://${host}`);
+
+    const querySubpath = parsedUrl.searchParams.get('subpath') || parsedUrl.searchParams.get('path');
+    const pathSubpath = parsedUrl.pathname.replace(/^\/api\/admin\/?/, '');
+    const headerSubpath =
+      (req.headers && req.headers['x-matched-path']?.replace(/^\/api\/admin\/?/, '')) ||
+      (req.headers && req.headers['x-forwarded-uri']?.replace(/^\/api\/admin\/?/, ''));
+    const subpath = (querySubpath || (pathSubpath && pathSubpath !== 'admin' ? pathSubpath : '') || headerSubpath || '').replace(/^\/+/, '');
+
+    // Fast-path for unauthenticated staff login
+    if ((subpath === 'login' || subpath === '' || subpath === 'admin') && (req.method || '').toUpperCase() === 'POST') {
+      let body: any = req.body;
+      if (typeof body === 'string') {
+        try { body = JSON.parse(body); } catch {}
+      }
+      if (body?.email && body?.password) {
+        try {
+          const result = await AdminService.authenticateStaff(body.email, body.password);
+          if (res) {
+            res.statusCode = 200;
+            return res.end(JSON.stringify(result));
+          }
+          return result;
+        } catch (authErr: any) {
+          const status = authErr.message?.includes('deactivated') ? 403 : 401;
+          if (res) {
+            res.statusCode = status;
+            return res.end(JSON.stringify({ error: authErr.message || 'Invalid credentials.' }));
+          }
+        }
+      }
+    }
+
+    const headers = new Headers();
+    for (const [key, value] of Object.entries(req.headers || {})) {
+      if (!key || key.startsWith(':') || key.toLowerCase() === 'content-length') continue;
+      try {
+        if (Array.isArray(value)) value.forEach((v) => headers.append(key, v));
+        else if (value !== undefined) headers.set(key, String(value));
+      } catch {}
+    }
+
+    let reqBody: any = undefined;
+    if (!['GET', 'HEAD'].includes((req.method || 'GET').toUpperCase())) {
+      if (req.body !== undefined && req.body !== null) {
+        reqBody = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
+      }
+    }
+
+    const webRequest = new Request(parsedUrl.href, {
+      method: req.method,
+      headers,
+      body: reqBody,
+    });
+
+    const webResponse = await handleAdminWeb(webRequest);
+
+    if (res) {
+      res.statusCode = webResponse.status;
+      webResponse.headers.forEach((val, key) => {
+        if (key.toLowerCase() !== 'content-length') {
+          res.setHeader(key, val);
+        }
+      });
+      const buffer = Buffer.from(await webResponse.arrayBuffer());
+      res.end(buffer);
+      return;
+    }
+  } catch (err: any) {
+    if (res && !res.headersSent) {
+      res.statusCode = 500;
+      res.setHeader('Content-Type', 'application/json');
+      return res.end(JSON.stringify({ error: err.message || 'An administrative error occurred.' }));
+    }
+  }
+}
+
+handler.fetch = handleAdminWeb;
