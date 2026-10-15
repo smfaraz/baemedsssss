@@ -30,6 +30,8 @@ function apiDevMiddleware() {
             handler = (await server.ssrLoadModule('./api/account.ts')).default;
           } else if (pathname.startsWith('/api/feeds')) {
             handler = (await server.ssrLoadModule('./api/feeds.ts')).default;
+          } else if (pathname.startsWith('/api/coupon')) {
+            handler = (await server.ssrLoadModule('./api/coupon.ts')).default;
           }
 
           if (!handler || typeof handler.fetch !== 'function') {

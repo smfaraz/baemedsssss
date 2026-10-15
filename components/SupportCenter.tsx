@@ -404,11 +404,19 @@ const SupportCenter: React.FC = () => {
             <div className="flex min-w-0 items-center gap-3">
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-medical-primary" aria-hidden="true"><Bot size={20} /></span>
               <div className="min-w-0">
-                <h2 className="text-sm font-black">AI Bot</h2>
-                <p className="truncate text-[11px] text-white/70">Product and order support</p>
+                <h2 className="text-sm font-black">BaeMeds Support & AI</h2>
+                <div className="flex items-center gap-2 text-[11px] text-white/80 mt-0.5">
+                  <a href={`tel:${CONTACT_PHONE.replace(/\D/g, '')}`} className="hover:underline flex items-center gap-1">
+                    <Phone size={10} /> {CONTACT_PHONE}
+                  </a>
+                  <span>•</span>
+                  <a href={`mailto:${CONTACT_EMAIL}`} className="hover:underline flex items-center gap-1">
+                    <Mail size={10} /> Email
+                  </a>
+                </div>
               </div>
             </div>
-            <button type="button" onClick={() => setIsChatOpen(false)} className="tap-target inline-flex items-center justify-center rounded-xl hover:bg-white/10" aria-label="Close AI Bot">
+            <button type="button" onClick={() => setIsChatOpen(false)} className="tap-target inline-flex h-9 w-9 items-center justify-center rounded-xl hover:bg-white/10 text-white" aria-label="Close Support Chat">
               <X size={20} />
             </button>
           </header>
@@ -510,29 +518,18 @@ const SupportCenter: React.FC = () => {
         </section>
       )}
 
-      {isCenterOpen && !isChatOpen && (
-        <div className="reveal-up flex flex-col items-end gap-2">
-          <a href={`tel:${CONTACT_PHONE.replace(/\D/g, '')}`} className="flex min-h-11 items-center gap-3 rounded-full bg-white px-4 font-bold text-medical-dark shadow-lg ring-1 ring-slate-200">
-            <Phone size={18} /> Call {CONTACT_PHONE}
-          </a>
-          <a href={`mailto:${CONTACT_EMAIL}`} className="flex min-h-11 items-center gap-3 rounded-full bg-medical-primary px-4 font-bold text-white shadow-lg">
-            <Mail size={18} /> Email Support
-          </a>
-          <button type="button" onClick={() => { setIsChatOpen(true); setIsCenterOpen(false); }} className="flex min-h-11 items-center gap-3 rounded-full bg-medical-dark px-4 font-bold text-white shadow-lg">
-            <Bot size={18} /> Open AI Assistant
-          </button>
-        </div>
-      )}
-
       {!isChatOpen && (
         <button
           type="button"
-          onClick={() => setIsCenterOpen((current) => !current)}
-          className={`tap-target inline-flex h-14 w-14 items-center justify-center rounded-full text-white shadow-2xl transition-colors ${isCenterOpen ? 'bg-slate-800' : 'bg-medical-primary hover:bg-medical-dark'}`}
-          aria-label={isCenterOpen ? 'Close support' : 'Open product support, call, and email'}
-          aria-expanded={isCenterOpen}
+          onClick={() => {
+            setIsChatOpen(true);
+            setIsCenterOpen(false);
+          }}
+          className="tap-target inline-flex h-14 w-14 items-center justify-center rounded-full bg-medical-primary text-white shadow-2xl transition-all duration-200 hover:scale-105 hover:bg-medical-dark"
+          aria-label="Open support and live chat"
+          aria-expanded={isChatOpen}
         >
-          {isCenterOpen ? <X size={23} /> : <MessageSquare size={24} />}
+          <MessageSquare size={24} />
         </button>
       )}
     </div>

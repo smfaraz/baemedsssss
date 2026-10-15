@@ -10,7 +10,7 @@ import {
 } from '../server/commerce';
 import { adminSupabase } from '../server/adminSupabase';
 import catalogSeed from '../data/catalog_seed.json';
-import { recordFirstPartyOrder } from '../server/adminService';
+import { AdminService, recordFirstPartyOrder } from '../server/adminService';
 import { TaxService, TaxCalculationItem } from '../server/taxService';
 
 interface CheckoutItem {
@@ -46,6 +46,7 @@ interface CheckoutBody {
   prescriptionInfo?: PrescriptionInfo;
   customerIsTaxExempt?: boolean;
   taxExemptionCertificate?: string;
+  couponCode?: string;
   items: CheckoutItem[];
 }
 
@@ -221,7 +222,30 @@ export default createVercelHandler(async (request: Request) => {
       });
 
       const taxAmount = taxCalculation.estimatedTax;
-      const totalAmount = Number((calculatedSubtotal + shippingAmount + taxAmount).toFixed(2));
+
+      // Authoritative promotional discount calculation
+      let discountAmount = 0;
+      let appliedCouponCode: string | null = null;
+      if (body.couponCode) {
+        const cleanCoupon = body.couponCode.trim().toUpperCase();
+        try {
+          const discounts = await AdminService.getDiscounts('super_admin');
+          const matchedDiscount = discounts.find((d: any) => d.code === cleanCoupon && d.isActive !== false);
+          if (matchedDiscount) {
+            const minOrder = matchedDiscount.minOrderAmount || 0;
+            if (calculatedSubtotal >= minOrder) {
+              if (matchedDiscount.type === 'percentage') {
+                discountAmount = Number(((calculatedSubtotal * matchedDiscount.value) / 100).toFixed(2));
+              } else {
+                discountAmount = Number(Math.min(calculatedSubtotal, matchedDiscount.value).toFixed(2));
+              }
+              appliedCouponCode = matchedDiscount.code;
+            }
+          }
+        } catch {}
+      }
+
+      const totalAmount = Number(Math.max(0, calculatedSubtotal - discountAmount + shippingAmount + taxAmount).toFixed(2));
 
       // Order generation
       const orderNumber = `BM-${Date.now().toString().slice(-6)}-${Math.floor(Math.random() * 900 + 100)}`;
@@ -236,7 +260,8 @@ export default createVercelHandler(async (request: Request) => {
         subtotal_amount: calculatedSubtotal,
         tax_amount: taxAmount,
         shipping_amount: shippingAmount,
-        discount_amount: 0,
+        discount_amount: discountAmount,
+        coupon_code: appliedCouponCode,
         total_amount: totalAmount,
         requires_prescription: orderRequiresPrescription,
         tax_rate: taxCalculation.taxRate,

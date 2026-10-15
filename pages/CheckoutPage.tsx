@@ -13,6 +13,8 @@ import {
   MapPin,
   Building2,
   FileCheck2,
+  Tag,
+  RefreshCw,
 } from 'lucide-react';
 import { APP_NAME } from '../constants';
 import { Link, useCart, useNavigate } from '../context/CartContext';
@@ -20,6 +22,7 @@ import { useAuth } from '../context/AuthContext';
 import { Analytics } from '../lib/analytics';
 import { StripePaymentSection } from '../components/checkout/StripePaymentSection';
 import { calculateTaxEstimate, DetailedTaxCalculation } from '../lib/clientTax';
+import { US_STATES, US_STATE_CODES } from '../lib/marketConfig';
 
 export type CheckoutStepId = 'shipping' | 'delivery' | 'payment';
 
@@ -55,6 +58,19 @@ export const CheckoutPage: React.FC = () => {
   const [customerIsTaxExempt, setCustomerIsTaxExempt] = useState(false);
   const [taxExemptionCertificate, setTaxExemptionCertificate] = useState('');
 
+  // Promotional Coupon State
+  const [couponInput, setCouponInput] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<{
+    code: string;
+    type: 'percentage' | 'fixed';
+    value: number;
+    discountAmount: number;
+    message?: string;
+  } | null>(null);
+  const [couponError, setCouponError] = useState('');
+  const [couponSuccess, setCouponSuccess] = useState('');
+  const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
+
   // Stripe state
   const [stripeClientSecret, setStripeClientSecret] = useState('');
   const [stripePublishableKey, setStripePublishableKey] = useState(
@@ -62,6 +78,7 @@ export const CheckoutPage: React.FC = () => {
   );
   const [paymentIntentId, setPaymentIntentId] = useState('');
   const [isInitializingStripe, setIsInitializingStripe] = useState(true);
+  const [paymentGatewayError, setPaymentGatewayError] = useState('');
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -89,8 +106,8 @@ export const CheckoutPage: React.FC = () => {
       setErrorMessage('Please enter your city.');
       return;
     }
-    if (!province.trim()) {
-      setErrorMessage('Please enter your 2-letter state code (e.g. DE, CA, NY).');
+    if (!province.trim() || !US_STATE_CODES.has(province.trim().toUpperCase())) {
+      setErrorMessage('Please select a valid US state from the dropdown list.');
       return;
     }
     if (!zip.trim()) {
@@ -125,6 +142,47 @@ export const CheckoutPage: React.FC = () => {
     }
   }, [customer]);
 
+  // Coupon handlers
+  const handleApplyCoupon = async () => {
+    const trimmed = couponInput.trim().toUpperCase();
+    if (!trimmed) return;
+    setCouponError('');
+    setCouponSuccess('');
+    setIsApplyingCoupon(true);
+
+    try {
+      const res = await fetch('/api/coupon', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: trimmed, subtotal: cartTotal }),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok || !data?.valid) {
+        setCouponError(data?.error || `Coupon code "${trimmed}" could not be applied.`);
+        return;
+      }
+      setAppliedCoupon({
+        code: data.code,
+        type: data.type,
+        value: data.value,
+        discountAmount: data.discountAmount,
+        message: data.message,
+      });
+      setCouponSuccess(data.message || `Coupon "${data.code}" applied!`);
+      setCouponInput('');
+    } catch (err: any) {
+      setCouponError(err.message || 'Unable to validate coupon code.');
+    } finally {
+      setIsApplyingCoupon(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponError('');
+    setCouponSuccess('');
+  };
+
   // Financial calculations
   let shippingCost = 0;
   if (shippingTier === 'priority') {
@@ -134,6 +192,9 @@ export const CheckoutPage: React.FC = () => {
   } else {
     shippingCost = cartTotal >= 99 ? 0.0 : 12.0;
   }
+
+  const discountAmount = appliedCoupon ? appliedCoupon.discountAmount : 0;
+  const discountedSubtotal = Math.max(0, cartTotal - discountAmount);
 
   // Authoritative destination-based sales tax and medical DME exemption calculation
   const taxCalc: DetailedTaxCalculation = useMemo(() => {
@@ -157,7 +218,7 @@ export const CheckoutPage: React.FC = () => {
   }, [cart, province, zip, city, customerIsTaxExempt, taxExemptionCertificate]);
 
   const taxAmount = taxCalc.estimatedTax;
-  const finalTotal = Number((cartTotal + shippingCost + taxAmount).toFixed(2));
+  const finalTotal = Number((discountedSubtotal + shippingCost + taxAmount).toFixed(2));
 
   // Handle redirect return from payment providers (Amazon Pay, Klarna, Cash App, etc.)
   useEffect(() => {
@@ -194,12 +255,14 @@ export const CheckoutPage: React.FC = () => {
     }
   }, []);
 
-  // Initialize or update Stripe PaymentIntent
+  // Initialize or update Stripe PaymentIntent with debouncing and safe JSON handling
   useEffect(() => {
     let isMounted = true;
-    const initIntent = async () => {
+    const timer = setTimeout(async () => {
       try {
         setIsInitializingStripe(true);
+        setPaymentGatewayError('');
+
         const res = await fetch('/api/payment-intent', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -208,9 +271,12 @@ export const CheckoutPage: React.FC = () => {
             amountInCents: Math.round(finalTotal * 100),
             currency: 'usd',
             cartTotal,
+            discountAmount,
+            couponCode: appliedCoupon?.code,
             shippingCost,
             taxAmount,
             shippingTier,
+            paymentIntentId,
             metadata: {
               customer_email: email,
               items_count: cart.reduce((s, i) => s + i.quantity, 0),
@@ -218,35 +284,51 @@ export const CheckoutPage: React.FC = () => {
           }),
         });
 
-        if (!res.ok) {
-          const errData = await res.json();
-          throw new Error(errData.error || 'Failed to initialize payment gateway.');
+        const text = await res.text();
+        let data: any = null;
+        try {
+          data = JSON.parse(text);
+        } catch {
+          console.warn('[CheckoutPage] Non-JSON response from /api/payment-intent:', text.slice(0, 100));
         }
 
-        const data = await res.json();
+        if (!res.ok || !data) {
+          const warnMsg = data?.error || 'Payment gateway connection will establish at Step 3.';
+          console.warn('[CheckoutPage] Payment initialization note:', warnMsg);
+          if (isMounted) {
+            setPaymentGatewayError(warnMsg);
+            if (currentStep === 'payment') {
+              setErrorMessage(warnMsg);
+            }
+          }
+          return;
+        }
+
         if (isMounted) {
           if (data.clientSecret) setStripeClientSecret(data.clientSecret);
           if (data.paymentIntentId) setPaymentIntentId(data.paymentIntentId);
           if (data.publishableKey) setStripePublishableKey(data.publishableKey);
         }
       } catch (err: any) {
-        console.error('[CheckoutPage] Stripe init error:', err);
+        console.warn('[CheckoutPage] Stripe init background error:', err);
         if (isMounted) {
-          setErrorMessage(err.message || 'Unable to connect to payment gateway.');
+          setPaymentGatewayError('Payment gateway will connect during payment review.');
+          if (currentStep === 'payment') {
+            setErrorMessage('Unable to connect to payment gateway. Please retry.');
+          }
         }
       } finally {
         if (isMounted) {
           setIsInitializingStripe(false);
         }
       }
-    };
-
-    initIntent();
+    }, 350);
 
     return () => {
       isMounted = false;
+      clearTimeout(timer);
     };
-  }, [finalTotal]);
+  }, [finalTotal, shippingTier, province, zip]);
 
   // Validation before Stripe confirms payment
   const validateCheckoutForm = (): string | null => {
@@ -289,6 +371,7 @@ export const CheckoutPage: React.FC = () => {
         shippingTier,
         customerIsTaxExempt,
         taxExemptionCertificate,
+        couponCode: appliedCoupon?.code,
         cart,
       }));
     } catch { }
@@ -313,6 +396,7 @@ export const CheckoutPage: React.FC = () => {
       const activeShippingTier = overrideData?.shippingTier || shippingTier;
       const activeIsTaxExempt = overrideData?.customerIsTaxExempt !== undefined ? overrideData.customerIsTaxExempt : customerIsTaxExempt;
       const activeTaxCert = overrideData?.taxExemptionCertificate || taxExemptionCertificate;
+      const activeCouponCode = overrideData?.couponCode || appliedCoupon?.code;
       const activeCart = (overrideData?.cart && overrideData.cart.length > 0) ? overrideData.cart : cart;
 
       const itemsPayload = activeCart.map((item: any) => ({
@@ -342,6 +426,7 @@ export const CheckoutPage: React.FC = () => {
           shippingTier: activeShippingTier,
           customerIsTaxExempt: activeIsTaxExempt,
           taxExemptionCertificate: activeTaxCert,
+          couponCode: activeCouponCode,
           items: itemsPayload,
           paymentIntentId: confirmedIntentId,
           paymentToken: confirmedIntentId,
@@ -665,24 +750,30 @@ export const CheckoutPage: React.FC = () => {
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <label className="block text-xs font-bold uppercase tracking-wider text-medical-text/80 mb-1">
+                        <label htmlFor="checkout-state-select" className="block text-xs font-bold uppercase tracking-wider text-medical-text/80 mb-1">
                           State *
                         </label>
-                        <input
-                          type="text"
+                        <select
+                          id="checkout-state-select"
                           required
                           value={province}
-                          onChange={(e) => setProvince(e.target.value.toUpperCase())}
-                          placeholder="DE"
-                          maxLength={2}
-                          className="w-full rounded-xl border border-medical-light bg-[#fbfaf8] px-4 py-3 text-sm text-medical-dark focus:border-medical-primary focus:bg-white focus:outline-none"
-                        />
+                          onChange={(e) => setProvince(e.target.value)}
+                          className="w-full rounded-xl border border-medical-light bg-[#fbfaf8] px-4 py-3 text-sm font-medium text-medical-dark focus:border-medical-primary focus:bg-white focus:outline-none cursor-pointer"
+                        >
+                          <option value="">Select State</option>
+                          {US_STATES.map((st) => (
+                            <option key={st.code} value={st.code}>
+                              {st.name} ({st.code})
+                            </option>
+                          ))}
+                        </select>
                       </div>
                       <div>
-                        <label className="block text-xs font-bold uppercase tracking-wider text-medical-text/80 mb-1">
+                        <label htmlFor="checkout-zip-input" className="block text-xs font-bold uppercase tracking-wider text-medical-text/80 mb-1">
                           ZIP *
                         </label>
                         <input
+                          id="checkout-zip-input"
                           type="text"
                           required
                           value={zip}
@@ -695,14 +786,15 @@ export const CheckoutPage: React.FC = () => {
 
                     {/* Tax-Exempt Healthcare Facility / Institutional Buyer */}
                     <div className="sm:col-span-2 mt-2 rounded-2xl border border-medical-light bg-slate-50/70 p-4 transition-all">
-                      <label className="flex items-start gap-3 cursor-pointer select-none">
+                      <div className="flex items-start gap-3 select-none">
                         <input
+                          id="tax-exempt-checkbox"
                           type="checkbox"
                           checked={customerIsTaxExempt}
                           onChange={(e) => setCustomerIsTaxExempt(e.target.checked)}
-                          className="mt-1 h-4 w-4 rounded border-slate-300 text-medical-primary focus:ring-medical-primary"
+                          className="mt-1 h-4 w-4 rounded border-slate-300 text-medical-primary focus:ring-medical-primary cursor-pointer shrink-0"
                         />
-                        <div className="flex-1">
+                        <label htmlFor="tax-exempt-checkbox" className="flex-1 cursor-pointer">
                           <div className="flex items-center gap-1.5 font-bold text-medical-dark text-sm">
                             <Building2 size={16} className="text-medical-primary" />
                             <span>Tax-Exempt Healthcare Facility / Hospital / 501(c)(3)</span>
@@ -710,16 +802,17 @@ export const CheckoutPage: React.FC = () => {
                           <p className="text-xs text-medical-text/70 mt-0.5">
                             Check this box if your organization holds a valid State Resale Certificate, Direct Pay Permit, or Federal Tax Exemption Certificate.
                           </p>
-                        </div>
-                      </label>
+                        </label>
+                      </div>
 
                       {customerIsTaxExempt && (
                         <div className="mt-3.5 pt-3 border-t border-slate-200/80">
-                          <label className="block text-xs font-bold uppercase tracking-wider text-medical-text/80 mb-1">
+                          <label htmlFor="tax-exempt-cert-input" className="block text-xs font-bold uppercase tracking-wider text-medical-text/80 mb-1">
                             State Exemption Certificate Number / Federal EIN *
                           </label>
                           <div className="relative">
                             <input
+                              id="tax-exempt-cert-input"
                               type="text"
                               value={taxExemptionCertificate}
                               onChange={(e) => setTaxExemptionCertificate(e.target.value)}
@@ -892,6 +985,15 @@ export const CheckoutPage: React.FC = () => {
                   <span className="rounded bg-slate-100 px-2 py-0.5 font-medium text-slate-700">FSA / HSA Card</span>
                 </div>
 
+                {paymentGatewayError && !stripeClientSecret && (
+                  <div className="mb-4 flex items-center justify-between rounded-xl border border-amber-200 bg-amber-50 p-3.5 text-xs text-amber-900">
+                    <div className="flex items-center gap-2">
+                      <AlertCircle size={16} className="text-amber-600 shrink-0" />
+                      <span>{paymentGatewayError}</span>
+                    </div>
+                  </div>
+                )}
+
                 <StripePaymentSection
                   publishableKey={stripePublishableKey}
                   clientSecret={stripeClientSecret}
@@ -952,12 +1054,88 @@ export const CheckoutPage: React.FC = () => {
                 ))}
               </div>
 
+              {/* Promotional / Coupon Code Section */}
+              <div className="mt-4 border-t border-medical-light pt-4">
+                {appliedCoupon ? (
+                  <div className="flex items-center justify-between rounded-xl border border-emerald-200 bg-emerald-50/70 p-3 text-xs">
+                    <div className="flex items-center gap-2">
+                      <Tag size={16} className="text-emerald-600 shrink-0" />
+                      <div>
+                        <span className="font-bold text-emerald-900 tracking-wide uppercase">{appliedCoupon.code}</span>
+                        <span className="ml-1 text-emerald-700">
+                          ({appliedCoupon.type === 'percentage' ? `${appliedCoupon.value}% OFF` : `$${appliedCoupon.value.toFixed(2)} OFF`})
+                        </span>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleRemoveCoupon}
+                      className="font-bold text-rose-600 hover:text-rose-800 text-xs px-2 py-1 rounded hover:bg-rose-50 transition"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-1.5">
+                    <label htmlFor="promo-code-input" className="block text-xs font-bold uppercase tracking-wider text-medical-text/80">
+                      Promo / Coupon Code
+                    </label>
+                    <div className="flex gap-2">
+                      <div className="relative flex-1">
+                        <input
+                          id="promo-code-input"
+                          type="text"
+                          value={couponInput}
+                          onChange={(e) => {
+                            setCouponInput(e.target.value.toUpperCase());
+                            setCouponError('');
+                            setCouponSuccess('');
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              handleApplyCoupon();
+                            }
+                          }}
+                          placeholder="e.g. WELCOME10"
+                          className="w-full rounded-xl border border-medical-light bg-[#fbfaf8] px-3.5 py-2.5 text-xs font-semibold text-medical-dark uppercase placeholder:normal-case placeholder:font-normal focus:border-medical-primary focus:bg-white focus:outline-none"
+                        />
+                        <Tag size={14} className="absolute right-3 top-3 text-slate-400" />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleApplyCoupon}
+                        disabled={!couponInput.trim() || isApplyingCoupon}
+                        className="rounded-xl bg-slate-900 px-4 py-2.5 text-xs font-bold text-white hover:bg-medical-primary disabled:opacity-40 transition shrink-0"
+                      >
+                        {isApplyingCoupon ? 'Applying...' : 'Apply'}
+                      </button>
+                    </div>
+                    {couponError && (
+                      <p className="text-[11px] text-rose-600 font-medium">{couponError}</p>
+                    )}
+                    {couponSuccess && (
+                      <p className="text-[11px] text-emerald-700 font-medium">{couponSuccess}</p>
+                    )}
+                  </div>
+                )}
+              </div>
+
               {/* Calculations */}
               <div className="mt-4 space-y-2.5 border-t border-medical-light pt-4 text-sm text-medical-text/80">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
                   <span className="font-semibold text-medical-dark">${cartTotal.toFixed(2)}</span>
                 </div>
+                {appliedCoupon && (
+                  <div className="flex justify-between text-emerald-700 font-medium">
+                    <span className="flex items-center gap-1">
+                      <Tag size={13} className="text-emerald-600" />
+                      <span>Discount ({appliedCoupon.code})</span>
+                    </span>
+                    <span className="font-bold">-${appliedCoupon.discountAmount.toFixed(2)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between">
                   <span>Shipping</span>
                   <span className="font-semibold text-medical-dark">
