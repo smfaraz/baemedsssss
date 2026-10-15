@@ -18,6 +18,7 @@ const HOP_BY_HOP_HEADERS = new Set([
   'trailer',
   'transfer-encoding',
   'upgrade',
+  'content-length',
 ]);
 
 export function createVercelHandler(fetchHandler: FetchHandler) {
@@ -61,12 +62,17 @@ export function createVercelHandler(fetchHandler: FetchHandler) {
 
       const headers = new Headers();
       for (const [key, value] of Object.entries(req.headers || {})) {
-        if (value !== undefined && !HOP_BY_HOP_HEADERS.has(key.toLowerCase())) {
+        if (!key || key.startsWith(':')) continue; // Skip HTTP/2 pseudo-headers like :path, :method, :authority
+        const lowerKey = key.toLowerCase();
+        if (HOP_BY_HOP_HEADERS.has(lowerKey)) continue;
+        try {
           if (Array.isArray(value)) {
             value.forEach((v) => headers.append(key, v));
-          } else {
+          } else if (value !== undefined) {
             headers.set(key, String(value));
           }
+        } catch {
+          // Ignore invalid header values rather than failing the entire request
         }
       }
 
