@@ -927,65 +927,83 @@ async function handleCheckoutWeb(request: Request): Promise<Response> {
 
       const totalAmount = Number(Math.max(0, calculatedSubtotal - discountAmount + shippingAmount + taxAmount).toFixed(2));
 
-      // Server-Authoritative Stripe PaymentIntent Verification
-      const paymentIntentId = body.paymentIntentId || body.paymentToken;
+      // Server-Authoritative Stripe PaymentIntent Verification (Fail-Closed)
+      const paymentIntentId = (body.paymentIntentId || body.paymentToken || '').toString().trim();
       const stripeSecretKey = (process.env.STRIPE_SECRET_KEY || '').trim();
-      let determinedStatus = 'PAID';
-      let determinedPaymentStatus = 'paid';
 
-      if (paymentIntentId && !paymentIntentId.startsWith('pi_mock_') && stripeSecretKey && !stripeSecretKey.includes('placeholder')) {
-        try {
-          const Stripe = (await import('stripe')).default;
-          const stripe = new Stripe(stripeSecretKey, { apiVersion: '2025-02-24.acacia' as any });
-          const intent = await stripe.paymentIntents.retrieve(paymentIntentId);
+      // Invariant: Status initializes to PENDING / unpaid - NEVER to PAID
+      let determinedStatus = 'PENDING';
+      let determinedPaymentStatus = 'unpaid';
 
-          // 1. Verify Payment Intent status
-          if (!['succeeded', 'requires_capture', 'processing'].includes(intent.status)) {
-            throw new ApiError(402, `Payment not completed. Stripe payment intent status is '${intent.status}'. Order cannot be placed in unpaid state.`);
-          }
+      // 1. Mandatory PaymentIntent identifier check
+      if (!paymentIntentId) {
+        throw new ApiError(400, 'PaymentIntent identifier is required. Checkout cannot proceed without verified payment.');
+      }
 
-          // Invariant: Uncaptured authorizations and pending processing payments must NOT be marked PAID
-          if (intent.status === 'requires_capture') {
-            determinedStatus = 'AUTHORIZED';
-            determinedPaymentStatus = 'authorized';
-          } else if (intent.status === 'processing') {
-            determinedStatus = 'PENDING';
-            determinedPaymentStatus = 'pending';
-          } else {
-            determinedStatus = 'PAID';
-            determinedPaymentStatus = 'paid';
-          }
+      // 2. Reject mock payment identifiers in production/staging checkout
+      if (paymentIntentId.startsWith('pi_mock_')) {
+        throw new ApiError(400, 'Invalid PaymentIntent identifier. Mock payment identifiers are strictly prohibited.');
+      }
 
-          // 2. Anti-tampering check: verify paid amount matches authoritative order total exactly
-          const expectedCents = Math.round(totalAmount * 100);
-          if (intent.amount !== expectedCents) {
-            const mismatchType = intent.amount < expectedCents ? 'underpaid' : 'overpaid';
-            throw new ApiError(400, `Payment amount mismatch (${mismatchType}). Order total is $${totalAmount.toFixed(2)} (${expectedCents}¢), but PaymentIntent was authorized for $${(intent.amount / 100).toFixed(2)} (${intent.amount}¢).`);
-          }
+      // 3. Mandatory Stripe server secret key check (Fail-Closed)
+      if (!stripeSecretKey || stripeSecretKey.includes('placeholder')) {
+        throw new ApiError(503, 'Payment gateway configuration is missing or unusable on server. Fail-closed.');
+      }
 
-          // 3. Verify currency
-          if ((intent.currency || '').toLowerCase() !== 'usd') {
-            throw new ApiError(400, `Payment currency mismatch. Expected USD, got ${(intent.currency || '').toUpperCase()}.`);
-          }
+      // 4. Server-to-server authoritative retrieval directly from Stripe
+      let intent: any;
+      try {
+        const Stripe = (await import('stripe')).default;
+        const stripe = new Stripe(stripeSecretKey, { apiVersion: '2025-02-24.acacia' as any });
+        intent = await stripe.paymentIntents.retrieve(paymentIntentId);
+      } catch (stripeErr: any) {
+        if (stripeErr instanceof ApiError) throw stripeErr;
+        throw new ApiError(400, `Stripe payment retrieval failed: ${stripeErr?.message || 'PaymentIntent could not be retrieved.'}`);
+      }
 
-          // 4. Anti-replay check: ensure PaymentIntent is not already consumed by another order
-          try {
-            const { data: existingOrder } = await adminSupabase
-              .from('orders')
-              .select('id, order_number')
-              .eq('payment_intent_id', paymentIntentId)
-              .maybeSingle();
+      if (!intent || !intent.status) {
+        throw new ApiError(400, 'PaymentIntent could not be authoritatively verified by Stripe.');
+      }
 
-            if (existingOrder) {
-              throw new ApiError(409, `PaymentIntent ${paymentIntentId} has already been consumed for order #${existingOrder.order_number}.`);
-            }
-          } catch (dbCheckErr) {
-            if (dbCheckErr instanceof ApiError) throw dbCheckErr;
-          }
-        } catch (stripeErr) {
-          if (stripeErr instanceof ApiError) throw stripeErr;
-          throw new ApiError(400, `Stripe payment validation failed: ${stripeErr.message}`);
-        }
+      // 5. Authoritative PaymentIntent lifecycle status mapping
+      if (intent.status === 'succeeded') {
+        determinedStatus = 'PAID';
+        determinedPaymentStatus = 'paid';
+      } else if (intent.status === 'requires_capture') {
+        determinedStatus = 'AUTHORIZED';
+        determinedPaymentStatus = 'authorized';
+      } else if (intent.status === 'processing') {
+        determinedStatus = 'PENDING';
+        determinedPaymentStatus = 'pending';
+      } else {
+        throw new ApiError(402, `Payment not completed. Stripe payment intent status is '${intent.status}'. Order cannot be placed in unpaid or incomplete state.`);
+      }
+
+      // 6. Anti-tampering check: verify paid amount matches authoritative order total exactly
+      const expectedCents = Math.round(totalAmount * 100);
+      if (intent.amount !== expectedCents) {
+        const mismatchType = intent.amount < expectedCents ? 'underpaid' : 'overpaid';
+        throw new ApiError(400, `Payment amount mismatch (${mismatchType}). Order total is $${totalAmount.toFixed(2)} (${expectedCents}¢), but PaymentIntent was authorized for $${(intent.amount / 100).toFixed(2)} (${intent.amount}¢).`);
+      }
+
+      // 7. Verify currency
+      if ((intent.currency || '').toLowerCase() !== 'usd') {
+        throw new ApiError(400, `Payment currency mismatch. Expected USD, got ${(intent.currency || '').toUpperCase()}.`);
+      }
+
+      // 8. Anti-replay check: ensure PaymentIntent is not already consumed by another order
+      const { data: existingOrder, error: dbCheckErr } = await adminSupabase
+        .from('orders')
+        .select('id, order_number')
+        .eq('payment_intent_id', paymentIntentId)
+        .maybeSingle();
+
+      if (dbCheckErr) {
+        throw new ApiError(500, `Database error during payment replay verification: ${dbCheckErr.message}`);
+      }
+
+      if (existingOrder) {
+        throw new ApiError(409, `PaymentIntent ${paymentIntentId} has already been consumed for order #${existingOrder.order_number}.`);
       }
 
       // Order generation
@@ -1043,40 +1061,49 @@ async function handleCheckoutWeb(request: Request): Promise<Response> {
         created_at: new Date().toISOString(),
       };
 
-      // Server-authoritative in-memory persistence (syncs live to admin and customer accounts)
-      recordFirstPartyOrder(firstPartyOrder);
+      // Durable database persistence with database-enforced unique constraint
+      const { error: orderInsertError } = await adminSupabase.from('orders').insert({
+        id: orderId,
+        order_number: orderNumber,
+        customer_email: email,
+        status: determinedStatus,
+        payment_status: determinedPaymentStatus,
+        payment_intent_id: paymentIntentId,
+        currency: 'USD',
+        subtotal_amount: calculatedSubtotal,
+        tax_amount: taxAmount,
+        shipping_amount: shippingAmount,
+        discount_amount: discountAmount,
+        total_amount: totalAmount,
+        requires_prescription: orderRequiresPrescription,
+        shipping_address: firstPartyOrder.shipping_address,
+        billing_address: firstPartyOrder.billing_address,
+        shipping_method: shippingMethod,
+      });
 
-      // Async write to Supabase if database available
-      try {
-        const { error: orderInsertError } = await adminSupabase.from('orders').insert({
-          id: orderId,
-          order_number: orderNumber,
-          customer_email: email,
-          status: determinedStatus,
-          payment_status: determinedPaymentStatus,
-          payment_intent_id: paymentIntentId,
-          currency: 'USD',
-          subtotal_amount: calculatedSubtotal,
-          tax_amount: taxAmount,
-          shipping_amount: shippingAmount,
-          discount_amount: discountAmount,
-          total_amount: totalAmount,
-          requires_prescription: orderRequiresPrescription,
-          shipping_address: firstPartyOrder.shipping_address,
-          billing_address: firstPartyOrder.billing_address,
-          shipping_method: shippingMethod,
-        });
-
-        if (!orderInsertError) {
-          const formattedItems = orderItems.map((item) => ({
-            ...item,
-            order_id: orderId,
-          }));
-          await adminSupabase.from('order_items').insert(formattedItems);
+      if (orderInsertError) {
+        if (
+          orderInsertError.code === '23505' ||
+          orderInsertError.message?.toLowerCase().includes('duplicate key') ||
+          orderInsertError.message?.toLowerCase().includes('unique constraint')
+        ) {
+          throw new ApiError(409, `PaymentIntent ${paymentIntentId} has already been consumed (concurrent transaction detected).`);
         }
-      } catch (dbErr) {
-        // Resilient fallback: order is securely retained in server store
+        throw new ApiError(500, `Database error during order persistence: ${orderInsertError.message}`);
       }
+
+      // Persist order items
+      const formattedItems = orderItems.map((item) => ({
+        ...item,
+        order_id: orderId,
+      }));
+      const { error: itemsInsertError } = await adminSupabase.from('order_items').insert(formattedItems);
+      if (itemsInsertError) {
+        console.warn('[checkout] Order items persistence warning:', itemsInsertError.message);
+      }
+
+      // Only record in-memory order AFTER durable database persistence succeeds
+      recordFirstPartyOrder(firstPartyOrder);
 
       // Automated Transactional Email Dispatch (Customer Receipt + McKesson Drop-Ship PO Alert)
       try {

@@ -92,7 +92,9 @@ export class PostgresEngine {
         order_number text unique not null,
         user_id uuid,
         customer_email text not null,
-        status text not null default 'PAID',
+        status text not null default 'PENDING',
+        payment_status text not null default 'unpaid',
+        payment_intent_id text,
         currency text not null default 'USD',
         subtotal_amount numeric(10,2) not null check (subtotal_amount >= 0),
         tax_amount numeric(10,2) not null default 0.00 check (tax_amount >= 0),
@@ -110,6 +112,11 @@ export class PostgresEngine {
         created_at timestamptz not null default now(),
         updated_at timestamptz not null default now()
       );
+
+      CREATE UNIQUE INDEX IF NOT EXISTS orders_payment_intent_id_unique_idx 
+        ON public.orders (payment_intent_id) 
+        WHERE payment_intent_id IS NOT NULL;
+
 
       CREATE TABLE IF NOT EXISTS public.order_items (
         id text primary key default ('oit_' || replace(gen_random_uuid()::text, '-', '')),

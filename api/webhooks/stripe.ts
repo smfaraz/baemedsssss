@@ -75,8 +75,8 @@ async function handleWebhookWeb(request: Request): Promise<Response> {
           }
 
           // Anti-regression: Do not overwrite cancelled or refunded orders
-          if (['CANCELLED', 'REFUNDED'].includes(order.status)) {
-            console.warn(`[Stripe Webhook] Order ${orderNumber} is already ${order.status}. Skipping PAID transition.`);
+          if (['CANCELLED', 'REFUNDED', 'PARTIALLY_REFUNDED'].includes(order.status)) {
+            console.warn(`[Stripe Webhook] Order ${orderNumber} is already in terminal state ${order.status}. Skipping PAID transition.`);
             break;
           }
 
@@ -224,7 +224,19 @@ async function handleWebhookWeb(request: Request): Promise<Response> {
 
       if (paymentIntentId) {
         try {
+          const { data: currentOrder } = await supabase
+            .from('orders')
+            .select('status')
+            .eq('payment_intent_id', paymentIntentId)
+            .maybeSingle();
+
           const isFullRefund = charge.refunded;
+          // Invariant: Do not demote an already fully REFUNDED order to PARTIALLY_REFUNDED
+          if (!isFullRefund && currentOrder?.status === 'REFUNDED') {
+            console.warn(`[Stripe Webhook] Order is already fully REFUNDED. Skipping partial refund status downgrade.`);
+            break;
+          }
+
           await supabase
             .from('orders')
             .update({
