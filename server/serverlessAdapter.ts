@@ -123,6 +123,7 @@ export function createVercelHandler(fetchHandler: FetchHandler) {
 
         const buffer = Buffer.from(await response.arrayBuffer());
         res.end(buffer);
+        return;
       }
       return response;
     } catch (err: any) {
