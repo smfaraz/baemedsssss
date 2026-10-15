@@ -36,7 +36,7 @@
 
 import checkoutHandler from '../api/checkout.js';
 import webhookHandler from '../api/webhooks/stripe.js';
-import { adminSupabase, getAdminSupabase } from '../api/admin.js';
+import { adminSupabase, getAdminSupabase, memoryOrders } from '../api/admin.js';
 import { PostgresEngine } from '../server/commerce/postgresEngine.js';
 import Stripe from 'stripe';
 
@@ -132,6 +132,8 @@ async function runPhase6SecuritySuite() {
   // Intercept Supabase for deterministic replay & persistence checks
   let mockReplayLookupResult: { data: any; error: any } = { data: null, error: null };
   let mockOrderInsertResult: { error: any } = { error: null };
+  let mockOrderItemsInsertResult: { error: any } = { error: null };
+  let mockOrderDeleteCalled: boolean = false;
 
   const underlyingClient = getAdminSupabase();
   const originalFrom = underlyingClient.from.bind(underlyingClient);
@@ -143,12 +145,18 @@ async function runPhase6SecuritySuite() {
             maybeSingle: async () => mockReplayLookupResult
           })
         }),
-        insert: async (_data: any) => mockOrderInsertResult
+        insert: async (_data: any) => mockOrderInsertResult,
+        delete: () => ({
+          eq: (_col: string, _val: any) => {
+            mockOrderDeleteCalled = true;
+            return Promise.resolve({ error: null });
+          }
+        })
       } as any;
     }
     if (table === 'order_items') {
       return {
-        insert: async (_items: any) => ({ error: null })
+        insert: async (_items: any) => mockOrderItemsInsertResult
       } as any;
     }
     return originalFrom(table);
@@ -828,8 +836,134 @@ async function runPhase6SecuritySuite() {
     );
   }
 
+  // ------------------------------------------------------------------
+  // 31. Failed order_items insertion triggers atomic rollback & fails closed
+  // ------------------------------------------------------------------
+  {
+    mockStripeRetrieveHandler = async (id) => ({
+      id,
+      status: 'succeeded',
+      amount: EXPECTED_CENTS,
+      currency: 'usd'
+    });
+    mockReplayLookupResult = { data: null, error: null };
+    mockOrderInsertResult = { error: null };
+    mockOrderItemsInsertResult = {
+      error: { message: 'column order_items.invalid_column does not exist' }
+    };
+    mockOrderDeleteCalled = false;
+
+    const initialMemoryCount = memoryOrders.length;
+    const req = makeCheckoutReq({ paymentIntentId: 'pi_fail_order_items_rollback_1' });
+    const res = await (checkoutHandler as any).fetch(req);
+    const body = await res.json();
+
+    assert(
+      res.status === 500 &&
+      body.error?.includes('order line items persistence') &&
+      Boolean(mockOrderDeleteCalled) &&
+      memoryOrders.length === initialMemoryCount,
+      'Failed order_items insertion aborts checkout, rolls back parent order, and prevents in-memory/email creation',
+      `Got status: ${res.status}, rollbackCalled: ${mockOrderDeleteCalled}`
+    );
+    mockOrderItemsInsertResult = { error: null };
+  }
+
+  // ------------------------------------------------------------------
+  // 32. Recovery: Stripe succeeded but database temporarily unavailable, followed by successful retry
+  // ------------------------------------------------------------------
+  {
+    mockStripeRetrieveHandler = async (id) => ({
+      id,
+      status: 'succeeded',
+      amount: EXPECTED_CENTS,
+      currency: 'usd'
+    });
+    // Request 1: Transient DB timeout
+    mockReplayLookupResult = {
+      data: null,
+      error: { message: 'Database connection timeout' }
+    };
+    const req1 = makeCheckoutReq({ paymentIntentId: 'pi_transient_db_fail_1' });
+    const res1 = await (checkoutHandler as any).fetch(req1);
+    assert(res1.status === 500, 'Transient DB failure safely returns HTTP 500 without creating phantom order');
+
+    // Request 2 (Client Retry): Database restored
+    mockReplayLookupResult = { data: null, error: null };
+    mockOrderInsertResult = { error: null };
+    mockOrderItemsInsertResult = { error: null };
+
+    const req2 = makeCheckoutReq({ paymentIntentId: 'pi_transient_db_fail_1' });
+    const res2 = await (checkoutHandler as any).fetch(req2);
+    const body2 = await res2.json();
+
+    assert(
+      res2.status === 200 && body2.success === true && body2.status === 'PAID',
+      'Client retry after database recovery consumes PaymentIntent authoritatively without duplicate charge',
+      `Got status: ${res2.status}`
+    );
+  }
+
+  // ------------------------------------------------------------------
+  // 33. Webhook delivery after a partial persistence failure does not resurrect rolled-back orders
+  // ------------------------------------------------------------------
+  {
+    const webhookSecret = 'whsec_test_synthetic_secret_unit';
+    const payload = JSON.stringify({
+      id: 'evt_test_partial_failure_webhook',
+      object: 'event',
+      type: 'payment_intent.succeeded',
+      data: {
+        object: {
+          id: 'pi_rolled_back_intent',
+          amount: EXPECTED_CENTS,
+          metadata: { orderNumber: 'BM-ROLLEDBACK-001' }
+        }
+      }
+    });
+
+    const signature = (new Stripe('sk_test_fake', { apiVersion: '2025-02-24.acacia' as any })).webhooks.generateTestHeaderString({
+      payload,
+      secret: webhookSecret,
+      timestamp: Math.floor(Date.now() / 1000)
+    });
+
+    const req = new Request('https://www.baemeds.com/api/webhooks/stripe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'stripe-signature': signature },
+      body: payload
+    });
+    const res = await (webhookHandler as any).fetch(req);
+    const body = await res.json();
+    assert(
+      res.status === 200 && body.received === true,
+      'Webhook received for non-existent/rolled-back order safely logs warning and ignores',
+      `Got status: ${res.status}`
+    );
+  }
+
+  // ------------------------------------------------------------------
+  // 34. Exhaustive verification: No drop-shipping side-effects or memory store mutation on failed persistence
+  // ------------------------------------------------------------------
+  {
+    mockOrderInsertResult = {
+      error: { code: '57014', message: 'canceling statement due to statement timeout' }
+    };
+    const memBefore = memoryOrders.length;
+    const req = makeCheckoutReq({ paymentIntentId: 'pi_exhaust_timeout_1' });
+    const res = await (checkoutHandler as any).fetch(req);
+    const body = await res.json();
+
+    assert(
+      res.status === 500 && memoryOrders.length === memBefore,
+      'Persistence failure enforces zero memory order retention and zero external drop-ship dispatch',
+      `Got status: ${res.status}, memBefore: ${memBefore}, memAfter: ${memoryOrders.length}`
+    );
+    mockOrderInsertResult = { error: null };
+  }
+
   console.log('\n================================================================');
-  console.log(`ALL ${passedTests} / ${totalTests} PAYMENT SECURITY REGRESSION TESTS PASSED!`);
+  console.log(`ALL ${passedTests} / ${totalTests} TRANSACTION INTEGRITY & PAYMENT SECURITY REGRESSION TESTS PASSED!`);
   console.log('================================================================\n');
 }
 

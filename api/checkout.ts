@@ -1099,10 +1099,16 @@ async function handleCheckoutWeb(request: Request): Promise<Response> {
       }));
       const { error: itemsInsertError } = await adminSupabase.from('order_items').insert(formattedItems);
       if (itemsInsertError) {
-        console.warn('[checkout] Order items persistence warning:', itemsInsertError.message);
+        // Rollback created parent order to prevent orphan records with missing items
+        try {
+          await adminSupabase.from('orders').delete().eq('id', orderId);
+        } catch (rollbackErr: any) {
+          console.error('[checkout] Failed to rollback parent order after line-items failure:', rollbackErr?.message);
+        }
+        throw new ApiError(500, `Database error during order line items persistence: ${itemsInsertError.message}`);
       }
 
-      // Only record in-memory order AFTER durable database persistence succeeds
+      // Only record in-memory order AFTER both order and items are durably persisted
       recordFirstPartyOrder(firstPartyOrder);
 
       // Automated Transactional Email Dispatch (Customer Receipt + McKesson Drop-Ship PO Alert)
