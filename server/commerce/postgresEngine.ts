@@ -131,7 +131,7 @@ export class PostgresEngine {
     // 2. Read and apply the transactional inventory ledger migration
     let migrationPath = path.resolve(process.cwd(), 'supabase/migrations/20261001080000_inventory_ledger_and_atomic_transactions.sql');
     if (!fs.existsSync(migrationPath)) {
-      const dirname = path.dirname(fileURLToPath(import.meta.url));
+      const dirname = typeof __dirname !== 'undefined' ? __dirname : process.cwd();
       migrationPath = path.resolve(dirname, '../../supabase/migrations/20261001080000_inventory_ledger_and_atomic_transactions.sql');
     }
 

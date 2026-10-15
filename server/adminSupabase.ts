@@ -15,9 +15,6 @@ const getEnvVar = (name: string): string | undefined => {
   if (typeof process !== 'undefined' && process.env && process.env[name]) {
     return process.env[name];
   }
-  if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env[name]) {
-    return import.meta.env[name];
-  }
   return undefined;
 };
 
