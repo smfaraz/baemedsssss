@@ -69,8 +69,12 @@
   ],
   "rewrites": [
     {
-      "source": "/api/admin/((?!login).*)$",
-      "destination": "/api/admin?subpath=$1"
+      "source": "/api/admin/login",
+      "destination": "/api/admin/login"
+    },
+    {
+      "source": "/api/admin/:subpath*",
+      "destination": "/api/admin?subpath=:subpath*"
     },
     {
       "source": "/api/v1/:subpath*",
