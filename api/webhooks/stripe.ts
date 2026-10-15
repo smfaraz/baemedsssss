@@ -1,9 +1,24 @@
-import Stripe from 'stripe';
-import { json } from '../../server/commerceCore';
-import { adminSupabase } from '../../server/adminSupabase';
-import { createVercelHandler } from '../../server/serverlessAdapter';
+/**
+ * BaeMeds Stripe Webhook Gateway
+ * Authoritative payment status synchronization and idempotency handler.
+ * Self-contained serverless module with zero external relative imports.
+ */
 
-export default createVercelHandler(async (request: Request) => {
+if (typeof globalThis !== 'undefined' && !(globalThis as any).WebSocket) {
+  (globalThis as any).WebSocket = class WebSocket {};
+}
+
+import Stripe from 'stripe';
+import { adminSupabase } from '../admin';
+
+const json = (value: unknown, status = 200, headers?: HeadersInit) => {
+  const responseHeaders = new Headers(headers);
+  responseHeaders.set('Cache-Control', 'no-store, max-age=0');
+  responseHeaders.set('Content-Type', 'application/json; charset=utf-8');
+  return new Response(JSON.stringify(value), { status, headers: responseHeaders });
+};
+
+async function handleWebhookWeb(request: Request): Promise<Response> {
   if (request.method !== 'POST') {
     return json({ error: 'Method not allowed.' }, 405, { Allow: 'POST' });
   }
@@ -65,4 +80,62 @@ export default createVercelHandler(async (request: Request) => {
   }
 
   return json({ received: true });
-});
+}
+
+export default async function handler(req: any, res?: any) {
+  if (req instanceof Request || (!res && typeof req.text === 'function')) {
+    return handleWebhookWeb(req);
+  }
+
+  try {
+    const rawProto = req.headers && req.headers['x-forwarded-proto'];
+    const protocol = (Array.isArray(rawProto) ? rawProto[0] : (rawProto || '').split(',')[0].trim()) || 'https';
+    const rawHost = req.headers && (req.headers['x-forwarded-host'] || req.headers.host);
+    const host = (Array.isArray(rawHost) ? rawHost[0] : (rawHost || '').split(',')[0].trim()) || 'localhost';
+    const parsedUrl = new URL(req.url || '/', `${protocol}://${host}`);
+
+    const headers = new Headers();
+    for (const [key, value] of Object.entries(req.headers || {})) {
+      if (!key || key.startsWith(':') || key.toLowerCase() === 'content-length') continue;
+      try {
+        if (Array.isArray(value)) value.forEach((v) => headers.append(key, v));
+        else if (value !== undefined) headers.set(key, String(value));
+      } catch {}
+    }
+
+    let reqBody: any = undefined;
+    if (!['GET', 'HEAD'].includes((req.method || 'GET').toUpperCase())) {
+      if (req.body !== undefined && req.body !== null) {
+        reqBody = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
+      }
+    }
+
+    const webRequest = new Request(parsedUrl.href, {
+      method: req.method,
+      headers,
+      body: reqBody,
+    });
+
+    const webResponse = await handleWebhookWeb(webRequest);
+
+    if (res) {
+      res.statusCode = webResponse.status;
+      webResponse.headers.forEach((val, key) => {
+        if (key.toLowerCase() !== 'content-length') {
+          res.setHeader(key, val);
+        }
+      });
+      const text = await webResponse.text();
+      res.end(text);
+      return;
+    }
+  } catch (err: any) {
+    if (res && !res.headersSent) {
+      res.statusCode = 500;
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify({ error: err.message || 'Webhook processing error' }));
+    }
+  }
+}
+
+handler.fetch = handleWebhookWeb;

@@ -90,7 +90,13 @@ export default defineConfig(() => {
           output: {
             manualChunks(id) {
               if (id.includes('node_modules')) {
-                return 'vendor';
+                if (id.includes('@stripe')) {
+                  return 'vendor-stripe';
+                }
+                if (id.includes('@supabase')) {
+                  return 'vendor-supabase';
+                }
+                return 'vendor-core';
               }
             }
           }

@@ -2,10 +2,11 @@
  * BaeMeds Automated Marketing Feeds Engine
  * Generates standards-compliant Google Merchant Center XML (RSS 2.0 + g: namespace)
  * and Meta Product Catalog CSV feeds for BaeMeds USA Top 100 Hero and DME Products.
+ * 
+ * Standalone, self-contained serverless module with zero cross-directory imports.
  */
 
-import { supabase } from '../lib/supabase';
-import { createVercelHandler } from '../server/serverlessAdapter';
+import { adminSupabase } from './admin';
 
 const BASE_URL = 'https://www.baemeds.com';
 const BRAND = 'BaeMeds USA';
@@ -50,7 +51,7 @@ const getGoogleCategory = (cat: string): string => {
 
 async function getFeedProducts(heroesOnly = false) {
   try {
-    let query = supabase
+    let query = adminSupabase
       .from('products')
       .select('*')
       .eq('is_active', true);
@@ -67,36 +68,35 @@ async function getFeedProducts(heroesOnly = false) {
     console.warn('Fallback to local catalog for feeds:', e);
   }
 
-  // Fallback to empty if database is unreachable
   return [];
 }
 
-export default createVercelHandler(async (request: Request) => {
-    const url = new URL(request.url);
-    const pathname = url.pathname;
-    const heroesOnly = url.searchParams.get('heroes') === '1' || url.searchParams.get('heroes_only') === 'true';
+async function handleFeedsRequest(request: Request): Promise<Response> {
+  const url = new URL(request.url);
+  const pathname = url.pathname;
+  const heroesOnly = url.searchParams.get('heroes') === '1' || url.searchParams.get('heroes_only') === 'true';
 
-    const products = await getFeedProducts(heroesOnly);
+  const products = await getFeedProducts(heroesOnly);
 
-    // 1. Google Merchant Center XML (RSS 2.0)
-    if (pathname.includes('google') || pathname.endsWith('.xml')) {
-      const itemsXml = products.map((p: any) => {
-        const id = p.id;
-        const title = escapeXml(p.title);
-        const description = escapeXml(p.description || `${p.title} - Certified Durable Medical Equipment by BaeMeds USA.`);
-        const link = `${BASE_URL}/products/${p.handle || p.id}`;
-        const imageLink = p.featured_image || (Array.isArray(p.images) && p.images[0]) || `${BASE_URL}/placeholder-dme.jpg`;
-        const availability = (p.inventory_quantity ?? 25) > 0 ? 'in_stock' : 'out_of_stock';
-        const price = `${Number(p.price || 0).toFixed(2)} USD`;
-        const gpc = escapeXml(getGoogleCategory(p.category));
-        const brand = escapeXml(p.vendor || BRAND);
-        const mpn = escapeXml(p.sku || p.id);
-        const gtin = p.barcode ? `<g:gtin>${escapeXml(p.barcode)}</g:gtin>` : '';
-        const mckNum = p.mckesson_item_number ? `<g:custom_label_0>MCK_${escapeXml(p.mckesson_item_number)}</g:custom_label_0>` : '';
-        const heroTag = p.is_hero_product ? '<g:custom_label_1>TOP_100_HERO</g:custom_label_1>' : '<g:custom_label_1>STANDARD_CATALOG</g:custom_label_1>';
-        const hcpcsTag = p.hcpcs_code ? `<g:custom_label_2>HCPCS_${escapeXml(p.hcpcs_code)}</g:custom_label_2>` : '';
+  // 1. Google Merchant Center XML (RSS 2.0)
+  if (pathname.includes('google') || pathname.endsWith('.xml')) {
+    const itemsXml = products.map((p: any) => {
+      const id = p.id;
+      const title = escapeXml(p.title);
+      const description = escapeXml(p.description || `${p.title} - Certified Durable Medical Equipment by BaeMeds USA.`);
+      const link = `${BASE_URL}/products/${p.handle || p.id}`;
+      const imageLink = p.featured_image || (Array.isArray(p.images) && p.images[0]) || `${BASE_URL}/placeholder-dme.jpg`;
+      const availability = (p.inventory_quantity ?? 25) > 0 ? 'in_stock' : 'out_of_stock';
+      const price = `${Number(p.price || 0).toFixed(2)} USD`;
+      const gpc = escapeXml(getGoogleCategory(p.category));
+      const brand = escapeXml(p.vendor || BRAND);
+      const mpn = escapeXml(p.sku || p.id);
+      const gtin = p.barcode ? `<g:gtin>${escapeXml(p.barcode)}</g:gtin>` : '';
+      const mckNum = p.mckesson_item_number ? `<g:custom_label_0>MCK_${escapeXml(p.mckesson_item_number)}</g:custom_label_0>` : '';
+      const heroTag = p.is_hero_product ? '<g:custom_label_1>TOP_100_HERO</g:custom_label_1>' : '<g:custom_label_1>STANDARD_CATALOG</g:custom_label_1>';
+      const hcpcsTag = p.hcpcs_code ? `<g:custom_label_2>HCPCS_${escapeXml(p.hcpcs_code)}</g:custom_label_2>` : '';
 
-        return `
+      return `
     <item>
       <g:id>${id}</g:id>
       <g:title>${title}</g:title>
@@ -119,9 +119,9 @@ export default createVercelHandler(async (request: Request) => {
       ${heroTag}
       ${hcpcsTag}
     </item>`;
-      }).join('\n');
+    }).join('\n');
 
-      const xml = `<?xml version="1.0" encoding="UTF-8"?>
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">
   <channel>
     <title>BaeMeds USA - High-Quality Durable Medical Equipment</title>
@@ -131,73 +131,117 @@ export default createVercelHandler(async (request: Request) => {
   </channel>
 </rss>`;
 
-      return new Response(xml, {
-        headers: {
-          'Content-Type': 'application/xml; charset=utf-8',
-          'Cache-Control': 'public, max-age=3600, s-maxage=86400',
-        },
-      });
-    }
-
-    // 2. Meta (Facebook / Instagram) Catalog CSV Feed
-    if (pathname.includes('meta') || pathname.endsWith('.csv')) {
-      const headers = [
-        'id',
-        'title',
-        'description',
-        'availability',
-        'condition',
-        'price',
-        'link',
-        'image_link',
-        'brand',
-        'google_product_category',
-        'custom_label_0',
-        'custom_label_1',
-      ];
-
-      const rows = products.map((p: any) => {
-        const id = p.id;
-        const title = p.title;
-        const description = (p.description || `${p.title} - Professional Durable Medical Equipment`).slice(0, 5000);
-        const availability = (p.inventory_quantity ?? 25) > 0 ? 'in stock' : 'out of stock';
-        const condition = 'new';
-        const price = `${Number(p.price || 0).toFixed(2)} USD`;
-        const link = `${BASE_URL}/products/${p.handle || p.id}`;
-        const imageLink = p.featured_image || (Array.isArray(p.images) && p.images[0]) || `${BASE_URL}/placeholder-dme.jpg`;
-        const brand = p.vendor || BRAND;
-        const gpc = getGoogleCategory(p.category);
-        const heroTag = p.is_hero_product ? 'TOP_100_HERO' : 'STANDARD_CATALOG';
-        const mckTag = p.mckesson_item_number ? `MCK_${p.mckesson_item_number}` : '';
-
-        return [
-          escapeCsv(id),
-          escapeCsv(title),
-          escapeCsv(description),
-          escapeCsv(availability),
-          escapeCsv(condition),
-          escapeCsv(price),
-          escapeCsv(link),
-          escapeCsv(imageLink),
-          escapeCsv(brand),
-          escapeCsv(gpc),
-          escapeCsv(heroTag),
-          escapeCsv(mckTag),
-        ].join(',');
-      });
-
-      const csv = [headers.join(','), ...rows].join('\n');
-
-      return new Response(csv, {
-        headers: {
-          'Content-Type': 'text/csv; charset=utf-8',
-          'Cache-Control': 'public, max-age=3600, s-maxage=86400',
-        },
-      });
-    }
-
-    // Default: JSON format
-    return new Response(JSON.stringify({ count: products.length, products }), {
-      headers: { 'Content-Type': 'application/json' },
+    return new Response(xml, {
+      headers: {
+        'Content-Type': 'application/xml; charset=utf-8',
+        'Cache-Control': 'public, max-age=3600, s-maxage=86400',
+        'Access-Control-Allow-Origin': '*',
+      },
     });
-});
+  }
+
+  // 2. Meta (Facebook / Instagram) Catalog CSV Feed
+  if (pathname.includes('meta') || pathname.endsWith('.csv')) {
+    const headers = [
+      'id',
+      'title',
+      'description',
+      'availability',
+      'condition',
+      'price',
+      'link',
+      'image_link',
+      'brand',
+      'google_product_category',
+      'custom_label_0',
+      'custom_label_1',
+    ];
+
+    const rows = products.map((p: any) => {
+      const id = p.id;
+      const title = p.title;
+      const description = (p.description || `${p.title} - Professional Durable Medical Equipment`).slice(0, 5000);
+      const availability = (p.inventory_quantity ?? 25) > 0 ? 'in stock' : 'out of stock';
+      const condition = 'new';
+      const price = `${Number(p.price || 0).toFixed(2)} USD`;
+      const link = `${BASE_URL}/products/${p.handle || p.id}`;
+      const imageLink = p.featured_image || (Array.isArray(p.images) && p.images[0]) || `${BASE_URL}/placeholder-dme.jpg`;
+      const brand = p.vendor || BRAND;
+      const gpc = getGoogleCategory(p.category);
+      const heroTag = p.is_hero_product ? 'TOP_100_HERO' : 'STANDARD_CATALOG';
+      const mckTag = p.mckesson_item_number ? `MCK_${p.mckesson_item_number}` : '';
+
+      return [
+        escapeCsv(id),
+        escapeCsv(title),
+        escapeCsv(description),
+        escapeCsv(availability),
+        escapeCsv(condition),
+        escapeCsv(price),
+        escapeCsv(link),
+        escapeCsv(imageLink),
+        escapeCsv(brand),
+        escapeCsv(gpc),
+        escapeCsv(heroTag),
+        escapeCsv(mckTag),
+      ].join(',');
+    });
+
+    const csv = [headers.join(','), ...rows].join('\n');
+
+    return new Response(csv, {
+      headers: {
+        'Content-Type': 'text/csv; charset=utf-8',
+        'Cache-Control': 'public, max-age=3600, s-maxage=86400',
+        'Access-Control-Allow-Origin': '*',
+      },
+    });
+  }
+
+  // Default: JSON format
+  return new Response(JSON.stringify({ count: products.length, products }), {
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*',
+    },
+  });
+}
+
+export default async function handler(req: any, res?: any) {
+  if (req instanceof Request || (!res && typeof req?.text === 'function')) {
+    return await handleFeedsRequest(req);
+  }
+
+  try {
+    const rawProto = req.headers && req.headers['x-forwarded-proto'];
+    const protocol = (Array.isArray(rawProto) ? rawProto[0] : (rawProto || '').split(',')[0].trim()) || 'https';
+    const rawHost = req.headers && (req.headers['x-forwarded-host'] || req.headers.host);
+    const host = (Array.isArray(rawHost) ? rawHost[0] : (rawHost || '').split(',')[0].trim()) || 'localhost';
+    const url = new URL(req.url || '/', `${protocol}://${host}`);
+
+    const webRequest = new Request(url.href, {
+      method: req.method || 'GET',
+      headers: req.headers,
+    });
+
+    const webResponse = await handleFeedsRequest(webRequest);
+
+    if (res) {
+      res.statusCode = webResponse.status;
+      webResponse.headers.forEach((val, key) => {
+        res.setHeader(key, val);
+      });
+      const text = await webResponse.text();
+      res.end(text);
+      return;
+    }
+  } catch (err: any) {
+    if (res && !res.headersSent) {
+      res.statusCode = 500;
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify({ error: err.message || 'Feeds generation error' }));
+    }
+  }
+}
+
+handler.fetch = handleFeedsRequest;
