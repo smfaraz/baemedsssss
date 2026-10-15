@@ -4,15 +4,71 @@
  * RBAC authorization, and mutation auditing.
  */
 
-import '../server/polyfill';
-import {
-  ApiError,
-  errorResponse,
-  getSessionToken,
-  json,
-  readJson,
-  assertSameOrigin,
-} from '../server/commerce';
+export class ApiError extends Error {
+  status: number;
+  constructor(status: number, message: string) {
+    super(message);
+    this.status = status;
+  }
+}
+
+export const json = (value: unknown, status = 200, headers?: HeadersInit) => {
+  const responseHeaders = new Headers(headers);
+  responseHeaders.set('Cache-Control', 'no-store, max-age=0');
+  responseHeaders.set('Content-Type', 'application/json; charset=utf-8');
+  responseHeaders.set('X-Content-Type-Options', 'nosniff');
+  return new Response(JSON.stringify(value), { status, headers: responseHeaders });
+};
+
+export const errorResponse = (error: unknown) => {
+  if (error instanceof ApiError) return json({ error: error.message }, error.status);
+  return json({ error: 'The request could not be completed.' }, 500);
+};
+
+export const readJson = async <T>(request: Request): Promise<T> => {
+  const contentType = request.headers.get('content-type') || '';
+  if (!contentType.toLowerCase().startsWith('application/json')) {
+    throw new ApiError(415, 'JSON is required.');
+  }
+  try {
+    return (await request.json()) as T;
+  } catch {
+    throw new ApiError(400, 'The request body is invalid.');
+  }
+};
+
+export const getSessionToken = (request: Request) => {
+  const cookieHeader = request.headers.get('cookie') || '';
+  for (const part of cookieHeader.split(';')) {
+    const [name, ...valueParts] = part.trim().split('=');
+    if (name === '__Host-baemeds_session' || name === 'baemeds_session') {
+      return decodeURIComponent(valueParts.join('='));
+    }
+  }
+  return '';
+};
+
+export const assertSameOrigin = (request: Request) => {
+  const origin = request.headers.get('origin');
+  if (!origin) return;
+  try {
+    const originUrl = new URL(origin);
+    const requestUrl = new URL(request.url);
+    const isAllowed =
+      originUrl.origin === requestUrl.origin ||
+      originUrl.hostname === 'baemeds.com' ||
+      originUrl.hostname === 'www.baemeds.com' ||
+      originUrl.hostname.endsWith('.vercel.app') ||
+      originUrl.hostname === 'localhost' ||
+      originUrl.hostname === '127.0.0.1';
+    if (!isAllowed) {
+      throw new ApiError(403, 'The request origin was not accepted.');
+    }
+  } catch (e: any) {
+    if (e instanceof ApiError) throw e;
+    throw new ApiError(403, 'The request origin was not accepted.');
+  }
+};
 import {
   AdminService,
   AdminUser,

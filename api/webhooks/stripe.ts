@@ -1,5 +1,5 @@
 import Stripe from 'stripe';
-import { json } from '../../server/commerce';
+import { json } from '../../server/commerceCore';
 import { adminSupabase } from '../../server/adminSupabase';
 import { createVercelHandler } from '../../server/serverlessAdapter';
 

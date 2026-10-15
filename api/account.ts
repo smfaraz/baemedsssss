@@ -9,7 +9,7 @@ import {
   json,
   readJson,
   requireSessionToken,
-} from '../server/commerce';
+} from '../server/commerceCore';
 import {
   isValidUSState,
   isValidUSZip,
