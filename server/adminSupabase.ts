@@ -7,8 +7,6 @@
  * - Prescription review pipeline
  */
 
-import './polyfill';
-import { MockWebSocket } from './polyfill';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
 const getEnvVar = (name: string): string | undefined => {
@@ -35,9 +33,6 @@ export const getAdminSupabase = (): SupabaseClient => {
       auth: {
         persistSession: false,
         autoRefreshToken: false,
-      },
-      realtime: {
-        transport: MockWebSocket as any,
       },
     });
   }

@@ -559,8 +559,8 @@ export default async function handler(req: any, res?: any): Promise<any> {
           res.setHeader(key, val);
         }
       });
-      const buffer = Buffer.from(await webResponse.arrayBuffer());
-      res.end(buffer);
+      const text = await webResponse.text();
+      res.end(text);
       return;
     }
   } catch (err: any) {
