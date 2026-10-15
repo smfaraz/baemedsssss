@@ -1055,7 +1055,7 @@ async function handleCheckoutWeb(request: Request): Promise<Response> {
 
       // Order generation
       const orderNumber = `BM-${Date.now().toString().slice(-6)}-${Math.floor(Math.random() * 900 + 100)}`;
-      const orderId = `ord_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+      let orderId = `ord_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
 
       const firstPartyOrder = {
         id: orderId,
@@ -1108,8 +1108,8 @@ async function handleCheckoutWeb(request: Request): Promise<Response> {
         created_at: new Date().toISOString(),
       };
 
-      // Durable database persistence with database-enforced unique constraint
-      const { error: orderInsertError } = await adminSupabase.from('orders').insert({
+      // Prepare payload for atomic or compensatory order persistence
+      const orderPayload = {
         id: orderId,
         order_number: orderNumber,
         customer_email: email,
@@ -1126,33 +1126,109 @@ async function handleCheckoutWeb(request: Request): Promise<Response> {
         shipping_address: firstPartyOrder.shipping_address,
         billing_address: firstPartyOrder.billing_address,
         shipping_method: shippingMethod,
-      });
+        metadata: {
+          stripe_payment_intent_id: paymentIntentId,
+          stripe_verified_amount: totalAmount,
+          stripe_verified_cents: intent?.amount,
+        },
+      };
 
-      if (orderInsertError) {
-        if (
-          orderInsertError.code === '23505' ||
-          orderInsertError.message?.toLowerCase().includes('duplicate key') ||
-          orderInsertError.message?.toLowerCase().includes('unique constraint')
-        ) {
-          throw new ApiError(409, `PaymentIntent ${paymentIntentId} has already been consumed (concurrent transaction detected).`);
-        }
-        throw new ApiError(500, `Database error during order persistence: ${orderInsertError.message}`);
-      }
-
-      // Persist order items
       const formattedItems = orderItems.map((item) => ({
         ...item,
         order_id: orderId,
       }));
-      const { error: itemsInsertError } = await adminSupabase.from('order_items').insert(formattedItems);
-      if (itemsInsertError) {
-        // Rollback created parent order to prevent orphan records with missing items
-        try {
-          await adminSupabase.from('orders').delete().eq('id', orderId);
-        } catch (rollbackErr: any) {
-          console.error('[checkout] Failed to rollback parent order after line-items failure:', rollbackErr?.message);
+
+      let persistedAtomically = false;
+
+      // 1. Prefer atomic PostgreSQL transaction via create_order_atomic RPC
+      try {
+        const { data: rpcData, error: rpcError } = await adminSupabase.rpc('create_order_atomic', {
+          p_order: orderPayload,
+          p_items: formattedItems,
+        });
+
+        if (!rpcError && (rpcData as any)?.success) {
+          persistedAtomically = true;
+          if ((rpcData as any)?.order_id) {
+            orderId = (rpcData as any).order_id;
+            firstPartyOrder.id = orderId;
+          }
+        } else if (rpcError) {
+          if (
+            rpcError.code === '23505' ||
+            rpcError.message?.includes('ORDER_CREATION_FAILED_UNIQUE') ||
+            rpcError.message?.toLowerCase().includes('duplicate key')
+          ) {
+            throw new ApiError(409, `PaymentIntent ${paymentIntentId} has already been consumed (concurrent transaction detected).`);
+          }
+          console.warn('[checkout] create_order_atomic RPC unavailable or unapplied, proceeding to hardened compensatory persistence:', rpcError.message);
         }
-        throw new ApiError(500, `Database error during order line items persistence: ${itemsInsertError.message}`);
+      } catch (rpcErr: any) {
+        if (rpcErr instanceof ApiError) throw rpcErr;
+        console.warn('[checkout] create_order_atomic RPC threw; falling back to compensatory persistence:', rpcErr?.message);
+      }
+
+      // 2. Compensatory fallback if atomic RPC was unavailable
+      if (!persistedAtomically) {
+        const { error: orderInsertError } = await adminSupabase.from('orders').insert(orderPayload);
+
+        if (orderInsertError) {
+          if (
+            orderInsertError.code === '23505' ||
+            orderInsertError.message?.toLowerCase().includes('duplicate key') ||
+            orderInsertError.message?.toLowerCase().includes('unique constraint')
+          ) {
+            throw new ApiError(409, `PaymentIntent ${paymentIntentId} has already been consumed (concurrent transaction detected).`);
+          }
+          console.error('[checkout] Order parent write failed. Preserving payment evidence for reconciliation:', {
+            paymentIntentId,
+            orderNumber,
+            error: orderInsertError.message,
+          });
+          throw new ApiError(500, `Database error during order persistence: ${orderInsertError.message}`);
+        }
+
+        const { error: itemsInsertError } = await adminSupabase.from('order_items').insert(formattedItems);
+        if (itemsInsertError) {
+          console.error('[checkout] Order items write failed. Initiating compensatory rollback for parent order:', orderId);
+          let rollbackSucceeded = false;
+          try {
+            const { error: deleteError } = await adminSupabase.from('orders').delete().eq('id', orderId);
+            if (!deleteError) {
+              rollbackSucceeded = true;
+            } else {
+              console.error('[checkout] Compensatory delete returned error:', deleteError.message);
+            }
+          } catch (rollbackErr: any) {
+            console.error('[checkout] Failed to delete parent order during rollback:', rollbackErr?.message);
+          }
+
+          // DUAL FAILURE RECOVERY: If rollback deletion failed, quarantine the orphan parent order
+          // Never erase payment evidence, lock fulfillment, mark failed, and alert reconciliation.
+          if (!rollbackSucceeded) {
+            console.error('[checkout] CRITICAL DUAL FAILURE: Parent order deletion failed. Quarantining order to prevent fulfillment:', orderId);
+            try {
+              await adminSupabase.from('orders').update({
+                status: 'FAILED_PERSISTENCE',
+                payment_status: 'failed',
+                metadata: {
+                  ...orderPayload.metadata,
+                  fulfillment_locked: true,
+                  persistence_failure: true,
+                  line_items_error: itemsInsertError.message,
+                  rollback_failed: true,
+                  reconciliation_required: true,
+                  quarantined_at: new Date().toISOString(),
+                },
+              }).eq('id', orderId);
+            } catch (quarantineErr: any) {
+              console.error('[checkout] CRITICAL: Quarantine update also failed:', quarantineErr?.message);
+            }
+          }
+
+          // Fail-closed: Never dispatch emails, never dispatch McKesson PO, never report success.
+          throw new ApiError(500, `Database error during order line items persistence: ${itemsInsertError.message}`);
+        }
       }
 
       // Only record in-memory order AFTER both order and items are durably persisted

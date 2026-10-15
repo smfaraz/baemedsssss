@@ -14,9 +14,13 @@ import { createClient } from '@supabase/supabase-js';
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || 'https://ifadlrhqsgdxeeebjblo.supabase.co';
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlmYWRscmhxc2dkeGVlZWJqYmxvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc5MDc4Nzg4NiwiZXhwIjoyMTA2MzYzODg2fQ.iqFzLb2dntbQuW4u_LZuxLA9Ki8AcFsRLO7jzUTRBco';
 
-const supabase = createClient(SUPABASE_URL, SERVICE_KEY, {
+export let supabase = createClient(SUPABASE_URL, SERVICE_KEY, {
   auth: { persistSession: false, autoRefreshToken: false }
 });
+
+export const setWebhookSupabase = (client: any) => {
+  supabase = client;
+};
 
 const json = (value: unknown, status = 200, headers?: HeadersInit) => {
   const responseHeaders = new Headers(headers);
@@ -65,7 +69,7 @@ async function handleWebhookWeb(request: Request): Promise<Response> {
         try {
           const { data: order, error: orderErr } = await supabase
             .from('orders')
-            .select('id, total_amount, status, payment_status, payment_intent_id')
+            .select('id, total_amount, status, payment_status, payment_intent_id, metadata')
             .eq('order_number', orderNumber)
             .single();
 
@@ -77,6 +81,35 @@ async function handleWebhookWeb(request: Request): Promise<Response> {
           // Anti-regression: Do not overwrite cancelled or refunded orders
           if (['CANCELLED', 'REFUNDED', 'PARTIALLY_REFUNDED'].includes(order.status)) {
             console.warn(`[Stripe Webhook] Order ${orderNumber} is already in terminal state ${order.status}. Skipping PAID transition.`);
+            break;
+          }
+
+          // Quarantined / Persistence-Failed Order Protection
+          if (order.status === 'FAILED_PERSISTENCE' || order.metadata?.fulfillment_locked) {
+            console.warn(`[Stripe Webhook] Order ${orderNumber} is quarantined (FAILED_PERSISTENCE). Preserving lock and recording payment verification.`);
+            await supabase
+              .from('orders')
+              .update({
+                payment_intent_id: paymentIntent.id,
+                metadata: {
+                  ...(order.metadata || {}),
+                  stripe_webhook_verified: true,
+                  stripe_amount_received: paymentIntent.amount,
+                  reconciliation_required: true,
+                  webhook_received_at: new Date().toISOString(),
+                },
+                updated_at: new Date().toISOString(),
+              })
+              .eq('order_number', orderNumber);
+
+            await supabase.from('audit_logs').insert({
+              action: 'WEBHOOK_PAYMENT_QUARANTINED_ORDER',
+              entity_type: 'ORDER',
+              entity_id: orderNumber,
+              actor_id: 'system_stripe_webhook',
+              details: { paymentIntentId: paymentIntent.id, amount: paymentIntent.amount, reason: 'Persistence failure quarantine preserved' },
+              created_at: new Date().toISOString(),
+            });
             break;
           }
 

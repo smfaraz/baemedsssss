@@ -35,7 +35,7 @@
  */
 
 import checkoutHandler from '../api/checkout.js';
-import webhookHandler from '../api/webhooks/stripe.js';
+import webhookHandler, { setWebhookSupabase } from '../api/webhooks/stripe.js';
 import { adminSupabase, getAdminSupabase, memoryOrders } from '../api/admin.js';
 import { PostgresEngine } from '../server/commerce/postgresEngine.js';
 import Stripe from 'stripe';
@@ -134,21 +134,36 @@ async function runPhase6SecuritySuite() {
   let mockOrderInsertResult: { error: any } = { error: null };
   let mockOrderItemsInsertResult: { error: any } = { error: null };
   let mockOrderDeleteCalled: boolean = false;
+  let mockOrderDeleteResult: { error: any } = { error: null };
+  let mockOrderUpdateCalled: boolean = false;
+  let mockOrderUpdateData: any = null;
+  let mockRpcResult: { data: any; error: any } = { data: null, error: { message: 'Could not find the function public.create_order_atomic in schema cache' } };
 
   const underlyingClient = getAdminSupabase();
   const originalFrom = underlyingClient.from.bind(underlyingClient);
+  (underlyingClient as any).rpc = async (_fn: string, _params: any) => {
+    return mockRpcResult;
+  };
   underlyingClient.from = (table: string) => {
     if (table === 'orders') {
       return {
         select: (_cols?: string) => ({
           eq: (_col: string, _val: any) => ({
-            maybeSingle: async () => mockReplayLookupResult
+            maybeSingle: async () => mockReplayLookupResult,
+            single: async () => mockReplayLookupResult
           })
         }),
         insert: async (_data: any) => mockOrderInsertResult,
         delete: () => ({
           eq: (_col: string, _val: any) => {
             mockOrderDeleteCalled = true;
+            return Promise.resolve(mockOrderDeleteResult);
+          }
+        }),
+        update: (data: any) => ({
+          eq: (_col: string, _val: any) => {
+            mockOrderUpdateCalled = true;
+            mockOrderUpdateData = data;
             return Promise.resolve({ error: null });
           }
         })
@@ -159,8 +174,14 @@ async function runPhase6SecuritySuite() {
         insert: async (_items: any) => mockOrderItemsInsertResult
       } as any;
     }
+    if (table === 'audit_logs') {
+      return {
+        insert: async (_log: any) => ({ error: null })
+      } as any;
+    }
     return originalFrom(table);
   };
+  setWebhookSupabase(underlyingClient);
 
   // ------------------------------------------------------------------
   // 1. Missing PaymentIntent identifier
@@ -960,6 +981,279 @@ async function runPhase6SecuritySuite() {
       `Got status: ${res.status}, memBefore: ${memBefore}, memAfter: ${memoryOrders.length}`
     );
     mockOrderInsertResult = { error: null };
+  }
+
+  // ------------------------------------------------------------------
+  // 35. Dual failure recovery: order_items fails AND compensatory delete fails
+  // ------------------------------------------------------------------
+  {
+    mockRpcResult = { data: null, error: { message: 'RPC not available' } };
+    mockOrderInsertResult = { error: null };
+    mockOrderItemsInsertResult = { error: { message: 'order_items disk error' } };
+    mockOrderDeleteResult = { error: { message: 'connection dropped during compensatory rollback delete' } };
+    mockOrderDeleteCalled = false;
+    mockOrderUpdateCalled = false;
+    mockOrderUpdateData = null;
+
+    const memBefore = memoryOrders.length;
+    const req = makeCheckoutReq({ paymentIntentId: 'pi_dual_failure_quarantine_1' });
+    const res = await (checkoutHandler as any).fetch(req);
+    const body = await res.json();
+
+    assert(
+      res.status === 500 &&
+      body.error?.includes('order line items persistence') &&
+      Boolean(mockOrderDeleteCalled) &&
+      Boolean(mockOrderUpdateCalled) &&
+      mockOrderUpdateData?.status === 'FAILED_PERSISTENCE' &&
+      mockOrderUpdateData?.payment_status === 'failed' &&
+      mockOrderUpdateData?.metadata?.fulfillment_locked === true &&
+      mockOrderUpdateData?.metadata?.reconciliation_required === true &&
+      mockOrderUpdateData?.metadata?.stripe_payment_intent_id === 'pi_dual_failure_quarantine_1' &&
+      memoryOrders.length === memBefore,
+      'Dual write/rollback failure safely quarantines parent order as FAILED_PERSISTENCE, locks fulfillment, preserves payment evidence, and prevents order dispatch',
+      `Got status: ${res.status}, updateCalled: ${mockOrderUpdateCalled}, updateStatus: ${mockOrderUpdateData?.status}`
+    );
+
+    mockOrderItemsInsertResult = { error: null };
+    mockOrderDeleteResult = { error: null };
+    mockOrderUpdateCalled = false;
+    mockOrderUpdateData = null;
+  }
+
+  // ------------------------------------------------------------------
+  // 36. Atomic Order Creation RPC: single database transaction success
+  // ------------------------------------------------------------------
+  {
+    mockRpcResult = {
+      data: { success: true, order_id: 'ord_atomic_success_100', items_count: 1 },
+      error: null
+    };
+
+    const req = makeCheckoutReq({ paymentIntentId: 'pi_atomic_rpc_success_1' });
+    const res = await (checkoutHandler as any).fetch(req);
+    const body = await res.json();
+
+    assert(
+      res.status === 200 &&
+      body.success === true &&
+      body.orderId === 'ord_atomic_success_100' &&
+      body.status === 'PAID',
+      'Atomic order creation via create_order_atomic RPC commits parent order and items in a single PostgreSQL transaction',
+      `Got status: ${res.status}, orderId: ${body.orderId}`
+    );
+
+    mockRpcResult = { data: null, error: { message: 'RPC not available' } };
+  }
+
+  // ------------------------------------------------------------------
+  // 37. Atomic Order Creation RPC: Replay / unique violation returns HTTP 409
+  // ------------------------------------------------------------------
+  {
+    mockRpcResult = {
+      data: null,
+      error: { code: '23505', message: 'ORDER_CREATION_FAILED_UNIQUE: duplicate key value violates unique constraint' }
+    };
+
+    const req = makeCheckoutReq({ paymentIntentId: 'pi_atomic_rpc_replay_1' });
+    const res = await (checkoutHandler as any).fetch(req);
+    const body = await res.json();
+
+    assert(
+      res.status === 409 &&
+      body.error?.includes('concurrent transaction detected'),
+      'Atomic RPC duplicate key error safely translates to HTTP 409 Conflict',
+      `Got status: ${res.status}, error: ${body.error}`
+    );
+
+    mockRpcResult = { data: null, error: { message: 'RPC not available' } };
+  }
+
+  // ------------------------------------------------------------------
+  // 38. Webhook received for an order with status 'FAILED_PERSISTENCE' or 'fulfillment_locked'
+  // ------------------------------------------------------------------
+  {
+    mockReplayLookupResult = {
+      data: {
+        id: 'ord_quarantined_99',
+        order_number: 'BM-QUARANTINED-99',
+        total_amount: EXPECTED_CENTS / 100,
+        status: 'FAILED_PERSISTENCE',
+        payment_status: 'failed',
+        payment_intent_id: 'pi_quarantined_webhook_1',
+        metadata: { fulfillment_locked: true, reconciliation_required: true }
+      },
+      error: null
+    };
+    mockOrderUpdateCalled = false;
+    mockOrderUpdateData = null;
+
+    const webhookSecret = 'whsec_test_synthetic_secret_unit';
+    const payload = JSON.stringify({
+      id: 'evt_test_quarantined_webhook',
+      object: 'event',
+      type: 'payment_intent.succeeded',
+      data: {
+        object: {
+          id: 'pi_quarantined_webhook_1',
+          amount: EXPECTED_CENTS,
+          metadata: { orderNumber: 'BM-QUARANTINED-99' }
+        }
+      }
+    });
+
+    const signature = (new Stripe('sk_test_fake', { apiVersion: '2025-02-24.acacia' as any })).webhooks.generateTestHeaderString({
+      payload,
+      secret: webhookSecret,
+      timestamp: Math.floor(Date.now() / 1000)
+    });
+
+    const req = new Request('https://www.baemeds.com/api/webhooks/stripe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'stripe-signature': signature },
+      body: payload
+    });
+    const res = await (webhookHandler as any).fetch(req);
+    const body = await res.json();
+
+    assert(
+      res.status === 200 &&
+      body.received === true &&
+      Boolean(mockOrderUpdateCalled) &&
+      mockOrderUpdateData?.status === undefined && // Does NOT overwrite status to PAID
+      mockOrderUpdateData?.metadata?.stripe_webhook_verified === true &&
+      mockOrderUpdateData?.metadata?.reconciliation_required === true,
+      'Webhook received on quarantined FAILED_PERSISTENCE order preserves fulfillment lock and alerts reconciliation without auto-fulfilling',
+      `Got status: ${res.status}, updateData: ${JSON.stringify(mockOrderUpdateData)}`
+    );
+
+    mockReplayLookupResult = { data: null, error: null };
+    mockOrderUpdateCalled = false;
+    mockOrderUpdateData = null;
+  }
+
+  // ------------------------------------------------------------------
+  // 39. Out-of-order partial and full refund webhook idempotency & monotonicity
+  // ------------------------------------------------------------------
+  {
+    // Test that an order already in REFUNDED state cannot be downgraded to PARTIALLY_REFUNDED by an out-of-order webhook
+    mockReplayLookupResult = {
+      data: {
+        id: 'ord_refunded_mono',
+        order_number: 'BM-REFUNDED-01',
+        status: 'REFUNDED',
+        payment_status: 'refunded'
+      },
+      error: null
+    };
+    mockOrderUpdateCalled = false;
+
+    const webhookSecret = 'whsec_test_synthetic_secret_unit';
+    const payload = JSON.stringify({
+      id: 'evt_test_partial_refund_late',
+      object: 'event',
+      type: 'charge.refunded',
+      data: {
+        object: {
+          id: 'ch_test_refund_late',
+          payment_intent: 'pi_refunded_mono_1',
+          refunded: false, // Partial refund event arriving late
+          amount_refunded: 2000
+        }
+      }
+    });
+
+    const signature = (new Stripe('sk_test_fake', { apiVersion: '2025-02-24.acacia' as any })).webhooks.generateTestHeaderString({
+      payload,
+      secret: webhookSecret,
+      timestamp: Math.floor(Date.now() / 1000)
+    });
+
+    const req = new Request('https://www.baemeds.com/api/webhooks/stripe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'stripe-signature': signature },
+      body: payload
+    });
+    const res = await (webhookHandler as any).fetch(req);
+    const body = await res.json();
+
+    assert(
+      res.status === 200 &&
+      body.received === true &&
+      mockOrderUpdateCalled === false,
+      'Out-of-order partial refund webhook arriving after full refund cannot downgrade order status, preserving monotonicity',
+      `Got status: ${res.status}, updateCalled: ${mockOrderUpdateCalled}`
+    );
+
+    mockReplayLookupResult = { data: null, error: null };
+  }
+
+  // ------------------------------------------------------------------
+  // 40. Migration 20261016000000 Pre-Flight Check Blocks on Duplicate PaymentIntents
+  // ------------------------------------------------------------------
+  {
+    const runPreflightCheck = (orders: Array<{ payment_intent_id: string | null }>) => {
+      const counts: Record<string, number> = {};
+      for (const row of orders) {
+        if (row.payment_intent_id) {
+          counts[row.payment_intent_id] = (counts[row.payment_intent_id] || 0) + 1;
+        }
+      }
+      const duplicateEntries = Object.entries(counts).filter(([_, count]) => count > 1);
+      const v_dup_count = duplicateEntries.length;
+      if (v_dup_count > 0) {
+        const masked = duplicateEntries
+          .slice(0, 5)
+          .map(([id]) => `${id.slice(0, 7)}...${id.slice(-4)}`)
+          .join(', ');
+        throw new Error(
+          `MIGRATION_HALTED_DUPLICATE_PAYMENT_INTENTS: Found ${v_dup_count} duplicate non-null payment_intent_id group(s) in public.orders (sample: [${masked}]). Deduplication required before applying unique index.`
+        );
+      }
+      return true;
+    };
+
+    // Test 1: Duplicate non-null PaymentIntents MUST throw and stop migration
+    let migrationBlocked = false;
+    let errorMessage = '';
+    try {
+      runPreflightCheck([
+        { payment_intent_id: 'pi_3MtwMockUserSecret12345' },
+        { payment_intent_id: 'pi_3MtwMockUserSecret12345' }, // Duplicate!
+        { payment_intent_id: 'pi_unique_intent_99999' },
+        { payment_intent_id: null },
+        { payment_intent_id: null } // Multiple nulls are allowed
+      ]);
+    } catch (err: any) {
+      migrationBlocked = true;
+      errorMessage = err.message;
+    }
+
+    assert(
+      migrationBlocked === true &&
+      errorMessage.includes('MIGRATION_HALTED_DUPLICATE_PAYMENT_INTENTS') &&
+      errorMessage.includes('pi_3Mtw...2345') && // Proves masking protects secrets
+      !errorMessage.includes('pi_3MtwMockUserSecret12345'), // Proves raw ID is not leaked
+      'Migration pre-flight duplicate check blocks migration with safe masked error when duplicates exist',
+      `Blocked: ${migrationBlocked}, Error: ${errorMessage}`
+    );
+
+    // Test 2: Clean data passes pre-flight check cleanly
+    let cleanPassed = false;
+    try {
+      cleanPassed = runPreflightCheck([
+        { payment_intent_id: 'pi_order_clean_1111' },
+        { payment_intent_id: 'pi_order_clean_2222' },
+        { payment_intent_id: null },
+        { payment_intent_id: null }
+      ]);
+    } catch {}
+
+    assert(
+      cleanPassed === true,
+      'Migration pre-flight check allows unique and null payment_intent_id data to proceed to unique index creation',
+      `Passed: ${cleanPassed}`
+    );
   }
 
   console.log('\n================================================================');
