@@ -1,4 +1,9 @@
-import { APP_NAME, COMPANY_NAME, COMPANY_ADDRESS, CONTACT_PHONE, CONTACT_EMAIL, SITE_URL } from '../constants.tsx';
+export const APP_NAME = "BaeMeds";
+export const COMPANY_NAME = "BaeMeds Healthcare USA LLC";
+export const COMPANY_ADDRESS = "1209 Orange Street, Wilmington, DE 19801";
+export const CONTACT_PHONE = "+1 (800) 555-0199";
+export const CONTACT_EMAIL = "support@baemeds.com";
+export const SITE_URL = "https://www.baemeds.com";
 
 export interface EmailOrderItem {
   product_id: string;

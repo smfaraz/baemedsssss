@@ -76,8 +76,7 @@ export const assertSameOrigin = (request: Request) => {
     throw new ApiError(403, 'The request origin was not accepted.');
   }
 };
-import { adminSupabase } from '../server/adminSupabase';
-import { AdminService, recordFirstPartyOrder } from '../server/adminService';
+import { adminSupabase, AdminService, recordFirstPartyOrder } from './admin';
 import { TaxService, TaxCalculationItem } from '../server/taxService';
 
 const catalogSeed: any[] = [];

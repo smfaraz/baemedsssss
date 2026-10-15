@@ -168,7 +168,11 @@ async function handleWebStandard(request: Request): Promise<Response> {
       if (password.length < 6) {
         return new Response(JSON.stringify({ error: 'Password must be at least 6 characters.' }), { status: 400, headers: corsHeaders });
       }
-      const token = createSessionToken(email);
+      const existing = memoryCustomerAccounts.get(email);
+      if (!existing || existing.password !== password) {
+        return new Response(JSON.stringify({ error: 'Invalid email or password.' }), { status: 401, headers: corsHeaders });
+      }
+      const token = createSessionToken(email, existing.firstName, existing.lastName);
       return new Response(JSON.stringify({ ok: true }), {
         status: 200,
         headers: { ...corsHeaders, 'Set-Cookie': sessionCookie(token) },
@@ -284,7 +288,15 @@ export default async function handler(req: any, res?: any) {
             return res.end(JSON.stringify({ error: 'Password must be at least 6 characters.' }));
           }
         }
-        const token = createSessionToken(email);
+        const existing = memoryCustomerAccounts.get(email);
+        if (!existing || existing.password !== password) {
+          if (res) {
+            res.statusCode = 401;
+            return res.end(JSON.stringify({ error: 'Invalid email or password.' }));
+          }
+          return { error: 'Invalid email or password.' };
+        }
+        const token = createSessionToken(email, existing.firstName, existing.lastName);
         if (res) {
           res.setHeader('Set-Cookie', sessionCookie(token));
           res.statusCode = 200;

@@ -30,7 +30,7 @@ async function processCoupon(code: string, subtotal: number) {
 
   let discounts: any[] = DEFAULT_DISCOUNTS;
   try {
-    const { AdminService } = await import('../server/adminService');
+    const { AdminService } = await import('./admin');
     discounts = await AdminService.getDiscounts('super_admin');
   } catch {
     discounts = DEFAULT_DISCOUNTS;
