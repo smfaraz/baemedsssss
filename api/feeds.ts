@@ -3,10 +3,21 @@
  * Generates standards-compliant Google Merchant Center XML (RSS 2.0 + g: namespace)
  * and Meta Product Catalog CSV feeds for BaeMeds USA Top 100 Hero and DME Products.
  * 
- * Standalone, self-contained serverless module with zero cross-directory imports.
+ * 100% Standalone, self-contained serverless module with zero relative imports.
  */
 
-import { adminSupabase } from './admin';
+if (typeof globalThis !== 'undefined' && !(globalThis as any).WebSocket) {
+  (globalThis as any).WebSocket = class WebSocket {};
+}
+
+import { createClient } from '@supabase/supabase-js';
+
+const SUPABASE_URL = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || 'https://ifadlrhqsgdxeeebjblo.supabase.co';
+const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlmYWRscmhxc2dkeGVlZWJqYmxvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc5MDc4Nzg4NiwiZXhwIjoyMTA2MzYzODg2fQ.iqFzLb2dntbQuW4u_LZuxLA9Ki8AcFsRLO7jzUTRBco';
+
+const supabase = createClient(SUPABASE_URL, SERVICE_KEY, {
+  auth: { persistSession: false, autoRefreshToken: false }
+});
 
 const BASE_URL = 'https://www.baemeds.com';
 const BRAND = 'BaeMeds USA';
@@ -51,7 +62,7 @@ const getGoogleCategory = (cat: string): string => {
 
 async function getFeedProducts(heroesOnly = false) {
   try {
-    let query = adminSupabase
+    let query = supabase
       .from('products')
       .select('*')
       .eq('is_active', true);
@@ -79,7 +90,7 @@ async function handleFeedsRequest(request: Request): Promise<Response> {
   const products = await getFeedProducts(heroesOnly);
 
   // 1. Google Merchant Center XML (RSS 2.0)
-  if (pathname.includes('google') || pathname.endsWith('.xml')) {
+  if (pathname.includes('google') || pathname.endsWith('.xml') || url.searchParams.get('format') === 'google') {
     const itemsXml = products.map((p: any) => {
       const id = p.id;
       const title = escapeXml(p.title);
@@ -141,7 +152,7 @@ async function handleFeedsRequest(request: Request): Promise<Response> {
   }
 
   // 2. Meta (Facebook / Instagram) Catalog CSV Feed
-  if (pathname.includes('meta') || pathname.endsWith('.csv')) {
+  if (pathname.includes('meta') || pathname.endsWith('.csv') || url.searchParams.get('format') === 'meta') {
     const headers = [
       'id',
       'title',

@@ -1,10 +1,21 @@
 /**
  * BaeMeds Customer Account & Address API Gateway
  * Handles /api/account endpoints for customer address book CRUD.
- * Standalone, self-contained serverless module with zero cross-directory imports.
+ * 100% Standalone, self-contained serverless module with zero relative imports.
  */
 
-import { adminSupabase } from './admin';
+if (typeof globalThis !== 'undefined' && !(globalThis as any).WebSocket) {
+  (globalThis as any).WebSocket = class WebSocket {};
+}
+
+import { createClient } from '@supabase/supabase-js';
+
+const SUPABASE_URL = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || 'https://ifadlrhqsgdxeeebjblo.supabase.co';
+const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlmYWRscmhxc2dkeGVlZWJqYmxvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc5MDc4Nzg4NiwiZXhwIjoyMTA2MzYzODg2fQ.iqFzLb2dntbQuW4u_LZuxLA9Ki8AcFsRLO7jzUTRBco';
+
+const supabase = createClient(SUPABASE_URL, SERVICE_KEY, {
+  auth: { persistSession: false, autoRefreshToken: false }
+});
 
 const SESSION_COOKIE = '__Host-baemeds_session';
 
@@ -155,7 +166,7 @@ export default async function handler(req: any, res?: any) {
     // 1. GET Addresses
     if (method === 'GET') {
       try {
-        const { data, error } = await adminSupabase
+        const { data, error } = await supabase
           .from('addresses')
           .select('*')
           .eq('customer_email', email);
@@ -203,7 +214,7 @@ export default async function handler(req: any, res?: any) {
       };
 
       try {
-        await adminSupabase.from('addresses').insert(newAddress);
+        await supabase.from('addresses').insert(newAddress);
       } catch {
         // Fallback to memory
       }
@@ -222,7 +233,7 @@ export default async function handler(req: any, res?: any) {
       }
 
       try {
-        await adminSupabase.from('addresses').delete().eq('id', id);
+        await supabase.from('addresses').delete().eq('id', id);
       } catch {}
 
       const existing = memoryAddresses.get(email) || [];
