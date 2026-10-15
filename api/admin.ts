@@ -4,6 +4,14 @@
  * RBAC authorization, and mutation auditing.
  */
 
+import {
+  AdminService,
+  hasPermission,
+  logAdminAction,
+} from '../server/adminService';
+import type { AdminUser, AdminRole } from '../server/adminService';
+import { adminSupabase } from '../server/adminSupabase';
+
 export class ApiError extends Error {
   status: number;
   constructor(status: number, message: string) {
@@ -69,15 +77,6 @@ export const assertSameOrigin = (request: Request) => {
     throw new ApiError(403, 'The request origin was not accepted.');
   }
 };
-import {
-  AdminService,
-  AdminUser,
-  AdminRole,
-  hasPermission,
-  logAdminAction,
-} from '../server/adminService';
-
-import { adminSupabase } from '../server/adminSupabase';
 
 // Resolve caller identity and role from server-authoritative session
 export const resolveAdminActor = async (request: Request): Promise<AdminUser> => {

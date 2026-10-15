@@ -80,6 +80,8 @@ import { adminSupabase } from '../server/adminSupabase';
 import { AdminService, recordFirstPartyOrder } from '../server/adminService';
 import { TaxService, TaxCalculationItem } from '../server/taxService';
 
+const catalogSeed: any[] = [];
+
 interface CheckoutItem {
   id: string;
   merchandiseId: string;

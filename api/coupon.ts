@@ -32,8 +32,8 @@ async function processCoupon(code: string, subtotal: number) {
   try {
     const { AdminService } = await import('../server/adminService');
     discounts = await AdminService.getDiscounts('super_admin');
-  } catch (err: any) {
-    return { status: 200, data: { debugError: err?.message, code: err?.code, stack: err?.stack } };
+  } catch {
+    discounts = DEFAULT_DISCOUNTS;
   }
 
   const matched = discounts.find((d: any) => d.code === rawCode);
