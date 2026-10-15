@@ -1,3 +1,8 @@
+// Polyfill WebSocket in Node environments (Node < 22) to prevent @supabase/supabase-js crashing on boot
+if (typeof globalThis !== 'undefined' && !(globalThis as any).WebSocket) {
+  (globalThis as any).WebSocket = class WebSocket {};
+}
+
 export class ApiError extends Error {
   status: number;
   constructor(status: number, message: string) {
