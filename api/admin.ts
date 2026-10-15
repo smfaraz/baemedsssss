@@ -57,7 +57,7 @@ export const resolveAdminActor = async (request: Request): Promise<AdminUser> =>
         // Also check admin_users table
         const { data: adminUserRow } = await adminSupabase
           .from('admin_users')
-          .select('id')
+          .select('user_id')
           .eq('user_id', user.id)
           .maybeSingle();
 
@@ -74,6 +74,14 @@ export const resolveAdminActor = async (request: Request): Promise<AdminUser> =>
 
         if (userRole === 'customer') {
           throw new ApiError(403, 'Forbidden: Customer accounts are not permitted to access administrative systems.');
+        }
+
+        // Auto-provision into public.admin_users and user_roles if missing
+        if (!adminUserRow && (userRole === 'super_admin' || userRole === 'support_agent')) {
+          try {
+            await adminSupabase.from('admin_users').upsert({ user_id: user.id });
+            await adminSupabase.from('user_roles').upsert({ user_id: user.id, role: userRole });
+          } catch {}
         }
 
         return {

@@ -1326,6 +1326,12 @@ export const AdminService = {
           throw new Error('Forbidden: Customer accounts cannot access the administrative portal.');
         }
 
+        // Auto-provision into public.admin_users and user_roles table if missing
+        try {
+          await adminSupabase.from('admin_users').upsert({ user_id: supaAuth.user.id });
+          await adminSupabase.from('user_roles').upsert({ user_id: supaAuth.user.id, role });
+        } catch {}
+
         const user: AdminUser = {
           id: supaAuth.user.id,
           email: supaAuth.user.email || email,
