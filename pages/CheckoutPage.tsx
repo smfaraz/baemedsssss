@@ -432,7 +432,7 @@ export const CheckoutPage: React.FC = () => {
           'Origin': window.location.origin,
         },
         body: JSON.stringify({
-          cartId: localStorage.getItem('shopify_cart_id') || 'cart_default',
+          cartId: localStorage.getItem('baemeds_cart_id') || localStorage.getItem('cartId') || 'cart_default',
           email: activeEmail,
           firstName: activeFirstName,
           lastName: activeLastName,

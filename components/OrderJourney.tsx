@@ -14,13 +14,13 @@ const steps = [
   },
   {
     icon: CreditCard,
-    title: 'Complete Shopify checkout',
-    text: 'Enter delivery details once, review shipping and tax, then choose payment.',
+    title: 'Complete secure checkout',
+    text: 'Enter delivery details once, review insured shipping and tax, then choose payment.',
   },
   {
     icon: CheckCircle2,
     title: 'Confirm and track',
-    text: 'Keep the Shopify order number. Tracking appears after the courier is assigned.',
+    text: 'Keep your BaeMeds order number. Tracking appears after the medical courier is assigned.',
   },
 ];
 

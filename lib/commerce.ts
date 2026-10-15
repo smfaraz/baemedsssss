@@ -1,7 +1,7 @@
 /**
  * BaeMeds First-Party Native Commerce Library
- * Replaces Shopify Storefront API with native database/catalog services.
- * Preserves 100% of existing functional contracts and signatures for zero-UI-breakage.
+ * Native high-performance database and commerce catalog services.
+ * Preserves 100% of existing functional contracts and signatures.
  */
 
 import { Product, CartItem } from '../types';
@@ -595,8 +595,13 @@ const setStoredCartItems = (cartId: string, items: Array<{ id: string; merchandi
   } catch {}
 };
 
-export const formatCartResponse = (cartId: string): NativeCart => {
-  const storedItems = getStoredCartItems(cartId);
+export const formatCartResponse = (
+  cartId: string,
+  initialItems?: Array<{ id?: string; merchandiseId: string; quantity: number }>
+): NativeCart => {
+  const storedItems = initialItems && initialItems.length > 0
+    ? initialItems.map((item, idx) => ({ id: item.id || `line_${idx}`, merchandiseId: item.merchandiseId, quantity: item.quantity }))
+    : getStoredCartItems(cartId);
 
   let subtotal = 0;
   const edges = storedItems.map((item) => {
@@ -642,16 +647,16 @@ export const formatCartResponse = (cartId: string): NativeCart => {
   };
 };
 
-export const createShopifyCart = async (): Promise<{ id: string; checkoutUrl: string }> => {
+export const createNativeCart = async (): Promise<{ id: string; checkoutUrl: string }> => {
   const cartId = `cart_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
   if (typeof window !== 'undefined') {
-    localStorage.setItem('shopify_cart_id', cartId);
+    localStorage.setItem('baemeds_cart_id', cartId);
     localStorage.setItem('cartId', cartId);
   }
   return { id: cartId, checkoutUrl: '/checkout' };
 };
 
-export const fetchShopifyCart = async (cartId: string): Promise<NativeCart> => {
+export const fetchNativeCart = async (cartId: string): Promise<NativeCart> => {
   return formatCartResponse(cartId);
 };
 

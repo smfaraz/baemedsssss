@@ -7,7 +7,7 @@ const __dirname = path.dirname(__filename);
 const SITEMAP_PATH = path.resolve(__dirname, '../public/sitemap.xml');
 const SITE_URL = process.env.VITE_SITE_URL || 'https://www.baemeds.com';
 
-async function fetchAllShopifyProducts() {
+async function fetchAllCatalogProducts() {
   const catalogPath = path.resolve(__dirname, '../data/catalog_seed.json');
   if (fs.existsSync(catalogPath)) {
     const raw = fs.readFileSync(catalogPath, 'utf8');
@@ -77,10 +77,10 @@ async function generateCompleteSitemap() {
     "Breast Pumps"
   ];
 
-  // 3. Fetch 100% of products with pagination from Shopify
-  console.log('Fetching full catalogue with images from Shopify Storefront GraphQL API...');
-  const products = await fetchAllShopifyProducts();
-  console.log(`Fetched ${products.length} total products from Shopify.`);
+  // 3. Load 100% of products with metadata from native catalogue
+  console.log('Loading full catalogue with images from native product catalogue...');
+  const products = await fetchAllCatalogProducts();
+  console.log(`Loaded ${products.length} total products from native catalogue.`);
 
   let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
   xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n`;

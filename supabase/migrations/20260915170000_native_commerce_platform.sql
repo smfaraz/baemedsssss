@@ -1,6 +1,6 @@
 -- 20260915170000_native_commerce_platform.sql
 -- BaeMeds USA: First-Party Native Commerce Engine
--- Replaces Shopify Storefront API with PostgreSQL native catalog, cart, and order tables.
+-- PostgreSQL native catalog, cart, and order tables.
 
 -- ==============================================================================
 -- 1. CATALOG ARCHITECTURE

@@ -47,7 +47,7 @@ export const SUPPORT_EMAIL = CONTACT_EMAIL;
 export const LEGAL_ENTITY_NAME = COMPANY_NAME;
 export const STORE_ADDRESS = COMPANY_ADDRESS;
 
-// Product data is fetched from Shopify.
+// Product data is dynamically fetched from native commerce catalog.
 export const PRODUCTS: Product[] = [];
 
 export const CATEGORIES: Category[] = [

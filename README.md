@@ -60,7 +60,7 @@ baemeds-main/
 │   ├── 📁 architecture/   # System blueprints & schema docs
 │   ├── 📁 security/       # HIPAA, RBAC, and security audit reports
 │   ├── 📁 api/            # API specifications
-│   ├── 📁 migration/      # Shopify migration & launch guides
+│   ├── 📁 migration/      # Platform migration & launch guides
 │   └── 📁 testing/        # Test plans & readiness reports
 │
 └── 📁 reports/            # 📊 Client Deliverables, Presentations & HTML Roadmaps

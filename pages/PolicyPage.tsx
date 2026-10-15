@@ -89,8 +89,8 @@ const PrivacyPolicy = () => (
     <Section title="6. Information Sharing & Third-Party Service Providers">
       <p>We share data only as necessary to execute our services with vetted providers under appropriate confidentiality and data protection agreements:</p>
       <ul className="list-disc space-y-2 pl-5 marker:text-medical-primary">
-        <li>Commerce infrastructure (Shopify) for order processing and encrypted customer accounts.</li>
-        <li>PCI-DSS Level 1 payment processors (e.g., Stripe, Shopify Payments, Apple Pay) for card tokenization.</li>
+        <li>Cloud commerce and database infrastructure for order processing and encrypted customer accounts.</li>
+        <li>PCI-DSS Level 1 payment processors (e.g., Stripe, Apple Pay, Google Pay) for card tokenization.</li>
         <li>Shipping carriers (USPS, UPS, FedEx, Medical Freight) to deliver physical packages.</li>
         <li>Sales tax automation services for real-time state and local jurisdiction calculation.</li>
       </ul>
@@ -135,13 +135,13 @@ const ShippingPolicy = () => (
     <header>
       <p className="text-sm font-bold uppercase tracking-[0.16em] text-medical-primary">Order delivery</p>
       <h1 className="mt-2 text-3xl font-bold text-medical-dark sm:text-4xl">Shipping &amp; Delivery</h1>
-      <p className="mt-4 leading-7 text-slate-600">The final available shipping method, charge, and estimated delivery window are shown in Shopify checkout before you place the order.</p>
+      <p className="mt-4 leading-7 text-slate-600">The final available shipping method, charge, and estimated delivery window are shown at checkout before you place the order.</p>
       <p className="mt-3 text-sm font-medium text-slate-500">Last updated: 23 July 2026</p>
     </header>
 
     <Section title="1. Shipping charges">
-      <p>Shipping is not calculated by the Baemeds product page or cart subtotal display. Shopify applies the configured shipping profile at checkout after it has the delivery location and the products and quantities in the cart.</p>
-      <p>A rate can be affected by the configured delivery zone, shipment weight, package requirements, product mix, carrier or fulfilment-app rate, and any free-shipping or order-value rule. The rate shown at checkout is the charge that applies before payment.</p>
+      <p>BaeMeds applies product-based tiered flat shipping ($4.00 standard items & supplies, $11.00 large machines / CPAP / oxygen, $15.00 heavy DME) calculated at checkout based on destination and cart contents.</p>
+      <p>A rate can be affected by the configured delivery tier (Standard Insured Ground, Priority Medical Courier, or White-Glove In-Service delivery) and product mix. The rate shown at checkout is the charge that applies before payment.</p>
     </Section>
 
     <Section title="2. Delivery estimates">
@@ -149,7 +149,7 @@ const ShippingPolicy = () => (
     </Section>
 
     <Section title="3. Order confirmation and tracking">
-      <p>After a successful checkout, Shopify shows the order confirmation and sends the available receipt or notification. When the order is fulfilled and the courier details are recorded, the tracking number and tracking link appear on the Shopify order-status page and in the signed-in Baemeds order history.</p>
+      <p>After a successful checkout, BaeMeds shows the order confirmation and sends the available receipt or notification. When the order is fulfilled and the courier details are recorded, the tracking number and tracking link appear in the signed-in BaeMeds order history.</p>
     </Section>
 
     <Section title="4. Receiving the shipment">
@@ -157,7 +157,7 @@ const ShippingPolicy = () => (
     </Section>
 
     <Section title="5. Delivery help">
-      <p>For serviceability, a delayed shipment, or a tracking problem, contact {CONTACT_EMAIL} or {CONTACT_PHONE} with the Shopify order number. Shipping questions are handled separately from return eligibility, which is covered by the Returns &amp; Refunds policy.</p>
+      <p>For serviceability, a delayed shipment, or a tracking problem, contact {CONTACT_EMAIL} or {CONTACT_PHONE} with your BaeMeds order number. Shipping questions are handled separately from return eligibility, which is covered by the Returns &amp; Refunds policy.</p>
     </Section>
   </>
 );

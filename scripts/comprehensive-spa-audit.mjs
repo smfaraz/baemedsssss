@@ -95,7 +95,7 @@ async function runAudit() {
     // TEST 2: Product Listing /products
     console.log('\n--- 2. Testing Route: /products (Product Listing Page) ---');
     res = await page.goto(BASE_URL + '/products', { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(2500); // Allow Shopify GraphQL fetch
+    await page.waitForTimeout(2500); // Allow catalog hydration and render
     status = res.status();
     title = await page.title();
     console.log(`GET /products -> HTTP ${status}, Title: "${title}"`);

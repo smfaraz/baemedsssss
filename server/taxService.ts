@@ -5,7 +5,7 @@
  * - State, county, and district rates
  * - Category-based exemptions (e.g., Rx durable medical equipment vs taxable accessories)
  * - Hospital / institutional tax-exempt entity validation (EIN / Resale Certificate)
- * - Provider adapter architecture (Shopify Tax, TaxJar, Avalara, or Stripe Tax)
+ * - Provider adapter architecture (TaxJar, Avalara, or Stripe Tax)
  */
 
 import { TaxCalculation } from '../types';

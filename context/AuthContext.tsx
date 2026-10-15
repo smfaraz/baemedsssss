@@ -43,9 +43,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     const initAuth = async () => {
-      // Remove the legacy JavaScript-readable bearer token. New sessions use
+      // Remove any legacy insecure bearer tokens. New sessions use
       // a Secure, HttpOnly cookie issued by the same-origin Vercel function.
-      localStorage.removeItem('shopify_customer_token');
+      localStorage.removeItem('baemeds_customer_token');
       try {
         await refreshCustomer();
       } catch (sessionError) {

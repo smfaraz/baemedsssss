@@ -1,6 +1,6 @@
 /**
  * BaeMeds First-Party Native Commerce Server Core
- * Replaces server/shopify.ts with direct database authentication, address management, and order processing.
+ * Direct database authentication, address management, and order processing.
  */
 
 import type { Customer, Address, Order } from '../types';

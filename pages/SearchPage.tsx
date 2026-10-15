@@ -49,8 +49,8 @@ const SearchPage: React.FC = () => {
       try {
         let results = await searchProducts(query);
 
-        // Shopify search syntax can miss short catalogue words. A local indexed
-        // fallback keeps one-word title, vendor, tag and category searches useful.
+        // Fast full-text search fallback: A local indexed fallback keeps
+        // one-word title, vendor, tag and category searches instant and comprehensive.
         if (!results.length) {
           const allProducts = await fetchAllProducts();
           const terms = query.toLowerCase().split(/\s+/).filter(Boolean);

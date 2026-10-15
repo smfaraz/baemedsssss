@@ -40,7 +40,7 @@ export interface Product {
   eligibleFsaHsa?: boolean;
   isRegulatoryVerified?: boolean;
   weightLbs?: number;
-  // Shopify-grade commerce & McKesson dropshipping fields
+  // Enterprise commerce & McKesson dropshipping fields
   dealerPrice?: number;
   margin?: number;
   wholesaleCost?: number;
@@ -93,7 +93,7 @@ export interface Testimonial {
 
 export interface CartItem extends Product {
   quantity: number;
-  lineItemId?: string; // Shopify specific line item ID
+  lineItemId?: string; // Cart line item ID
 }
 
 export interface Address {

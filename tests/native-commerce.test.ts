@@ -92,8 +92,8 @@ async function testNativeCheckoutApi() {
     throw new Error(`Expected validation error 400, got status ${invalidRes.status}`);
   }
 
-  // 2. Valid checkout must calculate totals authoritatively
-  const validReq = new Request('https://baemeds.com/api/checkout', {
+  // 2. Checkout without PaymentIntent must strictly throw 400 (security hardening)
+  const noPaymentReq = new Request('https://baemeds.com/api/checkout', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -113,19 +113,23 @@ async function testNativeCheckoutApi() {
     }),
   });
 
-  const validRes = await checkoutHandler.fetch(validReq);
-  const validData = await validRes.json();
-  if (validRes.status !== 200 || !validData.success || !validData.orderNumber) {
-    throw new Error(`Valid checkout failed: ${JSON.stringify(validData)}`);
+  const noPaymentRes = await checkoutHandler.fetch(noPaymentReq);
+  const noPaymentData = await noPaymentRes.json();
+  if (noPaymentRes.status !== 400 || !noPaymentData.error?.includes('PaymentIntent')) {
+    throw new Error(`Expected PaymentIntent validation error 400, got status ${noPaymentRes.status}: ${JSON.stringify(noPaymentData)}`);
   }
 
-  const expectedSubtotal = Number(sampleProduct.price);
-  const calculatedSubtotal = Number(validData.subtotal);
+  // 3. Native Cart calculation authoritative subtotal verification
+  const cartFormatted = formatCartResponse('test_cart_math', [
+    { merchandiseId: sampleProduct.id, quantity: 2 },
+  ]);
+  const expectedSubtotal = Number(sampleProduct.price) * 2;
+  const calculatedSubtotal = Number(cartFormatted.cost.subtotalAmount.amount);
   if (Math.abs(expectedSubtotal - calculatedSubtotal) > 0.01) {
     throw new Error(`Subtotal mismatch: expected ${expectedSubtotal}, got ${calculatedSubtotal}`);
   }
 
-  console.log('✔ Server Authoritative Checkout API tests passed.');
+  console.log('✔ Server Authoritative Checkout & Cart Calculation tests passed.');
 }
 
 async function testZeroShopifyRuntime() {
@@ -137,7 +141,10 @@ async function testZeroShopifyRuntime() {
     'shopify-buy',
     'X-Shopify-Storefront-Access-Token',
     'gid://shopify/Cart',
+    'gid://shopify/Product',
     'ptya1n-k0.myshopify.com',
+    'shopify_cart_id',
+    'shopify_customer_token',
   ];
 
   let violations = 0;

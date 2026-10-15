@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { Product, CartItem } from '../types';
 import { 
-  createShopifyCart, 
-  fetchShopifyCart, 
+  createNativeCart, 
+  fetchNativeCart, 
   addItemToCart, 
   removeLineItemFromCart, 
   updateLineItemInCart,
@@ -194,12 +194,12 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [cartId, setCartId] = useState<string | null>(null);
   const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  // Keep the cart in a loading state until the persisted Shopify cart has been hydrated.
+  // Keep the cart in a loading state until the persisted cart has been hydrated.
   // This prevents the empty-cart screen flashing on refresh while the cart request is pending.
   const [isLoading, setIsLoading] = useState(true);
 
   const syncCartWithCustomer = useCallback(async () => {
-     const currentCartId = cartId || localStorage.getItem('shopify_cart_id');
+     const currentCartId = cartId || localStorage.getItem('baemeds_cart_id') || localStorage.getItem('cartId');
      if (!currentCartId) return null;
      
      try {
@@ -226,10 +226,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const initCart = () => {
       setIsLoading(true);
-      let existingCartId = localStorage.getItem('shopify_cart_id') || localStorage.getItem('cartId');
+      let existingCartId = localStorage.getItem('baemeds_cart_id') || localStorage.getItem('cartId');
       if (!existingCartId) {
         existingCartId = `cart_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-        localStorage.setItem('shopify_cart_id', existingCartId);
+        localStorage.setItem('baemeds_cart_id', existingCartId);
         localStorage.setItem('cartId', existingCartId);
       }
       setCartId(existingCartId);
@@ -318,10 +318,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(true);
 
     try {
-      let currentCartId = cartId || localStorage.getItem('shopify_cart_id') || localStorage.getItem('cartId');
+      let currentCartId = cartId || localStorage.getItem('baemeds_cart_id') || localStorage.getItem('cartId');
       if (!currentCartId) {
         currentCartId = `cart_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-        localStorage.setItem('shopify_cart_id', currentCartId);
+        localStorage.setItem('baemeds_cart_id', currentCartId);
         localStorage.setItem('cartId', currentCartId);
         setCartId(currentCartId);
       }
@@ -394,7 +394,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return nextCart;
       });
 
-      const currentCartId = cartId || localStorage.getItem('shopify_cart_id');
+      const currentCartId = cartId || localStorage.getItem('baemeds_cart_id') || localStorage.getItem('cartId');
       if (currentCartId) {
         try {
           await removeLineItemFromCart(currentCartId, [lineItemId]);
@@ -426,7 +426,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return nextCart;
       });
 
-      const currentCartId = cartId || localStorage.getItem('shopify_cart_id');
+      const currentCartId = cartId || localStorage.getItem('baemeds_cart_id') || localStorage.getItem('cartId');
       if (currentCartId) {
         try {
           await updateLineItemInCart(currentCartId, [{ id: lineItemId, quantity }]);
@@ -442,11 +442,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const clearCart = () => {
     setCart([]);
     localStorage.removeItem('baemeds_native_cart');
-    const currentCartId = cartId || localStorage.getItem('shopify_cart_id') || localStorage.getItem('cartId');
+    const currentCartId = cartId || localStorage.getItem('baemeds_cart_id') || localStorage.getItem('cartId');
     if (currentCartId) {
       localStorage.removeItem(`baemeds_cart_${currentCartId}`);
     }
-    localStorage.removeItem('shopify_cart_id');
+    localStorage.removeItem('baemeds_cart_id');
     localStorage.removeItem('cartId');
     setCartId(null);
   };

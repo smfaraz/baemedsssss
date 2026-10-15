@@ -1,61 +1,15 @@
 """
 BaeMeds Google Merchant Center Feed Automated Sync
-Connects directly to Shopify Storefront GraphQL API to fetch all live products,
-working Shopify CDN images, live pricing, and stock status.
-Injects Google Shopping Title Attributes & Official Google Product Categories.
+Loads live products from native product catalogue,
+injects Google Shopping Title Attributes & Official Google Product Categories.
 """
 
-import urllib.request
+import os
 import json
 import re
 import xml.etree.ElementTree as ET
 
-ENDPOINT = "https://ptya1n-k0.myshopify.com/api/2024-07/graphql.json"
-ACCESS_TOKEN = "c1fb47a74eaec2fbafa70becac08f52b"
 STORE_URL = "https://baemeds.com"
-
-query = """
-{
-  products(first: 250) {
-    edges {
-      node {
-        id
-        title
-        handle
-        description
-        productType
-        vendor
-        variants(first: 10) {
-          edges {
-            node {
-              id
-              sku
-              title
-              price {
-                amount
-                currencyCode
-              }
-              compareAtPrice {
-                amount
-                currencyCode
-              }
-              availableForSale
-            }
-          }
-        }
-        images(first: 10) {
-          edges {
-            node {
-              url
-              altText
-            }
-          }
-        }
-      }
-    }
-  }
-}
-"""
 
 def optimize_title_and_category(raw_title, raw_vendor, raw_type):
     t = raw_title.replace('\ufffd', '–').strip()
@@ -322,22 +276,57 @@ def optimize_title_and_category(raw_title, raw_vendor, raw_type):
     return t, p_type, g_cat
 
 def sync():
-    print("[*] Connecting to Shopify API...")
-    req = urllib.request.Request(
-        ENDPOINT,
-        data=json.dumps({"query": query}).encode('utf-8'),
-        headers={
-            'Content-Type': 'application/json',
-            'X-Shopify-Storefront-Access-Token': ACCESS_TOKEN,
-            'Accept': 'application/json'
-        }
-    )
+    catalog_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'catalog_seed.json')
+    print(f"[*] Loading products from native catalog: {catalog_path}...")
+    with open(catalog_path, 'r', encoding='utf-8') as f:
+        catalog_products = json.load(f)
 
-    with urllib.request.urlopen(req) as resp:
-        res = json.loads(resp.read().decode('utf-8'))
-        products_edges = res.get('data', {}).get('products', {}).get('edges', [])
+    print(f"[*] Loaded {len(catalog_products)} live products from native catalog!")
 
-    print(f"[*] Fetched {len(products_edges)} live products from Shopify!")
+    products_edges = []
+    for p in catalog_products:
+        variants_edges = []
+        if p.get('variants'):
+            for v in p['variants']:
+                variants_edges.append({
+                    'node': {
+                        'id': v.get('id', p['id']),
+                        'sku': v.get('sku', p.get('sku', '')),
+                        'title': v.get('title', 'Default'),
+                        'price': {'amount': str(v.get('price', p.get('price', 0))), 'currencyCode': 'USD'},
+                        'compareAtPrice': {'amount': str(v.get('compareAtPrice', ''))} if v.get('compareAtPrice') else None,
+                        'availableForSale': v.get('inStock', True)
+                    }
+                })
+        else:
+            variants_edges.append({
+                'node': {
+                    'id': p['id'],
+                    'sku': p.get('sku', ''),
+                    'title': 'Default',
+                    'price': {'amount': str(p.get('price', 0)), 'currencyCode': 'USD'},
+                    'compareAtPrice': {'amount': str(p.get('compareAtPrice', ''))} if p.get('compareAtPrice') else None,
+                    'availableForSale': p.get('inStock', True)
+                }
+            })
+
+        images_edges = []
+        imgs = p.get('images') or ([p['image']] if p.get('image') else [])
+        for img in imgs:
+            images_edges.append({'node': {'url': img, 'altText': p['title']}})
+
+        products_edges.append({
+            'node': {
+                'id': p['id'],
+                'title': p['title'],
+                'handle': p['handle'],
+                'description': p.get('description', ''),
+                'vendor': p.get('vendor', 'BaeMeds'),
+                'productType': p.get('category', 'Medical Equipment'),
+                'variants': {'edges': variants_edges},
+                'images': {'edges': images_edges}
+            }
+        })
 
     feed_items = []
 

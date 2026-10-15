@@ -19,7 +19,7 @@ export const INITIAL_SEED_REVIEWS: ProductReview[] = [
   // 1. RGB Infrared Thermometer (10000006840565)
   {
     id: 'rev_rgb_1',
-    productId: 'gid://shopify/Product/10000006840565',
+    productId: 'prd-10000006840565',
     productHandle: 'rgb-infrared-thermometer-ith-in-01li',
     author: 'Dr. Ramesh K.',
     email: 'ramesh.clinic@gmail.com',
@@ -37,7 +37,7 @@ export const INITIAL_SEED_REVIEWS: ProductReview[] = [
   },
   {
     id: 'rev_rgb_2',
-    productId: 'gid://shopify/Product/10000006840565',
+    productId: 'prd-10000006840565',
     productHandle: 'rgb-infrared-thermometer-ith-in-01li',
     author: 'Priya Sundaram',
     email: 'priya.s@yahoo.com',
@@ -55,7 +55,7 @@ export const INITIAL_SEED_REVIEWS: ProductReview[] = [
   // 2. Swan Otoscope SW2700 (10000006906101)
   {
     id: 'rev_swan_oto_1',
-    productId: 'gid://shopify/Product/10000006906101',
+    productId: 'prd-10000006906101',
     productHandle: 'swan-otoscope-sw2700',
     author: 'Dr. Anita Varma',
     email: 'anita.ent@healthcarepartners.org',
@@ -75,7 +75,7 @@ export const INITIAL_SEED_REVIEWS: ProductReview[] = [
   // 3. Perfecxa Infra-Red Thermometer VHS-0100 (10000007004405)
   {
     id: 'rev_perfecxa_1',
-    productId: 'gid://shopify/Product/10000007004405',
+    productId: 'prd-10000007004405',
     productHandle: 'perfecxa-infrared-thermometer-vhs0100',
     author: 'Sister Mary D.',
     email: 'sister.mary@stjudehealth.org',
@@ -95,7 +95,7 @@ export const INITIAL_SEED_REVIEWS: ProductReview[] = [
   // 4. Suvarna Arrow Analog Scale (10000007037173)
   {
     id: 'rev_suvarna_arrow_1',
-    productId: 'gid://shopify/Product/10000007037173',
+    productId: 'prd-10000007037173',
     productHandle: 'suvarna-arrow-body-weight-scale-br9011',
     author: 'Mohammed Farooq',
     email: 'm.farooq@outlook.com',
@@ -113,7 +113,7 @@ export const INITIAL_SEED_REVIEWS: ProductReview[] = [
   // 5. EZ-Life Digital Scale EZ 023 (10000007069941)
   {
     id: 'rev_ezlife_023_1',
-    productId: 'gid://shopify/Product/10000007069941',
+    productId: 'prd-10000007069941',
     productHandle: 'ez-life-personal-digital-weighing-scale-ez023',
     author: 'Sandeep Reddy',
     email: 'sandeep.physio@gmail.com',
@@ -133,7 +133,7 @@ export const INITIAL_SEED_REVIEWS: ProductReview[] = [
   // 6. Swan's Doctor Aneroid Sphygmomanometer (10000007168245)
   {
     id: 'rev_swan_aneroid_1',
-    productId: 'gid://shopify/Product/10000007168245',
+    productId: 'prd-10000007168245',
     productHandle: 'swans-doctor-aneroid-sphygmomanometer',
     author: 'Dr. K. Venkat Rao',
     email: 'venkat.rao.doc@gmail.com',
@@ -153,7 +153,7 @@ export const INITIAL_SEED_REVIEWS: ProductReview[] = [
   // 7. RainbowMMed ECG Electrode Bulb Set of 6 (10000007201013)
   {
     id: 'rev_ecg_bulb_1',
-    productId: 'gid://shopify/Product/10000007201013',
+    productId: 'prd-10000007201013',
     productHandle: 'rainbowmmed-ecg-electrode-bulb-set-6',
     author: 'Rajesh Kumar',
     email: 'rajesh.diagnostics@yahoo.com',
@@ -173,7 +173,7 @@ export const INITIAL_SEED_REVIEWS: ProductReview[] = [
   // 8. Longlife Mercurial Sphygmomanometer MBP-25 (10000007233781)
   {
     id: 'rev_longlife_mbp25_1',
-    productId: 'gid://shopify/Product/10000007233781',
+    productId: 'prd-10000007233781',
     productHandle: 'longlife-mercurial-sphygmomanometer-mbp25',
     author: 'Dr. Sudhir Prasad',
     email: 'sudhir.cardio@carehospitals.com',
@@ -193,7 +193,7 @@ export const INITIAL_SEED_REVIEWS: ProductReview[] = [
   // 9. Long Life Palm Aneroid Sphygmomanometer (10000007299317)
   {
     id: 'rev_longlife_palm_1',
-    productId: 'gid://shopify/Product/10000007299317',
+    productId: 'prd-10000007299317',
     productHandle: 'longlife-palm-aneroid-sphygmomanometer',
     author: 'Sister Hemalatha',
     email: 'hema.icu@yashodahospitals.org',
@@ -211,7 +211,7 @@ export const INITIAL_SEED_REVIEWS: ProductReview[] = [
   // 10. Diamond Mercurial BP Monitor Regular (10000007364853)
   {
     id: 'rev_diamond_regular_1',
-    productId: 'gid://shopify/Product/10000007364853',
+    productId: 'prd-10000007364853',
     productHandle: 'diamond-mercurial-bp-monitor-regular',
     author: 'Dr. M. G. Naidu',
     email: 'mgnaidu.clinic@gmail.com',
@@ -231,7 +231,7 @@ export const INITIAL_SEED_REVIEWS: ProductReview[] = [
   // 11. Diamond BPMR120 Deluxe Mercurial BP Monitor (10000007430389)
   {
     id: 'rev_diamond_deluxe_1',
-    productId: 'gid://shopify/Product/10000007430389',
+    productId: 'prd-10000007430389',
     productHandle: 'diamond-bpmr120-deluxe-mercurial-bp-monitor',
     author: 'Dr. Shailaja B.',
     email: 'shailaja.med@memorialhealth.org',
@@ -249,7 +249,7 @@ export const INITIAL_SEED_REVIEWS: ProductReview[] = [
   // 12. AccuSure Digital Scale SF B-18 (10000007463157)
   {
     id: 'rev_accusure_scale_1',
-    productId: 'gid://shopify/Product/10000007463157',
+    productId: 'prd-10000007463157',
     productHandle: 'accusure-digital-weighing-scale-sf-b18',
     author: 'Ananya Joshi',
     email: 'ananya.joshi@gmail.com',
@@ -267,7 +267,7 @@ export const INITIAL_SEED_REVIEWS: ProductReview[] = [
   // 13. SUVARNA Galaxy Mechanical Scale (10000007528693)
   {
     id: 'rev_suvarna_galaxy_1',
-    productId: 'gid://shopify/Product/10000007528693',
+    productId: 'prd-10000007528693',
     productHandle: 'suvarna-galaxy-mechanical-weighing-scale',
     author: 'Dr. Vijay Chary',
     email: 'vijay.chary.pt@gmail.com',
@@ -287,7 +287,7 @@ export const INITIAL_SEED_REVIEWS: ProductReview[] = [
   // 14. AccuSure Simple Blood Glucose Test Strip 50 (10000007561461)
   {
     id: 'rev_accusure_strips_1',
-    productId: 'gid://shopify/Product/10000007561461',
+    productId: 'prd-10000007561461',
     productHandle: 'accusure-simple-blood-glucose-test-strip-50',
     author: 'Venkata Ramana',
     email: 'v.ramana@rediffmail.com',
@@ -305,7 +305,7 @@ export const INITIAL_SEED_REVIEWS: ProductReview[] = [
   // 15. Dr. Morepen GlucoOne BG-03 with 50 Strips (10000007594229)
   {
     id: 'rev_morepen_gluco_1',
-    productId: 'gid://shopify/Product/10000007594229',
+    productId: 'prd-10000007594229',
     productHandle: 'dr-morepen-glucoone-bg-03',
     author: 'Suresh Babu',
     email: 'suresh.babu62@gmail.com',
@@ -323,7 +323,7 @@ export const INITIAL_SEED_REVIEWS: ProductReview[] = [
   },
   {
     id: 'rev_morepen_gluco_2',
-    productId: 'gid://shopify/Product/10000007594229',
+    productId: 'prd-10000007594229',
     productHandle: 'dr-morepen-glucoone-bg-03',
     author: 'Dr. P. Archana',
     email: 'archana.endo@gmail.com',
@@ -341,7 +341,7 @@ export const INITIAL_SEED_REVIEWS: ProductReview[] = [
   // 16. Swan Ophthalmoscope SW-4700 (10000007626997)
   {
     id: 'rev_swan_ophthalmo_1',
-    productId: 'gid://shopify/Product/10000007626997',
+    productId: 'prd-10000007626997',
     productHandle: 'swan-ophthalmoscope-sw-4700',
     author: 'Dr. Gautam Reddy',
     email: 'gautam.ophthal@gmail.com',
@@ -361,7 +361,7 @@ export const INITIAL_SEED_REVIEWS: ProductReview[] = [
   // 17. Accu-Chek Instant Glucometer Strip 50 (10000007692533)
   {
     id: 'rev_accuchek_instant_1',
-    productId: 'gid://shopify/Product/10000007692533',
+    productId: 'prd-10000007692533',
     productHandle: 'accu-chek-instant-glucometer-strip-50',
     author: 'Harish V.',
     email: 'harish.kondapur@gmail.com',
@@ -381,7 +381,7 @@ export const INITIAL_SEED_REVIEWS: ProductReview[] = [
   // 18. Ez-Life Digital Bathroom Scale EZ046 (10000007725301)
   {
     id: 'rev_ezlife_046_1',
-    productId: 'gid://shopify/Product/10000007725301',
+    productId: 'prd-10000007725301',
     productHandle: 'ez-life-digital-bathroom-scale-ez046',
     author: 'Deepika M.',
     email: 'deepika.dietitian@gmail.com',
@@ -399,7 +399,7 @@ export const INITIAL_SEED_REVIEWS: ProductReview[] = [
   // 19. Dr Trust USA Wedge Orthopaedic Pillow 3201 (10000007758069)
   {
     id: 'rev_drtrust_pillow_1',
-    productId: 'gid://shopify/Product/10000007758069',
+    productId: 'prd-10000007758069',
     productHandle: 'dr-trust-wedge-orthopaedic-pillow-3201',
     author: 'Satyanarayana Murthy',
     email: 's.murthy@outlook.com',
@@ -419,7 +419,7 @@ export const INITIAL_SEED_REVIEWS: ProductReview[] = [
   // 20. CANTA Oxygen Concentrator 5L V5WNS (10000007790837)
   {
     id: 'rev_canta_oxy_1',
-    productId: 'gid://shopify/Product/10000007790837',
+    productId: 'prd-10000007790837',
     productHandle: 'canta-oxyzen-concentrator-5-liter-v5wns-fda-certified',
     author: 'Dr. Vivek N.',
     email: 'vivek.pulmo@carehospitals.com',
@@ -438,7 +438,7 @@ export const INITIAL_SEED_REVIEWS: ProductReview[] = [
   },
   {
     id: 'rev_canta_oxy_2',
-    productId: 'gid://shopify/Product/10000007790837',
+    productId: 'prd-10000007790837',
     productHandle: 'canta-oxyzen-concentrator-5-liter-v5wns-fda-certified',
     author: 'Lakshmi Narayana',
     email: 'lnarayana.ameerpet@gmail.com',
@@ -458,7 +458,7 @@ export const INITIAL_SEED_REVIEWS: ProductReview[] = [
   // 21. TYNOR R.O.M. Knee Brace 18" (10000007823605)
   {
     id: 'rev_tynor_rom_1',
-    productId: 'gid://shopify/Product/10000007823605',
+    productId: 'prd-10000007823605',
     productHandle: 'tynor-r-o-m-knee-brace-18-46cm-adjustable-range-of-motion-knee-support-black-universal-size',
     author: 'Dr. Ashwin Kumar',
     email: 'ashwin.ortho@sunshine.org',
@@ -476,7 +476,7 @@ export const INITIAL_SEED_REVIEWS: ProductReview[] = [
   },
   {
     id: 'rev_tynor_rom_2',
-    productId: 'gid://shopify/Product/10000007823605',
+    productId: 'prd-10000007823605',
     productHandle: 'tynor-r-o-m-knee-brace-18-46cm-adjustable-range-of-motion-knee-support-black-universal-size',
     author: 'Rohan Gupta',
     email: 'rohan.football@gmail.com',
@@ -494,7 +494,7 @@ export const INITIAL_SEED_REVIEWS: ProductReview[] = [
   // 22. Tynor Knee Cap Air (Pair) (10000007856373)
   {
     id: 'rev_tynor_cap_1',
-    productId: 'gid://shopify/Product/10000007856373',
+    productId: 'prd-10000007856373',
     productHandle: 'tynor-knee-cap-air-for-men-women-support-pain-relief-during-sports-gym-running-beige-1-pair',
     author: 'Meenakshi S.',
     email: 'meenakshi.s@gmail.com',
@@ -512,7 +512,7 @@ export const INITIAL_SEED_REVIEWS: ProductReview[] = [
   // 23. TYNOR Knee Immobiliser 14" (10000007889141)
   {
     id: 'rev_tynor_immob_1',
-    productId: 'gid://shopify/Product/10000007889141',
+    productId: 'prd-10000007889141',
     productHandle: 'tynor-knee-immobiliser-14-36cm-support-protection-for-knee-injury-pain-relief-green-medium',
     author: 'Dr. Farhan Ali',
     email: 'farhan.sportsmed@gmail.com',
@@ -532,7 +532,7 @@ export const INITIAL_SEED_REVIEWS: ProductReview[] = [
   // 24. TYNOR Elastic Shoulder Immobiliser (10000007921909)
   {
     id: 'rev_tynor_shoulder_1',
-    productId: 'gid://shopify/Product/10000007921909',
+    productId: 'prd-10000007921909',
     productHandle: 'tynor-elastic-shoulder-immobiliser-injury-recovery-support-adjustable-sling-for-pain-relief-grey-large',
     author: 'Vikramaditya T.',
     email: 'vikram.t@yahoo.com',
@@ -550,7 +550,7 @@ export const INITIAL_SEED_REVIEWS: ProductReview[] = [
   // 25. TYNOR Pouch Arm Sling Baggy (10000007954677)
   {
     id: 'rev_tynor_sling_1',
-    productId: 'gid://shopify/Product/10000007954677',
+    productId: 'prd-10000007954677',
     productHandle: 'tynor-pouch-arm-sling-baggy-lightweight-breathable-arm-support-for-injury-recovery-shoulder-dislocation-grey-medium',
     author: 'Sunita Rao',
     email: 'sunita.rao@gmail.com',
