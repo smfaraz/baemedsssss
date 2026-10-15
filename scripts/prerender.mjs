@@ -97,9 +97,9 @@ async function prerender() {
   const routesToPrerender = [
     '/',
     '/products',
+    '/cart',
+    '/checkout',
     '/about',
-
-
     '/contact',
     '/bulk-orders',
     '/policies/privacy',
@@ -128,7 +128,7 @@ async function prerender() {
         let html = await page.content();
         
         // Ensure accurate per-route canonical and OpenGraph URL
-        const canonicalUrl = `https://baemeds.com${route === '/' ? '/' : (route.startsWith('/') ? route : '/' + route)}`;
+        const canonicalUrl = `https://www.baemeds.com${route === '/' ? '/' : (route.startsWith('/') ? route : '/' + route)}`;
         html = html.replace(/<link rel="canonical"[^>]*>/i, `<link rel="canonical" href="${canonicalUrl}" />`);
         html = html.replace(/<meta property="og:url"[^>]*>/i, `<meta property="og:url" content="${canonicalUrl}" />`);
         
