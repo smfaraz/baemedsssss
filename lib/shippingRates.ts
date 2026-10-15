@@ -2,9 +2,9 @@
  * BaeMeds USA Tiered Product-Based Flat Shipping Engine
  *
  * Implements authoritative product-based minimum flat shipping calculations:
- * - Heavy DME (Wheelchairs, Hospital Beds, Patient Lifts): $45.00 minimum
- * - Large Machines (CPAP / BiPAP, Oxygen Concentrators, Patient Monitors, Suction): $25.00 minimum
- * - Standard Items / Supplies / Consumables / Accessories: $12.00 minimum
+ * - Heavy DME (Wheelchairs, Hospital Beds, Patient Lifts): $15.00 minimum
+ * - Large Machines (CPAP / BiPAP, Oxygen Concentrators, Patient Monitors, Suction): $11.00 minimum
+ * - Standard Items / Supplies / Consumables / Accessories: $4.00 minimum
  *
  * Invariant: Zero free shipping. All orders enforce product-based flat rate minimums.
  * Safe for client-side and server-side execution with zero external dependencies.
@@ -22,9 +22,9 @@ export interface ShippingProductItem {
 }
 
 export const FLAT_SHIPPING_RATES = {
-  HEAVY_DME_MINIMUM: 45.0,
-  LARGE_MACHINE_MINIMUM: 25.0,
-  STANDARD_ITEM_MINIMUM: 12.0,
+  HEAVY_DME_MINIMUM: 15.0,
+  LARGE_MACHINE_MINIMUM: 11.0,
+  STANDARD_ITEM_MINIMUM: 4.0,
 } as const;
 
 /**

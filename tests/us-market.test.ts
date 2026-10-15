@@ -144,8 +144,8 @@ function testShippingService() {
 
   // Product-based flat minimum shipping on large machines (Zero free shipping, even over $99)
   const groundOption = options.find(o => o.id === 'standard-ground');
-  if (!groundOption || groundOption.price !== 25.00) {
-    throw new Error(`Expected $25.00 flat minimum ground shipping for Oxygen Concentrator, got ${groundOption?.price}`);
+  if (!groundOption || groundOption.price !== 11.00) {
+    throw new Error(`Expected $11.00 flat minimum ground shipping for Oxygen Concentrator, got ${groundOption?.price}`);
   }
 
   // Tracking URL tests

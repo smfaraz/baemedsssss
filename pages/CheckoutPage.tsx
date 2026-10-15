@@ -200,8 +200,8 @@ export const CheckoutPage: React.FC = () => {
 
   const shippingCost = shippingInfo.shippingCost;
   const standardTierCost = shippingInfo.baseStandardRate;
-  const priorityTierCost = standardTierCost === 12.0 ? 25.0 : standardTierCost + 15.0;
-  const whiteGloveTierCost = standardTierCost === 45.0 ? 115.0 : 95.0;
+  const priorityTierCost = standardTierCost === 4.0 ? 25.0 : standardTierCost + 15.0;
+  const whiteGloveTierCost = standardTierCost === 15.0 ? 115.0 : 95.0;
 
   const discountAmount = appliedCoupon ? appliedCoupon.discountAmount : 0;
   const discountedSubtotal = Math.max(0, cartTotal - discountAmount);

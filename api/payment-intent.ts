@@ -121,18 +121,18 @@ async function calculateAuthoritativeTotalInCents(body: PaymentIntentBody): Prom
       }
 
       // Server-calculated tiered flat shipping (Zero Free Delivery)
-      let baseStandard = 12.0;
+      let baseStandard = 4.0;
       if (hasHeavyDme) {
-        baseStandard = 45.0;
+        baseStandard = 15.0;
       } else if (hasLargeMachine) {
-        baseStandard = 25.0;
+        baseStandard = 11.0;
       }
 
       let shipping = baseStandard;
       if (body.shippingTier === 'priority') {
-        shipping = baseStandard === 12.0 ? 25.0 : baseStandard + 15.0;
+        shipping = baseStandard === 4.0 ? 25.0 : baseStandard + 15.0;
       } else if (body.shippingTier === 'white_glove') {
-        shipping = baseStandard === 45.0 ? 115.0 : 95.0;
+        shipping = baseStandard === 15.0 ? 115.0 : 95.0;
       }
 
       // Apply server-validated discount and tax

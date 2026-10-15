@@ -875,7 +875,7 @@ async function handleCheckoutWeb(request: Request): Promise<Response> {
       }
 
       // Server-authoritative product-based tiered flat shipping (Zero Free Delivery)
-      let baseStandardShipping = 12.0; // Standard items & supplies baseline
+      let baseStandardShipping = 4.0; // Standard items & supplies baseline
 
       const hasHeavyDme = taxCalculationItems.some((item) => {
         const cat = (item.category || '').toLowerCase();
@@ -919,19 +919,19 @@ async function handleCheckoutWeb(request: Request): Promise<Response> {
       });
 
       if (hasHeavyDme) {
-        baseStandardShipping = 45.0;
+        baseStandardShipping = 15.0;
       } else if (hasLargeMachine) {
-        baseStandardShipping = 25.0;
+        baseStandardShipping = 11.0;
       }
 
       let shippingAmount = baseStandardShipping;
       let shippingMethod = `Standard Insured Ground ($${baseStandardShipping.toFixed(2)} Flat)`;
 
       if (body.shippingTier === 'priority') {
-        shippingAmount = baseStandardShipping === 12.0 ? 25.0 : baseStandardShipping + 15.0;
+        shippingAmount = baseStandardShipping === 4.0 ? 25.0 : baseStandardShipping + 15.0;
         shippingMethod = 'Priority Medical Courier (1-2 Business Days)';
       } else if (body.shippingTier === 'white_glove') {
-        shippingAmount = baseStandardShipping === 45.0 ? 115.0 : 95.0;
+        shippingAmount = baseStandardShipping === 15.0 ? 115.0 : 95.0;
         shippingMethod = 'White-Glove DME Delivery & Clinical In-Service';
       }
 
